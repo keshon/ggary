@@ -82,9 +82,7 @@
 
   <button bind:this={triggerEl} {...api.triggerProps}>
     <span {...api.valueProps}>{api.displayText}</span>
-    <svg {...api.indicatorProps} width="14" height="14" viewBox="0 0 16 16" fill="none">
-      <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
+    <span {...api.indicatorProps}></span>
   </button>
 
   <div bind:this={positionerEl} {...api.positionerProps}>
@@ -95,9 +93,7 @@
       {#each api.items as item, index (item.value)}
         <li {...api.getItemProps(item, index)}>
           <span {...api.getItemTextProps()}>{item.label}</span>
-          <svg {...api.getItemIndicatorProps()} width="14" height="14" viewBox="0 0 16 16" fill="none">
-            <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
+          <span {...api.getItemIndicatorProps()}></span>
         </li>
       {/each}
     </ul>

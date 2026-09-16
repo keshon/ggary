@@ -4,9 +4,17 @@
   "private": true,
   "type": "module",
   "description": "Instrument's design language ported onto the ggary spine",
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": "./src/index.css"
   },
-  "dependencies": { "@ggary/structure": "*" }
+  "dependencies": {
+    "@ggary/structure": "*",
+    "@ggary/icons": "*"
+  },
+  "scripts": {
+    "build": "node build-icons.mjs"
+  }
 }

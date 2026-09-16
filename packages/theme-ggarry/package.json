@@ -3,12 +3,22 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "sideEffects": ["*.css"],
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": "./src/index.css",
-    "./tokens": { "types": "./dist/index.ts", "default": "./dist/index.ts" },
+    "./tokens": {
+      "types": "./dist/index.ts",
+      "default": "./dist/index.ts"
+    },
     "./tokens.css": "./dist/tokens.css"
   },
-  "dependencies": { "@ggary/structure": "*" },
-  "scripts": { "build": "node build.mjs" }
+  "dependencies": {
+    "@ggary/structure": "*",
+    "@ggary/icons": "*"
+  },
+  "scripts": {
+    "build": "node build.mjs"
+  }
 }

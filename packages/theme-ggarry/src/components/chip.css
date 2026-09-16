@@ -102,6 +102,11 @@ button[data-scope='chip'][data-part='root']:hover:not([data-disabled]) {
   cursor: not-allowed;
 }
 
+[data-scope='chip'][data-part='remove-icon'] {
+  inline-size: 10px;
+  block-size: 10px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-scope='chip'][data-part='root'],
   [data-scope='chip'][data-part='remove'] { transition: none; }

@@ -1,5 +1,5 @@
 import type { Dict, Normalizer } from '../../types'
-import { chipAttrs, chipRemoveAttrs } from '../chip/chip.connect'
+import { chipAttrs, chipRemoveAttrs, chipRemoveIconAttrs } from '../chip/chip.connect'
 import type { ChipEmphasis, ChipSize } from '../chip/chip.types'
 import { chipGroupAnatomy } from './chip-group.anatomy'
 import type { ChipGroupEvent, ChipGroupState, ChipItem } from './chip-group.types'
@@ -138,6 +138,8 @@ export function connect<T = Dict>(
           state.disabled || item.disabled ? undefined : () => send({ type: 'REMOVE', index })
         )
       ),
+
+    getChipRemoveIconProps: () => normalize(chipRemoveIconAttrs()),
 
     emptyProps: normalize({ ...chipGroupAnatomy.attrs('empty') }),
 

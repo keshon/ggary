@@ -49,25 +49,3 @@ export function h<K extends keyof HTMLElementTagNameMap>(
   if (children) element.append(...children)
   return element
 }
-
-const SVG_NS = 'http://www.w3.org/2000/svg'
-
-export function icon(path: string, props?: DomProps): SVGElement {
-  const svg = document.createElementNS(SVG_NS, 'svg')
-  svg.setAttribute('width', '14')
-  svg.setAttribute('height', '14')
-  svg.setAttribute('viewBox', '0 0 16 16')
-  svg.setAttribute('fill', 'none')
-  const d = document.createElementNS(SVG_NS, 'path')
-  d.setAttribute('d', path)
-  d.setAttribute('stroke', 'currentColor')
-  d.setAttribute('stroke-width', '1.75')
-  d.setAttribute('stroke-linecap', 'round')
-  d.setAttribute('stroke-linejoin', 'round')
-  svg.append(d)
-  if (props) spread(svg, props)
-  return svg
-}
-
-export const CHEVRON = 'M4 6l4 4 4-4'
-export const CHECK = 'M3.5 8.5l3 3 6-7'

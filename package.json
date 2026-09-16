@@ -7,13 +7,14 @@
     "apps/*"
   ],
   "scripts": {
-    "tokens": "node packages/theme-ggarry/build.mjs",
-    "dev": "npm run tokens && npm run dev -w @ggary/sandbox",
-    "test": "npm run tokens && vitest run",
+    "assets": "node packages/icons/build.mjs && node packages/theme-ggarry/build.mjs && node packages/theme-instrument/build-icons.mjs",
+    "dev": "npm run assets && npm run dev -w @ggary/sandbox",
+    "test": "npm run assets && vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "npm run assets && tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
+    "@types/node": "^24.13.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "jsdom": "^26.0.0",

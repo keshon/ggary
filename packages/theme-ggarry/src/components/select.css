@@ -57,7 +57,8 @@
 }
 
 [data-scope='select'][data-part='indicator'] {
-  flex: none;
+  inline-size: 14px;
+  block-size: 14px;
   color: var(--ggarry-text-muted);
   transition: transform var(--ggarry-duration-fast) ease;
 }
@@ -102,7 +103,8 @@
 }
 
 [data-scope='select'][data-part='item-indicator'] {
-  flex: none;
+  inline-size: 14px;
+  block-size: 14px;
   opacity: 0;
 }
 [data-scope='select'][data-part='item'][data-selected] [data-part='item-indicator'] {

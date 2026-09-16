@@ -13,7 +13,7 @@
     "skipLibCheck": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
-    "types": ["vitest/globals", "vite/client"]
+    "types": ["vitest/globals", "vite/client", "node"]
   },
   "include": ["packages/*/src/**/*", "tests/**/*", "apps/*/src/**/*"]
 }

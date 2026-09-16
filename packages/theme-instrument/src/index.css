@@ -29,6 +29,10 @@
 @import './tokens/roles.css' layer(gg.tokens);
 @import './tokens/density.css' layer(gg.tokens);
 @import './tokens/scale.css' layer(gg.tokens);
+/* The base glyph set, then Instrument's own drawings of the same names: same
+   layer, later declaration wins. */
+@import '@ggary/icons/icons.css' layer(gg.tokens);
+@import '../dist/icons.css' layer(gg.tokens);
 @import './contract.css' layer(gg.tokens);
 
 @import '@ggary/structure' layer(gg.structure);

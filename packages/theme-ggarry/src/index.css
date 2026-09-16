@@ -14,6 +14,7 @@
 @layer gg.tokens, gg.structure, gg.base, gg.components, gg.forced, gg.motion;
 
 @import '../dist/tokens.css' layer(gg.tokens);
+@import '@ggary/icons/icons.css' layer(gg.tokens);
 @import './contract.css' layer(gg.tokens);
 
 @import '@ggary/structure' layer(gg.structure);

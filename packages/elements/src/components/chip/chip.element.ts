@@ -1,8 +1,6 @@
 import { connect, type ChipEmphasis, type ChipSize } from '@ggary/core/chip'
 import { domNormalizer } from '@ggary/core'
-import { spread } from '../../spread'
-
-export const REMOVE_ICON = 'M1.5 1.5l7 7M8.5 1.5l-7 7'
+import { h, spread } from '../../spread'
 
 /**
  * Enhancement, like <gg-button>:
@@ -59,14 +57,16 @@ export class GgChipElement extends HTMLElement {
     spread(host, api.labelProps)
 
     if (removable && !this.#remove) {
-      this.#remove = document.createElement('span')
-      this.#remove.innerHTML = `<svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="${REMOVE_ICON}" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`
+      this.#remove = h('span', undefined, [h('span')])
       this.append(this.#remove)
     } else if (!removable && this.#remove) {
       this.#remove.remove()
       this.#remove = null
     }
-    if (this.#remove) spread(this.#remove, api.removeProps)
+    if (this.#remove) {
+      spread(this.#remove, api.removeProps)
+      spread(this.#remove.firstElementChild!, api.removeIconProps)
+    }
   }
 }
 

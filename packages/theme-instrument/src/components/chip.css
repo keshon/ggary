@@ -90,8 +90,13 @@ button[data-scope='chip'][data-part='root'] {
   }
 
   &:hover { color: var(--text-primary); }
+}
 
-  & > svg { inline-size: 100%; block-size: 100%; }
+/* The glyph is a child part, not the target itself: an icon is a mask, and a
+   mask on `remove` would clip the ::before tap area above to the 10px box. */
+[data-scope='chip'][data-part='remove-icon'] {
+  inline-size: 100%;
+  block-size: 100%;
 }
 
 [data-scope='chip'][data-part='root'][data-disabled] [data-part='remove'] {

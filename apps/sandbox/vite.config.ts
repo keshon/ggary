@@ -11,7 +11,7 @@ export default defineConfig({
   optimizeDeps: {
     exclude: [
       '@ggary/core', '@ggary/elements', '@ggary/react', '@ggary/svelte',
-      '@ggary/structure', '@ggary/theme-ggarry', '@ggary/theme-instrument',
+      '@ggary/icons', '@ggary/structure', '@ggary/theme-ggarry', '@ggary/theme-instrument',
     ],
   },
   build: {

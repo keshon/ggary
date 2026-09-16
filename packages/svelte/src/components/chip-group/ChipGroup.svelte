@@ -8,7 +8,6 @@
   } from '@ggary/core/chip-group'
   import type { ChipEmphasis, ChipSize } from '@ggary/core/chip'
   import { rovingFocus, svelteNormalizer, uid } from '@ggary/core'
-  import RemoveIcon from '../chip/RemoveIcon.svelte'
 
   type Props = {
     items: ChipItem[]
@@ -96,7 +95,7 @@
       <button {...api.getChipProps(item, index)}>
         <span {...api.getChipLabelProps()}>{item.label}</span>
         {#if item.removable ?? removable}
-          <span {...api.getChipRemoveProps(item, index)}><RemoveIcon /></span>
+          <span {...api.getChipRemoveProps(item, index)}><span {...api.getChipRemoveIconProps()}></span></span>
         {/if}
       </button>
     {/each}

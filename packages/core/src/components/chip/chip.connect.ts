@@ -1,3 +1,4 @@
+import type { IconName } from '@ggary/icons'
 import type { Dict, Normalizer } from '../../types'
 import { chipAnatomy } from './chip.anatomy'
 import type { ChipProps } from './chip.types'
@@ -50,6 +51,21 @@ export function chipRemoveAttrs(onRemove?: (event: any) => void): Dict {
   }
 }
 
+/**
+ * The glyph inside the dismiss target, as a part of its own.
+ *
+ * It cannot live on `remove` itself: an icon is drawn as a CSS mask, a mask clips
+ * everything on its element including pseudo-elements, and a theme may hang an
+ * enlarged tap area on `remove::before`.
+ */
+export function chipRemoveIconAttrs(): Dict {
+  return {
+    ...chipAnatomy.attrs('remove-icon'),
+    'data-icon': 'close' satisfies IconName,
+    'aria-hidden': 'true',
+  }
+}
+
 export function connect<T = Dict>(props: ChipProps, normalize: Normalizer<T>, onRemove?: () => void) {
   const { disabled = false, removable = false, interactive = false } = props
 
@@ -67,5 +83,6 @@ export function connect<T = Dict>(props: ChipProps, normalize: Normalizer<T>, on
     }),
     labelProps: normalize({ ...chipAnatomy.attrs('label') }),
     removeProps: normalize(chipRemoveAttrs(onRemove && !disabled ? onRemove : undefined)),
+    removeIconProps: normalize(chipRemoveIconAttrs()),
   }
 }

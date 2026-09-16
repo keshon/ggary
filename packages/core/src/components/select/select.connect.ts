@@ -1,3 +1,4 @@
+import type { IconName } from '@ggary/icons'
 import type { Dict, Normalizer } from '../../types'
 import { selectAnatomy } from './select.anatomy'
 import type { SelectEvent, SelectItem, SelectState } from './select.types'
@@ -161,8 +162,10 @@ export function connect<T = Dict>(
       'data-placeholder': selectedItem ? undefined : '',
     }),
 
+    // Core names the glyph; the theme draws it. See @ggary/structure/icon.css.
     indicatorProps: normalize({
       ...selectAnatomy.attrs('indicator'),
+      'data-icon': 'chevron-down' satisfies IconName,
       'aria-hidden': 'true',
       'data-state': state.open ? 'open' : 'closed',
     }),
@@ -205,7 +208,8 @@ export function connect<T = Dict>(
       }),
 
     getItemTextProps: () => normalize({ ...selectAnatomy.attrs('item-text') }),
-    getItemIndicatorProps: () => normalize({ ...selectAnatomy.attrs('item-indicator'), 'aria-hidden': 'true' }),
+    getItemIndicatorProps: () =>
+      normalize({ ...selectAnatomy.attrs('item-indicator'), 'data-icon': 'check' satisfies IconName, 'aria-hidden': 'true' }),
     emptyProps: normalize({ ...selectAnatomy.attrs('empty') }),
 
     /**

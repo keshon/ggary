@@ -7,24 +7,6 @@ import {
 } from '@ggary/core/chip-group'
 import { domNormalizer, rovingFocus, uid, type Machine } from '@ggary/core'
 import { h, spread } from '../../spread'
-import { REMOVE_ICON } from '../chip/chip.element'
-
-const SVG_NS = 'http://www.w3.org/2000/svg'
-
-function removeIcon(): SVGElement {
-  const svg = document.createElementNS(SVG_NS, 'svg')
-  svg.setAttribute('width', '10')
-  svg.setAttribute('height', '10')
-  svg.setAttribute('viewBox', '0 0 10 10')
-  svg.setAttribute('fill', 'none')
-  const path = document.createElementNS(SVG_NS, 'path')
-  path.setAttribute('d', REMOVE_ICON)
-  path.setAttribute('stroke', 'currentColor')
-  path.setAttribute('stroke-width', '1.6')
-  path.setAttribute('stroke-linecap', 'round')
-  svg.append(path)
-  return svg
-}
 
 /**
  * Client-rendered, like <gg-select>.
@@ -174,13 +156,16 @@ export class GgChipGroupElement extends HTMLElement {
       const wantsRemove = item.removable ?? groupRemovable
       let remove = chip.querySelector<HTMLElement>('[data-part="remove"]')
       if (wantsRemove && !remove) {
-        remove = h('span', undefined, [removeIcon()])
+        remove = h('span', undefined, [h('span')])
         chip.append(remove)
       } else if (!wantsRemove && remove) {
         remove.remove()
         remove = null
       }
-      if (remove) spread(remove, api.getChipRemoveProps(item, index))
+      if (remove) {
+        spread(remove, api.getChipRemoveProps(item, index))
+        spread(remove.firstElementChild!, api.getChipRemoveIconProps())
+      }
     })
   }
 

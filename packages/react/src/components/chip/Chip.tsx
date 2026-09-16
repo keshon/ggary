@@ -25,7 +25,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(function Chip(props, ref)
       <span {...api.labelProps}>{children}</span>
       {(removable ?? !!onRemove) && (
         <span {...api.removeProps}>
-          <RemoveIcon />
+          <span {...api.removeIconProps} />
         </span>
       )}
     </>
@@ -41,11 +41,3 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(function Chip(props, ref)
     </span>
   )
 })
-
-export function RemoveIcon() {
-  return (
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-      <path d="M1.5 1.5l7 7M8.5 1.5l-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  )
-}

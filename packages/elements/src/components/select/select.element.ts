@@ -7,7 +7,7 @@ import {
   uid,
   type Machine,
 } from '@ggary/core'
-import { CHECK, CHEVRON, h, icon, spread } from '../../spread'
+import { h, spread } from '../../spread'
 
 /**
  * Pattern B — client-rendered custom element.
@@ -36,7 +36,7 @@ export class GgSelectElement extends HTMLElement {
   #label: HTMLLabelElement | null = null
   #trigger: HTMLButtonElement | null = null
   #value: HTMLSpanElement | null = null
-  #indicator: SVGElement | null = null
+  #indicator: HTMLSpanElement | null = null
   #positioner: HTMLDivElement | null = null
   #content: HTMLUListElement | null = null
   #hiddenInput: HTMLInputElement | null = null
@@ -108,7 +108,7 @@ export class GgSelectElement extends HTMLElement {
     this.#label = h('label')
     this.#trigger = h('button')
     this.#value = h('span')
-    this.#indicator = icon(CHEVRON)
+    this.#indicator = h('span')
     this.#positioner = h('div')
     this.#content = h('ul')
     this.#hiddenInput = h('input')
@@ -165,11 +165,11 @@ export class GgSelectElement extends HTMLElement {
     api.items.forEach((item, index) => {
       let row = rows[index]
       if (!row) {
-        row = h('li', undefined, [h('span'), icon(CHECK)])
+        row = h('li', undefined, [h('span'), h('span')])
         content.append(row)
       }
       spread(row, api.getItemProps(item, index))
-      const [text, check] = Array.from(row.children) as [HTMLElement, SVGElement]
+      const [text, check] = Array.from(row.children) as [HTMLElement, HTMLElement]
       spread(text, api.getItemTextProps())
       spread(check, api.getItemIndicatorProps())
       text.textContent = item.label

@@ -2,7 +2,6 @@
   import { connect, type ChipProps } from '@ggary/core/chip'
   import { svelteNormalizer } from '@ggary/core'
   import type { Snippet } from 'svelte'
-  import RemoveIcon from './RemoveIcon.svelte'
 
   type Props = ChipProps & {
     children?: Snippet
@@ -31,7 +30,7 @@
 {#snippet body()}
   <span {...api.labelProps}>{@render children?.()}</span>
   {#if showRemove}
-    <span {...api.removeProps}><RemoveIcon /></span>
+    <span {...api.removeProps}><span {...api.removeIconProps}></span></span>
   {/if}
 {/snippet}
 

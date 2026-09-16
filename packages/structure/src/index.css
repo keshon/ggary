@@ -17,5 +17,6 @@
    ========================================================================== */
 
 @import './global.css';
+@import './icon.css';
 @import './select.css';
 @import './chip-group.css';

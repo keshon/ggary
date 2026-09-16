@@ -81,7 +81,7 @@ export function Select(props: SelectProps) {
 
       <button ref={triggerRef} {...api.triggerProps}>
         <span {...api.valueProps}>{api.displayText}</span>
-        <ChevronIcon {...api.indicatorProps} />
+        <span {...api.indicatorProps} />
       </button>
 
       <div ref={positionerRef} {...api.positionerProps}>
@@ -90,7 +90,7 @@ export function Select(props: SelectProps) {
           {api.items.map((item, index) => (
             <li key={item.value} {...api.getItemProps(item, index)}>
               <span {...api.getItemTextProps()}>{item.label}</span>
-              <CheckIcon {...api.getItemIndicatorProps()} />
+              <span {...api.getItemIndicatorProps()} />
             </li>
           ))}
         </ul>
@@ -98,21 +98,5 @@ export function Select(props: SelectProps) {
 
       {name && <input {...api.hiddenInputProps} />}
     </div>
-  )
-}
-
-function ChevronIcon(props: Record<string, unknown>) {
-  return (
-    <svg {...props} width="14" height="14" viewBox="0 0 16 16" fill="none">
-      <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
-}
-
-function CheckIcon(props: Record<string, unknown>) {
-  return (
-    <svg {...props} width="14" height="14" viewBox="0 0 16 16" fill="none">
-      <path d="M3.5 8.5l3 3 6-7" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
   )
 }

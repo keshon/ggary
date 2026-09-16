@@ -1,0 +1,31 @@
+/* An icon is an empty element carrying data-icon="name". It draws the glyph
+   token --gg-icon (mapped from the name by @ggary/icons) as a MASK over a fill
+   of currentColor, so the glyph always takes the colour of the text around it
+   and a theme recolours it the way it recolours text.
+
+   Themes size an icon on its part ([data-part='indicator'] and so on); 1em is
+   only the fallback, so an icon dropped into running text sits at text size.
+
+   A MASK CLIPS EVERYTHING ON ITS ELEMENT, pseudo-elements included. So never put
+   data-icon on a part that also needs a ::before tap area or an ::after mark —
+   give the glyph a child part instead. This is why chip has `remove` (the
+   target) and `remove-icon` (the drawing). Learned from Instrument, where the
+   first masked remove button caught 0 of 4 test taps outside its 10px box. */
+[data-icon] {
+  display: inline-block;
+  flex: none;
+  inline-size: 1em;
+  block-size: 1em;
+  background-color: currentColor;
+  mask: var(--gg-icon) center / contain no-repeat;
+}
+
+/* Under forced colours a background is reset to a system colour, and a masked
+   glyph filled with it vanishes into the surface. Opting the icon out of the
+   adjustment keeps currentColor, which forced colours has already resolved to
+   the right system text colour for whatever the icon stands on. */
+@media (forced-colors: active) {
+  [data-icon] {
+    forced-color-adjust: none;
+  }
+}

@@ -2,7 +2,6 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalSto
 import { connect, createChipGroupMachine, type ChipGroupMode, type ChipGroupOrientation, type ChipItem } from '@ggary/core/chip-group'
 import type { ChipEmphasis, ChipSize } from '@ggary/core/chip'
 import { reactNormalizer, rovingFocus } from '@ggary/core'
-import { RemoveIcon } from '../chip/Chip'
 
 export interface ChipGroupProps {
   items: ChipItem[]
@@ -78,7 +77,7 @@ export function ChipGroup(props: ChipGroupProps) {
             <span {...api.getChipLabelProps()}>{item.label}</span>
             {(item.removable ?? removable) && (
               <span {...api.getChipRemoveProps(item, index)}>
-                <RemoveIcon />
+                <span {...api.getChipRemoveIconProps()} />
               </span>
             )}
           </button>

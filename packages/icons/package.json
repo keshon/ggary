@@ -1,0 +1,13 @@
+{
+  "name": "@ggary/icons",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": ["*.css"],
+  "exports": {
+    ".": { "types": "./dist/index.ts", "default": "./dist/index.ts" },
+    "./icons.css": "./dist/icons.css",
+    "./compile": "./compile.mjs"
+  },
+  "scripts": { "build": "node build.mjs" }
+}
