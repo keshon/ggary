@@ -1,0 +1,10 @@
+{
+  "name": "@ggary/checks",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Gates every ggary theme must pass: structure and contrast",
+  "exports": {
+    ".": { "types": "./src/index.ts", "default": "./src/index.ts" }
+  }
+}

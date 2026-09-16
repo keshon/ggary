@@ -1,0 +1,44 @@
+{
+  "$comment": "The theme contract: what every theme package must provide. Read by @ggary/checks. Adding a name or a pair here makes every theme fail until it complies — which is the point.",
+  "layers": ["gg.tokens", "gg.structure", "gg.base", "gg.components", "gg.forced", "gg.motion"],
+  "tokens": {
+    "--gg-page": "the page background",
+    "--gg-surface": "a raised surface: panel, card, popover",
+    "--gg-surface-sunken": "a recessed surface: inset, code block, sidebar",
+    "--gg-text": "body text, readable (4.5:1)",
+    "--gg-text-muted": "secondary text, still readable (4.5:1)",
+    "--gg-text-faint": "decoration only — separators, disabled hints (3:1)",
+    "--gg-border": "a decorative boundary between surfaces",
+    "--gg-border-strong": "a stronger decorative boundary",
+    "--gg-accent": "the accent fill",
+    "--gg-accent-text": "accent-coloured text (4.5:1)",
+    "--gg-accent-bg": "a tinted background under accent text",
+    "--gg-danger-text": "error and destructive text (4.5:1)",
+    "--gg-font-sans": "the interface font stack",
+    "--gg-font-mono": "the monospace font stack",
+    "--gg-radius": "the radius of a surface",
+    "--gg-z-popover": "the stacking level of floating content"
+  },
+  "runtime": {
+    "--gg-available-height": "written by core's attachPositioner onto a positioner at runtime",
+    "--gg-icon": "mapped from data-icon by @ggary/icons; a theme never declares it on the root"
+  },
+  "$pairs": "What every theme promises through the public names, whatever its language. Deliberately small: only what the token descriptions above promise, and nothing about how a theme builds depth — GGarry divides same-white surfaces with borders, Instrument separates them by lightness, and both are legitimate. min: text 4.5:1, large 3:1, step ΔL 0.022.",
+  "pairs": [
+    { "label": "contract: text on page", "fg": "--gg-text", "bg": ["--gg-page"], "min": "text" },
+    { "label": "contract: text on surface", "fg": "--gg-text", "bg": ["--gg-surface"], "min": "text" },
+    { "label": "contract: text on sunken", "fg": "--gg-text", "bg": ["--gg-surface-sunken"], "min": "text" },
+    { "label": "contract: muted on page", "fg": "--gg-text-muted", "bg": ["--gg-page"], "min": "text" },
+    { "label": "contract: muted on surface", "fg": "--gg-text-muted", "bg": ["--gg-surface"], "min": "text" },
+    { "label": "contract: muted on sunken", "fg": "--gg-text-muted", "bg": ["--gg-surface-sunken"], "min": "text" },
+    { "label": "contract: faint on page", "fg": "--gg-text-faint", "bg": ["--gg-page"], "min": "large" },
+    { "label": "contract: faint on surface", "fg": "--gg-text-faint", "bg": ["--gg-surface"], "min": "large" },
+    { "label": "contract: accent text on page", "fg": "--gg-accent-text", "bg": ["--gg-page"], "min": "text" },
+    { "label": "contract: accent text on surface", "fg": "--gg-accent-text", "bg": ["--gg-surface"], "min": "text" },
+    { "label": "contract: accent text on its tint", "fg": "--gg-accent-text", "bg": ["--gg-surface", "--gg-accent-bg"], "min": "text" },
+    { "label": "contract: danger text on page", "fg": "--gg-danger-text", "bg": ["--gg-page"], "min": "text" },
+    { "label": "contract: danger text on surface", "fg": "--gg-danger-text", "bg": ["--gg-surface"], "min": "text" },
+    { "label": "contract: accent fill on page", "fg": "--gg-accent", "bg": ["--gg-page"], "min": "large" },
+    { "label": "contract: accent fill on surface", "fg": "--gg-accent", "bg": ["--gg-surface"], "min": "large" }
+  ]
+}

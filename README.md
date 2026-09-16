@@ -13,8 +13,9 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 217 tests
+npm test         # 247 tests
 npm run typecheck
+npm run check:themes   # the theme gates as a readable report; -- -v for every row
 ```
 
 `index.html` is vanilla, `react.html` is React, `svelte.html` is Svelte. The
@@ -31,6 +32,7 @@ packages/
   theme-ggarry/      GGarry: JSON tokens -> CSS, component CSS, the --gg-* contract
   theme-instrument/  Instrument: OKLCH token tiers, component CSS, the --gg-* contract
   icons/             glyph SVGs -> --gg-icon-* tokens; the shared glyph compiler
+  checks/            the theme gates: structure and contrast, run on every theme
   elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>
   svelte/            <Button>, <Chip>, <ChipGroup>, <Select>
@@ -262,6 +264,92 @@ would drag focus back into the group from wherever the user had moved it. Fixed
 with `useLayoutEffect` plus an explicit last-seen-nonce ref — and the same guard
 in the Svelte and vanilla adapters, since all three had inherited the pattern.
 
+## Theme checks
+
+A theme can be wrong in ways that never throw: a custom property that resolves to
+nothing paints nothing, a stylesheet nobody imports is dead, a component missing
+from one theme renders unstyled only there, and a colour below threshold is found
+by the person who cannot read it. `@ggary/checks` turns each of those into a
+failing test. Themes are discovered from `packages/theme-*`; a theme without a
+`theme.check.ts` fails rather than going unmeasured.
+
+**The contract is data.** `packages/structure/contract.json` holds the layer
+order, the public `--gg-*` names, the runtime-written variables, and the contrast
+pairs every theme owes through those names. A pair can only measure a name the
+contract defines, so the two cannot drift apart.
+
+**Structure**, checked by reading the theme as shipped and following its imports:
+
+| Check | Fails when |
+|---|---|
+| imports | an `@import` does not resolve |
+| layers | the `@layer` order differs from the contract |
+| orphans | a stylesheet in `src/` is not reachable from `index.css` |
+| parity | core ships a component the theme has no stylesheet for |
+| contract | a `--gg-*` name is not mapped on the root, or an unknown one is declared |
+| variables | a `var()` with no fallback names a property declared nowhere the theme loads |
+| selectors | a rule targets a class instead of `[data-scope][data-part]` and state |
+| structure | the shared structure layer reads a theme-private token |
+
+Variables are resolved per theme in isolation, which also catches one theme's
+private token leaking into another's CSS.
+
+**Contrast** is Instrument's Go gate (`tools/cmd/contrast`), ported to TypeScript
+and generalised. Tokens are computed from the files as a browser computes them on
+`<html>` — the cascade with layers, `var()` with fallbacks, `calc()`,
+`light-dark()` by colour scheme, `color-mix(in oklab)`, OKLCH to sRGB, translucent
+layers composited onto their base — in every context a theme declares:
+
+| Theme | Contexts | Pairs | Measurements |
+|---|---|---|---|
+| GGarry | light, dark | 15 contract + 21 own | 72 |
+| Instrument | 5 modes × 4 accents | 15 contract + 117 own | 2,640 |
+
+Thresholds are WCAG's 4.5:1 for text and 3:1 for large text and meaningful
+non-text (a control's own border, a state mark), plus Instrument's OKLCH
+lightness step of 0.022 for surfaces that must read as separate — a ratio cannot
+serve there, because WCAG's flare term squeezes every ratio towards 1 at the
+dark end.
+
+**The port was verified against the original**, not assumed: all 580 rows the Go
+gate prints for the base accent, across five modes, match the TypeScript engine
+within ±0.0005 — the rounding of Go's three-decimal output. One deliberate
+difference: `color-mix(in oklab)` mixes in OKLab, where the Go code approximated
+in sRGB; Instrument's tokens mix only against `transparent`, where the two agree.
+
+**Coverage.** Every colour a theme's component CSS paints text with must be the
+foreground of some pair. Instrument skipped relay variables (`--btn-fg`,
+`--tone-ink`) by a hand-kept name pattern; here relays are followed instead —
+a property never declared on the root is traced through every value it is given
+down to the root tokens, and those must be covered.
+
+**Waivers.** A theme may waive a known failure with a reason. A waived pair that
+starts passing is itself a failure, so fixing a token forces the stale excuse out
+with it — verified by applying one of GGarry's candidate fixes.
+
+Every rule was proven able to fail: `tests/checks.contract.test.ts` builds a
+throwaway workspace per rule with exactly one defect planted, and a planted
+regression in Instrument's real `--text-muted` failed every row that reads it.
+
+### What the first run found
+
+**Instrument passes everything.** Its tightest pass is `stack: panel over page`
+at ΔL 0.023 against 0.022 — exactly as tight as its own notes describe.
+
+**GGarry has nine real failures**, waived pending a design decision because every
+fix changes its look. Each waiver in `packages/theme-ggarry/theme.check.ts`
+records the measured value and a measured candidate:
+
+| Failure | Now | Candidate |
+|---|---|---|
+| placeholder and empty state use subtle text | 2.56:1 light · 3.75:1 dark | use `text-muted`: 4.76:1 · 6.96:1 |
+| `--gg-text-faint` below even the decoration threshold | 2.56:1 light | ~`#8492a6`: 3.16:1 |
+| select trigger border, its only boundary | 1.48:1 light · 2.36:1 dark | ~`#8492a6`: 3.16:1 · slate-500: 3.75:1 |
+| white label on the dark accent fill | 3.58:1 | brand-600: 5.23:1 |
+| dark accent hover goes *lighter*, towards the label | 2.48:1 | brand-700: 7.31:1 |
+| white label on the dark danger fill | 3.76:1 | danger-600: 4.83:1 |
+| red text on the low-emphasis danger tint | 4.14:1 light | danger-700: 5.54:1 |
+
 ## Two custom-element patterns, on purpose
 
 `<gg-button>` **enhances** existing light-DOM markup:
@@ -283,7 +371,9 @@ fold, or you get layout shift on upgrade.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 46 tests. Every transition of every machine, pure, milliseconds. |
-| contract | node | `*.contract.test.ts` | 37 tests. Rules about how packages relate, read from the source tree. |
+| contract | node | `icons.contract.test.ts` | 37 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
+| contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
 | dom | jsdom | `conformance.dom.test.ts` | 126 tests. One contract × three adapters. |
 | dom | jsdom | `elements.dom.test.ts` | 8 tests. What only custom elements have: properties, events, attribute fallbacks. |
 
@@ -370,8 +460,11 @@ Real, and deliberately left open:
   `removable` on ChipGroup (and the build prints `state_referenced_locally`
   warnings for them) are read at construction and ignored after mount, in all
   three adapters. Queued as its own task.
-- **Theme gates are not ported yet.** The contract project checks icons; token
-  completeness per theme and Instrument's contrast gate are the next rules for it.
+- **GGarry waives nine contrast failures** pending a palette decision. See
+  Theme checks → What the first run found.
+- **Instrument's other gates are not ported:** tap targets (`cmd/targets`),
+  proportions (`cmd/proportion`), and the component registry (`cmd/registry`).
+  Forced-colors behaviour is styled but not checked.
 - No Changesets, no docs site.
 
 ## Scope
