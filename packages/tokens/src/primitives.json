@@ -1,0 +1,30 @@
+{
+  "color": {
+    "slate": {
+      "50": "#f8fafc", "100": "#f1f5f9", "200": "#e2e8f0", "300": "#cbd5e1",
+      "400": "#94a3b8", "500": "#64748b", "600": "#475569", "700": "#334155",
+      "800": "#1e293b", "900": "#0f172a", "950": "#020617"
+    },
+    "brand": {
+      "50": "#eef6ff", "100": "#d9eaff", "200": "#bcdcff", "300": "#8ec7ff",
+      "400": "#59a8ff", "500": "#3086f6", "600": "#1c67db", "700": "#1852b0",
+      "800": "#19468c", "900": "#193d73", "950": "#112648"
+    },
+    "danger": { "400": "#f87171", "500": "#ef4444", "600": "#dc2626", "700": "#b91c1c" },
+    "white": "#ffffff",
+    "black": "#000000"
+  },
+  "space": { "0": "0px", "1": "4px", "2": "8px", "3": "12px", "4": "16px", "5": "20px", "6": "24px", "8": "32px" },
+  "radius": { "sm": "4px", "md": "6px", "lg": "10px", "full": "9999px" },
+  "font": {
+    "family": {
+      "sans": "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif",
+      "mono": "ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace"
+    },
+    "size": { "xs": "12px", "sm": "13px", "md": "14px", "lg": "16px", "xl": "20px" },
+    "weight": { "normal": "400", "medium": "500", "semibold": "600" }
+  },
+  "size": { "control": { "sm": "28px", "md": "34px", "lg": "40px" } },
+  "duration": { "fast": "120ms", "normal": "200ms" },
+  "z": { "popover": "50" }
+}

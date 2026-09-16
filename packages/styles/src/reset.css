@@ -1,0 +1,22 @@
+/* Scoped to kit components only. A UI kit has no business restyling the host
+   app's <p> and <h1>. */
+[data-scope] {
+  box-sizing: border-box;
+}
+[data-scope] *,
+[data-scope] *::before,
+[data-scope] *::after {
+  box-sizing: inherit;
+}
+
+[data-scope][data-part='root'] {
+  font-family: var(--gg-font-family-sans);
+  font-size: var(--gg-font-size-md);
+  color: var(--gg-text-default);
+}
+
+/* Focus ring, defined once. Components never redefine it. */
+[data-scope]:focus-visible {
+  outline: var(--gg-focus-ring-width) solid var(--gg-focus-ring);
+  outline-offset: var(--gg-focus-ring-offset);
+}

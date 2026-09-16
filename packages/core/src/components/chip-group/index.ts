@@ -1,0 +1,7 @@
+export { chipGroupAnatomy } from './chip-group.anatomy'
+export type { ChipGroupPart } from './chip-group.anatomy'
+export { connect, chipGroupIds } from './chip-group.connect'
+export type { ChipGroupApi, ConnectOptions } from './chip-group.connect'
+export { createChipGroupMachine, initialState, reducer } from './chip-group.machine'
+export type { ChipGroupConfig } from './chip-group.machine'
+export type { ChipGroupEvent, ChipGroupMode, ChipGroupOrientation, ChipGroupState, ChipItem } from './chip-group.types'

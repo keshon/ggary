@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ggary-ui — react</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <!-- Static page chrome, identical on all three pages, so any visual
+         difference below is the components' doing and not the sandbox's. -->
+    <header class="bar">
+      <h1>ggary-ui sandbox</h1>
+      <span class="target">react</span>
+      <nav>
+        <a href="/index.html">vanilla</a>
+        <a href="/react.html" aria-current="page">react</a>
+        <a href="/svelte.html">svelte</a>
+      </nav>
+      <gg-button size="sm" variant="outline"><button id="theme-toggle">theme</button></gg-button>
+    </header>
+    <div class="page"><div id="app"></div></div>
+    <script type="module" src="/src/react.tsx"></script>
+  </body>
+</html>

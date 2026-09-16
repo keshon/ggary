@@ -1,0 +1,11 @@
+// Importing this module registers the custom elements — hence "sideEffects".
+import './components/button/button.element'
+import './components/chip/chip.element'
+import './components/chip-group/chip-group.element'
+import './components/select/select.element'
+
+export { spread } from './spread'
+export { GgButtonElement } from './components/button/button.element'
+export { GgChipElement } from './components/chip/chip.element'
+export { GgChipGroupElement } from './components/chip-group/chip-group.element'
+export { GgSelectElement } from './components/select/select.element'

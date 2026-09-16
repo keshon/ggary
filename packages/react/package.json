@@ -1,0 +1,35 @@
+{
+  "name": "@ggary/react",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./button": {
+      "types": "./src/components/button/index.ts",
+      "default": "./src/components/button/index.ts"
+    },
+    "./select": {
+      "types": "./src/components/select/index.ts",
+      "default": "./src/components/select/index.ts"
+    },
+    "./chip": {
+      "types": "./src/components/chip/index.ts",
+      "default": "./src/components/chip/index.ts"
+    },
+    "./chip-group": {
+      "types": "./src/components/chip-group/index.ts",
+      "default": "./src/components/chip-group/index.ts"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "dependencies": {
+    "@ggary/core": "*"
+  }
+}

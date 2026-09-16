@@ -1,0 +1,51 @@
+/* Sandbox chrome only. Nothing here belongs in the kit — it exists so the three
+   pages look identical and differences are the components' fault, not the page's. */
+body {
+  margin: 0;
+  padding: 0 0 80px;
+  font-family: var(--gg-font-family-sans);
+  background: var(--gg-bg-canvas);
+  color: var(--gg-text-default);
+  transition: background-color 150ms ease;
+}
+
+.page { max-width: 880px; margin: 0 auto; padding: 0 24px; }
+
+header.bar {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 16px 24px; margin-bottom: 32px;
+  border-bottom: 1px solid var(--gg-border-default);
+  background: var(--gg-bg-surface);
+}
+header.bar h1 { font-size: 15px; font-weight: 600; margin: 0; }
+header.bar .target {
+  padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: var(--gg-bg-accent-subtle); color: var(--gg-text-accent);
+}
+header.bar nav { display: flex; gap: 4px; margin-left: auto; }
+header.bar nav a {
+  padding: 4px 10px; border-radius: 6px; font-size: 13px; text-decoration: none;
+  color: var(--gg-text-muted);
+}
+header.bar nav a[aria-current] { background: var(--gg-bg-muted); color: var(--gg-text-default); }
+
+section { margin-bottom: 40px; }
+section > h2 {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--gg-text-subtle); margin: 0 0 12px;
+}
+.row { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+
+pre.state {
+  margin: 12px 0 0; padding: 12px 14px; overflow-x: auto;
+  font-family: var(--gg-font-family-mono); font-size: 12px; line-height: 1.6;
+  background: var(--gg-bg-subtle); color: var(--gg-text-muted);
+  border: 1px solid var(--gg-border-default); border-radius: 8px;
+}
+pre.state b { color: var(--gg-text-accent); font-weight: 600; }
+
+form.demo {
+  display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
+  padding: 16px; border: 1px dashed var(--gg-border-strong); border-radius: 10px;
+}
+.hint { font-size: 13px; color: var(--gg-text-muted); margin: 8px 0 0; }
