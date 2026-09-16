@@ -13,15 +13,16 @@
   "text": {
     "default": "{color.slate.900}",
     "muted": "{color.slate.500}",
-    "subtle": "{color.slate.400}",
+    "subtle": "{color.slate.450}",
     "on-accent": "{color.white}",
     "on-inverted": "{color.slate.50}",
     "accent": "{color.brand.700}",
-    "danger": "{color.danger.600}"
+    "danger": "{color.danger.700}"
   },
   "border": {
     "default": "{color.slate.200}",
     "strong": "{color.slate.300}",
+    "control": "{color.slate.450}",
     "accent": "{color.brand.600}",
     "danger": "{color.danger.500}"
   },

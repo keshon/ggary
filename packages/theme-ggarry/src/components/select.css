@@ -29,7 +29,10 @@
   text-align: start;
   color: var(--ggarry-text-default);
   background: var(--ggarry-bg-surface);
-  border: 1px solid var(--ggarry-border-strong);
+  /* border-control, not border-strong: this border is the trigger's only
+     boundary, so it owes 3:1 (WCAG 1.4.11). A button's outline is decoration —
+     its label identifies it — and keeps the quieter border-strong. */
+  border: 1px solid var(--ggarry-border-control);
   border-radius: var(--ggarry-radius-md);
   cursor: pointer;
   transition: border-color var(--ggarry-duration-fast) ease;
@@ -52,8 +55,9 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* A placeholder is read, so it takes readable text; subtle is decoration. */
 [data-scope='select'][data-part='value'][data-placeholder] {
-  color: var(--ggarry-text-subtle);
+  color: var(--ggarry-text-muted);
 }
 
 [data-scope='select'][data-part='indicator'] {
@@ -114,6 +118,6 @@
 [data-scope='select'][data-part='empty'] {
   padding: var(--ggarry-space-3);
   font-size: var(--ggarry-font-size-sm);
-  color: var(--ggarry-text-subtle);
+  color: var(--ggarry-text-muted);
   text-align: center;
 }

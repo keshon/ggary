@@ -302,7 +302,7 @@ layers composited onto their base — in every context a theme declares:
 
 | Theme | Contexts | Pairs | Measurements |
 |---|---|---|---|
-| GGarry | light, dark | 15 contract + 21 own | 72 |
+| GGarry | light, dark | 15 contract + 23 own | 76 |
 | Instrument | 5 modes × 4 accents | 15 contract + 117 own | 2,640 |
 
 Thresholds are WCAG's 4.5:1 for text and 3:1 for large text and meaningful
@@ -325,7 +325,8 @@ down to the root tokens, and those must be covered.
 
 **Waivers.** A theme may waive a known failure with a reason. A waived pair that
 starts passing is itself a failure, so fixing a token forces the stale excuse out
-with it — verified by applying one of GGarry's candidate fixes.
+with it. When GGarry's palette fixes landed, the gate flagged each waiver as
+stale with its new value before the waivers were removed.
 
 Every rule was proven able to fail: `tests/checks.contract.test.ts` builds a
 throwaway workspace per rule with exactly one defect planted, and a planted
@@ -336,19 +337,30 @@ regression in Instrument's real `--text-muted` failed every row that reads it.
 **Instrument passes everything.** Its tightest pass is `stack: panel over page`
 at ΔL 0.023 against 0.022 — exactly as tight as its own notes describe.
 
-**GGarry has nine real failures**, waived pending a design decision because every
-fix changes its look. Each waiver in `packages/theme-ggarry/theme.check.ts`
-records the measured value and a measured candidate:
+**GGarry had nine real failures.** They were first waived, each with a measured
+candidate fix, then fixed. GGarry now passes all 76 measurements with no waivers:
 
-| Failure | Now | Candidate |
-|---|---|---|
-| placeholder and empty state use subtle text | 2.56:1 light · 3.75:1 dark | use `text-muted`: 4.76:1 · 6.96:1 |
-| `--gg-text-faint` below even the decoration threshold | 2.56:1 light | ~`#8492a6`: 3.16:1 |
-| select trigger border, its only boundary | 1.48:1 light · 2.36:1 dark | ~`#8492a6`: 3.16:1 · slate-500: 3.75:1 |
-| white label on the dark accent fill | 3.58:1 | brand-600: 5.23:1 |
-| dark accent hover goes *lighter*, towards the label | 2.48:1 | brand-700: 7.31:1 |
-| white label on the dark danger fill | 3.76:1 | danger-600: 4.83:1 |
-| red text on the low-emphasis danger tint | 4.14:1 light | danger-700: 5.54:1 |
+| Failure | Before | Fix | After |
+|---|---|---|---|
+| placeholder and empty state on subtle text | 2.56:1 light · 3.75:1 dark | read text: `text-muted` | 4.76:1 · 6.96:1 |
+| `--gg-text-faint` below the decoration threshold | 2.56:1 light | `text.subtle` → new `slate-450` `#8492a6` | 3.16:1 |
+| select trigger border, its only boundary | 1.48:1 light · 2.36:1 dark | new `border.control`: slate-450 · slate-500 | 3.16:1 · 3.75:1 |
+| white label on the dark accent fill | 3.58:1 | `bg.accent` dark → brand-600 | 5.23:1 |
+| dark accent hover went *lighter*, towards the label | 2.48:1 | `bg.accent-hover` dark → brand-700 | 7.31:1 |
+| white label on the dark danger fill | 3.76:1 | `bg.danger` dark → danger-600 | 4.83:1 |
+| red text on the low-emphasis danger tint | 4.14:1 light | `text.danger` light → danger-700 | 5.54:1 |
+
+Two of the fixes are structural rather than a colour swap. The select trigger got
+its own **`border.control`** token instead of darkening `border-strong`: a
+trigger's border is its only boundary and owes 3:1, while a button's outline is
+decoration — its label identifies it — so outlined buttons and chips keep the
+quieter border, exactly the load-bearing/decorative split Instrument draws. And
+subtle text is now **decoration only** (a disabled option, measured at 3:1);
+anything read uses `text-muted`.
+
+`text.danger` changed globally in light mode, not only on the low-emphasis
+button: every red label is now 6.5:1 on white instead of 4.8:1, rather than
+keeping two reds.
 
 ## Two custom-element patterns, on purpose
 
@@ -460,8 +472,6 @@ Real, and deliberately left open:
   `removable` on ChipGroup (and the build prints `state_referenced_locally`
   warnings for them) are read at construction and ignored after mount, in all
   three adapters. Queued as its own task.
-- **GGarry waives nine contrast failures** pending a palette decision. See
-  Theme checks → What the first run found.
 - **Instrument's other gates are not ported:** tap targets (`cmd/targets`),
   proportions (`cmd/proportion`), and the component registry (`cmd/registry`).
   Forced-colors behaviour is styled but not checked.

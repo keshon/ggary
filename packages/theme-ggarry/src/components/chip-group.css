@@ -22,5 +22,5 @@
 
 [data-scope='chip-group'][data-part='empty'] {
   font-size: var(--ggarry-font-size-sm);
-  color: var(--ggarry-text-subtle);
+  color: var(--ggarry-text-muted);
 }

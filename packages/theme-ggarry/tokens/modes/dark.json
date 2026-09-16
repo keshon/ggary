@@ -5,10 +5,10 @@
     "subtle": "{color.slate.800}",
     "muted": "{color.slate.800}",
     "inverted": "{color.slate.100}",
-    "accent": "{color.brand.500}",
-    "accent-hover": "{color.brand.400}",
+    "accent": "{color.brand.600}",
+    "accent-hover": "{color.brand.700}",
     "accent-subtle": "{color.brand.950}",
-    "danger": "{color.danger.500}"
+    "danger": "{color.danger.600}"
   },
   "text": {
     "default": "{color.slate.100}",
@@ -22,6 +22,7 @@
   "border": {
     "default": "{color.slate.700}",
     "strong": "{color.slate.600}",
+    "control": "{color.slate.500}",
     "accent": "{color.brand.500}",
     "danger": "{color.danger.500}"
   },
