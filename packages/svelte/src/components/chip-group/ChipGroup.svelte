@@ -6,7 +6,7 @@
     type ChipGroupOrientation,
     type ChipItem,
   } from '@ggary/core/chip-group'
-  import type { ChipSize, ChipVariant } from '@ggary/core/chip'
+  import type { ChipEmphasis, ChipSize } from '@ggary/core/chip'
   import { rovingFocus, svelteNormalizer, uid } from '@ggary/core'
   import RemoveIcon from '../chip/RemoveIcon.svelte'
 
@@ -15,7 +15,7 @@
     label?: string
     mode?: ChipGroupMode
     orientation?: ChipGroupOrientation
-    variant?: ChipVariant
+    emphasis?: ChipEmphasis
     size?: ChipSize
     removable?: boolean
     disabled?: boolean
@@ -32,7 +32,7 @@
     label,
     mode,
     orientation,
-    variant,
+    emphasis,
     size,
     removable = false,
     disabled = false,
@@ -62,7 +62,7 @@
   let snapshot = $state(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))
 
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label, variant, size, name }))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label, emphasis, size, name }))
 
   $effect(() => machine.send({ type: 'SYNC_ITEMS', items }))
   $effect(() => machine.send({ type: 'SYNC_DISABLED', disabled }))

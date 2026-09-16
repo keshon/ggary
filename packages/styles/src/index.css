@@ -1,8 +1,0 @@
-/* One import pulls the whole kit. Per-component files exist so an app that uses
-   two components ships two stylesheets: @ggary/styles/button.css */
-@import '@ggary/tokens/css';
-@import './reset.css';
-@import './button.css';
-@import './chip.css';
-@import './chip-group.css';
-@import './select.css';

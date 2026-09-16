@@ -1,0 +1,153 @@
+/* ==========================================================================
+   GGarry — button
+
+   Selectors key off the anatomy contract ([data-scope][data-part]) and the
+   intent attributes core emits: data-emphasis, data-tone, data-size. No class
+   names, and no look-named variants — `outline` is how GGarry happens to draw
+   medium emphasis, not a word the API knows.
+
+   GGarry's answers to the four emphasis levels:
+
+     high     solid accent fill
+     medium   neutral outline — the antd-style default button
+     low      accent-tinted fill, no border
+     minimal  nothing until hover
+
+   Every level only re-points the local custom properties below, so a variant
+   stays a few lines and hover never has to be re-declared per level.
+   ========================================================================== */
+
+[data-scope='button'][data-part='root'] {
+  --button-height: var(--ggarry-size-control-md);
+  --button-padding-x: var(--ggarry-space-3);
+  --button-font-size: var(--ggarry-font-size-md);
+
+  /* medium emphasis is the base: it is the default core emits */
+  --button-bg: transparent;
+  --button-bg-hover: var(--ggarry-bg-subtle);
+  --button-fg: var(--ggarry-text-default);
+  --button-border: var(--ggarry-border-strong);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ggarry-space-2);
+  height: var(--button-height);
+  padding-inline: var(--button-padding-x);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--button-font-size);
+  font-weight: var(--ggarry-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--button-fg);
+  background: var(--button-bg);
+  border: 1px solid var(--button-border);
+  border-radius: var(--ggarry-radius-md);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--ggarry-duration-fast) ease, border-color var(--ggarry-duration-fast) ease,
+    color var(--ggarry-duration-fast) ease;
+}
+
+[data-scope='button'][data-part='root']:hover:not([data-disabled]) {
+  background: var(--button-bg-hover);
+}
+
+[data-scope='button'][data-part='root']:active:not([data-disabled]) {
+  transform: translateY(0.5px);
+}
+
+[data-scope='button'][data-part='root'][data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+[data-scope='button'][data-part='root'][data-full-width] {
+  width: 100%;
+}
+
+/* --- emphasis ------------------------------------------------------------ */
+
+[data-scope='button'][data-part='root'][data-emphasis='high'] {
+  --button-bg: var(--ggarry-bg-accent);
+  --button-bg-hover: var(--ggarry-bg-accent-hover);
+  --button-fg: var(--ggarry-text-on-accent);
+  --button-border: transparent;
+}
+[data-scope='button'][data-part='root'][data-emphasis='low'] {
+  --button-bg: var(--ggarry-bg-accent-subtle);
+  --button-bg-hover: var(--ggarry-border-default);
+  --button-fg: var(--ggarry-text-accent);
+  --button-border: transparent;
+}
+[data-scope='button'][data-part='root'][data-emphasis='minimal'] {
+  --button-bg: transparent;
+  --button-bg-hover: var(--ggarry-bg-muted);
+  --button-fg: var(--ggarry-text-default);
+  --button-border: transparent;
+}
+
+/* --- tone ----------------------------------------------------------------
+
+   Danger paints whatever emphasis it stands on. GGarry allows a SOLID red
+   primary — Instrument forbids one, because a fill under a white label is the
+   accent's privilege there. Same markup, same API, different design language:
+   exactly the kind of decision a theme is supposed to own. */
+
+[data-scope='button'][data-part='root'][data-tone='danger'] {
+  --button-fg: var(--ggarry-text-danger);
+  --button-bg-hover: color-mix(in oklab, var(--ggarry-bg-danger) 10%, transparent);
+}
+[data-scope='button'][data-part='root'][data-tone='danger'][data-emphasis='medium'] {
+  --button-border: var(--ggarry-border-danger);
+}
+/* Low emphasis is a tinted fill; the tint has to follow the tone, or a red
+   label sits on the accent's blue. */
+[data-scope='button'][data-part='root'][data-tone='danger'][data-emphasis='low'] {
+  --button-bg: color-mix(in oklab, var(--ggarry-bg-danger) 10%, transparent);
+  --button-bg-hover: color-mix(in oklab, var(--ggarry-bg-danger) 18%, transparent);
+}
+[data-scope='button'][data-part='root'][data-tone='danger'][data-emphasis='high'] {
+  --button-bg: var(--ggarry-bg-danger);
+  --button-bg-hover: var(--ggarry-color-danger-700);
+  --button-fg: var(--ggarry-color-white);
+}
+
+/* --- sizes --------------------------------------------------------------- */
+
+[data-scope='button'][data-part='root'][data-size='sm'] {
+  --button-height: var(--ggarry-size-control-sm);
+  --button-padding-x: var(--ggarry-space-2);
+  --button-font-size: var(--ggarry-font-size-sm);
+}
+[data-scope='button'][data-part='root'][data-size='lg'] {
+  --button-height: var(--ggarry-size-control-lg);
+  --button-padding-x: var(--ggarry-space-4);
+  --button-font-size: var(--ggarry-font-size-lg);
+}
+
+/* --- loading ------------------------------------------------------------
+   Busy, not disabled: the button keeps its colour and stays focusable. */
+
+[data-scope='button'][data-part='root'][data-loading] {
+  pointer-events: none;
+  cursor: progress;
+}
+
+[data-scope='button'][data-part='spinner'] {
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: var(--ggarry-radius-full);
+  animation: ggarry-button-spin 600ms linear infinite;
+}
+
+@keyframes ggarry-button-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='button'][data-part='spinner'] { animation-duration: 2s; }
+  [data-scope='button'][data-part='root'] { transition: none; }
+}

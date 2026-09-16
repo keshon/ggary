@@ -1,0 +1,179 @@
+/* ==========================================================================
+   Instrument — button
+
+   Ported from instrument/src/actions.css (.inst-btn and its weights), with the
+   selectors moved onto the anatomy contract. The full measured reasoning for
+   every weight stays in the original file; what follows is the short form.
+
+   Instrument's answers to the four emphasis levels — its "weights", measured as
+   presence = area × lightness step against the ground:
+
+     high     solid     accent fill + edge + a pixel of thickness   0.47
+     medium   default   a RECESS: no border, no shadow              0.046
+     low      soft      half a recess, no border at all             0.017
+     minimal  ghost     nothing until hover; the label quietened    0
+
+   Hover changes ONLY --btn-bg, and the base rule never writes background
+   directly — otherwise every level has to re-declare hover in full.
+
+   NOT PORTED: the `--outline` weight. It exists in actions.css but not in
+   Instrument's design principles, which list exactly four weights and say
+   "there is no outlined weight". The port follows the principles.
+   ========================================================================== */
+
+[data-scope='button'][data-part='root'] {
+  align-self: var(--flow-self, center);
+
+  --btn-fg: var(--text-primary);
+  /* Recessed, not raised: a drop in lightness is visible by itself and needs
+     neither an outline nor a shadow. The button is a hollow IN the plane. */
+  --btn-bg: var(--surface-recessed);
+  --btn-bg-hover: var(--surface-recessed-hover);
+  --btn-bg-active: var(--surface-recessed-active);
+  /* Transparent rather than absent: the pixel stays, so no level changes the
+     button's width. */
+  --btn-border: transparent;
+  --btn-shadow: none;
+  --btn-pad: var(--control-pad-md);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap-inline);
+  min-block-size: var(--control-h-md);
+  padding-inline: var(--btn-pad);
+  box-shadow: var(--btn-shadow);
+  border: var(--hairline) solid var(--btn-border);
+  border-radius: var(--radius-control-md);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--dur-1) var(--ease-out),
+              border-color var(--dur-1) var(--ease-out),
+              transform var(--dur-1) var(--ease-out);
+
+  &:hover:not(:disabled)  { --btn-bg: var(--btn-bg-hover); }
+  /* 0.985: a press is to be felt, not examined. The thickness comes off too —
+     an object pushed in has none. */
+  &:active:not(:disabled) { --btn-bg: var(--btn-bg-active); --btn-shadow: none; transform: scale(0.985); }
+
+  /* Transparency rather than grey: it stays visible WHICH action is off. */
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  &[data-full-width] { inline-size: 100%; }
+}
+
+/* --- emphasis ------------------------------------------------------------ */
+
+[data-scope='button'][data-part='root'][data-emphasis='high'] {
+  --btn-fg: var(--accent-on);
+  --btn-bg: var(--accent-solid);
+  /* Down, not up: the fill moves AWAY from the colour of the white label. */
+  --btn-bg-hover: var(--accent-hover);
+  --btn-bg-active: var(--accent-hover);
+  /* An edge half a step below the fill — invisible when present, missed when
+     absent: without it the solid button's boundary reads softer than the
+     recessed one beside it. */
+  --btn-border: color-mix(in oklab, var(--accent-solid) 80%, var(--accent-hover));
+  /* Thickness on both sides: a shadow below, a highlight above. */
+  --btn-shadow: var(--shadow-control),
+                inset 0 var(--stroke) 0 var(--accent-edge);
+}
+
+/* Soft: a control INSIDE a group. No border — in a row of five, outlines add
+   up into a grid and the group reads as a table. */
+[data-scope='button'][data-part='root'][data-emphasis='low'] {
+  --btn-bg: var(--surface-recessed-hover);
+  --btn-border: transparent;
+  --btn-shadow: none;
+}
+
+/* Ghost: nothing until hover, AND a quieter label — a third-order action with
+   an almost-black label still outshouts the data it serves. */
+[data-scope='button'][data-part='root'][data-emphasis='minimal'] {
+  --btn-bg: transparent;
+  --btn-border: transparent;
+  --btn-shadow: none;
+  --btn-fg: var(--text-secondary);
+
+  &:hover:not(:disabled) { --btn-fg: var(--text-primary); }
+}
+
+/* --- tone ----------------------------------------------------------------
+
+   A tone paints whichever weight it stands on and adds no border of its own:
+   a red outline would be the loudest line in an action bar.
+
+   There is deliberately NO solid red. A fill under a white label is the
+   accent's privilege, and a second solid colour would mean a second primary
+   action on the screen. So high emphasis + danger keeps the accent fill and
+   the white label: in Instrument a destructive primary does NOT look
+   destructive. GGarry answers the same markup with a solid red button. That
+   difference is the point of having themes — but it is also a real semantic
+   gap, recorded in the README. */
+
+[data-scope='button'][data-part='root'][data-tone] {
+  --btn-fg: var(--tone-ink);
+  --btn-bg-hover: var(--tone-bg);
+  --btn-bg-active: var(--tone-bg);
+}
+
+[data-scope='button'][data-part='root'][data-tone][data-emphasis='high'] {
+  --btn-fg: var(--accent-on);
+  --btn-bg-hover: var(--accent-hover);
+  --btn-bg-active: var(--accent-hover);
+}
+
+/* --- sizes --------------------------------------------------------------- */
+
+[data-scope='button'][data-part='root'][data-size='sm'] {
+  --btn-pad: var(--control-pad-sm);
+  min-block-size: var(--control-h-sm);
+  border-radius: var(--radius-control-sm);
+  font-size: var(--text-xs);
+}
+[data-scope='button'][data-part='root'][data-size='lg'] {
+  --btn-pad: var(--control-pad-lg);
+  min-block-size: var(--control-h-lg);
+  border-radius: var(--radius-control-lg);
+  font-size: var(--text-md);
+}
+
+/* --- busy ----------------------------------------------------------------
+
+   Busy is aria-busy, not disabled: the button stays focusable and keeps its
+   width. The label is dimmed by colour rather than taken out of the flow, so
+   the action bar does not twitch at the moment of the press.
+
+   Instrument draws the ring itself, so the kit's `spinner` part is hidden —
+   a theme is allowed to not render a part, as long as the part exists. */
+
+[data-scope='button'][data-part='spinner'] { display: none; }
+
+[data-scope='button'][data-part='root'][aria-busy='true'] {
+  position: relative;
+  pointer-events: none;
+  color: transparent;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    translate: -50% -50%;
+    inline-size: var(--size-spinner);
+    block-size: var(--size-spinner);
+    border: calc(var(--stroke) * 2) solid color-mix(in oklab, var(--btn-fg) 25%, transparent);
+    border-block-start-color: var(--btn-fg);
+    border-radius: var(--radius-full);
+    animation: instrument-spin 0.7s linear infinite;
+  }
+}
+
+@keyframes instrument-spin { to { rotate: 360deg; } }

@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Instrument — the theme entry point.
+
+   Ported from github.com/keshon/instrument onto ggary's spine. The layer order
+   is the kit contract and is identical to GGarry's: application styles live
+   outside every layer and always win without !important.
+
+   Instrument, unlike GGarry, styles the DOCUMENT and not only kit components:
+   its base layer resets margins, sets the body type and draws the focus ring and
+   scrollbars globally. That is its design language — "the base of the document
+   is the interface" — and it is the first thing a project notices on switching.
+
+   Runtime axes, all attributes on any subtree:
+     data-mode      light-neutral · light · light-cool · dark · dark-soft
+     data-accent    (petrol) · graphite · indigo · clay
+     data-density   compact · (regular) · comfortable
+     data-scale     (14) · 15 · 16 · 17 · 18
+   ========================================================================== */
+
+@layer gg.tokens, gg.structure, gg.base, gg.components, gg.forced, gg.motion;
+
+/* Tier 1 → 3, then the knobs that retune them. */
+@import './tokens/ramps.css' layer(gg.tokens);
+@import './tokens/semantics.css' layer(gg.tokens);
+@import './tokens/typography.css' layer(gg.tokens);
+@import './tokens/scales.css' layer(gg.tokens);
+@import './tokens/modes.css' layer(gg.tokens);
+@import './tokens/accents.css' layer(gg.tokens);
+@import './tokens/roles.css' layer(gg.tokens);
+@import './tokens/density.css' layer(gg.tokens);
+@import './tokens/scale.css' layer(gg.tokens);
+@import './contract.css' layer(gg.tokens);
+
+@import '@ggary/structure' layer(gg.structure);
+
+@import './base/base.css' layer(gg.base);
+@import './base/tone.css' layer(gg.base);
+
+@import './components/button.css' layer(gg.components);
+@import './components/chip.css' layer(gg.components);
+@import './components/chip-group.css' layer(gg.components);
+@import './components/select.css' layer(gg.components);
+
+@import './a11y/forced.css' layer(gg.forced);
+@import './a11y/motion.css' layer(gg.motion);

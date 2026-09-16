@@ -19,7 +19,7 @@ import { CHECK, CHEVRON, h, icon, spread } from '../../spread'
  * this one builds its own light DOM. Give the host element a min-height in CSS
  * if you render it above the fold, or you will get layout shift on upgrade.
  *
- * Still no shadow DOM: the same @ggary/styles stylesheet reaches it, and the
+ * Still no shadow DOM: the same theme stylesheet reaches it, and the
  * host app can theme it with the same [data-part] selectors as React and Svelte.
  */
 export class GgSelectElement extends HTMLElement {

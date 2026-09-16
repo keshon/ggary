@@ -1,0 +1,11 @@
+{
+  "name": "@ggary/structure",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "sideEffects": ["*.css"],
+  "exports": {
+    ".": "./src/index.css",
+    "./*.css": "./src/*.css"
+  }
+}

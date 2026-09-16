@@ -1,6 +1,6 @@
 import type { Dict, Normalizer } from '../../types'
 import { chipAttrs, chipRemoveAttrs } from '../chip/chip.connect'
-import type { ChipSize, ChipVariant } from '../chip/chip.types'
+import type { ChipEmphasis, ChipSize } from '../chip/chip.types'
 import { chipGroupAnatomy } from './chip-group.anatomy'
 import type { ChipGroupEvent, ChipGroupState, ChipItem } from './chip-group.types'
 
@@ -15,7 +15,7 @@ const isPrintable = (key: string) => key.length === 1 && key !== ' '
 
 export interface ConnectOptions {
   label?: string
-  variant?: ChipVariant
+  emphasis?: ChipEmphasis
   size?: ChipSize
   /** Rendered as hidden inputs so the selection participates in form submission. */
   name?: string
@@ -29,7 +29,7 @@ export function connect<T = Dict>(
   options: ConnectOptions = {}
 ) {
   const ids = chipGroupIds(state.id)
-  const { label, variant = 'subtle', size = 'md', name, form } = options
+  const { label, emphasis = 'low', size = 'md', name, form } = options
   const horizontal = state.orientation === 'horizontal'
 
   const forward = horizontal ? 'ArrowRight' : 'ArrowDown'
@@ -109,7 +109,7 @@ export function connect<T = Dict>(
       const removable = (item.removable ?? state.removable) && !disabled
       return normalize({
         ...chipAttrs({
-          variant,
+          emphasis,
           size,
           selected: state.selection.includes(item.value),
           disabled,

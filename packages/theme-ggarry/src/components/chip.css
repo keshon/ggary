@@ -4,30 +4,30 @@
 
 [data-scope='chip'][data-part='root'] {
   --chip-height: 26px;
-  --chip-padding-x: var(--gg-space-3);
-  --chip-font-size: var(--gg-font-size-sm);
-  --chip-bg: var(--gg-bg-muted);
-  --chip-bg-hover: var(--gg-border-default);
-  --chip-fg: var(--gg-text-default);
+  --chip-padding-x: var(--ggarry-space-3);
+  --chip-font-size: var(--ggarry-font-size-sm);
+  --chip-bg: var(--ggarry-bg-muted);
+  --chip-bg-hover: var(--ggarry-border-default);
+  --chip-fg: var(--ggarry-text-default);
   --chip-border: transparent;
 
   display: inline-flex;
   align-items: center;
-  gap: var(--gg-space-2);
+  gap: var(--ggarry-space-2);
   height: var(--chip-height);
   padding-inline: var(--chip-padding-x);
   max-width: 100%;
-  font-family: var(--gg-font-family-sans);
+  font-family: var(--ggarry-font-family-sans);
   font-size: var(--chip-font-size);
-  font-weight: var(--gg-font-weight-medium);
+  font-weight: var(--ggarry-font-weight-medium);
   line-height: 1;
   color: var(--chip-fg);
   background: var(--chip-bg);
   border: 1px solid var(--chip-border);
-  border-radius: var(--gg-radius-full);
+  border-radius: var(--ggarry-radius-full);
   user-select: none;
-  transition: background-color var(--gg-duration-fast) ease, border-color var(--gg-duration-fast) ease,
-    color var(--gg-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) ease, border-color var(--ggarry-duration-fast) ease,
+    color var(--ggarry-duration-fast) ease;
 }
 
 /* Only chips that are actually buttons get a pointer and hover feedback. */
@@ -40,26 +40,26 @@ button[data-scope='chip'][data-part='root']:hover:not([data-disabled]) {
 
 [data-scope='chip'][data-part='root'][data-size='sm'] {
   --chip-height: 22px;
-  --chip-padding-x: var(--gg-space-2);
-  --chip-font-size: var(--gg-font-size-xs);
+  --chip-padding-x: var(--ggarry-space-2);
+  --chip-font-size: var(--ggarry-font-size-xs);
 }
 
-[data-scope='chip'][data-part='root'][data-variant='outline'] {
+[data-scope='chip'][data-part='root'][data-emphasis='medium'] {
   --chip-bg: transparent;
-  --chip-bg-hover: var(--gg-bg-subtle);
-  --chip-border: var(--gg-border-strong);
+  --chip-bg-hover: var(--ggarry-bg-subtle);
+  --chip-border: var(--ggarry-border-strong);
 }
-[data-scope='chip'][data-part='root'][data-variant='solid'] {
-  --chip-bg: var(--gg-bg-inverted);
-  --chip-bg-hover: var(--gg-bg-inverted);
-  --chip-fg: var(--gg-text-on-inverted);
+[data-scope='chip'][data-part='root'][data-emphasis='high'] {
+  --chip-bg: var(--ggarry-bg-inverted);
+  --chip-bg-hover: var(--ggarry-bg-inverted);
+  --chip-fg: var(--ggarry-text-on-inverted);
 }
 
 /* Selected wins over every variant — it is state, not style. */
 [data-scope='chip'][data-part='root'][data-selected] {
-  --chip-bg: var(--gg-bg-accent);
-  --chip-bg-hover: var(--gg-bg-accent-hover);
-  --chip-fg: var(--gg-text-on-accent);
+  --chip-bg: var(--ggarry-bg-accent);
+  --chip-bg-hover: var(--ggarry-bg-accent-hover);
+  --chip-fg: var(--ggarry-text-on-accent);
   --chip-border: transparent;
 }
 
@@ -72,7 +72,7 @@ button[data-scope='chip'][data-part='root']:hover:not([data-disabled]) {
    element (the group can be blurred entirely). Show a quiet resting marker so
    the tab target is discoverable, and let :focus-visible do the loud version. */
 [data-scope='chip'][data-part='root'][data-focused]:not(:focus-visible):not([data-selected]) {
-  --chip-border: var(--gg-border-strong);
+  --chip-border: var(--ggarry-border-strong);
 }
 
 [data-scope='chip'][data-part='label'] {
@@ -89,10 +89,10 @@ button[data-scope='chip'][data-part='root']:hover:not([data-disabled]) {
   width: 14px;
   height: 14px;
   margin-inline-end: -4px;
-  border-radius: var(--gg-radius-full);
+  border-radius: var(--ggarry-radius-full);
   opacity: 0.6;
   cursor: pointer;
-  transition: opacity var(--gg-duration-fast) ease, background-color var(--gg-duration-fast) ease;
+  transition: opacity var(--ggarry-duration-fast) ease, background-color var(--ggarry-duration-fast) ease;
 }
 [data-scope='chip'][data-part='remove']:hover {
   opacity: 1;

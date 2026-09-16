@@ -1,0 +1,87 @@
+/* ══ Accents ═══════════════════════════════════════════════════════════════
+
+   THE THIRD KNOB, and it is orthogonal to the theme: any accent combines
+   with any of the five themes, because it overrides only the --a-* ramp,
+   while the whole of the semantics (--accent-solid, --accent-mark,
+   --accent-text, --accent-bg, --focus-ring) reads the ramp and knows nothing
+   of the change. 4 accents × 5 themes × 3 densities.
+
+   Petrol is declared above without an attribute — it is the base, as "black"
+   is among the dark themes. Removing the attribute means returning to it; a
+   separate [data-accent="petrol"] is deliberately absent, a duplicate would
+   diverge one day.
+
+   ── What every set has to hold ───────────────────────────────────────────
+
+     step 1  the tinted background in a light theme
+     step 2  text on RAISED dark surfaces (dark-soft)
+     step 3  text and mark in the dark themes
+     step 4  the FILL under a white label. The lightness is bounded from
+             above, and the bound depends on hue — 0.545 / 0.560 / 0.560 /
+             0.560 respectively
+     step 5  text in a LIGHT theme over step 1 (4.5:1 on white)
+     step 6  the focus ring in the light themes — the one step that is never
+             a fill, so it outlines one without merging into it
+
+   All 24 colours are checked for sRGB clipping and are run through the
+   contrast gate across all five themes: cmd/contrast iterates the accent
+   axis alongside the theme.
+
+   ── A fifth set ──────────────────────────────────────────────────────────
+
+   Costs six lines. The requirements: no closer than 25° to the status hues
+   (25 · 85 · 150), step 4 within gamut at its lightness, and a run of the
+   gate.                                                                    */
+
+/* Graphite: the same hue as the former default, but a third quieter. For
+   those who want blue and do not want character: the kit stops shouting
+   while staying familiar. */
+[data-accent="graphite"] {
+  --a-1: oklch(0.960 0.014 250);
+  --a-2: oklch(0.800 0.065 250);
+  --a-3: oklch(0.700 0.084 250);
+  --a-4: oklch(0.560 0.100 250);
+  --a-5: oklch(0.450 0.087 250);
+  --a-6: oklch(0.330 0.065 250);
+}
+
+/* Indigo: the most saturated of the four — at 275° the ceiling of the gamut
+   is high, and step 4 takes 0.145 without clipping.
+
+   MIND the neighbourhood of the categorical palette: --chart-1 stands at
+   292°, that is 17° from here. Inside one component they do not meet (the
+   accent does not step into the area of a chart, a categorical colour does
+   not step outside it), but the legend of a multi-series chart will stand
+   beside the accent on one screen. What tells them apart there is lightness
+   rather than hue.                                                          */
+[data-accent="indigo"] {
+  --a-1: oklch(0.960 0.021 275);
+  --a-2: oklch(0.800 0.093 275);
+  --a-3: oklch(0.700 0.122 275);
+  --a-4: oklch(0.560 0.145 275);
+  --a-5: oklch(0.450 0.126 275);
+  --a-6: oklch(0.330 0.093 275);
+}
+
+/* Clay: the only WARM accent, and the only one standing on the same side of
+   the neutral as the warning.
+
+   From here to warn (85°) is 40°, which is more than the 25° the kit
+   accepts — but 25° is the threshold for the CATEGORICAL palette, where
+   colour is the only thing telling a series apart. With an accent it is
+   otherwise, and the protection is already written: the "running" state is
+   recognised by its PULSE rather than by its hue (nothing else in the kit
+   pulses), and a status by rule always travels with a dot AND a word.
+
+   Even so this is the one set where the orange "running" mark stands in the
+   same register as the yellow warn mark, and on a 6px dot the difference is
+   finer than in any other set. If a screen is built around status dots
+   without labels, this is not the one to choose.                            */
+[data-accent="clay"] {
+  --a-1: oklch(0.960 0.018 45);
+  --a-2: oklch(0.800 0.084 45);
+  --a-3: oklch(0.700 0.109 45);
+  --a-4: oklch(0.560 0.130 45);
+  --a-5: oklch(0.450 0.113 45);
+  --a-6: oklch(0.330 0.084 45);
+}

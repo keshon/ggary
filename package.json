@@ -7,7 +7,7 @@
     "apps/*"
   ],
   "scripts": {
-    "tokens": "node packages/tokens/build.mjs",
+    "tokens": "node packages/theme-ggarry/build.mjs",
     "dev": "npm run tokens && npm run dev -w @ggary/sandbox",
     "test": "npm run tokens && vitest run",
     "test:watch": "vitest",

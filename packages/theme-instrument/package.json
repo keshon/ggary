@@ -1,0 +1,12 @@
+{
+  "name": "@ggary/theme-instrument",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Instrument's design language ported onto the ggary spine",
+  "sideEffects": ["*.css"],
+  "exports": {
+    ".": "./src/index.css"
+  },
+  "dependencies": { "@ggary/structure": "*" }
+}

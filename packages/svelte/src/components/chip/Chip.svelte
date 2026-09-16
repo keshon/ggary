@@ -11,7 +11,7 @@
   }
 
   let {
-    variant = 'subtle',
+    emphasis = 'low',
     size = 'md',
     selected = false,
     disabled = false,
@@ -24,7 +24,7 @@
 
   const showRemove = $derived(removable ?? !!onRemove)
   const api = $derived(
-    connect({ variant, size, selected, disabled, removable: showRemove, interactive }, svelteNormalizer, onRemove)
+    connect({ emphasis, size, selected, disabled, removable: showRemove, interactive }, svelteNormalizer, onRemove)
   )
 </script>
 

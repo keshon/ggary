@@ -1,11 +1,11 @@
-import { connect, type ButtonSize, type ButtonVariant } from '@ggary/core/button'
+import { connect, type ButtonEmphasis, type ButtonSize, type ButtonTone } from '@ggary/core/button'
 import { domNormalizer } from '@ggary/core'
 import { spread } from '../../spread'
 
 /**
  * Pattern A — light-DOM *enhancement*.
  *
- *   <gg-button variant="danger"><button>Delete</button></gg-button>
+ *   <gg-button tone="danger"><button>Delete</button></gg-button>
  *
  * The server (or a Go template) renders a real, working <button>. This element
  * only decorates it. No shadow DOM, no client-side markup generation, so there
@@ -14,7 +14,7 @@ import { spread } from '../../spread'
  * Compare with select.element.ts, which has to take the other approach.
  */
 export class GgButtonElement extends HTMLElement {
-  static observedAttributes = ['variant', 'size', 'disabled', 'loading', 'full-width', 'type']
+  static observedAttributes = ['emphasis', 'tone', 'size', 'disabled', 'loading', 'full-width', 'type']
 
   #button: HTMLButtonElement | null = null
   #spinner: HTMLSpanElement | null = null
@@ -39,7 +39,8 @@ export class GgButtonElement extends HTMLElement {
     const loading = this.hasAttribute('loading')
     const api = connect(
       {
-        variant: (this.getAttribute('variant') as ButtonVariant) ?? undefined,
+        emphasis: (this.getAttribute('emphasis') as ButtonEmphasis) ?? undefined,
+        tone: (this.getAttribute('tone') as ButtonTone) ?? undefined,
         size: (this.getAttribute('size') as ButtonSize) ?? undefined,
         disabled: this.hasAttribute('disabled'),
         loading,

@@ -1,0 +1,14 @@
+/* Scoped to kit components only. A UI kit has no business restyling the host
+   app's <p> and <h1>. Box sizing lives in @ggary/structure. */
+
+[data-scope][data-part='root'] {
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  color: var(--ggarry-text-default);
+}
+
+/* Focus ring, defined once. Components never redefine it. */
+[data-scope]:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}

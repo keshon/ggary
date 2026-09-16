@@ -1,13 +1,10 @@
-import '@ggary/styles'
+import './theme'
 import './shared.css'
-import '@ggary/elements' // only for the theme toggle in the page chrome
 
 import { StrictMode, useState, type FormEvent } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Button, Chip, ChipGroup, Select } from '@ggary/react'
-import { frameworks, installThemeToggle, tags } from './demo-data'
-
-installThemeToggle(document.getElementById('theme-toggle')!)
+import { frameworks, tags } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -25,13 +22,22 @@ function App() {
   return (
     <>
       <section>
-        <h2>Button — variants</h2>
+        <h2>Button — emphasis</h2>
         <div className="row">
-          <Button>Solid</Button>
-          <Button variant="subtle">Subtle</Button>
-          <Button variant="outline">Outline</Button>
-          <Button variant="ghost">Ghost</Button>
-          <Button variant="danger">Danger</Button>
+          <Button emphasis="high">high</Button>
+          <Button emphasis="medium">medium</Button>
+          <Button emphasis="low">low</Button>
+          <Button emphasis="minimal">minimal</Button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Button — tone danger, across emphasis</h2>
+        <div className="row">
+          <Button emphasis="high" tone="danger">high</Button>
+          <Button emphasis="medium" tone="danger">medium</Button>
+          <Button emphasis="low" tone="danger">low</Button>
+          <Button emphasis="minimal" tone="danger">minimal</Button>
         </div>
       </section>
 
@@ -49,9 +55,9 @@ function App() {
       <section>
         <h2>Chip — standalone</h2>
         <div className="row">
-          <Chip>Plain</Chip>
-          <Chip variant="outline">Outline</Chip>
-          <Chip variant="solid">Solid</Chip>
+          <Chip>low</Chip>
+          <Chip emphasis="medium">medium</Chip>
+          <Chip emphasis="high">high</Chip>
           <Chip selected>Selected</Chip>
           <Chip size="sm">Small</Chip>
           <Chip onRemove={() => alert('removed')}>Dismiss me</Chip>
@@ -82,7 +88,7 @@ function App() {
           Removal is a <b>request</b> — the machine never touches <code>items</code>, this page does.
         </p>
         <div className="row" style={{ marginTop: 12 }}>
-          <Button size="sm" variant="outline" onClick={() => setItems(tags)}>
+          <Button size="sm" onClick={() => setItems(tags)}>
             Restore removed
           </Button>
         </div>
@@ -124,10 +130,10 @@ function App() {
               setLastEvent(`onValueChange(${JSON.stringify(next)}, ${JSON.stringify(item?.label ?? null)})`)
             }}
           />
-          <Button variant="outline" onClick={() => setValue('qwik')}>
+          <Button onClick={() => setValue('qwik')}>
             Set to Qwik
           </Button>
-          <Button variant="ghost" onClick={() => setValue(null)}>
+          <Button emphasis="minimal" onClick={() => setValue(null)}>
             Clear
           </Button>
         </div>
@@ -144,8 +150,8 @@ function App() {
         <h2>Native form participation</h2>
         <form className="demo" onSubmit={onSubmit} onReset={() => setFormOutput('reset')}>
           <Select items={frameworks} name="framework" label="framework" placeholder="Required…" />
-          <Button type="submit">Submit</Button>
-          <Button type="reset" variant="ghost">
+          <Button emphasis="high" type="submit">Submit</Button>
+          <Button type="reset" emphasis="minimal">
             Reset
           </Button>
         </form>

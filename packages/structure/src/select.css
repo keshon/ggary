@@ -1,0 +1,31 @@
+/* The positioner is placed by Floating UI through `transform`, so it has to be
+   absolutely positioned from the root's top-left corner and free to move. */
+[data-scope='select'][data-part='root'] {
+  position: relative;
+}
+
+[data-scope='select'][data-part='positioner'] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: var(--gg-z-popover, 50);
+}
+
+[data-scope='select'][data-part='positioner'][data-state='closed'] {
+  display: none;
+}
+
+/* The listbox scrolls inside the room Floating UI measured for it. The
+   variable is written by core's `attachPositioner`, not by a theme. */
+[data-scope='select'][data-part='content'] {
+  max-height: var(--gg-available-height, 280px);
+  overflow-y: auto;
+  margin: 0;
+  list-style: none;
+}
+
+/* Focus stays on the trigger (aria-activedescendant), so the listbox itself
+   never shows a ring even though it carries tabindex="-1". */
+[data-scope='select'][data-part='content']:focus-visible {
+  outline: none;
+}

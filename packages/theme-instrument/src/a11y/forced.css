@@ -1,0 +1,37 @@
+/* ==========================================================================
+   Instrument — forced colours (Windows High Contrast)
+
+   Ported from instrument/src/forced.css for the components that exist here.
+   Its own layer (gg.forced), declared after the components, so these rules win
+   by layer order rather than by !important — which would also beat the
+   application's own unlayered styles and break the kit's promise to it.
+
+   The whole language is "a hairline plus a step between surfaces". Under
+   forced-colors the fills and alpha borders reset to system colours, and
+   without this the fields, the recessed buttons and the selection collapse
+   into one flat plane.
+   ========================================================================== */
+
+@media (forced-colors: active) {
+  [data-scope='button'][data-part='root'],
+  [data-scope='select'][data-part='trigger'],
+  [data-scope='select'][data-part='content'],
+  [data-scope='chip'][data-part='root'] {
+    border: var(--stroke) solid CanvasText;
+  }
+
+  /* A selection that is only a fill has to survive the reset. */
+  [data-scope='select'][data-part='item'][data-highlighted],
+  [data-scope='chip-group'] [data-scope='chip'][data-part='root'][data-selected] {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  /* The ring of a busy button: without this every border turns CanvasText,
+     the ring is even, and the spin stops being visible at all. */
+  [data-scope='button'][data-part='root'][aria-busy='true']::after {
+    forced-color-adjust: none;
+    border-color: ButtonFace;
+    border-block-start-color: ButtonText;
+  }
+}

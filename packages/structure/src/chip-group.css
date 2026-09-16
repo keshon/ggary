@@ -1,0 +1,15 @@
+/* Orientation is behaviour, not style: `aria-orientation` decides which arrow
+   keys move focus, so the layout has to agree with it in every theme. */
+[data-scope='chip-group'][data-part='list'] {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+[data-scope='chip-group'][data-part='list'][data-orientation='vertical'] {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+}

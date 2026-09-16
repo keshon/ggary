@@ -1,0 +1,460 @@
+:root {
+  /* ══ 2. Semantics ═══════════════════════════════════════════════════════
+
+     A dark theme is not an inversion. The contrast between neighbouring
+     surfaces widens, the chroma comes down, and the borders move from a dark
+     alpha to a light one. All of that is here, in one declaration per
+     token.                                                                 */
+
+  /* The surfaces read as a stack: sunken < page < raised < overlay. Depth is
+     carried by the order of lightness and never by a shadow.               */
+  --surface-sunken:   light-dark(var(--n-2), var(--n-14));
+  --surface-page:     light-dark(var(--n-1), var(--n-13));
+  --surface-raised:   light-dark(var(--n-0), var(--n-12));
+  --surface-overlay:  light-dark(var(--n-0), var(--n-11));
+
+  /* A FIELD IS RECESSED, and what identifies it is the border rather than the
+     depth. The two answer different questions, and a field that carries both
+     at full strength — a fill of its own plus a load-bearing border at 3.46:1,
+     the loudest line in the kit — is a grey slab in a dark frame, the one
+     element shouting twice.
+
+     What was removed is the fill and not the border, and the choice is not a
+     matter of taste. WCAG 1.4.11 asks 3:1 for the boundary of a control, and
+     on a PAGE the recess gave only 0.028 ΔL — that is, the fill never held
+     the norm, the border did. Remove the border and the kit stops meeting the
+     criterion; remove the fill and it does not.
+
+     be1b3fe brought the fill back in the same commit that removed it: there
+     the fill and the border justified each other in a circle. The circle is
+     gone — they have different work. The border holds WCAG 1.4.11 and
+     identifies the control; the fill holds INDEPENDENCE FROM THE CONTAINER —
+     a field steps away from its ground by the same amount on a page, in a
+     panel and in a modal alike. An absolute step cannot do that: it knows one
+     depth, and there are three grounds.
+
+     The role stays separate because "what colour is a field" and "what colour
+     is a panel" are different questions, and one day the answers will diverge
+     again. The same case as --surface-overlay, which also equals raised at
+     the light end: two roles on one step are not a duplicate.
+
+     A consequence: the field takes no part in the depth stack at all. That is
+     why the step gate does not check it — the "control boundary" pairs answer
+     for it.                                                                */
+
+  /* THE FIELD LIFTS TO THE RAISED SURFACE, and the earlier reasoning for a
+     recess is replaced rather than amended — it answered a different question.
+
+     What was measured then was a lift ABOVE A PANEL, as a film: white at 8%
+     over a panel that is already white gives +0.000, and there is genuinely no
+     headroom there. The conclusion drawn was that a lift does not exist in the
+     light themes, and the field went downwards instead.
+
+     Against the PAGE it does exist, because the page is not the panel.
+     Measured across the five themes, page → raised:
+
+       light        0.976 → 1.000   +0.024
+       light cool   0.976 → 1.000   +0.024
+       dark soft    0.196 → 0.242   +0.046
+       dark         0.155 → 0.196   +0.041
+
+     A step in all five, and it is the step the field wants: a field is a place
+     you may write in, and on every reference that reads as paper laid on the
+     page rather than as a dent in it.
+
+     INSIDE A PANEL THERE IS NO STEP, and that is accepted rather than worked
+     around. The panel is already the raised surface, so a field on it differs
+     by its border alone — which is exactly what --border-control is for, at
+     3.46:1 against both. Belt without braces: one carrier, doing its job.  */
+  --surface-field:    var(--surface-raised);
+
+  /* The surface of an ANNOTATION — the tooltip and everything that explains
+     the interface without being part of it. It deliberately falls out of the
+     sunken→page→raised→overlay stack: its job is not to lie higher but to
+     look unlike content.
+
+     On --surface-overlay a tooltip looks like a small panel — the same
+     border, shadow and text colour as everything else — and the eye reads it
+     as one more piece of interface rather than as a note about it.
+
+     In the light theme this is a dark step, in the dark one a light step: an
+     inversion against the page rather than a fixed black. A black plate on a
+     dark page disappears.                                                  */
+  --surface-inverse:  light-dark(var(--n-12), var(--n-3));
+  /* A soft inversion — for a PERMANENT selection rather than for a layer that
+     flashed by.
+
+     A hint lives for a second and takes the full inversion: it is entitled to
+     part from the page across the whole scale, because it covers the page and
+     has to read at once. A selected tab stands there all the time, and a full
+     inversion turns it into a brick: on a light page an almost-black plate
+     pulls more attention than the content the tab was selected for.
+
+     0.322 against 0.196 — two steps lighter, the same direction, and the
+     white label keeps three times the margin over the threshold.           */
+  --surface-inverse-soft: light-dark(var(--n-10), var(--n-4));
+  --text-on-inverse:  light-dark(var(--n-0),  var(--n-13));
+
+  --surface-hover:    light-dark(oklch(0 0 0 / 0.035), oklch(1 0 0 / 0.045));
+  --surface-active:   light-dark(oklch(0 0 0 / 0.065), oklch(1 0 0 / 0.080));
+
+  /* A RECESS is black laid over, not a step of the ramp. The difference is
+     not cosmetic: a step of the ramp sets lightness ABSOLUTELY and therefore
+     knows one depth only, while in fact a button lies now on a page, now on a
+     panel, now in a modal — and it has to step away from each of them by the
+     same amount. Translucent black does exactly that: the depth is counted
+     from whatever is under the button.
+
+     That is what catches a --surface-sunken fill out: on a page it gives the
+     drop that is wanted, and on a raised panel a double one, because the
+     panel is already a step higher. 0.087 in lightness instead of 0.033.
+
+     The numbers come from the Anthropic mockup: a panel at #262625 with a
+     secondary button on it at rgba(0,0,0,0.2) — a drop of 0.033 in lightness.
+     Hover there HALVES the recess (0.2 → 0.1), that is, it pulls the button
+     towards the surface rather than tearing it away. A press deepens it: an
+     object pushed in has a bigger drop, and that is the same thought as the
+     shadow removed from a raised one.
+
+     In the light themes the step is four times smaller. Black gains lightness
+     faster on white than on dark: the same 0.2 would give a grey brick on a
+     page. */
+  /* THE BOUNDARY OF THE ROLE, so that it is not applied across the board. A
+     relative recess is wanted by whatever has a changing ground OR whose step
+     would otherwise come out doubled. What stayed on an absolute step, and
+     why:
+
+       .inst-shell-aside, .inst-rail, .inst-statusbar — regions of the shell;
+         they are the ground themselves and have nothing to step away from;
+       .inst-log, .inst-code, .inst-code-src, .inst-diff-body — self-contained
+         wells: they have a border and a type size of their own, and depth
+         works there as a mark of kind rather than as a relation to a
+         neighbour.
+
+     The test is simple: if an element is a SURFACE something lies on, it gets
+     the absolute step; if the element LIES on a surface, the relative one. */
+  /* THE SIGN OF THE FILM DEPENDS ON WHERE WE ARE ON THE RAMP: black in the
+     light themes, white in the dark ones. The invariant is therefore stated
+     without the word "depth" — the surface of a control has to differ from
+     its ground by a discernible step: at the bottom of the ramp there is
+     nothing to subtract lightness from.
+
+     The sign changes, THE ORDER OF LOUDNESS does not: soft is quieter than
+     the default, a press is louder. The middle line serves two jobs at once —
+     the hover of the default and the rest state of the soft weight — so it
+     has to be quieter than the default in both themes.
+
+     The derivation of the alphas and the measurements are in
+     docs/internal/DECISIONS.md. Three cmd/contrast pairs guard this, and the
+     "ladder" among them compares DIRECTIONALLY: the modulus of the difference
+     let a reversed order through in silence. */
+  --surface-recessed:        light-dark(oklch(0 0 0 / 0.060), oklch(1 0 0 / 0.050));
+  --surface-recessed-hover:  light-dark(oklch(0 0 0 / 0.025), oklch(1 0 0 / 0.015));
+  --surface-recessed-active: light-dark(oklch(0 0 0 / 0.075), oklch(1 0 0 / 0.062));
+
+  /* THE LADDER OF BUTTON WEIGHTS LIVES ON THESE SAME STEPS, which is why the
+     light value of --surface-recessed is 0.060 rather than 0.050.
+
+     Weights are measured by "presence" — area weighted by the step in
+     lightness: a fill works with the whole box, a border only with the
+     perimeter, which on a 100×32 button is 8% of the area. Hence the ladder:
+
+       ghost 0          outline 0.007        soft 0.017–0.022
+       default 0.044–0.048            solid 0.17–0.47
+
+     The hover step doubles as the RESTING FILL of the soft weight. The
+     coincidence is deliberate: soft at rest looks like the default under a
+     cursor, and that confuses nobody — hover arrives with the cursor and
+     lives exactly as long as it stays.
+
+     0.050 does not fit arithmetically in the light theme: soft would stand
+     0.019 from the default against a step threshold of 0.022. 0.060 gives
+     0.027, and the dark theme on its 0.20 gives 0.024. The pair "ladder: soft
+     against default" in cmd/contrast checks it.                            */
+
+  /* Selection is alpha in both themes, so that states add up: hover over a
+     selected row has to stay visible rather than be eaten by an opaque
+     fill. */
+  --surface-selected: color-mix(in oklab, var(--a-4) 14%, transparent);
+
+  /* THE GROUND AND THE EDGE OF A QUIET REGION — the colour half of `data-rank`.
+
+     They stand in the SEMANTICS tier and not among the roles, and the split is
+     the kit's own definition rather than a convenience: tier 2 answers "what is
+     this colour for", tier 3 holds paddings, glyph sizes and gutters. A ground
+     is a colour. The rank RUNGS are sizes and stay below with the roles.
+
+     The tools agree with the tier split, which is the sign it is the right one:
+     cmd/contrast reads this block and cannot see the roles, cmd/proportion
+     reads the roles. Each half of the axis is guarded by the gate built for
+     what it is.
+
+     ── The film ────────────────────────────────────────────────────────────
+
+     The same film a control recesses by, under a name of its own. Not a
+     duplicate: the arrangement --surface-field has against --surface-raised,
+     and for the same reason. "How far does a control step off its ground" and
+     "how far does a quiet region step off its ground" are different questions
+     whose answers coincide today — and a region is a large area where a control
+     is a small one, so the day they part, they part in one line here.
+
+     It also earns its own mutation: repointing this turns the five rank pairs
+     in cmd/contrast red and leaves the button pairs alone, which is what proves
+     the rank pairs measure rank.
+
+     A REGION TAKES AT MOST ONE FILM. Depth requests it and rank requests it,
+     and a region receiving both requests still paints one — the depth of a
+     nesting shows through the stack of painted elements rather than through the
+     strength of a single fill. Measured: three nested films on white give
+     232.2 · 218.2 · 205.2, so the stacking is already there, and asking for it
+     twice on one box would be asking twice for what one box can give once.
+
+     The consequence to hold on to: rank's ground lever bites at depth 0 only. A
+     support panel on the page recedes; a support card already inside a panel
+     has spent the film on depth, and its rank shows in its title and its
+     missing edge instead. Symmetrical with lead, which never touches ground.
+
+     ── The edge ────────────────────────────────────────────────────────────
+
+     Support gives up its edge entirely. Chrome is the first thing to withdraw
+     and the cheapest one: an assembled kit screen carries about two and a half
+     times the drawn edges the reference does, so the quiet direction here is
+     also the direction the kit owed anyway. */
+  --region-ground-support: var(--surface-recessed);
+  --region-edge-support:   transparent;
+
+  /* Four tiers of text.
+     IMPORTANT: --text-faint is not applied to text that gets read. It is the
+     threshold of decoration (≥3:1), not of reading (≥4.5:1). A log timestamp
+     is data, and --text-muted is due to it.                                */
+  --text-primary:   light-dark(var(--n-12), var(--n-1));
+  --text-secondary: light-dark(var(--n-9),  var(--n-5));
+  --text-muted:     light-dark(var(--n-8),  var(--n-6));
+  --text-faint:     light-dark(var(--n-7),  var(--n-7));
+
+  /* Borders. Load-bearing and decorative are different tokens, because the
+     requirements on them differ. If the boundary IS the control (a checkbox,
+     a field, a switch track), it has to hold 3:1. If there is also a step
+     between surfaces beside it (a panel, a card, a divider), it does not. */
+  --border-subtle:  light-dark(oklch(0 0 0 / 0.07), oklch(1 0 0 / 0.06));
+  --border:         light-dark(oklch(0 0 0 / 0.12), oklch(1 0 0 / 0.11));
+  --border-strong:  light-dark(oklch(0 0 0 / 0.22), oklch(1 0 0 / 0.20));
+  --border-control: light-dark(oklch(0 0 0 / 0.46), oklch(1 0 0 / 0.38));
+
+  /* Every tone that carries meaning has EXACTLY TWO tokens, and that is the
+     result of a calculation rather than of taste.
+
+     --*-text  a MARK on a surface: text, a state dot, the fill of a meter,
+               the bar of a note. All of it is read by its boundary with the
+               background, and the background may be tinted (a badge) or
+               muted (a meter track) — so the requirement is one and the
+               same, the strictest one.
+     --*-bg    the tinted background under the mark.
+
+     A third token — a "fill" between the text and the background — is not
+     here. Living on step 4, it passes nowhere that has a track under it: a
+     yellow meter fill gives 2.49 against a norm of 3.0. On that same
+     superfluous tier a --warn-solid slides to step 3 and gives a yellow dot
+     at 1.92.
+
+     There is one exception — the accent, because it has a case the statuses
+     do not: a fill UNDER a white label.                                    */
+
+  --accent-text:   light-dark(var(--a-5), var(--a-3));
+  --accent-bg:     light-dark(var(--a-1), color-mix(in oklab, var(--a-4) 15%, transparent));
+
+  /* The button fill. Its lightness is bounded FROM ABOVE by the white label,
+     and the bound DEPENDS ON HUE: 0.545 at 215°, 0.568 at 250°, 0.576 at
+     275°, 0.580 at 45°. There can be no single number here: "lighter than
+     0.56 and the label loses 4.5:1" is the measurement of one blue, and on
+     petrol 0.560 gives 4.46.
+
+     Each --a-* set holds its own bound; the gate checks it.                */
+  --accent-solid:  var(--a-4);
+  --accent-on:     var(--n-0);
+
+  /* THE EDGE OF A SOLID FILL. Neither a shadow nor a border: a hairline a
+     little lighter than the fill, laid along the TOP edge. It says the same
+     thing --shadow-control says from below — the object has thickness — only
+     from the lit side. A shadow alone shows the thickness by half: the bottom
+     is parted, the top is cut off.
+
+     The number comes from the Anthropic mockup: a fill of oklch(0.543 0.125
+     42) carries a line of oklch(0.613 0.122 57) at half opacity along its
+     top. In the steps of the ramp that is step 3 — the very one --accent-mark
+     already shines with in the dark theme — so the edge needed no number of
+     its own.
+
+     ONLY on a solid fill, and that is not thrift. A recessed or a ghost
+     button has nothing to light: it has no surface of its own to catch the
+     light with, only a darkening of somebody else's.                       */
+  --accent-edge: color-mix(in oklab, var(--a-3) 50%, transparent);
+
+  /* A MARK with no label over it: the "running" dot, the caret, the slider
+     thumb, the meter fill, a lane segment. It is bounded FROM BELOW — it has
+     to part from the surface and from the track — so in the dark theme it
+     moves up.
+
+     In the light theme it is the SAME step as the button fill, and that is
+     not a coincidence but a requirement: otherwise two different blues stand
+     side by side on one screen — a checkbox of one shade, a slider of
+     another. Text stays on step 5, because 4.5:1 on white is out of reach
+     otherwise, and that is the one place where the accent is entitled to
+     differ.                                                               */
+  --accent-mark:   light-dark(var(--a-4), var(--a-3));
+
+  /* On hover the fill of a solid button moves AWAY from the colour of the
+     label rather than towards it. The label is white, so in both themes that
+     is downwards. A mirrored "lighter in the dark theme" drops the label's
+     contrast to 2.61.                                                      */
+  --accent-hover:  var(--a-5);
+  --accent-border: light-dark(var(--a-4), var(--a-3));
+
+  /* A mark has a step of its own, as the accent does: step 5 is calculated
+     for TEXT (4.5:1) and across a full-width fill reads darker and duller
+     than the accent mark beside it. A mark makes do with 3:1, and on step 4
+     every mark in the kit — blue, green, yellow, red — lands in one
+     register. */
+  --ok-mark:   light-dark(var(--ok-4),   var(--ok-3));
+  --warn-mark: light-dark(var(--warn-4), var(--warn-3));
+  --err-mark:  light-dark(var(--err-4),  var(--err-3));
+
+  --ok-text:   light-dark(var(--ok-5),   var(--ok-3));
+  --ok-bg:     light-dark(var(--ok-1),   color-mix(in oklab, var(--ok-4) 16%, transparent));
+
+  --warn-text: light-dark(var(--warn-5), var(--warn-3));
+  --warn-bg:   light-dark(var(--warn-1), color-mix(in oklab, var(--warn-4) 16%, transparent));
+
+  --err-text:  light-dark(var(--err-5),  var(--err-3));
+  --err-bg:    light-dark(var(--err-1),  color-mix(in oklab, var(--err-4) 16%, transparent));
+
+  /* ── The categorical palette ─────────────────────────────────────────────
+
+     The one place where colour encodes NOT a state but a series, which is why
+     it has rules and tones of its own. The order, the ceiling of six series,
+     the deliberately differing lightness for the sake of colour blindness and
+     the minimum of 25° from the status corridors — see
+     docs/components/charts/palette.md.
+
+     Against the ACCENT there is no angular guarantee and there can be none:
+     it has four positions (215 · 250 · 275 · 45), and clay stands 10° from
+     --chart-4. In place of a guarantee, a division of territory — the accent
+     does not step inside a chart, a categorical colour does not step outside.
+     The default for a single series is --accent-mark; the measurement behind
+     that is in data.css.                                                   */
+
+  /* 292 rather than 280: the "indigo" set puts the accent at 275°, and five
+     degrees of distance would make series no. 1 indistinguishable from the
+     interface. 292 gives 17° — not a guarantee, but together with the
+     differing lightness it is enough, and 28° remain to the neighbouring
+     series (320).                                                          */
+  --chart-1: light-dark(oklch(0.520 0.150 292), oklch(0.700 0.130 292));
+  --chart-2: light-dark(oklch(0.600 0.150 320), oklch(0.760 0.120 320));
+  --chart-3: light-dark(oklch(0.550 0.140 355), oklch(0.720 0.120 355));
+  --chart-4: light-dark(oklch(0.650 0.120  55), oklch(0.800 0.110  55));
+  --chart-5: light-dark(oklch(0.580 0.130 115), oklch(0.740 0.120 115));
+  --chart-6: light-dark(oklch(0.620 0.110 190), oklch(0.780 0.100 190));
+
+  /* The focus ring is NOT a mark but an outline around one, and it has a
+     requirement of its own: to part both from every surface and from every
+     FILL the kit can lay under it.
+
+     IT USED TO MEET THAT REQUIREMENT WITH COLOUR, and paid for it. Around a
+     solid button the ring and the button are both the accent, contrast 1.00,
+     so the ring was pushed down the ramp to --a-6 until it cleared the fill by
+     2.51. Two things followed. The number never reached 3.0 — 2.51 is below
+     the norm the kit asks of every other non-text pair, so the guarantee was
+     always partial. And --a-6 is nearly black at four hues: the strongest
+     visual event on the screen was the outline of whatever the keyboard
+     happened to be resting on.
+
+     SO THE SEPARATION MOVES FROM COLOUR TO GEOMETRY. The ring is the ordinary
+     accent, and what parts it from the fill is the gap: outline-offset shows
+     the SURFACE between the two, and surface against accent is already gated
+     at 3:1 in three places, because a primary button has to be visible on a
+     page, a panel and a recess. The guarantee is therefore stronger than the
+     one it replaces — 3.0 rather than 2.51 — and it holds by construction
+     rather than by a colour chosen to dodge one case.
+
+     The offset is 2px rather than 1 for the same reason: at a device pixel
+     ratio of 1.25 a one-pixel gap rounds to one device pixel and can be
+     swallowed by antialiasing on a rounded corner. Two survives every ratio
+     the kit is used at.
+
+     A ring on a surface it does not outline is unaffected: the same three
+     pairs the gate already holds at 3:1 are what it stands on.            */
+  --focus-ring: light-dark(var(--a-4), var(--a-3));
+
+  /* The empty track of a meter and a slider. Deliberately quiet: its job is
+     to let the fill part from it, not to part from anything itself. The
+     extent of the track is shown not by its colour but by the inner hairline
+     on .inst-meter.
+
+     A track is not load-bearing, so 3:1 against the surface is not asked of
+     it. Of a switch it is asked, and there the --border-control ring is added
+     to it, because on a switch the boundary IS the control.                */
+  --track: light-dark(oklch(0 0 0 / 0.10), oklch(1 0 0 / 0.16));
+
+  /* THE SWITCH GETS A TRACK OF ITS OWN, and the reason is the sentence above:
+     of a switch, 3:1 IS asked, because there the boundary is the control and
+     "off" has to be told from "there is no element here".
+
+     It used to be asked of the border instead — --track at 1.25 with an inset
+     --border-control ring laid over it. That met the norm and drew an outlined
+     capsule: two edges and a pale middle where the reference has one solid
+     shape. The ring is the kind of chrome the kit spends its budget removing
+     everywhere else.
+
+     So the capsule carries its own contrast and the ring goes. This is a
+     SECOND token rather than a darker --track because a meter and a slider
+     want the quiet one: their job is to let the fill part from them, not to
+     part from the surface, and darkening the shared token would repaint every
+     bar in the kit to fix a switch.
+
+     The numbers are held by the gate against a page, a panel and a recess —
+     the three grounds a switch can stand on.                              */
+  --switch-track: light-dark(oklch(0 0 0 / 0.45), oklch(1 0 0 / 0.36));
+
+  /* The ground under a modal. In the dark theme it is denser: on a light page
+     a dimming creates contrast by itself, on a dark one it has to be added.
+     This is a dimming and not a blur — the kit forbids blurs.              */
+  --scrim: light-dark(oklch(0 0 0 / 0.32), oklch(0 0 0 / 0.58));
+
+  /* A shadow is not a colour, so what goes through light-dark() is its COLOUR
+     rather than the whole value: light-dark() accepts only a <color>.      */
+  --shadow-color-near: light-dark(oklch(0 0 0 / 0.06), oklch(0 0 0 / 0.30));
+  --shadow-color-far:  light-dark(oklch(0 0 0 / 0.10), oklch(0 0 0 / 0.45));
+
+  /* There are three shadows, and they carry TWO DIFFERENT MEANINGS. Mixing
+     them is not allowed — otherwise a shadow becomes decoration again.
+
+     Meaning one, "it floats above and is about to disappear": the popover and
+     the modal. A large blur, a noticeable offset — the layer is plainly torn
+     off the plane. A card and a panel never get such a shadow; they get a
+     surface.
+
+     Meaning two, "this is a physical surface and it gets pressed": a raised
+     button. A blur of one pixel and an almost zero offset — not a tearing off
+     the plane but a hint of thickness. It does NOT lift the element above the
+     layer, it says that under the finger there will be an object.
+
+     Why the second meaning was needed at all. A button differed from the
+     background by one outline, and at 3.46:1 that outline was the loudest
+     line on the screen. Dropping it to 1.31 gives a button that is barely
+     visible: the step between surfaces in the light themes is only 1.05, and
+     the fill alone cannot manage. The shadow takes the work — the very thing
+     this kit used to forbid.
+
+     The boundary between the meanings is checked by one question: does the
+     shadow TEAR the layer off or thicken it? Tears it off — that is a
+     popover, and there are exactly two. Thickens it — that is a control. A
+     third meaning does not exist, and starting one without an entry like this
+     is not allowed. */
+  --shadow-popover: 0 4px 12px -2px var(--shadow-color-far),
+                    0 2px 4px -2px var(--shadow-color-near);
+  --shadow-modal:   0 16px 40px -8px var(--shadow-color-far),
+                    0 4px 10px -4px var(--shadow-color-near);
+  --shadow-control: 0 1px 2px -1px var(--shadow-color-far),
+                    0 1px 1px -1px var(--shadow-color-near);
+
+}

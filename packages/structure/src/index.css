@@ -1,0 +1,21 @@
+/* ==========================================================================
+   @ggary/structure
+
+   What a component needs in order to WORK, and nothing it needs in order to
+   look like anything. Every theme imports this into its `gg.structure` layer,
+   which sits below `gg.base` and `gg.components`, so any theme can override
+   any line here by layer order alone.
+
+   The test for whether a rule belongs here: would the component be BROKEN
+   without it, in every theme? A closed listbox that still takes up space is
+   broken. A listbox with no shadow is merely a different theme.
+
+   This file exists because the first theme port found these rules duplicated
+   inside both themes' component CSS — the positioner's absolute placement,
+   the closed state, the list reset. Two copies of a behavioural rule are a
+   future divergence that shows up as a bug in one theme only.
+   ========================================================================== */
+
+@import './global.css';
+@import './select.css';
+@import './chip-group.css';

@@ -1,0 +1,93 @@
+:root {
+  /* ══ Space ═══════════════════════════════════════════════════════════════
+     A step of 2px at the bottom, growing after that: 2·4·6·8, then 12·16,
+     then 24·32·48·64. It is not a 4px step — 2 and 6 are in the set. The
+     scale is sparse on purpose, so that "a little bigger" is simply not an
+     available decision. Components take from here only through the role
+     tier.                                                                  */
+
+  --space-1: 2px;
+  --space-2: 4px;
+  --space-3: 6px;
+  --space-4: 8px;
+  --space-5: 12px;
+  --space-6: 16px;
+  --space-7: 24px;
+  --space-8: 32px;
+  --space-9: 48px;
+  --space-10: 64px;
+
+  /* ══ Radii ═══════════════════════════════════════════════════════════════
+     Nested corners need an inner radius smaller than the outer one,
+     otherwise the inner element looks as if it bulges out of its
+     container.                                                             */
+
+  /* All four are EVEN, and that is rasterisation rather than aesthetics.
+
+     A radius turns into device pixels by multiplication by the density. The
+     most frequent density on the desktop is 1.5 (Windows scaling at 150%),
+     and at it an odd radius gives HALF a pixel: 3·1.5 = 4.5, 5·1.5 = 7.5,
+     7·1.5 = 10.5, 11·1.5 = 16.5. The arc meets the straight edge half a pixel
+     off the grid, the browser smooths the junction over, and on each corner
+     it lands its own way. That is what reads as "the rounding is crooked, the
+     circle uneven": the edges themselves are crisp while the corners are
+     blurred and all four differ.
+
+     Even ones land whole on all three common densities:
+       1.0 →  4 ·  6 ·  8 · 12
+       1.5 →  6 ·  9 · 12 · 18
+       2.0 →  8 · 12 · 16 · 24
+
+     The step of the ladder is untouched: 3·5·7·11 with increments of 2·2·4
+     became 4·6·8·12 with the same 2·2·4. The nesting is intact too — on a
+     segmented control the outer radius minus its padding still gives the
+     inner one: 8 − 2 = 6.
+
+     Incidentally the radius grew relative to the height: on a 32px button
+     7/32 = 0.22 became 8/32 = 0.25. The arc is longer, and the passage from
+     edge to corner softer. */
+
+  /* The bottom step: the state dot and everything of its size. On a 6px box
+     even --radius-xs (4) gives a circle, and the circle is taken in this kit
+     — it marks a reversible item in a list of consequences. 2 reads as a
+     rounded square and leaves the shape free. */
+  --radius-2xs: 2px;
+  --radius-xs: 4px;   /* inline: badges, swatches, the ends of bars */
+  --radius-sm: 6px;   /* controls inside a card */
+  --radius-md: 8px;   /* free-standing controls */
+  --radius-lg: 12px;  /* cards, panels, the modal */
+  --radius-full: 999px;
+
+  /* ══ Motion ══════════════════════════════════════════════════════════════
+     Fast enough to read as a cause rather than as an animation. Everything
+     the user set off has to resolve within --dur-2; anything longer calls
+     for a state rather than a transition.                                  */
+
+  --dur-1: 80ms;
+  --dur-2: 140ms;
+  --dur-3: 220ms;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* The layer order of the application. There is NO toast here, and that is
+     not an omission: a modal lives in the TOP LAYER, and the top layer is
+     not pierced by any z-index. The toast region is itself declared a
+     popover — see overlay.css. A token that cannot be applied is a debt
+     rather than a reserve.                                                 */
+  --z-sticky: 10;
+  --z-popover: 100;
+  --z-modal: 1000;
+}
+
+/* ══ Line thickness ════════════════════════════════════════════════════════
+
+   A browser never draws a border thinner than one physical pixel. On a 1x
+   display 0.5px and 1px give THE SAME THING, while a negative margin of
+   -0.5px against a border drawn at 1px leaves half a pixel of doubled line.
+   So the hairline is turned on only where there is room for it. */
+
+:root { --hairline: 1px; --stroke: 1px; }
+
+@media (min-resolution: 1.5dppx) {
+  :root { --hairline: 0.5px; }
+}

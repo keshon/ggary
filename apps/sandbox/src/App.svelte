@@ -18,13 +18,22 @@
 </script>
 
 <section>
-  <h2>Button — variants</h2>
+  <h2>Button — emphasis</h2>
   <div class="row">
-    <Button>Solid</Button>
-    <Button variant="subtle">Subtle</Button>
-    <Button variant="outline">Outline</Button>
-    <Button variant="ghost">Ghost</Button>
-    <Button variant="danger">Danger</Button>
+    <Button emphasis="high">high</Button>
+    <Button emphasis="medium">medium</Button>
+    <Button emphasis="low">low</Button>
+    <Button emphasis="minimal">minimal</Button>
+  </div>
+</section>
+
+<section>
+  <h2>Button — tone danger, across emphasis</h2>
+  <div class="row">
+    <Button emphasis="high" tone="danger">high</Button>
+    <Button emphasis="medium" tone="danger">medium</Button>
+    <Button emphasis="low" tone="danger">low</Button>
+    <Button emphasis="minimal" tone="danger">minimal</Button>
   </div>
 </section>
 
@@ -42,9 +51,9 @@
 <section>
   <h2>Chip — standalone</h2>
   <div class="row">
-    <Chip>Plain</Chip>
-    <Chip variant="outline">Outline</Chip>
-    <Chip variant="solid">Solid</Chip>
+    <Chip>low</Chip>
+    <Chip emphasis="medium">medium</Chip>
+    <Chip emphasis="high">high</Chip>
     <Chip selected>Selected</Chip>
     <Chip size="sm">Small</Chip>
     <Chip onRemove={() => alert('removed')}>Dismiss me</Chip>
@@ -74,7 +83,7 @@ items      ${items.length}`}</pre>
     <b>request</b> — this page owns <code>items</code>.
   </p>
   <div class="row" style="margin-top:12px">
-    <Button size="sm" variant="outline" onclick={() => (items = tags)}>Restore removed</Button>
+    <Button size="sm" onclick={() => (items = tags)}>Restore removed</Button>
   </div>
 </section>
 
@@ -114,8 +123,8 @@ items      ${items.length}`}</pre>
         lastEvent = `onValueChange(${JSON.stringify(next)}, ${JSON.stringify(item?.label ?? null)})`
       }}
     />
-    <Button variant="outline" onclick={() => (value = 'qwik')}>Set to Qwik</Button>
-    <Button variant="ghost" onclick={() => (value = null)}>Clear</Button>
+    <Button onclick={() => (value = 'qwik')}>Set to Qwik</Button>
+    <Button emphasis="minimal" onclick={() => (value = null)}>Clear</Button>
   </div>
   <pre class="state">{`value       ${JSON.stringify(value)}
 last event  ${lastEvent}`}</pre>
@@ -129,8 +138,8 @@ last event  ${lastEvent}`}</pre>
   <h2>Native form participation</h2>
   <form class="demo" onsubmit={onSubmit} onreset={() => (formOutput = 'reset')}>
     <Select items={frameworks} name="framework" label="framework" placeholder="Required…" />
-    <Button type="submit">Submit</Button>
-    <Button type="reset" variant="ghost">Reset</Button>
+    <Button emphasis="high" type="submit">Submit</Button>
+    <Button type="reset" emphasis="minimal">Reset</Button>
   </form>
   <pre class="state">{formOutput}</pre>
 </section>

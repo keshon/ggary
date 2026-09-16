@@ -1,8 +1,12 @@
-export type ChipVariant = 'solid' | 'subtle' | 'outline'
+/**
+ * Named by intent, like ButtonEmphasis. A theme may draw every level alike:
+ * Instrument does, because its chips carry no weights.
+ */
+export type ChipEmphasis = 'low' | 'medium' | 'high'
 export type ChipSize = 'sm' | 'md'
 
 export interface ChipProps {
-  variant?: ChipVariant
+  emphasis?: ChipEmphasis
   size?: ChipSize
   selected?: boolean
   disabled?: boolean

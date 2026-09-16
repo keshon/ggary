@@ -37,7 +37,7 @@ function removeIcon(): SVGElement {
  * adapters instead of the vanilla one quietly doing something different.
  */
 export class GgChipGroupElement extends HTMLElement {
-  static observedAttributes = ['label', 'mode', 'orientation', 'variant', 'size', 'removable', 'disabled', 'name']
+  static observedAttributes = ['label', 'mode', 'orientation', 'emphasis', 'size', 'removable', 'disabled', 'name']
 
   #machine: Machine<any, any> | null = null
   #unsubscribe: (() => void) | null = null
@@ -121,7 +121,7 @@ export class GgChipGroupElement extends HTMLElement {
     const state = machine.getState()
     const api = connect(state, machine.send, domNormalizer, {
       label: this.getAttribute('label') ?? undefined,
-      variant: (this.getAttribute('variant') as any) ?? undefined,
+      emphasis: (this.getAttribute('emphasis') as any) ?? undefined,
       size: (this.getAttribute('size') as any) ?? undefined,
       name: this.getAttribute('name') ?? undefined,
     })

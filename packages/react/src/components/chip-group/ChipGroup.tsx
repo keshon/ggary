@@ -1,6 +1,6 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { connect, createChipGroupMachine, type ChipGroupMode, type ChipGroupOrientation, type ChipItem } from '@ggary/core/chip-group'
-import type { ChipSize, ChipVariant } from '@ggary/core/chip'
+import type { ChipEmphasis, ChipSize } from '@ggary/core/chip'
 import { reactNormalizer, rovingFocus } from '@ggary/core'
 import { RemoveIcon } from '../chip/Chip'
 
@@ -9,7 +9,7 @@ export interface ChipGroupProps {
   label?: string
   mode?: ChipGroupMode
   orientation?: ChipGroupOrientation
-  variant?: ChipVariant
+  emphasis?: ChipEmphasis
   size?: ChipSize
   removable?: boolean
   disabled?: boolean
@@ -24,7 +24,7 @@ export interface ChipGroupProps {
 
 export function ChipGroup(props: ChipGroupProps) {
   const {
-    items, label, mode, orientation, variant, size, removable, disabled = false,
+    items, label, mode, orientation, emphasis, size, removable, disabled = false,
     name, value, defaultValue, onSelectionChange, onRemove, emptyLabel = 'Nothing here',
   } = props
 
@@ -42,7 +42,7 @@ export function ChipGroup(props: ChipGroupProps) {
   )
 
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { label, variant, size, name })
+  const api = connect(state, machine.send, reactNormalizer, { label, emphasis, size, name })
 
   useEffect(() => machine.send({ type: 'SYNC_ITEMS', items }), [machine, items])
   useEffect(() => machine.send({ type: 'SYNC_DISABLED', disabled }), [machine, disabled])

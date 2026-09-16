@@ -1,0 +1,129 @@
+
+/* Switching the theme by hand. Changing color-scheme is enough — light-dark()
+   in the semantics starts handing out the second branch by itself. No second
+   block of tokens exists, so there is nothing to diverge. */
+/* ══ Themes ════════════════════════════════════════════════════════════════
+
+   A theme is NOT a separate set of tokens. It is a combination of three
+   independent knobs, and that is exactly why there are six themes rather
+   than six copies of the semantics:
+
+     knob 1 — the hue of the neutral  (--hue-neutral: 75 warm / 250 cool)
+     knob 2 — the strength of the cast (--tint: 1 present / 0 pure grey)
+     knob 3 — the depth of the dark surfaces (which ramp steps the surfaces
+              take)
+
+   The knobs do not overlap in purpose, and that is why the axes of the light
+   and the dark themes DIFFER — not by oversight but because different things
+   are noticed in them. In a light theme the eye catches the cast of the
+   neutral: white can be warm, cool, or neither. In a dark one the cast is
+   barely read, while it is immediately visible how deep the surfaces stand —
+   "black" and "grey" differ in exactly that.
+
+   The light depth is deliberately not adjustable: at the top of the ramp the
+   steps run close together, and a "less light" light theme is just a grey
+   background rather than a theme.
+
+   A seventh theme stays one line.                                         */
+
+/* ── The region of a theme ────────────────────────────────────────────────
+
+   A theme is declared by an attribute rather than by a root selector, so it
+   works on any subtree: `data-mode` on a div repaints everything inside it.
+
+   The attribute alone, however, is not enough. `color` is inherited by its
+   COMPUTED value: a node inside a dark region that has not declared a colour
+   itself inherits black from a light ancestor and becomes unreadable. The
+   same with the background — there simply is none.
+
+   `[data-mode]` declares the base afresh — the very lines `base.css`
+   declares for `body`. Without it a dark panel in a light application, a
+   theme preview in the settings and an embedded widget are impossible:
+   changing the theme works only on the whole document.                    */
+
+:where([data-mode]) {
+  color: var(--text-primary);
+  background: var(--surface-page);
+  /* The type size and the leading too — they are inherited as well, and
+     without them an island of theme redeclares the base only by half.
+
+     The cost of missing them was measured in the reference: its article
+     carries .inst-prose, that is a leading of 1.65, and it leaked through
+     .inst-theme into every live example. Eight components on one page were
+     drawn with the prose leading instead of the interface one —
+     .inst-panel-title, .inst-metric-delta, .inst-legend-*, .inst-budget-* and
+     others — that is, the reference showed the kit as something other than
+     what it turns out to be in an application.
+
+     An island of theme is a piece of an APPLICATION inside anything at all,
+     and its base has to be the interface one rather than inherited from
+     whatever is around.                                                    */
+  font-size: var(--text-sm);
+  line-height: var(--leading-ui);
+}
+
+/* ── The light ones: they differ by the cast of the neutral ────────────── */
+
+/* Neutral is the BASE, as "black" is among the dark ones: it has no overrides
+   of its own, because --tint: 0 is the root default. The attribute exists so
+   that the choice can be written down explicitly and so that it survives a
+   change of the default.
+
+   The cast on the other two is 2, not 1. At one, all three light themes
+   differ by a chroma of 0.003: on a small element that is below the threshold
+   of discrimination, and there was in fact one light theme though the list
+   promised three.
+
+   Two rather than three, and the difference here is not cosmetic. The
+   threshold of discrimination depends on AREA: on a full-screen page the eye
+   catches the cast far sooner than on a badge, and three takes the page to
+   #f8f4ee — that is cream already, and the middle of the ramp on it goes
+   brown and drags the borders and the muted text along. Two gives #f7f4f0: a
+   warm grey that is visible and does not appoint itself a colour of its own.
+
+   The steps of the ramp keep THEIR OWN shares of the cast through this: a
+   multiplier is a multiplier for that very reason — one number changes, and
+   the balance of the light and dark ends stays as it was chosen.          */
+[data-mode="light-neutral"] { color-scheme: light; }
+[data-mode="light"]         { color-scheme: light; --tint: 2; --hue-neutral: 75; }
+[data-mode="light-cool"]    { color-scheme: light; --tint: 2; --hue-neutral: 250; }
+
+/* ── The dark ones: they differ by the depth of the surfaces ──────────────
+
+   Only the surfaces are overridden — the rest of the semantics does not know
+   the theme has changed, because it looks at them.
+
+   There is no step deeper than "black": it stands at the bottom of the ramp.
+   Above "grey" a theme stops being dark, and a label on it loses its
+   threshold.                                                              */
+
+[data-mode="dark"] { color-scheme: dark; }   /* black: ramp bottom, no overrides */
+
+[data-mode="dark-soft"] {
+  color-scheme: dark;
+  --surface-sunken:  var(--n-13);
+  --surface-page:    var(--n-12);
+  --surface-raised:  var(--n-11);
+  --surface-overlay: var(--n-10);
+
+  /* The status labels move to step 2: the surface here is raised, and on it
+     step 3 does not reach the threshold.
+
+     A tone fill in the dark themes is TRANSPARENT: 16% of the colour rather
+     than a solid step 1 as in the light ones. So everything under a badge
+     shows through it, and the contrast depends on the stack. The panel of
+     this theme is lighter than in the base dark one, and on a badge inside a
+     SELECTED table row — panel, plus 14% of the accent from the selection,
+     plus 16% of the tone — a green label gives 4.15 against a norm of 4.5.
+
+     Such stacks cannot be enumerated in a text check: there are as many of
+     them as there are combinations of translucent layers. tools/audit.js
+     found this one by the rendered pixels. It is not one green that is
+     raised but all four: the tones have to stay in one register, otherwise
+     the green shouts louder than the red.                                  */
+  --accent-text: var(--a-2);
+  --ok-text:     var(--ok-2);
+  --warn-text:   var(--warn-2);
+  --err-text:    var(--err-2);
+}
+

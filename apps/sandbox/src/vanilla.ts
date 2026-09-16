@@ -1,22 +1,29 @@
-import '@ggary/styles'
+import './theme'
 import './shared.css'
 import '@ggary/elements'
 import type { GgChipGroupElement, GgSelectElement } from '@ggary/elements'
-import { frameworks, installThemeToggle, tags } from './demo-data'
-
-installThemeToggle(document.getElementById('theme-toggle')!)
+import { frameworks, tags } from './demo-data'
 
 const app = document.getElementById('app')!
 
 app.innerHTML = `
   <section>
-    <h2>Button — variants</h2>
+    <h2>Button — emphasis</h2>
     <div class="row">
-      <gg-button><button>Solid</button></gg-button>
-      <gg-button variant="subtle"><button>Subtle</button></gg-button>
-      <gg-button variant="outline"><button>Outline</button></gg-button>
-      <gg-button variant="ghost"><button>Ghost</button></gg-button>
-      <gg-button variant="danger"><button>Danger</button></gg-button>
+      <gg-button emphasis="high"><button>high</button></gg-button>
+      <gg-button emphasis="medium"><button>medium</button></gg-button>
+      <gg-button emphasis="low"><button>low</button></gg-button>
+      <gg-button emphasis="minimal"><button>minimal</button></gg-button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Button — tone danger, across emphasis</h2>
+    <div class="row">
+      <gg-button emphasis="high" tone="danger"><button>high</button></gg-button>
+      <gg-button emphasis="medium" tone="danger"><button>medium</button></gg-button>
+      <gg-button emphasis="low" tone="danger"><button>low</button></gg-button>
+      <gg-button emphasis="minimal" tone="danger"><button>minimal</button></gg-button>
     </div>
     <p class="hint">
       &lt;gg-button&gt; <b>enhances</b> a real &lt;button&gt; in the light DOM — view source, the markup
@@ -38,9 +45,9 @@ app.innerHTML = `
   <section>
     <h2>Chip — standalone</h2>
     <div class="row">
-      <gg-chip><span>Plain</span></gg-chip>
-      <gg-chip variant="outline"><span>Outline</span></gg-chip>
-      <gg-chip variant="solid"><span>Solid</span></gg-chip>
+      <gg-chip><span>low</span></gg-chip>
+      <gg-chip emphasis="medium"><span>medium</span></gg-chip>
+      <gg-chip emphasis="high"><span>high</span></gg-chip>
       <gg-chip selected><span>Selected</span></gg-chip>
       <gg-chip size="sm"><span>Small</span></gg-chip>
       <gg-chip removable id="dismissible"><span>Dismiss me</span></gg-chip>
@@ -60,7 +67,7 @@ app.innerHTML = `
       Removal is a <b>request</b>: the group fires <code>chipremove</code> and this page owns the list.
     </p>
     <div class="row" style="margin-top:12px">
-      <gg-button size="sm" variant="outline"><button id="restore">Restore removed</button></gg-button>
+      <gg-button size="sm"><button id="restore">Restore removed</button></gg-button>
     </div>
   </section>
 
@@ -84,8 +91,8 @@ app.innerHTML = `
     <h2>Native form participation</h2>
     <form class="demo" id="demo-form">
       <gg-select id="form-select" name="framework" label="framework" placeholder="Required…"></gg-select>
-      <gg-button type="submit"><button type="submit">Submit</button></gg-button>
-      <gg-button variant="ghost" type="reset"><button type="reset">Reset</button></gg-button>
+      <gg-button emphasis="high" type="submit"><button type="submit">Submit</button></gg-button>
+      <gg-button emphasis="minimal" type="reset"><button type="reset">Reset</button></gg-button>
     </form>
     <pre class="state" id="form-output">submit to see the FormData the hidden input contributes</pre>
   </section>

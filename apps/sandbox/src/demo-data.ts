@@ -31,20 +31,3 @@ export const targets = [
   { href: '/react.html', label: 'react', id: 'react' },
   { href: '/svelte.html', label: 'svelte', id: 'svelte' },
 ]
-
-/** Cycles light -> dark -> system. Proves the token layer is the only thing themes touch. */
-export function installThemeToggle(button: HTMLElement): void {
-  const modes = ['light', 'dark', 'system'] as const
-  let index = 0
-  const apply = () => {
-    const mode = modes[index]
-    if (mode === 'system') document.documentElement.removeAttribute('data-theme')
-    else document.documentElement.setAttribute('data-theme', mode)
-    button.textContent = `theme: ${mode}`
-  }
-  button.addEventListener('click', () => {
-    index = (index + 1) % modes.length
-    apply()
-  })
-  apply()
-}

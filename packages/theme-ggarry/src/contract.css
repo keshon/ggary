@@ -1,0 +1,32 @@
+/* ==========================================================================
+   The public contract, GGarry's side of it.
+
+   Every theme maps the same short list of --gg-* names onto its own private
+   tokens. Application code — a page layout, a sidebar, a chart — reads ONLY
+   these, and keeps working when the project switches theme. A theme's private
+   tokens (--ggarry-*, or Instrument's --surface-page and friends) are free to
+   change shape; these names are not.
+
+   Declared on [data-mode] as well as :root: a custom property referencing
+   another one is substituted where it is DECLARED, so a mapping made only on
+   :root would carry the light values into a dark island.
+   ========================================================================== */
+
+:where(:root, [data-mode]) {
+  --gg-page: var(--ggarry-bg-canvas);
+  --gg-surface: var(--ggarry-bg-surface);
+  --gg-surface-sunken: var(--ggarry-bg-subtle);
+  --gg-text: var(--ggarry-text-default);
+  --gg-text-muted: var(--ggarry-text-muted);
+  --gg-text-faint: var(--ggarry-text-subtle);
+  --gg-border: var(--ggarry-border-default);
+  --gg-border-strong: var(--ggarry-border-strong);
+  --gg-accent: var(--ggarry-bg-accent);
+  --gg-accent-text: var(--ggarry-text-accent);
+  --gg-accent-bg: var(--ggarry-bg-accent-subtle);
+  --gg-danger-text: var(--ggarry-text-danger);
+  --gg-font-sans: var(--ggarry-font-family-sans);
+  --gg-font-mono: var(--ggarry-font-family-mono);
+  --gg-radius: var(--ggarry-radius-lg);
+  --gg-z-popover: var(--ggarry-z-popover);
+}

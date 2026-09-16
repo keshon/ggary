@@ -1,27 +1,35 @@
 # ggary-ui
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
-custom elements, React, Svelte 5). Four components — Button, Chip, ChipGroup and
-Select — built end to end to prove the architecture holds.
+custom elements, React, Svelte 5), and two complete design languages on top of it.
+Four components — Button, Chip, ChipGroup and Select — built end to end to prove
+the architecture holds.
+
+The two themes are **GGarry**, the kit's own neutral language, and
+**Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
+to test whether a strict, opinionated language can live on this spine without
+becoming a monolith again.
 
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 74 tests
+npm test         # 82 tests
 npm run typecheck
 ```
 
 `index.html` is vanilla, `react.html` is React, `svelte.html` is Svelte. The
 header is static markup on all three, so anything that differs below it is the
-components' doing.
+components' doing. The header also switches theme and each theme's own axes; the
+choice persists across the three pages.
 
 ## Layout
 
 ```
 packages/
-  tokens/     JSON -> dist/tokens.css (custom properties) + dist/index.ts (typed consts)
-  core/       machine + connect + anatomy. No framework imports. One dependency.
-  styles/     plain CSS keyed on [data-scope]/[data-part]. No class names.
+  core/              machine + connect + anatomy. No framework imports. One dependency.
+  structure/         CSS a component needs to WORK, shared by every theme
+  theme-ggarry/      GGarry: JSON tokens -> CSS, component CSS, the --gg-* contract
+  theme-instrument/  Instrument: OKLCH token tiers, component CSS, the --gg-* contract
   elements/   <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>
   react/      <Button>, <Chip>, <ChipGroup>, <Select>
   svelte/     <Button>, <Chip>, <ChipGroup>, <Select>
@@ -57,17 +65,102 @@ it readable.
 Three rules every component obeys, so themes and third-party components can
 participate without importing any JS:
 
-1. Every node carries `data-scope` and `data-part`. `packages/styles` contains no
-   class selectors at all — `tests/select.dom.test.ts` asserts this.
+1. Every node carries `data-scope` and `data-part`. No theme stylesheet targets a
+   class name, and the components emit none — `tests/select.dom.test.ts` asserts
+   this.
 2. Every state is a data attribute: `data-state="open"`, `data-highlighted`,
    `data-disabled`. CSS is a pure function of DOM state. Notably the Select's
    highlight is driven by machine state, never `:hover`, so mouse and keyboard
    cannot disagree about which option is active.
 3. Every visual value comes from a token. Components hardcode no colors or sizes.
-   Per-component custom properties (`--button-height`) are the override surface.
+   Per-component custom properties (`--button-height`, `--btn-bg`) are the
+   override surface.
+4. Variants are named by **intent**, never by look: `emphasis: high | medium |
+   low | minimal`, `tone: neutral | danger`. A look-named variant like `outline`
+   is a lie in any theme whose language forbids outlines; an intent is a question
+   every theme can answer its own way.
 
 No shadow DOM. `data-scope` gives most of the encapsulation without breaking
 theming, global CSS, or SSR.
+
+## Themes
+
+A theme is a package that owns **tokens and component CSS**. It shares with every
+other theme exactly three things, and nothing else:
+
+1. **The DOM contract** — anatomy parts and state attributes, emitted by core.
+2. **The cascade layers**, identical in every theme:
+   `gg.tokens, gg.structure, gg.base, gg.components, gg.forced, gg.motion`.
+   Application CSS lives outside every layer and so always wins, with no
+   `!important`, whichever theme is loaded.
+3. **The public contract** — a short list of `--gg-*` custom properties
+   (`--gg-page`, `--gg-surface`, `--gg-text`, `--gg-border`, `--gg-accent-text`,
+   `--gg-font-sans`, …) that each theme maps onto its own private tokens.
+   Application layout reads only these and survives a theme switch. The sandbox
+   chrome is written against nothing else, which is how the contract is tested:
+   it stays readable in both themes and every mode.
+
+A theme's private tokens can have any shape. GGarry's are `--ggarry-*`, generated
+from JSON; Instrument's are its own four-tier OKLCH vocabulary (`--surface-page`,
+`--accent-solid`, `--control-h-md`). Neither leaks into the other.
+
+**A project picks one theme** by importing one stylesheet. Within a theme, the
+theme's axes are runtime attributes on any subtree:
+
+| Theme | Axes |
+|---|---|
+| GGarry | `data-mode`: light · dark (default: system) |
+| Instrument | `data-mode`: light-neutral · light · light-cool · dark · dark-soft<br>`data-accent`: petrol · graphite · indigo · clay<br>`data-density`: compact · regular · comfortable<br>`data-scale`: 14 · 15 · 16 · 17 · 18 |
+
+The sandbox is the one place that swaps whole languages at runtime, purely so a
+page can be compared across them. It mounts one theme stylesheet at a time —
+two loaded at once would fight over the same selectors.
+
+### `@ggary/structure`
+
+The CSS a component needs to function in every theme: the positioner's absolute
+placement and closed state, the listbox scroll, the chip list's flex and
+orientation. It exists because the port found these rules duplicated inside both
+themes' component CSS. The test for a rule belonging here: would the component be
+*broken* without it in every theme? A closed listbox that still takes space is
+broken; a listbox with no shadow is a different theme.
+
+### Porting Instrument: what it took, and what it found
+
+The token system came across **mechanically**: `tokens.css` was split by tier into
+nine files by line range, with every value and every comment intact. The only
+edits were `data-theme` → `data-mode` and the `.inst-theme` class → an attribute
+selector. The component CSS was **re-authored** onto anatomy selectors, keeping
+Instrument's decisions and shortening its reasoning, with pointers back to the
+original files.
+
+What the port changed in the spine, because Instrument was right:
+
+- **Loading is not disabled.** A busy button stays focusable; disabling it drops
+  it out of the tab order under the fingers of whoever pressed it from the
+  keyboard. Core now emits `aria-busy` without `disabled`.
+- **Variants became intents.** Instrument's measured "weights" answer *how loudly
+  does this ask to be pressed*. GGarry's old `solid/subtle/outline/ghost/danger`
+  answered *what does it look like*, and could not be mapped onto a theme that
+  forbids outlines.
+- **Structural CSS moved out of the themes** into `@ggary/structure`.
+
+What differs between the two languages, on identical markup:
+
+| Decision | GGarry | Instrument |
+|---|---|---|
+| medium button | neutral outline | a recess: no border, no shadow |
+| high + danger | solid red | accent fill — no solid red, by rule |
+| busy button | inline spinner part | label dimmed, a ring in `::after`; the spinner part is hidden |
+| standalone chip | pill, emphasis levels | a tag; emphasis levels drawn alike |
+| selected option | check mark, bolder label | check mark only; weight never changes |
+| document | styles kit components only | styles the whole document (`* { margin: 0 }`, body type, scrollbars) |
+
+What the first full render caught: a vertical ChipGroup rendered centred in
+Instrument. Its chips size themselves with `align-self: var(--flow-self, center)`,
+which outranks the structure layer's `align-items: flex-start`. The fix is
+Instrument's own hook, set on the vertical list — a theme bug, not a structure
+bug.
 
 ## The four components, and why these four
 
@@ -148,7 +241,7 @@ in the Svelte and vanilla adapters, since all three had inherited the pattern.
 `<gg-button>` **enhances** existing light-DOM markup:
 
 ```html
-<gg-button variant="danger"><button>Delete</button></gg-button>
+<gg-button tone="danger"><button>Delete</button></gg-button>
 ```
 
 The server renders a real, working button; the element only decorates it. Nothing
@@ -165,6 +258,7 @@ fold, or you get layout shift on upgrade.
 |---|---|---|
 | `tests/select.machine.test.ts` | node | 23 tests. Every transition, pure, ~5ms. |
 | `tests/chip-group.machine.test.ts` | node | 23 tests. Roving focus, selection, removal, typeahead. |
+| `tests/button.dom.test.ts` | jsdom | 8 tests. Intent attributes; busy is not disabled. |
 | `tests/select.dom.test.ts` | jsdom | 12 tests. Anatomy, ARIA wiring, keyboard, form, events. |
 | `tests/chip-group.dom.test.ts` | jsdom | 16 tests. Roving tabindex, toolbar semantics, removal, focus landing. |
 
@@ -205,9 +299,23 @@ Real, and deliberately left open:
 - **ChipGroup uses `role="toolbar"` with `aria-pressed` chips.** Right for filter
   chips, which deselect on re-click. Exclusive choice that cannot be undone wants
   a real `radiogroup` instead.
-- **Subtle chips are low-contrast in the dark theme.** `--gg-bg-muted` sits close
-  to `--gg-bg-surface` there. It is a one-line token change, which is rather the
-  point of having a token layer.
+- **Subtle chips are low-contrast in GGarry's dark mode.** `--ggarry-bg-muted`
+  sits close to `--ggarry-bg-surface` there. A one-line token change.
+- **In Instrument a destructive primary does not look destructive.** High emphasis
+  + danger keeps the accent fill, by Instrument's rule that a solid fill belongs
+  to the accent alone. Faithful to the language, but a real loss of meaning: a
+  project on Instrument should not rely on colour for a dangerous primary.
+- **Instrument's private tokens are unprefixed** (`--text-primary`, `--border`).
+  They can collide with an application's own custom properties. Prefixing 2,000
+  lines was out of scope for a first port.
+- **`data-accent` on a subtree is unverified in Instrument.** Its semantics are
+  declared on `:root`; the port only exercised the attribute on `<html>`.
+- **Icons are still baked into adapter markup.** Instrument draws glyphs with CSS
+  masks; here both themes style the inline SVGs the adapters emit, so a theme
+  cannot yet swap a glyph.
+- **Not ported from Instrument:** everything beyond these four components — prose,
+  forms, tables, overlays, the agent components, print styles, the contrast gate
+  and the component registry. The gates are the most valuable of those.
 - **`onValueChange` fires when the user re-picks the already-selected value.**
   Intent semantics, not value-diff semantics. Correct for controlled components,
   mildly surprising otherwise.

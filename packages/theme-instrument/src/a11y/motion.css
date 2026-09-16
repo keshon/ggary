@@ -1,0 +1,22 @@
+/* ==========================================================================
+   Instrument — motion under prefers-reduced-motion
+
+   Ported from instrument/src/motion.css. Its own layer (gg.motion), declared
+   last: it beats the components whatever their specificity and still loses to
+   the application.
+
+   Transitions collapse rather than switch off, so a listener on transitionend
+   keeps working. Endless activity indicators are NOT collapsed but slowed: an
+   animation squeezed to 0.01ms is a stop, and a stopped busy ring reports that
+   the work has halted.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope], [data-scope] *, [data-scope] *::before, [data-scope] *::after {
+    transition-duration: 0.01ms;
+    animation-delay: 0ms;
+    scroll-behavior: auto;
+  }
+
+  [data-scope='button'][data-part='root'][aria-busy='true']::after { animation-duration: 2.4s; }
+}

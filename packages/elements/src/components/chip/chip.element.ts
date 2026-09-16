@@ -1,4 +1,4 @@
-import { connect, type ChipSize, type ChipVariant } from '@ggary/core/chip'
+import { connect, type ChipEmphasis, type ChipSize } from '@ggary/core/chip'
 import { domNormalizer } from '@ggary/core'
 import { spread } from '../../spread'
 
@@ -7,13 +7,13 @@ export const REMOVE_ICON = 'M1.5 1.5l7 7M8.5 1.5l-7 7'
 /**
  * Enhancement, like <gg-button>:
  *
- *   <gg-chip variant="outline"><span>Design</span></gg-chip>
+ *   <gg-chip emphasis="medium"><span>Design</span></gg-chip>
  *
  * The server renders the chip's text; this element decorates it and, when
  * `removable` is set, appends the dismiss affordance.
  */
 export class GgChipElement extends HTMLElement {
-  static observedAttributes = ['variant', 'size', 'selected', 'disabled', 'removable']
+  static observedAttributes = ['emphasis', 'size', 'selected', 'disabled', 'removable']
 
   #host: HTMLElement | null = null
   #remove: HTMLSpanElement | null = null
@@ -40,7 +40,7 @@ export class GgChipElement extends HTMLElement {
     const interactive = host.tagName === 'BUTTON'
     const api = connect(
       {
-        variant: (this.getAttribute('variant') as ChipVariant) ?? undefined,
+        emphasis: (this.getAttribute('emphasis') as ChipEmphasis) ?? undefined,
         size: (this.getAttribute('size') as ChipSize) ?? undefined,
         selected: this.hasAttribute('selected'),
         disabled: this.hasAttribute('disabled'),

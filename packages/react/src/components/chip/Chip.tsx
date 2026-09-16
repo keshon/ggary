@@ -12,10 +12,10 @@ export interface ChipProps extends CoreChipProps, Omit<HTMLAttributes<HTMLElemen
  * a decorative tag should not be a tab stop.
  */
 export const Chip = forwardRef<HTMLElement, ChipProps>(function Chip(props, ref) {
-  const { variant, size, selected, disabled, removable, interactive, children, onRemove, ...rest } = props
+  const { emphasis, size, selected, disabled, removable, interactive, children, onRemove, ...rest } = props
   const isInteractive = interactive ?? false
   const api = connect(
-    { variant, size, selected, disabled, removable: removable ?? !!onRemove, interactive: isInteractive },
+    { emphasis, size, selected, disabled, removable: removable ?? !!onRemove, interactive: isInteractive },
     reactNormalizer,
     onRemove
   )

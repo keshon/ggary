@@ -1,0 +1,31 @@
+/* ==========================================================================
+   The public contract, Instrument's side of it.
+
+   The same --gg-* names GGarry maps (see theme-ggarry/src/contract.css), here
+   pointed at Instrument's own semantics. Application code reads these and
+   survives a theme switch.
+
+   Instrument's semantics resolve through light-dark() at the element that USES
+   them, so a mapping declared on :root already follows color-scheme. It is
+   still re-declared on the attribute regions, because dark-soft overrides the
+   surface tokens themselves and a :root mapping would carry the stale ones in.
+   ========================================================================== */
+
+:where(:root, [data-mode], [data-accent]) {
+  --gg-page: var(--surface-page);
+  --gg-surface: var(--surface-raised);
+  --gg-surface-sunken: var(--surface-sunken);
+  --gg-text: var(--text-primary);
+  --gg-text-muted: var(--text-muted);
+  --gg-text-faint: var(--text-faint);
+  --gg-border: var(--border);
+  --gg-border-strong: var(--border-strong);
+  --gg-accent: var(--accent-solid);
+  --gg-accent-text: var(--accent-text);
+  --gg-accent-bg: var(--accent-bg);
+  --gg-danger-text: var(--err-text);
+  --gg-font-sans: var(--font-sans);
+  --gg-font-mono: var(--font-mono);
+  --gg-radius: var(--radius-md);
+  --gg-z-popover: var(--z-popover);
+}

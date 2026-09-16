@@ -11,10 +11,10 @@ import type { ChipProps } from './chip.types'
  * forget its empty state. One source, two callers.
  */
 export function chipAttrs(props: ChipProps): Dict {
-  const { variant = 'subtle', size = 'md', selected = false, disabled = false, removable = false } = props
+  const { emphasis = 'low', size = 'md', selected = false, disabled = false, removable = false } = props
   return {
     ...chipAnatomy.attrs('root'),
-    'data-variant': variant,
+    'data-emphasis': emphasis,
     'data-size': size,
     'data-selected': selected ? '' : undefined,
     'data-disabled': disabled ? '' : undefined,

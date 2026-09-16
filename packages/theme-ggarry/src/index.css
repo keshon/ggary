@@ -1,0 +1,26 @@
+/* ==========================================================================
+   GGarry — the theme entry point.
+
+   The layer order is part of the kit contract and is identical in every theme:
+   application styles live OUTSIDE every layer and therefore always win, with no
+   !important, whichever theme the project loads.
+
+     gg.tokens      private tokens + the public --gg-* contract
+     gg.structure   what components need to work (shared, @ggary/structure)
+     gg.base        theme-wide defaults: type, focus
+     gg.components  one file per component
+   ========================================================================== */
+
+@layer gg.tokens, gg.structure, gg.base, gg.components, gg.forced, gg.motion;
+
+@import '../dist/tokens.css' layer(gg.tokens);
+@import './contract.css' layer(gg.tokens);
+
+@import '@ggary/structure' layer(gg.structure);
+
+@import './base/reset.css' layer(gg.base);
+
+@import './components/button.css' layer(gg.components);
+@import './components/chip.css' layer(gg.components);
+@import './components/chip-group.css' layer(gg.components);
+@import './components/select.css' layer(gg.components);

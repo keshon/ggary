@@ -1,0 +1,157 @@
+:root {
+  /* ══ Typography ══════════════════════════════════════════════════════════
+
+     Seven steps, no more. Every extra one is a decision somebody will take
+     wrongly. 14px is the interface base: dense tools live there. 16px is
+     prose, and that is a different task, so it is opt-in (.inst-prose) rather
+     than the default: the base has to be the frequent case, otherwise every
+     component is forced to redeclare the size.
+
+     ── Why the scale is this and not tighter ─────────────────────────────
+
+     A step exists only if it is SEEN. A scale of 11·12·13 gives ratios of
+     1.091 and 1.083 at the bottom — below the threshold at which the eye
+     tells type sizes apart, so the three steps work as one. Measured on live
+     screens: 98.2% of the interface text lay in a band two pixels wide. The
+     hierarchy was carried by weight and colour; size took no part in it, and
+     the screen sounded in one voice — exactly what reads as "flat".
+
+     The ratios are now 1.136 · 1.12 · 1.143 · 1.125 in the working part and
+     1.222 · 1.273 in the display part. The display ones are wider on purpose:
+     a heading differs from a heading by a larger share than a caption from a
+     caption.
+
+     Density is not lost by this — a 14px base is what tooling interfaces of
+     this class are set in. Only the sticking-together is lost.
+
+     Weights 600 and 700 stay forbidden, and that makes size the ONLY carrier
+     of the large-scale hierarchy. All the more reason for it to be
+     distinguishable.                                                       */
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+               "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "JetBrains Mono", "SF Mono",
+               Consolas, "Liberation Mono", monospace;
+
+  /* The sizes are in rem, and this is the only tier that is in rem.
+
+     An interface has to respect an increased default font size in the
+     browser: people sit in an admin panel all day, and that is the first
+     setting somebody with weakened sight changes. Page zoom (Ctrl+±) works
+     with px too, but the "default font size" setting is ignored by px
+     silently.
+
+     Everything else stays in px, because it is GEOMETRY rather than text: the
+     hairline, the state dot, the gutter, the radius. There is no point in
+     stretching those along with the type — a dense tooling look falls apart
+     from it.
+
+     A consequence that cannot be ignored: if the text grows while the control
+     heights are set in px, the text will one day hit the ceiling. So the
+     heights are applied as min-block-size rather than block-size: the token
+     sets a MINIMUM and a guarantee of density, not a ban on growth.
+
+     The values are exact at a root of 16px: 0.875rem × 16 = 14px. The base
+     coincides with the root at exactly one step — --text-md — and that is a
+     convenient coincidence rather than a tie: the scale is counted from 11px
+     upwards, not from the root downwards.                                  */
+
+  --text-2xs: 0.6875rem;  /* 11px — badges, axis labels: the floor, no lower */
+  --text-xs:  0.78125rem; /* 12.5px — metadata, times, hints */
+  --text-sm:  0.875rem;   /* 14px — the base: labels, buttons, cells */
+  --text-md:  1rem;       /* 16px — prose, message bodies, a panel name */
+  --text-lg:  1.125rem;   /* 18px */
+  --text-xl:  1.375rem;   /* 22px */
+  --text-2xl: 1.75rem;    /* 28px — the ceiling of the scale. h1, and the one
+                             metric band a screen may put under its header
+                             (.inst-metric-row--headline). A metric inside a
+                             region never reaches it: see the law over
+                             .inst-metric-value in surfaces.css. */
+
+  /* Two weights. 700 exists in the font and is forbidden: on a layout of
+     hairlines and air it reads as a shout.
+
+     MEDIUM IS 600, AND THAT IS AN ADMISSION OF FACT RATHER THAN A CHANGE OF
+     TASTE.
+
+     On 500, with the constitution forbidding 600 in a line of its own, a
+     measurement of the rendered pixels shows the ban was never enforced for a
+     day: Segoe UI has no true 500, and the system stack snaps it to Semibold.
+     One and the same line at 500 and at 600 matched PIXEL FOR PIXEL — that
+     is, on Windows every --weight-medium in this kit was already drawn in
+     precisely the weight called forbidden.
+
+     Worse: on macOS SF Pro does have a true Medium, and there it is what gets
+     drawn. The kit looked different on two platforms along the busiest axis
+     of the hierarchy — and that was not chosen, it fell out of the font by
+     lot.
+
+     The choice was between shipping a font of our own and admitting 600. A
+     font of our own costs the promise from the README — "no build and no
+     dependencies, in one line" — and that is worth more. Hence 600: the same
+     everywhere, zero dependencies, and the rule finally describes what is
+     drawn.
+
+     500 no longer occurs in the kit's markup: this token is its only door. */
+  --weight-normal: 400;
+  --weight-medium: 600;
+
+  --leading-tight: 1.25;  /* headings, single-line interface */
+  --leading-ui:    1.4;   /* wrapping labels, table cells */
+
+  /* 1.4 gives a fractional line on four scales out of five: 19.6 · 22.4 ·
+     23.8 · 25.2, whole only at 21 on the fifteenth. That looks like a breach
+     of the even-radius doctrine — "half a pixel off the grid" — and the
+     question has been raised twice.
+
+     MEASURED, and there is no harm. A table with identical text in six rows
+     at DPR 1.5: the rows get two heights, 31.927 and 32.260, a difference of
+     exactly 0.333 — half a device pixel. That is the remainder of the browser
+     snapping the row boundaries to the device grid ITSELF. The boundaries
+     land whole, and the borders of neighbouring rows are drawn alike.
+
+     A whole leading improves the picture but does not close it: on the
+     fifteenth scale 3 of 6 tops are fractional against 5 of 6 on the rest. So
+     the cause is not the leading alone, and changing 1.4 to 1.5 would thin
+     out every row and cell of the kit for the sake of the invisible.
+
+     For applications with virtualised lists: the row height must be MEASURED
+     rather than taken for a constant — it alternates within a third of a
+     pixel.                                                                 */
+  --leading-prose: 1.65;  /* prose */
+
+  /* A fourth step, and it is not invented: 1.55 already stood as a number in
+     four places — the "what exactly" block of an approval, a diff body, a
+     reason for refusal, a log. All four are monospaced and all four are read
+     THROUGH rather than scanned.
+
+     Its landing between the interface value (1.4) and the prose one (1.65) is
+     no accident. Monospaced setting is wider than proportional at the same
+     size, the line comes out shorter in characters, and the eye needs less
+     air than prose does — but more than a table cell that gets skimmed.
+
+     The number had no name of its own, and the kit's rule "a number in a
+     component is forbidden, a new value gets a token in the role tier" stood
+     broken by it four times over.                                          */
+  --leading-code:  1.55;  /* monospaced blocks: log, diff, reason for refusal */
+
+  /* THE MEASURE — the limit on the length of a line the eye can traverse
+     without losing the start of the next one. The classical norm is 45–75
+     characters; 68 stands at the upper edge, because interface descriptions
+     are short and wrap rarely.
+
+     A role rather than a literal: before this, 68ch was written out by hand
+     in two places, and every next place chose the number afresh. What that
+     costs was measured: a banner body on a wide container reached 105
+     characters.
+
+     The unit is ch and not pixels — otherwise the measure parts ways with the
+     type size on each of the five scale steps.                             */
+  --measure: 68ch;
+
+  /* Tracking: negative on the large, zero on the small. An optical
+     correction rather than a style — large type looks loose by default. */
+  --tracking-tight: -0.01em;
+  --tracking-normal: 0;
+
+}

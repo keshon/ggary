@@ -1,0 +1,12 @@
+/* A `hidden` attribute has to win over any `display` a theme or an app sets.
+   Without it `[data-part] { display: flex }` resurrects hidden parts. */
+[hidden] {
+  display: none !important;
+}
+
+[data-scope],
+[data-scope] *,
+[data-scope] *::before,
+[data-scope] *::after {
+  box-sizing: border-box;
+}

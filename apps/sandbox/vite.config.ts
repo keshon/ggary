@@ -9,7 +9,10 @@ export default defineConfig({
   // source instead of prebundling. This is what makes edits in packages/*
   // hot-reload here with no build step.
   optimizeDeps: {
-    exclude: ['@ggary/core', '@ggary/elements', '@ggary/react', '@ggary/styles', '@ggary/svelte', '@ggary/tokens'],
+    exclude: [
+      '@ggary/core', '@ggary/elements', '@ggary/react', '@ggary/svelte',
+      '@ggary/structure', '@ggary/theme-ggarry', '@ggary/theme-instrument',
+    ],
   },
   build: {
     rollupOptions: {

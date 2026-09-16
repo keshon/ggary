@@ -10,7 +10,8 @@
   }
 
   let {
-    variant = 'solid',
+    emphasis = 'medium',
+    tone = 'neutral',
     size = 'md',
     disabled = false,
     loading = false,
@@ -21,7 +22,7 @@
   }: Props = $props()
 
   // Same `connect()` React uses; only the normalizer differs.
-  const api = $derived(connect({ variant, size, disabled, loading, fullWidth, type }, svelteNormalizer))
+  const api = $derived(connect({ emphasis, tone, size, disabled, loading, fullWidth, type }, svelteNormalizer))
 </script>
 
 <button {...api.rootProps} {...rest}>

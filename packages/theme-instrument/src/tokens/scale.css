@@ -1,0 +1,556 @@
+/* ==========================================================================
+   Scale — the SECOND dimensional axis, and it is not a duplicate of density:
+   density moves the geometry and does not touch the type size, scale moves
+   the type size TOGETHER WITH the geometry. The test is the same as for the
+   attribute vocabularies: if two knobs give one result, it is one knob with
+   two names.
+
+   Why the ladder starts at 14, why the table is hand-written rather than a
+   multiplier, why every cell has two selectors and what is deliberately
+   absent from the table — docs/foundations/scale.md. The bands that guard
+   this are declared in cmd/proportion: a type-size step of 1.12–1.30, a
+   control radius against its height of 0.16–0.30.
+   ========================================================================== */
+
+[data-scale="15"] {
+  --text-2xs: 0.71875rem;   /* 11.5 */
+  --text-xs:  0.8125rem;    /* 13 */
+  --text-sm:  0.9375rem;    /* 15 — the interface base */
+  --text-md:  1.0625rem;    /* 17 */
+  --text-lg:  1.21875rem;   /* 19.5 */
+  --text-xl:  1.46875rem;   /* 23.5 */
+  --text-2xl: 1.875rem;     /* 30 */
+
+  --radius-2xs: 2px;        /* nailed down: see the header */
+  --radius-xs:  4px;
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  12px;
+
+  --control-h-xs: 22px;
+  --control-h-sm: 28px;
+  --control-h-md: 35px;
+  --control-h-lg: 41px;
+
+  --radius-control-sm: var(--radius-sm);
+  --radius-control-md: var(--radius-md);
+  --radius-control-lg: var(--radius-md);
+
+  --pad-panel:   var(--space-5);
+  --pad-card:    var(--space-6);
+  --pad-cell-x:  var(--space-4);
+  --row-pad-y:   var(--space-3);
+  --gap-row:     var(--space-3);
+  --gap-section: var(--space-7);
+  --gap-inline:  var(--space-4);
+  --pad-block-y: var(--space-4);
+
+  --size-dot:      6px;
+  --size-check:    16px;
+  --size-switch-w: 32px;
+  --size-switch-h: 19px;
+  --size-thumb:    15px;
+  --size-track:    4px;
+  --size-meter:    6px;
+  --size-spinner:  15px;
+  --size-icon:     19px;
+  --size-icon-lg:  26px;
+  /* 14, the same as on scale 14, and the ladder pausing here is not an
+     oversight. It stood at 16 for a while on the strength of a measurement
+     that said the cap height of --text-2xs stepped from 8 to 9 DEVICE PIXELS
+     while the icon did not. Cap height does not step: it is 0.700 of the type
+     size, and 11 -> 11.5px moves it 7.70 -> 8.05. The steps were an artefact
+     of a canvas that rounds the rasterised ascent to a whole pixel, and 16
+     put the icon 12% above the capital — further from level than any other
+     rung in the kit.
+
+     14 against 8.05 gives 0.981. The ladder is 14-14-16-16-18, and the pause
+     is what makes it tight enough to guard: the five ratios span 1.2174…
+     1.2857, narrower than a single pixel, so the band in cmd/proportion
+     refuses every one-pixel error. At 16 the span was 1.2727…1.3913 — wider
+     than a pixel, and no band could have separated the ladder from a defect. */
+  --size-icon-sm:  14px;
+  --size-icon-xs:  13px;
+  --size-chevron:  11px;
+  --size-tick:     3px;
+  --size-marker:   2px;
+  --size-gutter:   15px;
+  --size-indent:   15px;
+
+  /* Everything measured out by TEXT has to travel with the type size —
+     otherwise exactly the breakage the comment at --label-col is about
+     repeats: a label outgrows its column and tears the alignment of the whole
+     form. Density does not touch these, because it does not touch the type
+     size; scale touches them by the same logic, only with the opposite
+     sign.                                                                  */
+  --label-col:     112px;
+  --aside-w:       244px;
+  --col-min:       274px;
+  --container-max: 80rem;
+  --split-side:    19rem;
+  --split-main:    32rem;
+}
+
+[data-scale="16"] {
+  --text-2xs: 0.78125rem;   /* 12.5 */
+  --text-xs:  0.875rem;     /* 14 */
+  --text-sm:  1rem;         /* 16 — the interface base */
+  --text-md:  1.15625rem;   /* 18.5 */
+  --text-lg:  1.3125rem;    /* 21 */
+  --text-xl:  1.625rem;     /* 26 */
+  --text-2xl: 2.0625rem;    /* 33 */
+
+  --radius-2xs: 2px;
+  --radius-xs:  6px;
+  --radius-sm:  8px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+
+  --control-h-xs: 24px;
+  --control-h-sm: 30px;
+  --control-h-md: 38px;
+  --control-h-lg: 44px;
+
+  --radius-control-sm: var(--radius-sm);
+  --radius-control-md: var(--radius-md);
+  --radius-control-lg: var(--radius-md);
+
+  --pad-panel:   var(--space-6);
+  --pad-card:    var(--space-7);
+  --pad-cell-x:  var(--space-5);
+  --row-pad-y:   var(--space-4);
+  --gap-row:     var(--space-4);
+  --gap-section: var(--space-8);
+  --gap-inline:  var(--space-5);
+  --pad-block-y: var(--space-5);
+
+  --size-dot:      7px;
+  --size-check:    17px;
+  --size-switch-w: 34px;
+  --size-switch-h: 20px;
+  --size-thumb:    16px;
+  --size-track:    5px;
+  --size-meter:    7px;
+  --size-spinner:  16px;
+  --size-icon:     20px;
+  --size-icon-lg:  28px;
+  /* 16 against --text-2xs of 12.5: cap height 8.75, ink 9.02, ratio 1.031 —
+     level with the capital, and level with the untouched rungs at either end
+     of the ladder. This rung read 17 for a while for the same reason as the
+     one on scale 15, and it was wrong the same way: 17 gives 1.096.
+
+     Against the type gate 16/12.5 = 1.280, inside 1.216…1.300. That band is
+     narrow BECAUSE this ladder is tight, not despite it — see cmd/proportion,
+     where it is derived rung by rung.                                      */
+  --size-icon-sm:  16px;
+  --size-icon-xs:  14px;
+  --size-chevron:  11px;
+  --size-tick:     4px;
+  --size-marker:   2px;
+  --size-gutter:   16px;
+  --size-indent:   16px;
+
+  --label-col:     120px;
+  --aside-w:       256px;
+  --col-min:       288px;
+  --container-max: 84rem;
+  --split-side:    20rem;
+  --split-main:    34rem;
+}
+
+[data-scale="17"] {
+  --text-2xs: 0.8125rem;    /* 13 */
+  --text-xs:  0.9375rem;    /* 15 */
+  --text-sm:  1.0625rem;    /* 17 — the interface base */
+  --text-md:  1.21875rem;   /* 19.5 */
+  --text-lg:  1.40625rem;   /* 22.5 */
+  --text-xl:  1.75rem;      /* 28 */
+  --text-2xl: 2.21875rem;   /* 35.5 */
+
+  --radius-2xs: 2px;
+  --radius-xs:  6px;
+  --radius-sm:  8px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+
+  --control-h-xs: 25px;
+  --control-h-sm: 32px;
+  --control-h-md: 40px;
+  --control-h-lg: 47px;
+
+  --radius-control-sm: var(--radius-sm);
+  --radius-control-md: var(--radius-md);
+  --radius-control-lg: var(--radius-md);
+
+  --pad-panel:   var(--space-6);
+  --pad-card:    var(--space-7);
+  --pad-cell-x:  var(--space-5);
+  --row-pad-y:   var(--space-4);
+  --gap-row:     var(--space-4);
+  --gap-section: var(--space-8);
+  --gap-inline:  var(--space-5);
+  --pad-block-y: var(--space-5);
+
+  --size-dot:      7px;
+  --size-check:    18px;
+  --size-switch-w: 37px;
+  --size-switch-h: 22px;
+  --size-thumb:    17px;
+  --size-track:    5px;
+  --size-meter:    7px;
+  --size-spinner:  17px;
+  --size-icon:     22px;
+  --size-icon-lg:  30px;
+  /* 16 against --text-2xs of 13: cap height 9.10, ink 9.02, ratio 0.992. The
+     old comment here said the cap height "stays at 10 device pixels" from
+     scale 16 to 17 while the type grows — it does not stay anywhere, it goes
+     9.10 from 8.75. Whole device pixels were the canvas talking.
+
+     Against the type gate 16/13 = 1.231.                                   */
+  --size-icon-sm:  16px;
+  --size-icon-xs:  15px;
+  --size-chevron:  12px;
+  --size-tick:     4px;
+  --size-marker:   2px;
+  --size-gutter:   17px;
+  --size-indent:   17px;
+
+  --label-col:     128px;
+  --aside-w:       268px;
+  --col-min:       302px;
+  --container-max: 88rem;
+  --split-side:    21rem;
+  --split-main:    36rem;
+}
+
+[data-scale="18"] {
+  --text-2xs: 0.875rem;     /* 14 */
+  --text-xs:  1rem;         /* 16 */
+  --text-sm:  1.125rem;     /* 18 — the interface base */
+  --text-md:  1.3125rem;    /* 21 */
+  --text-lg:  1.5rem;       /* 24 */
+  --text-xl:  1.875rem;     /* 30 */
+  --text-2xl: 2.375rem;     /* 38 */
+
+  --radius-2xs: 2px;
+  --radius-xs:  6px;
+  --radius-sm:  8px;
+  --radius-md:  10px;
+  --radius-lg:  16px;
+
+  --control-h-xs: 26px;
+  --control-h-sm: 34px;
+  --control-h-md: 42px;
+  --control-h-lg: 50px;
+
+  --radius-control-sm: var(--radius-sm);
+  --radius-control-md: var(--radius-md);
+  --radius-control-lg: var(--radius-md);
+
+  --pad-panel:   var(--space-7);
+  --pad-card:    var(--space-8);
+  --pad-cell-x:  var(--space-6);
+  --row-pad-y:   var(--space-5);
+  --gap-row:     var(--space-5);
+  --gap-section: var(--space-9);
+  --gap-inline:  var(--space-6);
+  --pad-block-y: var(--space-6);
+
+  --size-dot:      8px;
+  --size-check:    19px;
+  --size-switch-w: 38px;
+  --size-switch-h: 23px;
+  --size-thumb:    18px;
+  --size-track:    5px;
+  --size-meter:    8px;
+  --size-spinner:  18px;
+  --size-icon:     24px;
+  --size-icon-lg:  32px;
+  --size-icon-sm:  18px;
+  --size-icon-xs:  16px;
+  --size-chevron:  12px;
+  --size-tick:     4px;
+  --size-marker:   3px;
+  --size-gutter:   18px;
+  --size-indent:   18px;
+
+  --label-col:     136px;
+  --aside-w:       280px;
+  --col-min:       316px;
+  --container-max: 92rem;
+  --split-side:    22rem;
+  --split-main:    38rem;
+}
+
+/* ── Two-dimensional cells ────────────────────────────────────────────────
+
+   Here stands exactly what BOTH axes touch: heights, the rounding of a
+   control, paddings and glyph sizes. The type size, the radius ladder and the
+   text-driven widths are deliberately absent from the cells — only scale
+   moves those, and repeating them here would start a duplicate that would
+   diverge one day.
+
+   The rounding of a control is written as REFERENCES into the ladder rather
+   than as numbers: the ladder is already scaled by the block above, and it
+   remains for the cell to pick a step.                                     */
+
+[data-scale="15"][data-density="compact"],
+[data-scale="15"] [data-density="compact"] {
+  --control-h-xs: 19px;
+  --control-h-sm: 24px;
+  --control-h-md: 29px;
+  --control-h-lg: 36px;
+
+  --radius-control-sm: var(--radius-xs);
+  --radius-control-md: var(--radius-sm);
+  --radius-control-lg: var(--radius-md);
+
+  --pad-panel:   var(--space-4);
+  --pad-card:    var(--space-5);
+  --pad-cell-x:  var(--space-3);
+  --row-pad-y:   var(--space-2);
+  --gap-row:     var(--space-2);
+  --gap-section: var(--space-6);
+  --gap-inline:  var(--space-3);
+  --pad-block-y: var(--space-3);
+
+  --size-check:    14px;
+  --size-switch-w: 28px;
+  --size-switch-h: 16px;
+  --size-thumb:    13px;
+  --size-spinner:  14px;
+  --size-gutter:   13px;
+  --size-indent:   13px;
+}
+
+[data-scale="15"][data-density="comfortable"],
+[data-scale="15"] [data-density="comfortable"] {
+  --control-h-xs: 24px;
+  --control-h-sm: 34px;
+  --control-h-md: 39px;
+  --control-h-lg: 47px;
+
+  --radius-control-sm: var(--radius-md);
+  --radius-control-md: var(--radius-md);
+  --radius-control-lg: var(--radius-lg);
+
+  --pad-panel:   var(--space-6);
+  --pad-card:    var(--space-7);
+  --pad-cell-x:  var(--space-5);
+  --row-pad-y:   var(--space-4);
+  --gap-row:     var(--space-4);
+  --gap-section: var(--space-8);
+  --gap-inline:  var(--space-5);
+  --pad-block-y: var(--space-5);
+
+  --size-check:    18px;
+  --size-switch-w: 36px;
+  --size-switch-h: 21px;
+  --size-thumb:    17px;
+  --size-spinner:  17px;
+  --size-gutter:   17px;
+  --size-indent:   17px;
+}
+
+[data-scale="16"][data-density="compact"],
+[data-scale="16"] [data-density="compact"] {
+  --control-h-xs: 20px;
+  --control-h-sm: 26px;
+  --control-h-md: 32px;
+  --control-h-lg: 38px;
+
+  --radius-control-sm: var(--radius-xs);
+  --radius-control-md: var(--radius-sm);
+  --radius-control-lg: var(--radius-md);
+
+  --pad-panel:   var(--space-5);
+  --pad-card:    var(--space-6);
+  --pad-cell-x:  var(--space-4);
+  --row-pad-y:   var(--space-3);
+  --gap-row:     var(--space-3);
+  --gap-section: var(--space-7);
+  --gap-inline:  var(--space-4);
+  --pad-block-y: var(--space-4);
+
+  --size-check:    15px;
+  --size-switch-w: 30px;
+  --size-switch-h: 17px;
+  --size-thumb:    14px;
+  --size-spinner:  15px;
+  --size-gutter:   14px;
+  --size-indent:   14px;
+}
+
+[data-scale="16"][data-density="comfortable"],
+[data-scale="16"] [data-density="comfortable"] {
+  --control-h-xs: 26px;
+  --control-h-sm: 34px;
+  --control-h-md: 42px;
+  --control-h-lg: 50px;
+
+  --radius-control-sm: var(--radius-md);
+  --radius-control-md: var(--radius-md);
+  --radius-control-lg: var(--radius-lg);
+
+  --pad-panel:   var(--space-7);
+  --pad-card:    var(--space-8);
+  --pad-cell-x:  var(--space-6);
+  --row-pad-y:   var(--space-5);
+  --gap-row:     var(--space-5);
+  --gap-section: var(--space-9);
+  --gap-inline:  var(--space-6);
+  --pad-block-y: var(--space-6);
+
+  --size-check:    19px;
+  --size-switch-w: 38px;
+  --size-switch-h: 23px;
+  --size-thumb:    18px;
+  --size-spinner:  18px;
+  --size-gutter:   18px;
+  --size-indent:   18px;
+}
+
+[data-scale="17"][data-density="compact"],
+[data-scale="17"] [data-density="compact"] {
+  --control-h-xs: 21px;
+  --control-h-sm: 28px;
+  --control-h-md: 34px;
+  --control-h-lg: 40px;
+
+  --radius-control-sm: var(--radius-xs);
+  --radius-control-md: var(--radius-sm);
+  --radius-control-lg: var(--radius-md);
+
+  --pad-panel:   var(--space-5);
+  --pad-card:    var(--space-6);
+  --pad-cell-x:  var(--space-4);
+  --row-pad-y:   var(--space-3);
+  --gap-row:     var(--space-3);
+  --gap-section: var(--space-7);
+  --gap-inline:  var(--space-4);
+  --pad-block-y: var(--space-4);
+
+  --size-check:    16px;
+  --size-switch-w: 32px;
+  --size-switch-h: 19px;
+  --size-thumb:    15px;
+  --size-spinner:  16px;
+  --size-gutter:   15px;
+  --size-indent:   15px;
+}
+
+[data-scale="17"][data-density="comfortable"],
+[data-scale="17"] [data-density="comfortable"] {
+  --control-h-xs: 27px;
+  --control-h-sm: 36px;
+  --control-h-md: 44px;
+  --control-h-lg: 53px;
+
+  --radius-control-sm: var(--radius-md);
+  --radius-control-md: var(--radius-md);
+  --radius-control-lg: var(--radius-lg);
+
+  --pad-panel:   var(--space-7);
+  --pad-card:    var(--space-8);
+  --pad-cell-x:  var(--space-6);
+  --row-pad-y:   var(--space-5);
+  --gap-row:     var(--space-5);
+  --gap-section: var(--space-9);
+  --gap-inline:  var(--space-6);
+  --pad-block-y: var(--space-6);
+
+  --size-check:    21px;
+  --size-switch-w: 41px;
+  --size-switch-h: 24px;
+  --size-thumb:    19px;
+  --size-spinner:  19px;
+  --size-gutter:   19px;
+  --size-indent:   19px;
+}
+
+[data-scale="18"][data-density="compact"],
+[data-scale="18"] [data-density="compact"] {
+  --control-h-xs: 22px;
+  --control-h-sm: 28px;
+  --control-h-md: 34px;
+   /* 44 rather than 42: at 42 the rail icon gives 32/42 = 0.762 against a
+     ceiling of 0.76. What moves is the height, not the icon — the icon holds
+     its ratio to the type size. */
+  --control-h-lg: 44px;
+
+  --radius-control-sm: var(--radius-xs);
+  --radius-control-md: var(--radius-sm);
+  --radius-control-lg: var(--radius-md);
+
+  --pad-panel:   var(--space-6);
+  --pad-card:    var(--space-7);
+  --pad-cell-x:  var(--space-5);
+  --row-pad-y:   var(--space-4);
+  --gap-row:     var(--space-4);
+  --gap-section: var(--space-8);
+  --gap-inline:  var(--space-5);
+  --pad-block-y: var(--space-5);
+
+  --size-check:    17px;
+  --size-switch-w: 34px;
+  --size-switch-h: 19px;
+  --size-thumb:    16px;
+  --size-spinner:  17px;
+  --size-gutter:   16px;
+  --size-indent:   16px;
+}
+
+[data-scale="18"][data-density="comfortable"],
+[data-scale="18"] [data-density="comfortable"] {
+  --control-h-xs: 28px;
+  --control-h-sm: 38px;
+  --control-h-md: 48px;
+  --control-h-lg: 56px;
+
+  --radius-control-sm: var(--radius-md);
+  --radius-control-md: var(--radius-md);
+  --radius-control-lg: var(--radius-lg);
+
+  --pad-panel:   var(--space-8);
+  --pad-card:    var(--space-9);
+  --pad-cell-x:  var(--space-7);
+  --row-pad-y:   var(--space-6);
+  --gap-row:     var(--space-6);
+  --gap-section: var(--space-10);
+  --gap-inline:  var(--space-7);
+  --pad-block-y: var(--space-7);
+
+  --size-check:    22px;
+  --size-switch-w: 44px;
+  --size-switch-h: 26px;
+  --size-thumb:    21px;
+  --size-spinner:  21px;
+  --size-gutter:   21px;
+  --size-indent:   21px;
+}
+
+/* ── A control's padding is derived from its height ────────────────────────
+
+   The rule stands HERE rather than in the role tier, and that is the
+   arrangement of the cascade rather than taste. The value of a custom
+   property is substituted where the property is DECLARED, and travels
+   downwards already computed. A calc(var(--control-h-md) * …) declared in
+   :root takes the height of the ROOT and freezes: the density attribute hangs
+   on a panel or on the shell, that is lower, and its turn never comes.
+   Verified by measurement — a button's padding stayed 12px in all three
+   modes, though the height honestly changed 26→32→36.
+
+   Hence the second selector — and the third: scale sets the heights by the
+   same scheme as density, so an element with [data-scale] has to recompute
+   the padding in the same way. On the element carrying the attribute itself
+   --control-h-* is already overridden, and the same formula is computed
+   afresh with its numbers. The formula meanwhile is one: no duplicate that
+   would diverge one day appears.
+   Nested density works for the same reason — a compact panel inside a
+   comfortable page recomputes the padding from its own height.            */
+
+:where(:root), [data-density], [data-scale] {
+  --control-pad-sm: calc(var(--control-h-sm) * var(--control-ratio-sm));
+  --control-pad-md: calc(var(--control-h-md) * var(--control-ratio-md));
+  --control-pad-lg: calc(var(--control-h-lg) * var(--control-ratio-lg));
+}

@@ -1,0 +1,117 @@
+[data-scope='select'][data-part='root'] {
+  --select-height: var(--ggarry-size-control-md);
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--ggarry-space-1);
+  min-width: 200px;
+}
+
+[data-scope='select'][data-part='label'] {
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+  color: var(--ggarry-text-muted);
+  cursor: default;
+}
+[data-scope='select'][data-part='label'][data-disabled] {
+  opacity: 0.55;
+}
+
+[data-scope='select'][data-part='trigger'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ggarry-space-2);
+  width: 100%;
+  height: var(--select-height);
+  padding-inline: var(--ggarry-space-3);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  text-align: start;
+  color: var(--ggarry-text-default);
+  background: var(--ggarry-bg-surface);
+  border: 1px solid var(--ggarry-border-strong);
+  border-radius: var(--ggarry-radius-md);
+  cursor: pointer;
+  transition: border-color var(--ggarry-duration-fast) ease;
+}
+
+[data-scope='select'][data-part='trigger']:hover:not([data-disabled]) {
+  border-color: var(--ggarry-border-accent);
+}
+[data-scope='select'][data-part='trigger'][data-state='open'] {
+  border-color: var(--ggarry-border-accent);
+}
+[data-scope='select'][data-part='trigger'][data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--ggarry-bg-subtle);
+}
+
+[data-scope='select'][data-part='value'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-scope='select'][data-part='value'][data-placeholder] {
+  color: var(--ggarry-text-subtle);
+}
+
+[data-scope='select'][data-part='indicator'] {
+  flex: none;
+  color: var(--ggarry-text-muted);
+  transition: transform var(--ggarry-duration-fast) ease;
+}
+[data-scope='select'][data-part='indicator'][data-state='open'] {
+  transform: rotate(180deg);
+}
+
+/* Placement, the closed state and scrolling live in @ggary/structure. */
+[data-scope='select'][data-part='content'] {
+  padding: var(--ggarry-space-1);
+  background: var(--ggarry-bg-surface);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  box-shadow: var(--ggarry-shadow-popover);
+}
+
+[data-scope='select'][data-part='item'] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-2) var(--ggarry-space-2);
+  font-size: var(--ggarry-font-size-md);
+  color: var(--ggarry-text-default);
+  border-radius: var(--ggarry-radius-sm);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Highlight is driven by machine state, NOT by :hover. Keyboard and mouse
+   therefore cannot disagree about which option is active. */
+[data-scope='select'][data-part='item'][data-highlighted] {
+  background: var(--ggarry-bg-accent);
+  color: var(--ggarry-text-on-accent);
+}
+[data-scope='select'][data-part='item'][data-selected] {
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+[data-scope='select'][data-part='item'][data-disabled] {
+  color: var(--ggarry-text-subtle);
+  cursor: not-allowed;
+}
+
+[data-scope='select'][data-part='item-indicator'] {
+  flex: none;
+  opacity: 0;
+}
+[data-scope='select'][data-part='item'][data-selected] [data-part='item-indicator'] {
+  opacity: 1;
+}
+
+[data-scope='select'][data-part='empty'] {
+  padding: var(--ggarry-space-3);
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-subtle);
+  text-align: center;
+}
