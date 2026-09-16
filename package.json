@@ -14,10 +14,14 @@
     "typecheck": "npm run assets && tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5.1.1",
     "@types/node": "^24.13.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "jsdom": "^26.0.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "svelte": "^5.57.0",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   }

@@ -13,7 +13,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 82 tests
+npm test         # 217 tests
 npm run typecheck
 ```
 
@@ -30,11 +30,12 @@ packages/
   structure/         CSS a component needs to WORK, shared by every theme
   theme-ggarry/      GGarry: JSON tokens -> CSS, component CSS, the --gg-* contract
   theme-instrument/  Instrument: OKLCH token tiers, component CSS, the --gg-* contract
-  elements/   <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>
-  react/      <Button>, <Chip>, <ChipGroup>, <Select>
-  svelte/     <Button>, <Chip>, <ChipGroup>, <Select>
-apps/sandbox/ the three demo pages
-tests/        *.machine.test.ts (node, no DOM) + *.dom.test.ts (jsdom)
+  icons/             glyph SVGs -> --gg-icon-* tokens; the shared glyph compiler
+  elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>
+  react/             <Button>, <Chip>, <ChipGroup>, <Select>
+  svelte/            <Button>, <Chip>, <ChipGroup>, <Select>
+apps/sandbox/        the three demo pages
+tests/               machine (node) · contract (node) · conformance and elements (jsdom)
 ```
 
 ## How one component reaches three frameworks
@@ -124,6 +125,31 @@ orientation. It exists because the port found these rules duplicated inside both
 themes' component CSS. The test for a rule belonging here: would the component be
 *broken* without it in every theme? A closed listbox that still takes space is
 broken; a listbox with no shadow is a different theme.
+
+### Icons
+
+Core **names** a glyph, a theme **draws** it, and adapters do neither:
+
+```
+core       data-icon="check" on a part               (types: IconName from @ggary/icons)
+structure  [data-icon] { mask: var(--gg-icon); background: currentColor }
+icons      svg/check.svg -> --gg-icon-check: url(data:…)  +  [data-icon=check] -> --gg-icon
+theme      --gg-icon-check: url(data:…)                (optional override, same layer, later)
+adapter    <span {...api.getItemIndicatorProps()} />   (no SVG anywhere)
+```
+
+A glyph is a mask filled with `currentColor`, so it always takes the colour of
+the text around it, and a theme recolours it the way it recolours text. Instrument
+ships its own drawings of the three glyphs on its own grid and stroke; GGarry uses
+the defaults. Adding a glyph is one SVG file — no adapter changes.
+
+One rule came from Instrument the hard way: **a mask clips everything on its
+element, pseudo-elements included.** A part that carries an enlarged tap area in
+`::before` cannot also be the glyph. That is why chip has `remove` (the target)
+and `remove-icon` (the drawing).
+
+`npm run assets` compiles the glyph sets and GGarry's tokens; `dev`, `test` and
+`typecheck` run it first.
 
 ### Porting Instrument: what it took, and what it found
 
@@ -254,18 +280,42 @@ fold, or you get layout shift on upgrade.
 
 ## Testing
 
-| Suite | Env | What it covers |
-|---|---|---|
-| `tests/select.machine.test.ts` | node | 23 tests. Every transition, pure, ~5ms. |
-| `tests/chip-group.machine.test.ts` | node | 23 tests. Roving focus, selection, removal, typeahead. |
-| `tests/button.dom.test.ts` | jsdom | 8 tests. Intent attributes; busy is not disabled. |
-| `tests/select.dom.test.ts` | jsdom | 12 tests. Anatomy, ARIA wiring, keyboard, form, events. |
-| `tests/chip-group.dom.test.ts` | jsdom | 16 tests. Roving tabindex, toolbar semantics, removal, focus landing. |
+| Project | Env | Files | What it covers |
+|---|---|---|---|
+| machine | node | `*.machine.test.ts` | 46 tests. Every transition of every machine, pure, milliseconds. |
+| contract | node | `*.contract.test.ts` | 37 tests. Rules about how packages relate, read from the source tree. |
+| dom | jsdom | `conformance.dom.test.ts` | 126 tests. One contract × three adapters. |
+| dom | jsdom | `elements.dom.test.ts` | 8 tests. What only custom elements have: properties, events, attribute fallbacks. |
 
-Behaviour tests against the machine are cheap and cover the hard part. The DOM
-suite runs against one renderer (the custom element); the same assertions should
-eventually run against React and Svelte too. That is the third test matrix you
-have to budget for.
+**Machine tests** cover behaviour in depth, once, where it is cheap. They run with
+no DOM at all, which is also what keeps reducers from touching one.
+
+**Contract tests** check the architecture itself: core names only glyphs that
+exist, adapters contain no SVG, every theme loads the base glyph set and overrides
+only known names, and the glyph compiler rejects bad input. Each was verified by
+planting the violation and watching it fail.
+
+**Conformance** is where adapter drift gets caught. Each spec in
+`tests/conformance/*.spec.ts` is written once against a small harness
+(`harness.ts`) that hides the three things that differ between frameworks — how a
+component mounts, how new props reach it, and when its effects have flushed:
+
+| Adapter | Props | Flush |
+|---|---|---|
+| elements | attributes and properties; callbacks are DOM events | synchronous |
+| react | `root.render` with new props | `act()` |
+| svelte | a `$state` props object, mutated in place | `flushSync()` |
+
+A failure names the adapter that drifted — `svelte > chip group > roving tabindex
+> wraps at both ends`. The suite was checked by planting a different bug in React
+and in Svelte: each failed under its own adapter's name and nowhere else. A spec
+skips what an adapter's API cannot express and says so (custom elements have no
+controlled mode), rather than faking it.
+
+Every mount is tracked and unmounted after each test. Detaching a component's DOM
+does not unmount it: an open Select keeps its document-level Escape listener, and
+the first run of the suite had the next test's keypress driving the previous
+test's machine.
 
 Floating UI is mocked in the jsdom suite. jsdom reports every rect as 0x0, so
 flip/shift/size churn against degenerate input — the suite took 216 seconds
@@ -310,16 +360,19 @@ Real, and deliberately left open:
   lines was out of scope for a first port.
 - **`data-accent` on a subtree is unverified in Instrument.** Its semantics are
   declared on `:root`; the port only exercised the attribute on `<html>`.
-- **Icons are still baked into adapter markup.** Instrument draws glyphs with CSS
-  masks; here both themes style the inline SVGs the adapters emit, so a theme
-  cannot yet swap a glyph.
 - **Not ported from Instrument:** everything beyond these four components — prose,
   forms, tables, overlays, the agent components, print styles, the contrast gate
   and the component registry. The gates are the most valuable of those.
 - **`onValueChange` fires when the user re-picks the already-selected value.**
   Intent semantics, not value-diff semantics. Correct for controlled components,
   mildly surprising otherwise.
-- No icons package, no Changesets, no docs site.
+- **Some config props are read once, at construction.** `mode`, `orientation` and
+  `removable` on ChipGroup (and the build prints `state_referenced_locally`
+  warnings for them) are read at construction and ignored after mount, in all
+  three adapters. Queued as its own task.
+- **Theme gates are not ported yet.** The contract project checks icons; token
+  completeness per theme and Instrument's contrast gate are the next rules for it.
+- No Changesets, no docs site.
 
 ## Scope
 

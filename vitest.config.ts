@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
 
 export default defineConfig({
   test: {
@@ -15,7 +16,14 @@ export default defineConfig({
         test: { name: 'contract', environment: 'node', include: ['tests/*.contract.test.ts'], globals: true },
       },
       {
-        // DOM-level conformance, run against the vanilla custom elements.
+        // DOM conformance, run against all three adapters (tests/conformance),
+        // plus element-only API tests.
+        //
+        // Svelte has to be compiled here, and resolved to its BROWSER build:
+        // under Node the default export condition picks the server build, where
+        // `mount` does not exist.
+        plugins: [svelte({ hot: false })],
+        resolve: { conditions: ['browser'] },
         test: { name: 'dom', environment: 'jsdom', include: ['tests/*.dom.test.ts'], globals: true },
       },
     ],
