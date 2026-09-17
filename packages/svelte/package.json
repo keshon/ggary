@@ -47,6 +47,10 @@
       "svelte": "./src/components/input/index.ts",
       "default": "./src/components/input/index.ts"
     },
+    "./menu": {
+      "svelte": "./src/components/menu/index.ts",
+      "default": "./src/components/menu/index.ts"
+    },
     "./popover": {
       "svelte": "./src/components/popover/index.ts",
       "default": "./src/components/popover/index.ts"

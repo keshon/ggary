@@ -119,6 +119,10 @@ const pairs: Pair[] = [
   { label: 'popover: text', fg: '--text-primary', bg: ['--surface-overlay'], min: text },
   { label: 'menu: keyboard shortcut', fg: '--text-muted', bg: ['--surface-overlay'], min: text },
   { label: 'menu: dangerous item', fg: '--err-text', bg: ['--surface-overlay'], min: text },
+  // The port highlights a row with a plate under it, so the row is read on it.
+  { label: 'menu: dangerous item highlighted', fg: '--err-text', bg: ['--surface-overlay', '--err-bg'], min: text },
+  { label: 'menu: item highlighted', fg: '--text-primary', bg: ['--surface-overlay', '--surface-hover'], min: text },
+  { label: 'menu: shortcut on highlighted row', fg: '--text-secondary', bg: ['--surface-overlay', '--surface-hover'], min: text },
   { label: 'menu: marked item', fg: '--accent-text', bg: ['--surface-overlay'], min: text },
   { label: 'tooltip: text', fg: '--text-primary', bg: ['--surface-overlay'], min: text },
   // The select's check mark: a mark with no label over it, on the popover. Not

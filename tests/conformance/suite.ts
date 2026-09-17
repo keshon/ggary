@@ -10,6 +10,7 @@ import { fieldConformance } from './field.spec'
 import { checkboxGroupConformance, fieldsetConformance } from './fieldset.spec'
 import { cleanup } from './harness'
 import { inputConformance } from './input.spec'
+import { menuConformance } from './menu.spec'
 import { popoverConformance, tooltipConformance } from './popover.spec'
 import { radioGroupConformance } from './radio-group.spec'
 import { resetConformance } from './reset.spec'
@@ -44,6 +45,7 @@ export function runConformance() {
       dialogConformance(adapter)
       popoverConformance(adapter)
       tooltipConformance(adapter)
+      menuConformance(adapter)
     })
   }
 }

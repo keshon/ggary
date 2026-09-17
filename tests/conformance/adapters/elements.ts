@@ -1,5 +1,5 @@
 import '../../../packages/elements/src/index'
-import type { GgChipGroupElement, GgSelectElement } from '../../../packages/elements/src/index'
+import type { GgChipGroupElement, GgMenuElement, GgSelectElement } from '../../../packages/elements/src/index'
 import {
   type Adapter,
   type ButtonProps,
@@ -17,6 +17,7 @@ import {
   type FieldsetProps,
   type PopoverProps,
   type TooltipProps,
+  type MenuProps,
   track,
 } from '../harness'
 
@@ -139,6 +140,14 @@ function applyPopoverHost(host: HTMLElement, props: Partial<PopoverProps>) {
   if ('closeOnEscape' in props || 'closeOnOutside' in props) {
     setAttr(host, 'persistent', props.closeOnEscape === false && props.closeOnOutside === false)
   }
+}
+
+function applyMenuHost(host: GgMenuElement, props: Partial<MenuProps>) {
+  if ('items' in props) host.items = props.items!
+  if ('open' in props) setAttr(host, 'open', props.open)
+  if ('placement' in props) setAttr(host, 'placement', props.placement)
+  if ('label' in props) setAttr(host, 'label', props.label)
+  if ('closeOnSelect' in props) setAttr(host, 'keep-open', props.closeOnSelect === false)
 }
 
 function applyTooltipHost(host: HTMLElement, props: Partial<TooltipProps>) {
@@ -392,6 +401,34 @@ export const elements: Adapter = {
       update: async (patch) => applyPopoverHost(host, patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<PopoverProps>)
+  },
+
+  async menu(props, target) {
+    const host = document.createElement('gg-menu') as GgMenuElement
+    const trigger = document.createElement('button')
+    trigger.slot = 'trigger'
+    trigger.textContent = props.trigger
+    host.append(trigger)
+    setAttr(host, 'open', props.defaultOpen)
+    applyMenuHost(host, props)
+    let current = props
+    host.addEventListener('openchange', (e) => {
+      const { open, reason } = (e as CustomEvent).detail
+      current.onOpenChange?.(open, { reason })
+    })
+    host.addEventListener('itemselect', (e) => {
+      const { value, ...details } = (e as CustomEvent).detail
+      current.onSelect?.(value, details)
+    })
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => {
+        current = { ...current, ...patch }
+        applyMenuHost(host, patch)
+      },
+      unmount: async () => host.remove(),
+    } satisfies Mounted<MenuProps>)
   },
 
   async tooltip(props, target) {

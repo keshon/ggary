@@ -194,6 +194,11 @@ export class GgSelectElement extends HTMLElement {
       const popover = attachPopover(this.#trigger!, this.#positioner!, {
         sameWidth: true,
         gutter: 4,
+        // Placement is asynchronous and shortens the list: keep the highlight in view after it.
+        onPlaced: () => {
+          const { highlightedIndex } = this.#machine!.getState()
+          if (highlightedIndex >= 0) scrollIntoViewIfNeeded(document.getElementById(api.ids.item(highlightedIndex)), this.#content)
+        },
         onDismiss: () => {
           this.#machine!.send({ type: 'CLOSE' })
           this.#trigger!.focus()

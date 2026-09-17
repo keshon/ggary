@@ -11,6 +11,7 @@ import {
   Field,
   Fieldset,
   Input,
+  Menu,
   RadioGroup,
   Select,
   Switch,
@@ -23,6 +24,7 @@ import {
   type DialogProps,
   type FieldProps,
   type FieldsetProps,
+  type MenuProps,
   type Mounted,
   type PopoverProps,
   type TooltipProps,
@@ -112,6 +114,10 @@ export const react: Adapter = {
     ]),
   tooltip: (props, target) =>
     mount(Tooltip, props, target, ({ trigger, ...rest }: TooltipProps) => [
+      { ...rest, trigger: (triggerProps: object) => createElement('button', triggerProps, trigger) },
+    ]),
+  menu: (props, target) =>
+    mount(Menu, props, target, ({ trigger, ...rest }: MenuProps) => [
       { ...rest, trigger: (triggerProps: object) => createElement('button', triggerProps, trigger) },
     ]),
   field: (props, target) =>

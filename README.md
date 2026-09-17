@@ -2,9 +2,9 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Fifteen components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
-Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Dialog, Popover and
-Tooltip — built end to end to prove the architecture holds.
+Sixteen components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
+Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Dialog, Popover, Tooltip
+and Menu — built end to end to prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -14,7 +14,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 1236 tests, 482 of them in headless Chrome
+npm test         # 1355 tests, 532 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -37,10 +37,10 @@ packages/
   checks/            the theme gates: structure and contrast, run on every theme
   elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>,
                      <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>, <gg-dialog>,
-                     <gg-popover>, <gg-tooltip>, <gg-fieldset>, <gg-checkbox-group>
+                     <gg-popover>, <gg-tooltip>, <gg-menu>, <gg-fieldset>, <gg-checkbox-group>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
                      <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Popover>, <Tooltip>,
-                     <Fieldset>, <CheckboxGroup>
+                     <Menu>, <Fieldset>, <CheckboxGroup>
   svelte/            the same ten as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
@@ -600,6 +600,70 @@ through intent, and in controlled mode moves nothing until the owner answers.
 <gg-tooltip content="Bold (Ctrl+B)"><gg-button><button aria-label="Bold">B</button></gg-button></gg-tooltip>
 ```
 
+### Menu
+
+A menu button (WAI-ARIA APG) on the same layer: a button opens a list of actions,
+toggles and choices. Items are data, as Select's are: actions (a link when they have
+`href`, so middle-click still opens a tab), `checkbox` and `radio` items, separators
+and labelled groups one level deep.
+
+```tsx
+<Menu
+  items={[
+    { value: 'rename', label: 'Rename', shortcut: 'F2' },
+    { type: 'separator' },
+    { value: 'delete', label: 'Delete', tone: 'danger' },
+  ]}
+  onSelect={(value, { item, checked }) => …}
+  trigger={(props) => <Button {...props}>Actions</Button>}
+/>
+```
+
+```html
+<gg-menu label="Row actions"><gg-button slot="trigger"><button>Actions</button></gg-button></gg-menu>
+<!-- menu.items = [...]; listen for `itemselect` ({ value, item, checked? }) -->
+```
+
+**Focus moves into the menu,** unlike Select. A menu is a place the user goes, and a
+link item has to hold focus for the browser to follow it. The highlight is still
+machine state: the pointer and the keyboard move one index, and the adapter focuses
+whatever it points at (`focusMenuItem`). The trigger opens with a press (focus on
+the menu itself, nothing highlighted), with Enter, Space or ArrowDown (first item),
+or with ArrowUp (last item). Arrows wrap, Home and End jump, a letter moves to an
+item, and Enter or Space activates. Activation always goes through a click, so a link
+navigates as a link does. Choosing an item reports it, closes the menu (`closeOnSelect`,
+per menu or per item) and gives focus back to the trigger; so do Escape and Tab.
+
+**Disabled items are stops.** Arrows land on them, and Enter and a click do nothing.
+A user who cannot reach an item never learns the action exists. This is the APG's
+guidance and Instrument's menu, and the opposite of Select, where a disabled option
+is skipped the way a native `<select>` skips it.
+
+**The owner holds the toggles.** A checkbox item reports the state it asks for, and a
+radio item always asks for `true`; the page passes new items back. The custom element
+reuses rows by value, so the focused row keeps focus when the items are replaced
+under it.
+
+Two things only the browser runs caught:
+
+- **React restores focus after a commit.** The menu's rows stay mounted while it is
+  closed, and React puts focus back on the element that had it before a commit,
+  after the layout cleanups run. A focus return from `attachPopover`'s cleanup
+  landed back on the item. Popover never met it: its content unmounts. The React
+  Menu attaches in passive effects, which run after that restore.
+- **Placement is asynchronous.** Floating UI writes the height limit after the
+  highlighted row has already been scrolled into view against the unlimited panel,
+  so the last row of a long menu ended up below the fold. The positioner now takes
+  `onPlaced`, and Menu and Select scroll again from it. Select had the same bug when
+  opening on a selected option far down a long list; a browser test now covers both,
+  and removing `onPlaced` fails both.
+
+The first theme pass had two layer bugs of its own, both now measured in the rhythm
+tests. Instrument laid the panel out with `display: flex`, which outranks the
+browser's `display: none` for a closed popover, so every closed menu was drawn. And
+auto margins in `@ggary/structure` lost to Instrument's `* { margin: 0 }` in a later
+layer, so shortcuts sat next to the label. The label now takes the slack with `flex`.
+
 ## Layering inside core
 
 ```
@@ -804,17 +868,17 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 111 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers. |
-| contract | node | `icons.contract.test.ts` | 98 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 129 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection and item roles. |
+| contract | node | `icons.contract.test.ts` | 104 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 461 tests. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 506 tests. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 461 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 506 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
-| browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — and the listbox corners, measured in pixels, per theme, mode and density. |
-| browser | Chrome | `overlay.browser.test.ts` | 8 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, real hover and Tab for tooltips, nested and passive layers. |
+| browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, and a menu row's shortcut at its edge, measured in pixels, per theme, mode and density. |
+| browser | Chrome | `overlay.browser.test.ts` | 13 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, nested and passive layers. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 | dom | jsdom | `svelte-bind.dom.test.ts` | 3 tests. `bind:value` on Select, ChipGroup, RadioGroup and CheckboxGroup writes back to the owner and follows it. |
 
@@ -916,7 +980,7 @@ Real, and deliberately left open:
 - **Platform close requests** (a back gesture) are cancelled through the `cancel`
   event, which browsers may refuse to let a page cancel without recent user
   activation; the dialog then closes natively and reports `native`.
-- **Not ported from Instrument:** everything beyond these fifteen components —
+- **Not ported from Instrument:** everything beyond these sixteen components —
   prose, the rest of forms (number field, slider, choice cards), tables, the sheet
   and toast overlays,
   the agent components (including the composer, a textarea with a toolbar in one
@@ -940,6 +1004,13 @@ Real, and deliberately left open:
   side-by-side label layout.
 - **A dialog or popover title's distance to its content is not on the rhythm
   tokens.** It is still each theme's own.
+- **Menu has no submenus,** no leading icons and no second line of description on
+  an item (Instrument's `.inst-menu-item-sub`).
+- **A menu item cannot keep the menu open from `onSelect`.** Whether it closes is
+  decided up front, by `closeOnSelect` on the menu or the item.
+- **`<gg-menu>` items are data only** — the `items` property or a JSON attribute.
+  There is no markup form (`<button>` children) to enhance.
+- **Menu item values must be unique.** Rows are keyed and reused by value.
 - **No option descriptions.** A radio or checkbox with a second line of help
   text (Instrument's choice card) is not built.
 - **No character counter.** `maxLength` is enforced by the browser, silently; a

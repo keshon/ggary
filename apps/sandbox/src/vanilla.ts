@@ -1,8 +1,8 @@
 import './theme'
 import './shared.css'
 import '@ggary/elements'
-import type { GgCheckboxElement, GgChipGroupElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
-import { frameworks, roles, tags, terms } from './demo-data'
+import type { GgCheckboxElement, GgChipGroupElement, GgMenuElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
+import { applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
 
@@ -349,6 +349,20 @@ app.innerHTML = `
     </p>
   </section>
 
+  <section id="menu">
+    <h2>Menu</h2>
+    <div class="row" style="align-items: center">
+      <gg-menu id="document-menu">
+        <gg-button slot="trigger"><button>Document</button></gg-button>
+      </gg-menu>
+      <gg-menu id="view-menu" label="View options" keep-open>
+        <gg-button slot="trigger" emphasis="low"><button>View</button></gg-button>
+      </gg-menu>
+    </div>
+    <pre class="state" id="menu-state">choose something</pre>
+    <p class="hint">A menu button: arrows walk every item, disabled ones too, and wrap; a letter jumps to an item; Enter or a click chooses. The view menu stays open while you toggle: the page owns the state and passes new items back.</p>
+  </section>
+
   <section>
     <h2>Native form participation</h2>
     <form class="demo" id="demo-form">
@@ -496,3 +510,22 @@ for (const id of ['filters-popover', 'share-popover']) {
     overlayState.innerHTML = `${id}  <b>${open ? 'open' : 'closed'}</b>  reason <b>${reason}</b>`
   })
 }
+
+// --- menus ---------------------------------------------------------------------
+const menuState = document.getElementById('menu-state')!
+const documentMenuEl = document.getElementById('document-menu') as GgMenuElement
+documentMenuEl.items = documentMenu
+documentMenuEl.addEventListener('itemselect', (event) => {
+  menuState.textContent = `chose ${(event as CustomEvent).detail.value}`
+})
+
+// The page owns the toggles: every choice comes back as new items.
+let view = initialView
+const viewMenuEl = document.getElementById('view-menu') as GgMenuElement
+viewMenuEl.items = viewMenu(view)
+viewMenuEl.addEventListener('itemselect', (event) => {
+  const { value, checked } = (event as CustomEvent).detail
+  view = applyView(view, value, checked)
+  viewMenuEl.items = viewMenu(view)
+  menuState.textContent = describeView(view)
+})

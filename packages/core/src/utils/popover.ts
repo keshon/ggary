@@ -74,6 +74,7 @@ export function attachPopover(reference: HTMLElement, content: HTMLElement, init
     attachPositioner(reference, content, {
       placement: options.placement,
       gutter: options.gutter,
+      onPlaced: () => options.onPlaced?.(),
       sameWidth: options.sameWidth ?? false,
       strategy: 'fixed',
     })

@@ -21,12 +21,18 @@ export interface PositionOptions {
    * lives in its parent's flow.
    */
   strategy?: 'absolute' | 'fixed'
+  /**
+   * After each placement, once the size limits are on the element. Placement is
+   * asynchronous, so anything measured against those limits — keeping a
+   * highlighted row inside a list that just got shorter — has to wait for this.
+   */
+  onPlaced?: () => void
 }
 
 export function attachPositioner(
   reference: HTMLElement,
   floating: HTMLElement,
-  { placement = 'bottom-start', gutter = 4, sameWidth = true, strategy = 'absolute' }: PositionOptions = {}
+  { placement = 'bottom-start', gutter = 4, sameWidth = true, strategy = 'absolute', onPlaced }: PositionOptions = {}
 ): () => void {
   return autoUpdate(reference, floating, () => {
     void computePosition(reference, floating, {
@@ -49,6 +55,7 @@ export function attachPositioner(
     }).then(({ x, y, placement: resolved }) => {
       floating.dataset.placement = resolved
       Object.assign(floating.style, { transform: `translate3d(${Math.round(x)}px, ${Math.round(y)}px, 0)` })
+      onPlaced?.()
     })
   })
 }

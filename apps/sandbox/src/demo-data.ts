@@ -1,4 +1,5 @@
 import type { ChipItem } from '@ggary/core/chip-group'
+import type { MenuEntry } from '@ggary/core/menu'
 import type { SelectItem } from '@ggary/core/select'
 
 export const frameworks: SelectItem[] = [
@@ -60,3 +61,54 @@ export const terms = [
   'Stacking. A dialog is in the top layer, above every z-index, and no ancestor can clip it.',
   'Ending. Close this dialog with Escape, the close button, a click outside, or Accept.',
 ]
+
+/** What the Menu demo's toggles control. The owner holds it; the menu reports choices. */
+export interface ViewState {
+  grid: boolean
+  rulers: boolean
+  density: 'compact' | 'comfortable'
+}
+
+export const initialView: ViewState = { grid: true, rulers: false, density: 'comfortable' }
+
+export const documentMenu: MenuEntry[] = [
+  { value: 'rename', label: 'Rename', shortcut: 'F2' },
+  { value: 'duplicate', label: 'Duplicate', shortcut: 'Ctrl+D' },
+  { value: 'archive', label: 'Archive (disabled)', disabled: true },
+  { type: 'separator' },
+  { value: 'docs', label: 'Open the docs', href: '#menu' },
+  { type: 'separator' },
+  { value: 'delete', label: 'Delete', tone: 'danger', shortcut: 'Del' },
+]
+
+export function viewMenu(view: ViewState): MenuEntry[] {
+  return [
+    {
+      type: 'group',
+      label: 'Show',
+      items: [
+        { type: 'checkbox', value: 'grid', label: 'Grid', checked: view.grid },
+        { type: 'checkbox', value: 'rulers', label: 'Rulers', checked: view.rulers },
+      ],
+    },
+    { type: 'separator' },
+    {
+      type: 'group',
+      label: 'Density',
+      items: [
+        { type: 'radio', value: 'compact', label: 'Compact', checked: view.density === 'compact' },
+        { type: 'radio', value: 'comfortable', label: 'Comfortable', checked: view.density === 'comfortable' },
+      ],
+    },
+  ]
+}
+
+/** The owner's answer to a choice in the view menu. */
+export function applyView(view: ViewState, value: string, checked?: boolean): ViewState {
+  if (value === 'grid' || value === 'rulers') return { ...view, [value]: Boolean(checked) }
+  if (value === 'compact' || value === 'comfortable') return { ...view, density: value }
+  return view
+}
+
+export const describeView = (view: ViewState) =>
+  `grid ${view.grid ? 'on' : 'off'}  rulers ${view.rulers ? 'on' : 'off'}  density ${view.density}`

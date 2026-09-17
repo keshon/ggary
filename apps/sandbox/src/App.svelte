@@ -9,6 +9,7 @@
     Field,
     Fieldset,
     Input,
+    Menu,
     Popover,
     RadioGroup,
     Select,
@@ -16,7 +17,7 @@
     Textarea,
     Tooltip,
   } from '@ggary/svelte'
-  import { frameworks, roles, tags, terms } from './demo-data'
+  import { applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -49,6 +50,9 @@
     { content: 'Italic (Ctrl+I)', label: 'Italic', glyph: 'I' },
     { content: 'Underline (Ctrl+U)', label: 'Underline', glyph: 'U' },
   ]
+
+  let view = $state(initialView)
+  let menuLog = $state('choose something')
 
   let taken = $state(false)
   let username = $state('garry')
@@ -484,6 +488,32 @@ invalid  ${taken}`}</pre>
     </Tooltip>
   </div>
   <pre class="state">{overlayLog}</pre>
+</section>
+
+<section id="menu">
+  <h2>Menu</h2>
+  <div class="row" style="align-items: center">
+    <Menu items={documentMenu} onSelect={(value) => (menuLog = `chose ${value}`)}>
+      {#snippet trigger(props)}
+        <Button {...props}>Document</Button>
+      {/snippet}
+    </Menu>
+    <Menu
+      label="View options"
+      closeOnSelect={false}
+      items={viewMenu(view)}
+      onSelect={(value, { checked }) => {
+        view = applyView(view, value, checked)
+        menuLog = describeView(view)
+      }}
+    >
+      {#snippet trigger(props)}
+        <Button emphasis="low" {...props}>View</Button>
+      {/snippet}
+    </Menu>
+  </div>
+  <pre class="state">{menuLog}</pre>
+  <p class="hint">A menu button: arrows walk every item, disabled ones too, and wrap; a letter jumps to an item; Enter or a click chooses. The view menu stays open while you toggle: the page owns the state and passes new items back.</p>
 </section>
 
 <section>

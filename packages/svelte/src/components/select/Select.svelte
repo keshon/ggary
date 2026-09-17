@@ -78,6 +78,11 @@
     const popover = attachPopover(triggerEl, positionerEl, {
       sameWidth: true,
       gutter: 4,
+      // Placement is asynchronous and shortens the list: keep the highlight in view after it.
+      onPlaced: () => {
+        const { highlightedIndex } = machine.getState()
+        if (highlightedIndex >= 0) scrollIntoViewIfNeeded(document.getElementById(api.ids.item(highlightedIndex)), contentEl)
+      },
       onDismiss: () => {
         machine.send({ type: 'CLOSE' })
         triggerEl?.focus()

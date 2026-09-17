@@ -4,7 +4,7 @@ import '../packages/structure/src/index.css'
 import '../packages/elements/src/index'
 import { coolDownTooltips } from '../packages/core/src/components/tooltip/tooltip.machine'
 import { openLayerCount } from '../packages/core/src/utils/dismissable'
-import type { GgDialogElement, GgPopoverElement, GgSelectElement } from '../packages/elements/src/index'
+import type { GgDialogElement, GgMenuElement, GgPopoverElement, GgSelectElement } from '../packages/elements/src/index'
 
 /**
  * Popover and Tooltip where only a browser can answer: real placement and
@@ -147,6 +147,22 @@ describe('select in a real browser', () => {
   })
 })
 
+describe('select opening far down a long list', () => {
+  it('shows the selected option, measured against the height the positioner gave the list', async () => {
+    await page.viewport(800, 300)
+    const host = mount(`<gg-select label="Item" style="position: absolute; top: 20px; left: 20px"></gg-select>`)
+    const select = host.querySelector('gg-select') as GgSelectElement
+    select.items = Array.from({ length: 30 }, (_, index) => ({ value: `v${index}`, label: `Item ${index}` }))
+    select.value = 'v28'
+    await userEvent.click(select.querySelector('[data-part="trigger"]')!)
+    await settle()
+    const content = select.querySelector('[data-part="content"]') as HTMLElement
+    const option = select.querySelector('[data-value="v28"]') as HTMLElement
+    expect(box(option).bottom).toBeLessThanOrEqual(box(content).bottom + 1)
+    expect(box(option).top).toBeGreaterThanOrEqual(box(content).top - 1)
+  })
+})
+
 describe('tooltip in a real browser', () => {
   it('a real hover shows it above the trigger after the delay; leaving hides it', async () => {
     const host = mount(`
@@ -201,5 +217,109 @@ describe('tooltip in a real browser', () => {
     await userEvent.click(host.querySelector('#elsewhere')!)
     await settle()
     expect(popover.open).toBe(false)
+  })
+})
+
+describe('menu in a real browser', () => {
+  const actions = [
+    { value: 'edit', label: 'Edit', shortcut: 'E' },
+    { value: 'duplicate', label: 'Duplicate' },
+    { type: 'separator' as const },
+    { value: 'delete', label: 'Delete', tone: 'danger' as const },
+  ]
+
+  const item = (host: Element, label: string) =>
+    [...host.querySelectorAll<HTMLElement>('[data-scope="menu"][data-part="item"]')].find(
+      (el) => el.querySelector('[data-part="item-text"]')!.textContent === label
+    )!
+
+  it('the keyboard alone: Tab to the trigger, open, walk, choose, and focus is back on the trigger', async () => {
+    const host = mount(`
+      <button id="before">Before</button>
+      <gg-menu style="position: absolute; top: 80px; left: 60px"><button slot="trigger">Actions</button></gg-menu>`)
+    const menu = host.querySelector('gg-menu') as GgMenuElement
+    menu.items = actions
+    const chosen: string[] = []
+    menu.addEventListener('itemselect', (event) => chosen.push((event as CustomEvent).detail.value))
+    const trigger = host.querySelector('[slot="trigger"]') as HTMLElement
+
+    ;(host.querySelector('#before') as HTMLElement).focus()
+    await userEvent.tab()
+    expect(document.activeElement).toBe(trigger)
+    await userEvent.keyboard('{Enter}')
+    await settle()
+    const content = host.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement
+    expect(content.matches(':popover-open')).toBe(true)
+    expect(document.activeElement).toBe(item(host, 'Edit'))
+    expect(Math.round(box(content).top)).toBe(Math.round(box(trigger).bottom + 4))
+
+    await userEvent.keyboard('{ArrowDown}{ArrowDown}')
+    expect(document.activeElement).toBe(item(host, 'Delete'))
+    await userEvent.keyboard('{Enter}')
+    await settle()
+    expect(chosen).toEqual(['delete'])
+    expect(content.matches(':popover-open')).toBe(false)
+    expect(document.activeElement).toBe(trigger)
+  })
+
+  it('a real pointer: hovering highlights and focuses a row, a click chooses it', async () => {
+    const host = mount(`<gg-menu><button slot="trigger">Actions</button></gg-menu>`)
+    const menu = host.querySelector('gg-menu') as GgMenuElement
+    menu.items = actions
+    const chosen: string[] = []
+    menu.addEventListener('itemselect', (event) => chosen.push((event as CustomEvent).detail.value))
+    await userEvent.click(host.querySelector('[slot="trigger"]')!)
+    await settle()
+    const content = host.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement
+    expect(document.activeElement).toBe(content)
+
+    await userEvent.hover(item(host, 'Duplicate'))
+    expect(item(host, 'Duplicate').hasAttribute('data-highlighted')).toBe(true)
+    expect(document.activeElement).toBe(item(host, 'Duplicate'))
+    // Off the rows: no row stays lit under a pointer that is on none.
+    await userEvent.hover(host.querySelector('[slot="trigger"]')!)
+    expect(host.querySelector('[data-part="item"][data-highlighted]')).toBeNull()
+    expect(document.activeElement).toBe(content)
+
+    await userEvent.click(item(host, 'Edit'))
+    await settle()
+    expect(chosen).toEqual(['edit'])
+    expect(menu.open).toBe(false)
+  })
+
+  it('a long menu scrolls inside the viewport, and the keyboard keeps its row in view', async () => {
+    await page.viewport(800, 300)
+    const host = mount(`<gg-menu style="position: absolute; top: 20px; left: 20px"><button slot="trigger">Many</button></gg-menu>`)
+    const menu = host.querySelector('gg-menu') as GgMenuElement
+    menu.items = Array.from({ length: 30 }, (_, index) => ({ value: `v${index}`, label: `Item ${index}` }))
+    const trigger = host.querySelector('[slot="trigger"]') as HTMLElement
+    trigger.focus()
+    await userEvent.keyboard('{ArrowUp}')
+    await settle()
+    const content = host.querySelector('[data-scope="menu"][data-part="content"]') as HTMLElement
+    expect(box(content).bottom).toBeLessThanOrEqual(300)
+    expect(content.scrollTop).toBeGreaterThan(0)
+    const last = item(host, 'Item 29')
+    expect(document.activeElement).toBe(last)
+    expect(box(last).bottom).toBeLessThanOrEqual(box(content).bottom + 1)
+  })
+
+  it('inside a dialog: Escape closes the menu and leaves the dialog open', async () => {
+    const host = mount(`
+      <gg-dialog heading="Settings">
+        <gg-menu><button slot="trigger">More</button></gg-menu>
+      </gg-dialog>`)
+    const dialog = host.querySelector('gg-dialog') as GgDialogElement
+    const menu = host.querySelector('gg-menu') as GgMenuElement
+    menu.items = actions
+    dialog.show()
+    await settle()
+    await userEvent.click(host.querySelector('[slot="trigger"]')!)
+    await settle()
+    expect(openLayerCount()).toBe(2)
+    await userEvent.keyboard('{Escape}')
+    await settle()
+    expect(menu.open).toBe(false)
+    expect(dialog.open).toBe(true)
   })
 })

@@ -20,6 +20,7 @@
   [data-scope='select'][data-part='content'],
   [data-scope='dialog'][data-part='content'],
   [data-scope='popover'][data-part='content'],
+  [data-scope='menu'][data-part='content'],
   [data-scope='tooltip'][data-part='content'],
   [data-scope='chip'][data-part='root'] {
     border: var(--stroke) solid CanvasText;
@@ -46,6 +47,7 @@
 
   /* A selection that is only a fill has to survive the reset. */
   [data-scope='select'][data-part='item'][data-highlighted],
+  [data-scope='menu'][data-part='item'][data-highlighted],
   [data-scope='chip-group'] [data-scope='chip'][data-part='root'][data-selected] {
     background: Highlight;
     color: HighlightText;

@@ -1,7 +1,7 @@
 import { expect } from 'vitest'
 import { userEvent } from '@vitest/browser/context'
 import '../../packages/elements/src/index'
-import type { GgSelectElement } from '../../packages/elements/src/index'
+import type { GgMenuElement, GgSelectElement } from '../../packages/elements/src/index'
 
 /**
  * The spacing rules every theme owes, measured in a real browser on real
@@ -13,7 +13,9 @@ import type { GgSelectElement } from '../../packages/elements/src/index'
  *     above its control, with the field's hint the same distance below;
  *   - groups inside a fieldset are --gg-space-group apart, which is more than
  *     an option step, so a group reads as one thing;
- *   - a highlighted option in the listbox is concentric with the panel.
+ *   - a highlighted option in the listbox, and a row of a menu, is concentric
+ *     with its panel; a closed menu is not drawn, and a row's shortcut stands
+ *     at the row's far edge.
  *
  * This is what caught the popover whose checkboxes sat 16px apart and whose
  * radios sat 8px apart: two groups, two rhythms, nobody owning the space.
@@ -41,9 +43,12 @@ export function mountGroups() {
       </gg-fieldset>
       <gg-select label="Plan"></gg-select>
       <gg-field label="Email" hint="Work address"><input type="email"></gg-field>
+      <gg-menu><button slot="trigger">Actions</button></gg-menu>
     </div>`
   const select = document.querySelector('gg-select') as GgSelectElement
   select.items = ['Free', 'Team', 'Business'].map((label) => ({ value: label.toLowerCase(), label }))
+  const menu = document.querySelector('gg-menu') as GgMenuElement
+  menu.items = ['Rename', 'Duplicate', 'Delete'].map((label) => ({ value: label.toLowerCase(), label, shortcut: label[0] }))
 }
 
 export async function expectRhythm() {
@@ -80,5 +85,20 @@ export async function expectConcentricListbox() {
   const item = getComputedStyle(select.querySelector('[data-part="item"]')!)
   const expected = Math.max(2, px(panel.borderTopLeftRadius) - px(panel.paddingTop) - px(panel.borderTopWidth))
   near(px(item.borderTopLeftRadius), expected)
+  await userEvent.keyboard('{Escape}')
+}
+
+export async function expectConcentricMenu() {
+  const menu = document.querySelector('gg-menu') as GgMenuElement
+  // A theme's layout must not outrank the platform's display: none for a
+  // closed popover — Instrument's first menu showed while closed.
+  expect(getComputedStyle(menu.querySelector('[data-part="content"]')!).display).toBe('none')
+  await userEvent.click(menu.querySelector('[slot="trigger"]')!)
+  const panel = getComputedStyle(menu.querySelector('[data-part="content"]')!)
+  const row = menu.querySelector('[data-part="item"]')!
+  const item = getComputedStyle(row)
+  const expected = Math.max(2, px(panel.borderTopLeftRadius) - px(panel.paddingTop) - px(panel.borderTopWidth))
+  near(px(item.borderTopLeftRadius), expected)
+  near(box(row.querySelector('[data-part="item-shortcut"]')!).right, box(row).right - px(item.paddingRight))
   await userEvent.keyboard('{Escape}')
 }

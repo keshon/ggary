@@ -49,6 +49,7 @@
 @import './components/field.css' layer(gg.components);
 @import './components/fieldset.css' layer(gg.components);
 @import './components/input.css' layer(gg.components);
+@import './components/menu.css' layer(gg.components);
 @import './components/popover.css' layer(gg.components);
 @import './components/radio-group.css' layer(gg.components);
 @import './components/select.css' layer(gg.components);

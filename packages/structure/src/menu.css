@@ -1,0 +1,52 @@
+/* A menu's content is a manual popover in the top layer, placed by Floating UI
+   as Popover's is (see popover.css): the browser's own popover box is removed
+   and the theme paints the panel. A long menu scrolls inside the room the
+   positioner measured for it.
+
+   `display: none` while closed is the platform's own; nothing here overrides it.
+   A theme that lays the panel out with `display` must scope it to
+   `:popover-open`, or the closed menu shows: a component layer outranks the
+   browser's own popover rule. */
+[data-scope='menu'][data-part='content'] {
+  position: fixed;
+  inset: 0 auto auto 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  inline-size: max-content;
+  max-inline-size: min(var(--gg-available-width, 100vw), calc(100vw - 16px));
+  max-block-size: var(--gg-available-height, 320px);
+  overflow-y: auto;
+}
+
+/* An item may be an <a>: it must not look like one. */
+[data-scope='menu'][data-part='item'] {
+  display: flex;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+  user-select: none;
+}
+
+/* The label takes the slack, so the shortcut and the mark stand at the far
+   edge, in that order. Not an auto margin: a theme's margin reset sits in a
+   later layer and would win. */
+[data-scope='menu'][data-part='item-text'] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-scope='menu'][data-part='item-shortcut'],
+[data-scope='menu'][data-part='item-indicator'] {
+  flex: none;
+}
+
+/* The mark shows the state, and keeps its room when unchecked so a column of
+   toggles does not shift as they change. */
+[data-scope='menu'][data-part='item-indicator'][data-state='unchecked'] {
+  visibility: hidden;
+}

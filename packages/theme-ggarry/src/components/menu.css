@@ -1,0 +1,103 @@
+/* ==========================================================================
+   GGarry — menu
+
+   The select listbox's panel and rows, so the two lists that float from a
+   button read as one family: the same surface, radius, shadow, concentric row
+   corners and accent highlight. Placement, scrolling and the order of the
+   parts are @ggary/structure's.
+   ========================================================================== */
+
+[data-scope='menu'][data-part='content'] {
+  --listbox-radius: var(--ggarry-radius-lg);
+  --listbox-inset: calc(var(--ggarry-space-1) + 1px);
+
+  min-inline-size: 180px;
+  padding: var(--ggarry-space-1);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--listbox-radius);
+  box-shadow: var(--ggarry-shadow-popover);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  line-height: 1.35;
+}
+
+[data-scope='menu'][data-part='item'] {
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-2);
+  /* Concentric with the panel, as the select's options are. */
+  border-radius: max(2px, calc(var(--listbox-radius) - var(--listbox-inset)));
+  cursor: pointer;
+}
+
+/* Highlight is machine state, not :hover — the pointer and the keyboard move
+   the same row. */
+[data-scope='menu'][data-part='item'][data-highlighted] {
+  background: var(--ggarry-bg-accent);
+  color: var(--ggarry-text-on-accent);
+}
+
+/* A destructive action is red AND named by its word. Highlighted, it takes the
+   danger fill rather than the accent, so the row does not turn blue at the
+   moment it is about to be pressed. */
+[data-scope='menu'][data-part='item'][data-tone='danger'] {
+  color: var(--ggarry-text-danger);
+}
+[data-scope='menu'][data-part='item'][data-tone='danger'][data-highlighted] {
+  background: var(--ggarry-bg-danger);
+  color: var(--ggarry-color-white);
+}
+
+/* Reachable, not choosable: the highlight is a quiet plate, not the accent
+   that says "Enter does something". On the plate the label steps up from
+   subtle to muted: subtle on muted is 2.89:1 in light mode. */
+[data-scope='menu'][data-part='item'][data-disabled] {
+  color: var(--ggarry-text-subtle);
+  cursor: not-allowed;
+}
+[data-scope='menu'][data-part='item'][data-disabled][data-highlighted] {
+  background: var(--ggarry-bg-muted);
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='menu'][data-part='item-shortcut'] {
+  padding-inline-start: var(--ggarry-space-4);
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='menu'][data-part='item'][data-highlighted]:not([data-disabled]) [data-part='item-shortcut'] {
+  color: inherit;
+}
+
+[data-scope='menu'][data-part='item-indicator'] {
+  inline-size: 14px;
+  block-size: 14px;
+}
+
+[data-scope='menu'][data-part='group-label'] {
+  padding: var(--ggarry-space-2) var(--ggarry-space-2) var(--ggarry-space-1);
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+  color: var(--ggarry-text-muted);
+  cursor: default;
+}
+
+[data-scope='menu'][data-part='separator'] {
+  block-size: 1px;
+  margin-block: var(--ggarry-space-1);
+  background: var(--ggarry-border-default);
+}
+
+/* Entry only, as the popover. */
+[data-scope='menu'][data-part='content']:popover-open {
+  transition: opacity var(--ggarry-duration-fast) ease;
+}
+
+@starting-style {
+  [data-scope='menu'][data-part='content']:popover-open { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='menu'][data-part='content']:popover-open { transition: none; }
+}

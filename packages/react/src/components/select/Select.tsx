@@ -64,6 +64,11 @@ export function Select(props: SelectProps) {
     const popover = attachPopover(triggerRef.current, positionerRef.current, {
       sameWidth: true,
       gutter: 4,
+      // Placement is asynchronous and shortens the list: keep the highlight in view after it.
+      onPlaced: () => {
+        const { highlightedIndex } = machine.getState()
+        if (highlightedIndex >= 0) scrollIntoViewIfNeeded(document.getElementById(api.ids.item(highlightedIndex)), contentRef.current)
+      },
       onDismiss: () => {
         machine.send({ type: 'CLOSE' })
         triggerRef.current?.focus()

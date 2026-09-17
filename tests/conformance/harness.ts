@@ -20,6 +20,7 @@ import type { InputSize, InputType } from '../../packages/core/src/components/in
 import type { TextareaResize, TextareaSize } from '../../packages/core/src/components/textarea'
 import type { CheckedState } from '../../packages/core/src/components/checkbox'
 import type { RadioGroupOrientation, RadioItem } from '../../packages/core/src/components/radio-group'
+import type { MenuEntry, MenuItem } from '../../packages/core/src/components/menu'
 
 export interface ButtonProps {
   label: string
@@ -182,6 +183,19 @@ export interface PopoverProps {
   closeButton?: boolean
 }
 
+export interface MenuProps {
+  items: MenuEntry[]
+  /** The trigger button's label. */
+  trigger: string
+  onSelect?: (value: string, details: { item: MenuItem; checked?: boolean }) => void
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean, details: { reason: string }) => void
+  placement?: string
+  closeOnSelect?: boolean
+  label?: string
+}
+
 export interface TooltipProps {
   content: string
   /** The trigger button's label. */
@@ -255,6 +269,7 @@ export interface Adapter {
   dialog(props: DialogProps, target: HTMLElement): Promise<Mounted<DialogProps>>
   popover(props: PopoverProps, target: HTMLElement): Promise<Mounted<PopoverProps>>
   tooltip(props: TooltipProps, target: HTMLElement): Promise<Mounted<TooltipProps>>
+  menu(props: MenuProps, target: HTMLElement): Promise<Mounted<MenuProps>>
   /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
 }

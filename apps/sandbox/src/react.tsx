@@ -13,6 +13,7 @@ import {
   Field,
   Fieldset,
   Input,
+  Menu,
   Popover,
   RadioGroup,
   Select,
@@ -20,7 +21,7 @@ import {
   Textarea,
   Tooltip,
 } from '@ggary/react'
-import { frameworks, roles, tags, terms } from './demo-data'
+import { applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -43,6 +44,9 @@ function App() {
   const [overlayLog, setOverlayLog] = useState('open a popover')
   const logOverlay = (name: string) => (open: boolean, { reason }: { reason: string }) =>
     setOverlayLog(`${name}  ${open ? 'open' : 'closed'}  reason ${reason}`)
+
+  const [view, setView] = useState(initialView)
+  const [menuLog, setMenuLog] = useState('choose something')
 
   const [taken, setTaken] = useState(false)
   const [username, setUsername] = useState('garry')
@@ -549,6 +553,34 @@ function App() {
           />
         </div>
         <pre className="state">{overlayLog}</pre>
+      </section>
+
+      <section id="menu">
+        <h2>Menu</h2>
+        <div className="row" style={{ alignItems: 'center' }}>
+          <Menu
+            items={documentMenu}
+            onSelect={(value) => setMenuLog(`chose ${value}`)}
+            trigger={(props) => <Button {...props}>Document</Button>}
+          />
+          <Menu
+            label="View options"
+            closeOnSelect={false}
+            items={viewMenu(view)}
+            onSelect={(value, { checked }) => {
+              const next = applyView(view, value, checked)
+              setView(next)
+              setMenuLog(describeView(next))
+            }}
+            trigger={(props) => (
+              <Button emphasis="low" {...props}>
+                View
+              </Button>
+            )}
+          />
+        </div>
+        <pre className="state">{menuLog}</pre>
+        <p className="hint">A menu button: arrows walk every item, disabled ones too, and wrap; a letter jumps to an item; Enter or a click chooses. The view menu stays open while you toggle: the page owns the state and passes new items back.</p>
       </section>
 
       <section>

@@ -45,6 +45,11 @@ const pairs: Pair[] = [
   // is written in button.css rather than as a token, so the pair spells it out.
   { label: 'danger: text on surface', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'danger: text on canvas', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-canvas'], min: TEXT },
+  // Menu rows. The highlighted row reuses the accent and danger fills above.
+  { label: 'menu: shortcut on surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  // Disabled text is exempt from 1.4.3; it is held to the decor tier, as the
+  // disabled option above. subtle on this plate failed even that (2.89:1).
+  { label: 'menu: disabled row on its highlight plate', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-muted'], min: LARGE },
   {
     label: 'danger: text on its tint (low button)',
     fg: '--ggarry-text-danger',
