@@ -13,6 +13,8 @@ import {
   type SwitchProps,
   type RadioGroupProps,
   type DialogProps,
+  type PopoverProps,
+  type TooltipProps,
   track,
 } from '../harness'
 
@@ -125,6 +127,23 @@ function applyDialogHost(host: HTMLElement, props: Partial<DialogProps>) {
   if ('closeOnEscape' in props || 'closeOnOutside' in props) {
     setAttr(host, 'persistent', props.closeOnEscape === false && props.closeOnOutside === false)
   }
+}
+
+function applyPopoverHost(host: HTMLElement, props: Partial<PopoverProps>) {
+  if ('open' in props) setAttr(host, 'open', props.open)
+  if ('title' in props) setAttr(host, 'heading', props.title)
+  if ('placement' in props) setAttr(host, 'placement', props.placement)
+  if ('closeButton' in props) setAttr(host, 'close-button', props.closeButton)
+  if ('closeOnEscape' in props || 'closeOnOutside' in props) {
+    setAttr(host, 'persistent', props.closeOnEscape === false && props.closeOnOutside === false)
+  }
+}
+
+function applyTooltipHost(host: HTMLElement, props: Partial<TooltipProps>) {
+  if ('content' in props) setAttr(host, 'content', props.content)
+  if ('openDelay' in props) setAttr(host, 'open-delay', props.openDelay)
+  if ('closeDelay' in props) setAttr(host, 'close-delay', props.closeDelay)
+  if ('disabled' in props) setAttr(host, 'disabled', props.disabled)
 }
 
 function applyButton(host: HTMLElement, props: Partial<ButtonProps>) {
@@ -291,6 +310,53 @@ export const elements: Adapter = {
       update: async (patch) => applyDialogHost(host, patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<DialogProps>)
+  },
+
+  async popover(props, target) {
+    const host = document.createElement('gg-popover')
+    const trigger = document.createElement('button')
+    trigger.slot = 'trigger'
+    trigger.textContent = props.trigger
+    const text = document.createElement('p')
+    text.textContent = props.body ?? 'Body'
+    const inside = document.createElement('button')
+    inside.type = 'button'
+    inside.textContent = 'Inside'
+    host.append(trigger, text, inside)
+    setAttr(host, 'open', props.defaultOpen)
+    applyPopoverHost(host, props)
+    if (props.onOpenChange) {
+      host.addEventListener('openchange', (e) => {
+        const { open, reason } = (e as CustomEvent).detail
+        props.onOpenChange!(open, { reason })
+      })
+    }
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applyPopoverHost(host, patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<PopoverProps>)
+  },
+
+  async tooltip(props, target) {
+    const host = document.createElement('gg-tooltip')
+    const trigger = document.createElement('button')
+    trigger.textContent = props.trigger
+    host.append(trigger)
+    applyTooltipHost(host, props)
+    if (props.onOpenChange) {
+      host.addEventListener('openchange', (e) => {
+        const { open, reason } = (e as CustomEvent).detail
+        props.onOpenChange!(open, { reason })
+      })
+    }
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applyTooltipHost(host, patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<TooltipProps>)
   },
 
   async field(props, target) {

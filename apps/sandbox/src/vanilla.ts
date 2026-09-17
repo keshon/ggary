@@ -279,6 +279,39 @@ app.innerHTML = `
   </section>
 
   <section>
+    <h2>Popover and Tooltip</h2>
+    <div class="row" style="align-items: center">
+      <gg-popover id="filters-popover" heading="Filters">
+        <gg-button slot="trigger"><button>Filters</button></gg-button>
+        <div class="dialog-fields">
+          <gg-checkbox><label><input type="checkbox" checked> Only open issues</label></gg-checkbox>
+          <gg-checkbox><label><input type="checkbox"> Assigned to me</label></gg-checkbox>
+          <gg-radio-group label="Sort" name="sort">
+            <label><input type="radio" value="newest" checked> Newest first</label>
+            <label><input type="radio" value="oldest"> Oldest first</label>
+          </gg-radio-group>
+        </div>
+      </gg-popover>
+      <gg-popover id="share-popover" heading="Share" close-button placement="bottom-end">
+        <gg-button slot="trigger" emphasis="low"><button>Share…</button></gg-button>
+        <gg-field label="Link" hint="Anyone with the link can view"><input readonly value="https://example.com/p/atlas"></gg-field>
+      </gg-popover>
+      <span style="flex: 1"></span>
+      <gg-tooltip content="Bold (Ctrl+B)"><gg-button emphasis="minimal" size="sm"><button aria-label="Bold"><b>B</b></button></gg-button></gg-tooltip>
+      <gg-tooltip content="Italic (Ctrl+I)"><gg-button emphasis="minimal" size="sm"><button aria-label="Italic"><i>I</i></button></gg-button></gg-tooltip>
+      <gg-tooltip content="Underline (Ctrl+U)"><gg-button emphasis="minimal" size="sm"><button aria-label="Underline"><u>U</u></button></gg-button></gg-tooltip>
+      <gg-tooltip content="Shown below, when there is room" placement="bottom"><gg-button emphasis="minimal" size="sm"><button>Below</button></gg-button></gg-tooltip>
+    </div>
+    <pre class="state" id="overlay-state">open a popover</pre>
+    <p class="hint">
+      Both live in the top layer as <code>popover="manual"</code> elements, placed by Floating UI: an
+      <code>overflow: hidden</code> ancestor cannot clip them. A popover takes focus and gives it back; a
+      tooltip describes its trigger, shows on hover after a delay or on keyboard focus at once, and moving
+      along the toolbar skips the delay.
+    </p>
+  </section>
+
+  <section>
     <h2>Native form participation</h2>
     <form class="demo" id="demo-form">
       <gg-select id="form-select" name="framework" label="framework" placeholder="Required…"></gg-select>
@@ -414,5 +447,14 @@ for (const id of ['edit-dialog', 'delete-dialog', 'terms-dialog']) {
   document.getElementById(id)!.addEventListener('openchange', (event) => {
     const { open, reason, returnValue } = (event as CustomEvent).detail
     dialogState.innerHTML = `${id}  <b>${open ? 'open' : 'closed'}</b>  reason <b>${reason}</b>${returnValue ? `  returnValue <b>${returnValue}</b>` : ''}`
+  })
+}
+
+// --- popovers ------------------------------------------------------------------
+const overlayState = document.getElementById('overlay-state')!
+for (const id of ['filters-popover', 'share-popover']) {
+  document.getElementById(id)!.addEventListener('openchange', (event) => {
+    const { open, reason } = (event as CustomEvent).detail
+    overlayState.innerHTML = `${id}  <b>${open ? 'open' : 'closed'}</b>  reason <b>${reason}</b>`
   })
 }

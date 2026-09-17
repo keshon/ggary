@@ -1,0 +1,31 @@
+/* ==========================================================================
+   GGarry — tooltip
+
+   An inverted plate: nothing else on the page is that colour, so it reads as
+   an annotation before it is read at all. No border — on an inversion it only
+   doubles the edge.
+   ========================================================================== */
+
+[data-scope='tooltip'][data-part='content'] {
+  padding: var(--ggarry-space-1) var(--ggarry-space-2);
+  background: var(--ggarry-bg-inverted);
+  color: var(--ggarry-text-on-inverted);
+  border-radius: var(--ggarry-radius-md);
+  box-shadow: var(--ggarry-shadow-sm);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-medium);
+  line-height: 1.4;
+}
+
+[data-scope='tooltip'][data-part='content']:popover-open {
+  transition: opacity var(--ggarry-duration-fast) ease;
+}
+
+@starting-style {
+  [data-scope='tooltip'][data-part='content']:popover-open { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='tooltip'][data-part='content']:popover-open { transition: none; }
+}

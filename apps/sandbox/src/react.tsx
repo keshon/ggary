@@ -3,7 +3,21 @@ import './shared.css'
 
 import { StrictMode, useState, type FormEvent } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Button, Checkbox, Chip, ChipGroup, Dialog, Field, Input, RadioGroup, Select, Switch, Textarea } from '@ggary/react'
+import {
+  Button,
+  Checkbox,
+  Chip,
+  ChipGroup,
+  Dialog,
+  Field,
+  Input,
+  Popover,
+  RadioGroup,
+  Select,
+  Switch,
+  Textarea,
+  Tooltip,
+} from '@ggary/react'
 import { frameworks, roles, tags, terms } from './demo-data'
 
 function App() {
@@ -23,6 +37,10 @@ function App() {
   const [dialogLog, setDialogLog] = useState('open a dialog')
   const logDialog = (name: string) => (open: boolean, { reason }: { reason: string }) =>
     setDialogLog(`${name}  ${open ? 'open' : 'closed'}  reason ${reason}`)
+
+  const [overlayLog, setOverlayLog] = useState('open a popover')
+  const logOverlay = (name: string) => (open: boolean, { reason }: { reason: string }) =>
+    setOverlayLog(`${name}  ${open ? 'open' : 'closed'}  reason ${reason}`)
 
   const [taken, setTaken] = useState(false)
   const [username, setUsername] = useState('garry')
@@ -416,6 +434,68 @@ function App() {
           </Dialog>
         </div>
         <pre className="state">{dialogLog}</pre>
+      </section>
+
+      <section>
+        <h2>Popover and Tooltip</h2>
+        <div className="row" style={{ alignItems: 'center' }}>
+          <Popover title="Filters" onOpenChange={logOverlay('filters')} trigger={(props) => <Button {...props}>Filters</Button>}>
+            <div className="dialog-fields">
+              <Checkbox defaultChecked>Only open issues</Checkbox>
+              <Checkbox>Assigned to me</Checkbox>
+              <RadioGroup
+                label="Sort"
+                name="sort"
+                defaultValue="newest"
+                items={[
+                  { value: 'newest', label: 'Newest first' },
+                  { value: 'oldest', label: 'Oldest first' },
+                ]}
+              />
+            </div>
+          </Popover>
+          <Popover
+            title="Share"
+            closeButton
+            placement="bottom-end"
+            onOpenChange={logOverlay('share')}
+            trigger={(props) => (
+              <Button emphasis="low" {...props}>
+                Share…
+              </Button>
+            )}
+          >
+            <Field label="Link" hint="Anyone with the link can view">
+              <Input readOnly defaultValue="https://example.com/p/atlas" />
+            </Field>
+          </Popover>
+          <span style={{ flex: 1 }} />
+          {[
+            ['Bold (Ctrl+B)', 'Bold', <b key="b">B</b>],
+            ['Italic (Ctrl+I)', 'Italic', <i key="i">I</i>],
+            ['Underline (Ctrl+U)', 'Underline', <u key="u">U</u>],
+          ].map(([content, label, glyph]) => (
+            <Tooltip
+              key={label as string}
+              content={content}
+              trigger={(props) => (
+                <Button emphasis="minimal" size="sm" aria-label={label as string} {...props}>
+                  {glyph}
+                </Button>
+              )}
+            />
+          ))}
+          <Tooltip
+            content="Shown below, when there is room"
+            placement="bottom"
+            trigger={(props) => (
+              <Button emphasis="minimal" size="sm" {...props}>
+                Below
+              </Button>
+            )}
+          />
+        </div>
+        <pre className="state">{overlayLog}</pre>
       </section>
 
       <section>

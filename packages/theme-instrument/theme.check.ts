@@ -147,6 +147,11 @@ const pairs: Pair[] = [
   { label: 'field: invalid border on panel', fg: '--err-text', bg: ['--surface-raised', '--surface-field'], min: large },
   { label: 'field: hint on panel', fg: '--text-muted', bg: ['--surface-raised'], min: text },
 
+  // Added with Popover and Tooltip: the popover is --surface-overlay like the
+  // dialog; the tooltip is small text on the inverse plate.
+  { label: 'popover: text on overlay', fg: '--text-primary', bg: ['--surface-overlay'], min: text },
+  { label: 'tooltip: text on inverse', fg: '--text-on-inverse', bg: ['--surface-inverse'], min: text },
+
   // Added with Dialog: the sheet is --surface-overlay, and its title,
   // sub-label and close cross stand on it.
   { label: 'dialog: title on overlay', fg: '--text-primary', bg: ['--surface-overlay'], min: text },

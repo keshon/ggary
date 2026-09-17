@@ -23,6 +23,12 @@ export interface DismissableOptions {
   closeOnEscape?: boolean
   /** A press outside dismisses this layer. Default true. */
   closeOnOutside?: boolean
+  /**
+   * The layer does not own the pointer: presses are judged by the layer below,
+   * as if it were not there. A tooltip is passive — it takes Escape, but a
+   * press elsewhere while it shows must still close the popover under it.
+   */
+  passive?: boolean
 }
 
 interface Layer {
@@ -57,7 +63,8 @@ function outside(layer: Layer, event: PointerEvent): boolean {
 
 function listen(doc: Document): () => void {
   const onPointerDown = (event: PointerEvent) => {
-    const layer = top()
+    // Passive layers step aside; they are dismissed by their own triggers.
+    const layer = [...stack].reverse().find((candidate) => !candidate.options.passive)
     if (!layer || layer.options.closeOnOutside === false) return
     if (outside(layer, event)) layer.options.onDismiss('outside-pointer')
   }

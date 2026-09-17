@@ -2,9 +2,9 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Eleven components — Button, Chip, ChipGroup, Select, Field, Input, Textarea,
-Checkbox, Switch, RadioGroup and Dialog — built end to end to prove the
-architecture holds.
+Thirteen components — Button, Chip, ChipGroup, Select, Field, Input, Textarea,
+Checkbox, Switch, RadioGroup, Dialog, Popover and Tooltip — built end to end to
+prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -14,7 +14,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 987 tests, 374 of them in headless Chrome
+npm test         # 1103 tests, 422 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -36,9 +36,10 @@ packages/
   icons/             glyph SVGs -> --gg-icon-* tokens; the shared glyph compiler
   checks/            the theme gates: structure and contrast, run on every theme
   elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>,
-                     <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>, <gg-dialog>
+                     <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>, <gg-dialog>,
+                     <gg-popover>, <gg-tooltip>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
-                     <Checkbox>, <Switch>, <RadioGroup>, <Dialog>
+                     <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Popover>, <Tooltip>
   svelte/            the same ten as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
@@ -452,6 +453,53 @@ Chrome against the real thing, and `tests/dialog.browser.test.ts` covers what on
 a browser has — `:modal`, Tab never leaving, the scroll lock, a real backdrop click,
 real Escape presses through the stack, the form close, and a controlled refusal.
 
+### Popover and Tooltip
+
+The same layer with the **Popover API** instead of `<dialog>`: `popover="manual"`
+puts the content in the top layer, and `attachPopover` (`utils/popover.ts`) shows it,
+places it with Floating UI's `fixed` strategy — a top-layer element is positioned
+against the viewport whatever its DOM parent — and puts it on the dismiss stack.
+`manual`, not `auto`: the platform's light dismiss would compete with the stack, and
+the trigger's own click would close the popover and open it again.
+`@ggary/structure` removes the browser's centred, bordered popover box, so
+placement is Floating UI's alone; removing that reset fails three placement tests.
+
+**Popover** is a non-modal dialog on its trigger — filters, a share panel. Focus
+moves to its first visible control and returns to the trigger; the trigger toggles
+it; Escape and a press outside close it.
+
+**Tooltip** describes its trigger (`aria-describedby`, whether shown or not) and
+holds no controls — that would be a popover. Its timing is the reducer's, its
+timers are effects:
+
+- hover shows it after `openDelay` (500 ms), and hides it after `closeDelay` (150 ms),
+  long enough for the pointer to move onto the tooltip without losing it
+  (WCAG 1.4.13, hoverable);
+- keyboard focus shows it at once — `:focus-visible` only, so a click that focuses
+  a button does not; blur, a press on the trigger and Escape hide it at once;
+- a touch "hover" is ignored: the tap should act, not describe;
+- moving from one tooltip to the next within 600 ms skips the delay, page-wide,
+  so running along a toolbar reads as one conversation.
+
+A tooltip is a **passive** layer on the stack: it takes Escape, but a press
+elsewhere while it shows still reaches the popover beneath it.
+
+Open and close requests for all three overlays share one rule,
+`utils/open-intent.ts`: a request is judged against the current state, reported
+through intent, and in controlled mode moves nothing until the owner answers.
+
+```tsx
+<Popover title="Filters" trigger={(props) => <Button {...props}>Filters</Button>}>
+  <Checkbox>Only open issues</Checkbox>
+</Popover>
+<Tooltip content="Bold (Ctrl+B)" trigger={(props) => <Button aria-label="Bold" {...props}>B</Button>} />
+```
+
+```html
+<gg-popover heading="Filters"><gg-button slot="trigger"><button>Filters</button></gg-button>…</gg-popover>
+<gg-tooltip content="Bold (Ctrl+B)"><gg-button><button aria-label="Bold">B</button></gg-button></gg-tooltip>
+```
+
 ## Layering inside core
 
 ```
@@ -656,15 +704,16 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 92 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice connects. |
-| contract | node | `icons.contract.test.ts` | 75 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 106 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice connects; tooltip timing with fake timers. |
+| contract | node | `icons.contract.test.ts` | 86 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 366 tests. One contract × three adapters. |
-| dom | jsdom | `layers.dom.test.ts` | 7 tests. The dismiss stack: which layer hears Escape and an outside press. |
+| dom | jsdom | `conformance.dom.test.ts` | 408 tests. One contract × three adapters. |
+| dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 366 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 408 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
+| browser | Chrome | `overlay.browser.test.ts` | 6 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, real hover and Tab for tooltips, nested and passive layers. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 
 **Machine tests** cover behaviour in depth, once, where it is cheap. They run with
@@ -757,6 +806,12 @@ Real, and deliberately left open:
 - **A Select inside a Dialog is still positioned in the dialog's flow.** Its
   listbox can be clipped by the dialog body's scroll box. Moving Select's listbox
   to the top layer is the next step of the overlay plan.
+- **A tooltip on a disabled button never shows.** A disabled button fires no
+  pointer or focus events; wrap it in a focusable element, or say why it is
+  disabled in visible text.
+- **No arrows** on popovers or tooltips, and no CSS anchor positioning: Floating
+  UI places everything, which works in every browser the kit targets.
+- **Popover and Tooltip have no exit animation**, for the same reason as Dialog.
 - **No exit animation.** A dialog's body unmounts as it closes, so there is nothing
   left to animate out; opening fades in.
 - **Svelte and the custom elements cannot refuse a close.** `bind:open` and the
@@ -768,7 +823,7 @@ Real, and deliberately left open:
 - **Platform close requests** (a back gesture) are cancelled through the `cancel`
   event, which browsers may refuse to let a page cancel without recent user
   activation; the dialog then closes natively and reports `native`.
-- **Not ported from Instrument:** everything beyond these eleven components —
+- **Not ported from Instrument:** everything beyond these thirteen components —
   prose, the rest of forms (number field, slider, choice cards), tables, the sheet
   and toast overlays,
   the agent components (including the composer, a textarea with a toolbar in one

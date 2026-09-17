@@ -1,5 +1,19 @@
 <script lang="ts">
-  import { Button, Checkbox, Chip, ChipGroup, Dialog, Field, Input, RadioGroup, Select, Switch, Textarea } from '@ggary/svelte'
+  import {
+    Button,
+    Checkbox,
+    Chip,
+    ChipGroup,
+    Dialog,
+    Field,
+    Input,
+    Popover,
+    RadioGroup,
+    Select,
+    Switch,
+    Textarea,
+    Tooltip,
+  } from '@ggary/svelte'
   import { frameworks, roles, tags, terms } from './demo-data'
 
   let value = $state<string | null>('svelte')
@@ -24,6 +38,15 @@
   let dialogLog = $state('open a dialog')
   const logDialog = (name: string) => (open: boolean, { reason }: { reason: string }) =>
     (dialogLog = `${name}  ${open ? 'open' : 'closed'}  reason ${reason}`)
+
+  let overlayLog = $state('open a popover')
+  const logOverlay = (name: string) => (open: boolean, { reason }: { reason: string }) =>
+    (overlayLog = `${name}  ${open ? 'open' : 'closed'}  reason ${reason}`)
+  const formatting = [
+    { content: 'Bold (Ctrl+B)', label: 'Bold', glyph: 'B' },
+    { content: 'Italic (Ctrl+I)', label: 'Italic', glyph: 'I' },
+    { content: 'Underline (Ctrl+U)', label: 'Underline', glyph: 'U' },
+  ]
 
   let taken = $state(false)
   let username = $state('garry')
@@ -370,6 +393,52 @@ invalid  ${taken}`}</pre>
     </Dialog>
   </div>
   <pre class="state">{dialogLog}</pre>
+</section>
+
+<section>
+  <h2>Popover and Tooltip</h2>
+  <div class="row" style="align-items: center">
+    <Popover title="Filters" onOpenChange={logOverlay('filters')}>
+      {#snippet trigger(props)}
+        <Button {...props}>Filters</Button>
+      {/snippet}
+      <div class="dialog-fields">
+        <Checkbox defaultChecked>Only open issues</Checkbox>
+        <Checkbox>Assigned to me</Checkbox>
+        <RadioGroup
+          label="Sort"
+          name="sort"
+          defaultValue="newest"
+          items={[
+            { value: 'newest', label: 'Newest first' },
+            { value: 'oldest', label: 'Oldest first' },
+          ]}
+        />
+      </div>
+    </Popover>
+    <Popover title="Share" closeButton placement="bottom-end" onOpenChange={logOverlay('share')}>
+      {#snippet trigger(props)}
+        <Button emphasis="low" {...props}>Share…</Button>
+      {/snippet}
+      <Field label="Link" hint="Anyone with the link can view">
+        <Input readOnly defaultValue="https://example.com/p/atlas" />
+      </Field>
+    </Popover>
+    <span style="flex: 1"></span>
+    {#each formatting as item (item.label)}
+      <Tooltip content={item.content}>
+        {#snippet trigger(props)}
+          <Button emphasis="minimal" size="sm" aria-label={item.label} {...props}>{item.glyph}</Button>
+        {/snippet}
+      </Tooltip>
+    {/each}
+    <Tooltip content="Shown below, when there is room" placement="bottom">
+      {#snippet trigger(props)}
+        <Button emphasis="minimal" size="sm" {...props}>Below</Button>
+      {/snippet}
+    </Tooltip>
+  </div>
+  <pre class="state">{overlayLog}</pre>
 </section>
 
 <section>

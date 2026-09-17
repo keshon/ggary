@@ -139,6 +139,31 @@ export interface DialogProps {
   closeOnOutside?: boolean
 }
 
+export interface PopoverProps {
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean, details: { reason: string }) => void
+  /** The trigger button's label. */
+  trigger: string
+  title?: string
+  /** Content text. The content also holds one button, "Inside". */
+  body?: string
+  placement?: string
+  closeOnEscape?: boolean
+  closeOnOutside?: boolean
+  closeButton?: boolean
+}
+
+export interface TooltipProps {
+  content: string
+  /** The trigger button's label. */
+  trigger: string
+  openDelay?: number
+  closeDelay?: number
+  disabled?: boolean
+  onOpenChange?: (open: boolean, details: { reason: string }) => void
+}
+
 /**
  * A Field wrapping one control: a Textarea, Checkbox or Switch when that key is
  * given, otherwise an Input configured by `input`.
@@ -188,6 +213,8 @@ export interface Adapter {
   switch(props: SwitchProps, target: HTMLElement): Promise<Mounted<SwitchProps>>
   radioGroup(props: RadioGroupProps, target: HTMLElement): Promise<Mounted<RadioGroupProps>>
   dialog(props: DialogProps, target: HTMLElement): Promise<Mounted<DialogProps>>
+  popover(props: PopoverProps, target: HTMLElement): Promise<Mounted<PopoverProps>>
+  tooltip(props: TooltipProps, target: HTMLElement): Promise<Mounted<TooltipProps>>
   /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
 }

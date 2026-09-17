@@ -10,10 +10,9 @@ import type { GgChipGroupElement, GgSelectElement } from '../packages/elements/s
  * this adapter too; nothing here is repeated there.
  */
 
-vi.mock('@ggary/core', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@ggary/core')>()),
-  attachPositioner: () => () => {},
-}))
+// Mocked at the module, not at `@ggary/core`: core's own overlay helpers import
+// the positioner directly, and a mock of the package entry would miss them.
+vi.mock('../packages/core/src/utils/position', () => ({ attachPositioner: () => () => {} }))
 
 beforeAll(async () => {
   await import('../packages/elements/src/index')

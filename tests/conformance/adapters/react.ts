@@ -5,6 +5,8 @@ import {
   Checkbox,
   ChipGroup,
   Dialog,
+  Popover,
+  Tooltip,
   Field,
   Input,
   RadioGroup,
@@ -12,7 +14,17 @@ import {
   Switch,
   Textarea,
 } from '../../../packages/react/src/index'
-import { type Adapter, type ButtonProps, type CheckboxProps, type DialogProps, type FieldProps, type Mounted, track } from '../harness'
+import {
+  type Adapter,
+  type ButtonProps,
+  type CheckboxProps,
+  type DialogProps,
+  type FieldProps,
+  type Mounted,
+  type PopoverProps,
+  type TooltipProps,
+  track,
+} from '../harness'
 
 /**
  * React: every render and every interaction goes through `act`, which flushes
@@ -80,6 +92,16 @@ export const react: Adapter = {
       },
       createElement('p', null, body ?? 'Body'),
       createElement('button', { type: 'button' }, 'Body action'),
+    ]),
+  popover: (props, target) =>
+    mount(Popover, props, target, ({ trigger, body, ...rest }: PopoverProps) => [
+      { ...rest, trigger: (triggerProps: object) => createElement('button', triggerProps, trigger) },
+      createElement('p', null, body ?? 'Body'),
+      createElement('button', { type: 'button' }, 'Inside'),
+    ]),
+  tooltip: (props, target) =>
+    mount(Tooltip, props, target, ({ trigger, ...rest }: TooltipProps) => [
+      { ...rest, trigger: (triggerProps: object) => createElement('button', triggerProps, trigger) },
     ]),
   field: (props, target) =>
     mount(Field, props, target, ({ input, textarea, checkbox, switch: switchProps, ...field }: FieldProps) => {

@@ -1,0 +1,26 @@
+/* Popover-API elements of the kit: a popover's and a tooltip's content.
+
+   The browser's default [popover] box is centred in the viewport with a
+   border, padding and a Canvas background. Floating UI places these instead,
+   with the `fixed` strategy and a transform measured from the viewport's
+   top-left corner, so the box starts there, unpainted, and a theme draws it.
+
+   `display: none` while closed is the platform's own
+   ([popover]:not(:popover-open)); nothing here overrides it. */
+:is([data-scope='popover'], [data-scope='tooltip'])[data-part='content'] {
+  position: fixed;
+  inset: 0 auto auto 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+  inline-size: max-content;
+  max-inline-size: min(var(--gg-available-width, 100vw), calc(100vw - 16px));
+}
+
+/* A tooltip is text; a long one wraps instead of running off the screen. */
+[data-scope='tooltip'][data-part='content'] {
+  max-inline-size: min(320px, var(--gg-available-width, 100vw));
+}

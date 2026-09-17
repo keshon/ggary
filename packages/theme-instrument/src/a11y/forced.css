@@ -19,6 +19,8 @@
   [data-scope='textarea'][data-part='root'],
   [data-scope='select'][data-part='content'],
   [data-scope='dialog'][data-part='content'],
+  [data-scope='popover'][data-part='content'],
+  [data-scope='tooltip'][data-part='content'],
   [data-scope='chip'][data-part='root'] {
     border: var(--stroke) solid CanvasText;
   }

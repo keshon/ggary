@@ -1,0 +1,31 @@
+/* ==========================================================================
+   Instrument — tooltip
+
+   Ported from instrument/src/overlay.css (.inst-tooltip-text). The plate of an
+   ANNOTATION, not a small panel: --surface-overlay, a border, the popover
+   shadow and ordinary text colour add up to the traits of any other piece of
+   interface, and a hint has to be recognised before it is read. An inverted
+   surface does that with one trait. The border goes; the shadow stays — a
+   tooltip really does float.
+
+   The source positioned it with CSS above its host and hid it with opacity;
+   here it is a top-layer popover placed by Floating UI, and closed means not
+   rendered at all, which settles the source's long note on invisible boxes
+   that still overflow.
+   ========================================================================== */
+
+[data-scope='tooltip'][data-part='content'] {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--surface-inverse);
+  box-shadow: var(--shadow-popover);
+  color: var(--text-on-inverse);
+  font-size: var(--text-xs);
+  line-height: var(--leading-ui);
+
+  &:popover-open { transition: opacity var(--dur-1) var(--ease-out); }
+}
+
+@starting-style {
+  [data-scope='tooltip'][data-part='content']:popover-open { opacity: 0; }
+}

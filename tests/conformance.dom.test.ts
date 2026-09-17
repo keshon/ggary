@@ -5,12 +5,10 @@ import { runConformance } from './conformance/suite'
  * The conformance suite under jsdom.
  *
  * Floating UI is mocked here: jsdom reports every rect as 0x0, and where a popup
- * lands on screen is a question for the browser run. It is mocked at
- * `@ggary/core`, which is where all three adapters import it from.
+ * lands on screen is a question for the browser run.
  */
-vi.mock('@ggary/core', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@ggary/core')>()),
-  attachPositioner: () => () => {},
-}))
+// Mocked at the module, not at `@ggary/core`: core's own overlay helpers import
+// the positioner directly, and a mock of the package entry would miss them.
+vi.mock('../packages/core/src/utils/position', () => ({ attachPositioner: () => () => {} }))
 
 runConformance()

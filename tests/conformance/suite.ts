@@ -9,6 +9,7 @@ import { dialogConformance } from './dialog.spec'
 import { fieldConformance } from './field.spec'
 import { cleanup } from './harness'
 import { inputConformance } from './input.spec'
+import { popoverConformance, tooltipConformance } from './popover.spec'
 import { radioGroupConformance } from './radio-group.spec'
 import { selectConformance } from './select.spec'
 import { textareaConformance } from './textarea.spec'
@@ -36,6 +37,8 @@ export function runConformance() {
       radioGroupConformance(adapter)
       fieldConformance(adapter)
       dialogConformance(adapter)
+      popoverConformance(adapter)
+      tooltipConformance(adapter)
     })
   }
 }

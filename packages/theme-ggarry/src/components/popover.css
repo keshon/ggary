@@ -1,0 +1,72 @@
+/* ==========================================================================
+   GGarry — popover
+
+   The select listbox's surface, grown into a panel: same border, radius and
+   shadow, so everything that floats reads as one family. Placement is
+   @ggary/structure's and Floating UI's; this is only the look.
+   ========================================================================== */
+
+[data-scope='popover'][data-part='content'] {
+  min-inline-size: 220px;
+  max-inline-size: min(360px, var(--gg-available-width, 100vw));
+  padding: var(--ggarry-space-4);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  box-shadow: var(--ggarry-shadow-popover);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  line-height: 1.5;
+}
+
+[data-scope='popover'][data-part='content'] > :last-child {
+  margin-block-end: 0;
+}
+
+[data-scope='popover'][data-part='title'] {
+  margin: 0 0 var(--ggarry-space-3);
+  padding-inline-end: var(--ggarry-space-6);
+  font-size: var(--ggarry-font-size-md);
+  font-weight: var(--ggarry-font-weight-semibold);
+  line-height: 1.35;
+}
+
+[data-scope='popover'][data-part='close'] {
+  position: absolute;
+  inset-block-start: var(--ggarry-space-2);
+  inset-inline-end: var(--ggarry-space-2);
+  display: inline-grid;
+  place-items: center;
+  inline-size: 24px;
+  block-size: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ggarry-radius-md);
+  background: transparent;
+  color: var(--ggarry-text-muted);
+  cursor: pointer;
+}
+
+[data-scope='popover'][data-part='close']:hover {
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='popover'][data-part='close-icon'] {
+  inline-size: 14px;
+  block-size: 14px;
+}
+
+/* Entry only: a closed popover leaves at once, as a dialog does. */
+[data-scope='popover'][data-part='content']:popover-open {
+  transition: opacity var(--ggarry-duration-fast) ease;
+}
+
+@starting-style {
+  [data-scope='popover'][data-part='content']:popover-open { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='popover'][data-part='content']:popover-open { transition: none; }
+}

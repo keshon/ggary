@@ -1,4 +1,4 @@
-import { autoUpdate, computePosition, flip, offset, shift, size } from '@floating-ui/dom'
+import { autoUpdate, computePosition, flip, offset, shift, size, type Placement } from '@floating-ui/dom'
 
 /**
  * `core` has exactly one runtime dependency, and this is why.
@@ -8,32 +8,41 @@ import { autoUpdate, computePosition, flip, offset, shift, size } from '@floatin
  * problem; reimplementing it is a multi-month detour that ends in a worse
  * version of Floating UI.
  */
+export type { Placement }
+
 export interface PositionOptions {
-  placement?: 'bottom-start' | 'bottom-end' | 'top-start' | 'top-end'
+  placement?: Placement
   gutter?: number
-  /** Match the popover's min-width to the trigger. What a <select> does. */
+  /** Match the floating element's min-width to the reference. What a <select> does. */
   sameWidth?: boolean
+  /**
+   * `fixed` for anything in the top layer — a popover is positioned against the
+   * viewport, whatever its DOM parent. `absolute` for a floating element that
+   * lives in its parent's flow.
+   */
+  strategy?: 'absolute' | 'fixed'
 }
 
 export function attachPositioner(
   reference: HTMLElement,
   floating: HTMLElement,
-  { placement = 'bottom-start', gutter = 4, sameWidth = true }: PositionOptions = {}
+  { placement = 'bottom-start', gutter = 4, sameWidth = true, strategy = 'absolute' }: PositionOptions = {}
 ): () => void {
   return autoUpdate(reference, floating, () => {
     void computePosition(reference, floating, {
       placement,
-      strategy: 'absolute',
+      strategy,
       middleware: [
         offset(gutter),
         flip({ padding: 8 }),
         shift({ padding: 8 }),
         size({
           padding: 8,
-          apply({ rects, availableHeight, elements }) {
+          apply({ rects, availableHeight, availableWidth, elements }) {
             const style = (elements.floating as HTMLElement).style
             if (sameWidth) style.minWidth = `${rects.reference.width}px`
             style.setProperty('--gg-available-height', `${Math.max(120, availableHeight)}px`)
+            style.setProperty('--gg-available-width', `${Math.max(120, availableWidth)}px`)
           },
         }),
       ],

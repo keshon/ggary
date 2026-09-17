@@ -85,6 +85,16 @@ describe('the dismiss stack', () => {
     expect(openLayerCount()).toBe(1)
   })
 
+  it('a passive layer takes Escape, but presses go to the layer below it', () => {
+    const popover = layer()
+    const tooltip = layer({ passive: true })
+    press(document.body)
+    expect(popover.onDismiss).toHaveBeenCalledWith('outside-pointer')
+    expect(tooltip.onDismiss).not.toHaveBeenCalled()
+    escape()
+    expect(tooltip.onDismiss).toHaveBeenCalledWith('escape')
+  })
+
   it('stops listening to the document when the stack empties', () => {
     const only = layer()
     only.release()

@@ -85,6 +85,9 @@ const pairs: Pair[] = [
   { label: 'dialog: description on surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'dialog: close glyph on its hover', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface', '--ggarry-bg-subtle'], min: LARGE },
 
+  // Tooltip: small text on the inverted plate, read at a glance.
+  { label: 'tooltip: text on inverted plate', fg: '--ggarry-text-on-inverted', bg: ['--ggarry-bg-inverted'], min: TEXT },
+
   // Focus ring against what it stands on.
   { label: 'focus: ring on surface', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'focus: ring on canvas', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-canvas'], min: LARGE },
