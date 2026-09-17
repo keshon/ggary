@@ -14,7 +14,8 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 551 tests
+npm test         # 881 tests, the last 330 in headless Chrome
+npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
 ```
@@ -586,6 +587,7 @@ build it where it does not. The native state stays the truth, so they never writ
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
 | dom | jsdom | `conformance.dom.test.ts` | 330 tests. One contract × three adapters. |
 | dom | jsdom | `elements.dom.test.ts` | 31 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
+| browser | Chrome | `conformance.browser.test.ts` | 330 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 
 **Machine tests** cover behaviour in depth, once, where it is cheap. They run with
@@ -623,6 +625,14 @@ Every mount is tracked and unmounted after each test. Detaching a component's DO
 does not unmount it: an open Select keeps its document-level Escape listener, and
 the first run of the suite had the next test's keypress driving the previous
 test's machine.
+
+The browser project runs the identical suite (`tests/conformance/suite.ts`) in the
+Chrome installed on the machine — Playwright drives it, and nothing is downloaded.
+Set `GG_BROWSER_CHANNEL=msedge` for Edge, or `chromium` after
+`npx playwright install chromium`. jsdom stays for speed and for machines with
+no browser (`npm run test:fast`), but it has no layout, no `<dialog>` methods,
+no Popover API and no `inert`: anything that depends on those is only proven in
+the browser run.
 
 Floating UI is mocked in the jsdom suite. jsdom reports every rect as 0x0, so
 flip/shift/size churn against degenerate input — the suite took 216 seconds

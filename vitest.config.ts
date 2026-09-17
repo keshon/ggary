@@ -26,6 +26,24 @@ export default defineConfig({
         resolve: { conditions: ['browser'] },
         test: { name: 'dom', environment: 'jsdom', include: ['tests/*.dom.test.ts'], globals: true },
       },
+      {
+        // A real browser, driven by Playwright. It uses the Chrome already
+        // installed on the machine (no browser download); GG_BROWSER_CHANNEL
+        // picks another — `msedge`, or `chromium` after `npx playwright install`.
+        plugins: [svelte({ hot: false })],
+        test: {
+          name: 'browser',
+          include: ['tests/*.browser.test.ts'],
+          globals: true,
+          browser: {
+            enabled: true,
+            provider: 'playwright',
+            headless: true,
+            screenshotFailures: false,
+            instances: [{ browser: 'chromium', launch: { channel: process.env.GG_BROWSER_CHANNEL ?? 'chrome' } }],
+          },
+        },
+      },
     ],
   },
 })

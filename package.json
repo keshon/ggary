@@ -10,6 +10,7 @@
     "assets": "node packages/icons/build.mjs && node packages/theme-ggarry/build.mjs && node packages/theme-instrument/build-icons.mjs",
     "dev": "npm run assets && npm run dev -w @ggary/sandbox",
     "test": "npm run assets && vitest run",
+    "test:fast": "npm run assets && vitest run --project machine --project contract --project dom",
     "test:watch": "vitest",
     "typecheck": "npm run assets && tsc -p tsconfig.json --noEmit",
     "check:themes": "npm run assets && node packages/checks/src/cli.ts"
@@ -19,7 +20,9 @@
     "@types/node": "^24.13.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@vitest/browser": "^3.2.7",
     "jsdom": "^26.0.0",
+    "playwright": "^1.63.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "svelte": "^5.57.0",
