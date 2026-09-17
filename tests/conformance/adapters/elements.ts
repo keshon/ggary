@@ -1,6 +1,15 @@
 import '../../../packages/elements/src/index'
 import type { GgChipGroupElement, GgSelectElement } from '../../../packages/elements/src/index'
-import { type Adapter, type ButtonProps, type ChipGroupProps, type Mounted, type SelectProps, track } from '../harness'
+import {
+  type Adapter,
+  type ButtonProps,
+  type ChipGroupProps,
+  type FieldProps,
+  type InputProps,
+  type Mounted,
+  type SelectProps,
+  track,
+} from '../harness'
 
 /**
  * Custom elements: props become attributes (scalars) or properties (arrays),
@@ -11,6 +20,20 @@ import { type Adapter, type ButtonProps, type ChipGroupProps, type Mounted, type
 function setAttr(el: Element, name: string, value: unknown) {
   if (value === undefined || value === null || value === false) el.removeAttribute(name)
   else el.setAttribute(name, value === true ? '' : String(value))
+}
+
+/** A native <input> as server markup would render it: native attributes only. */
+function nativeInput(props: InputProps): HTMLInputElement {
+  const input = document.createElement('input')
+  setAttr(input, 'type', props.type)
+  setAttr(input, 'name', props.name)
+  setAttr(input, 'placeholder', props.placeholder)
+  setAttr(input, 'required', props.required)
+  setAttr(input, 'disabled', props.disabled)
+  setAttr(input, 'readonly', props.readOnly)
+  if (props.defaultValue !== undefined) input.value = props.defaultValue
+  if (props.onValueChange) input.addEventListener('input', () => props.onValueChange!(input.value))
+  return input
 }
 
 function applyButton(host: HTMLElement, props: Partial<ButtonProps>) {
@@ -69,6 +92,46 @@ export const elements: Adapter = {
       // down its listeners.
       unmount: async () => el.remove(),
     } satisfies Mounted<SelectProps>)
+  },
+
+  async input(props, target) {
+    const host = document.createElement('gg-input')
+    const input = nativeInput(props)
+    setAttr(host, 'size', props.size)
+    setAttr(host, 'invalid', props.invalid)
+    host.append(input)
+    target.append(host)
+    return track({
+      root: host,
+      async update(patch) {
+        if ('size' in patch) setAttr(host, 'size', patch.size)
+        if ('invalid' in patch) setAttr(host, 'invalid', patch.invalid)
+        if ('disabled' in patch) setAttr(input, 'disabled', patch.disabled)
+        if ('readOnly' in patch) setAttr(input, 'readonly', patch.readOnly)
+        if ('required' in patch) setAttr(input, 'required', patch.required)
+      },
+      unmount: async () => host.remove(),
+    } satisfies Mounted<InputProps>)
+  },
+
+  async field(props, target) {
+    const host = document.createElement('gg-field')
+    const apply = (patch: Partial<FieldProps>) => {
+      for (const key of ['label', 'hint', 'error', 'invalid', 'required', 'disabled'] as const) {
+        if (key in patch) setAttr(host, key, patch[key])
+      }
+      if ('readOnly' in patch) setAttr(host, 'readonly', patch.readOnly)
+    }
+    const input = props.input ?? {}
+    setAttr(host, 'size', input.size)
+    host.append(nativeInput(input))
+    apply(props)
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => apply(patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<FieldProps>)
   },
 
   async chipGroup(props, target) {

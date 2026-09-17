@@ -1,7 +1,7 @@
 import { act, createElement, type ComponentType, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Button, ChipGroup, Select } from '../../../packages/react/src/index'
-import { type Adapter, type ButtonProps, type Mounted, track } from '../harness'
+import { Button, ChipGroup, Field, Input, Select } from '../../../packages/react/src/index'
+import { type Adapter, type ButtonProps, type FieldProps, type Mounted, track } from '../harness'
 
 /**
  * React: every render and every interaction goes through `act`, which flushes
@@ -53,4 +53,7 @@ export const react: Adapter = {
     mount(Button, props, target, ({ label, ...rest }: ButtonProps) => [rest, label]),
   select: (props, target) => mount(Select, props, target),
   chipGroup: (props, target) => mount(ChipGroup, props, target),
+  input: (props, target) => mount(Input, props, target),
+  field: (props, target) =>
+    mount(Field, props, target, ({ input, ...field }: FieldProps) => [field, createElement(Input, input ?? {})]),
 }

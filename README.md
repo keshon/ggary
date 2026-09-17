@@ -2,8 +2,8 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Four components — Button, Chip, ChipGroup and Select — built end to end to prove
-the architecture holds.
+Six components — Button, Chip, ChipGroup, Select, Field and Input — built end to
+end to prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -13,7 +13,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 263 tests
+npm test         # 361 tests
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
 ```
@@ -33,9 +33,9 @@ packages/
   theme-instrument/  Instrument: OKLCH token tiers, component CSS, the --gg-* contract
   icons/             glyph SVGs -> --gg-icon-* tokens; the shared glyph compiler
   checks/            the theme gates: structure and contrast, run on every theme
-  elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>
-  react/             <Button>, <Chip>, <ChipGroup>, <Select>
-  svelte/            <Button>, <Chip>, <ChipGroup>, <Select>
+  elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>
+  react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>
+  svelte/            <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
 ```
@@ -190,7 +190,7 @@ which outranks the structure layer's `align-items: flex-start`. The fix is
 Instrument's own hook, set on the vertical list — a theme bug, not a structure
 bug.
 
-## The four components, and why these four
+## The first four components, and why these four
 
 | | State | Focus model | What it proves |
 |---|---|---|---|
@@ -211,6 +211,70 @@ Adding component three and four is also where `utils/collection.ts` fell out.
 Select and ChipGroup both walk a list skipping disabled entries; they differ by
 one flag (`loop`), because a toolbar wraps and a native `<select>` clamps. Before
 ChipGroup existed, extracting that would have been speculation.
+
+## Field and Input
+
+Two components, split where the responsibilities split:
+
+| | State | Owns |
+|---|---|---|
+| Input | none — the value lives in the native `<input>` | the attribute contract (`data-size`, `data-invalid`) and `onValueChange` |
+| Field | machine | the label, the hint/error slot, the ids between them, and *when* an error shows |
+
+Input has no machine because every framework already knows how to own an input's
+value: React with `value`/`defaultValue`, Svelte with `bind:value`, the browser
+with the element itself. A machine would be a second copy to keep in sync.
+
+```tsx
+<Field label="Email" hint="We never share it" error="Enter a valid address" required>
+  <Input type="email" name="email" />
+</Field>
+```
+
+```html
+<gg-field label="Email" hint="We never share it" error="Enter a valid address">
+  <input type="email" name="email" required>
+</gg-field>
+```
+
+**Composition is a prop bag, merged.** Field publishes `control` — canonical,
+un-normalized props: the control's id, `aria-describedby`, `aria-invalid`, and
+blur/input/invalid handlers — through context (React, Svelte) or directly (the
+element). Input merges it with its own using `mergeProps` from core, then
+normalizes once. Merging rather than spreading matters because both sides add an
+input handler, and a caller's own `onBlur` has to run alongside the field's
+validation instead of replacing it. `mergeProps` chains handlers, joins token
+lists (`aria-describedby`, `class`), and otherwise lets the later bag win.
+
+**Validation follows the `:user-invalid` rule.** The constraint is the browser's
+own — `required`, `type="email"`, `minlength` — read from `validity`. What the
+machine decides is timing:
+
+- no error while the user types into a field for the first time, however invalid;
+- an error when they leave it, or when a submit attempt fires `invalid`;
+- once shown, it clears live as the value is fixed;
+- `invalid` from the owner (a server said the name is taken) shows at once.
+
+The hint and the error share one slot: the error *replaces* the hint, so the
+layout does not jump, and `aria-describedby` follows whichever is visible. The
+required marker is theme CSS (`label[data-required]::after`, with empty alt text
+so it is not read as "star"), not markup.
+
+For inline errors without the browser's bubble on top, put `novalidate` on the
+form and call `form.checkValidity()` in the submit handler: it still fires each
+control's `invalid` event, which is what the fields listen to. The sandbox's
+validated form does exactly that.
+
+**In the elements, the outermost enhancer owns the control.** `<gg-input>` inside
+a `<gg-field>` does nothing; the field applies the input contract itself and reads
+the wrapper's `size`. Two elements spreading props onto one `<input>` would each
+strip the other's attributes on every render. `<gg-field>` also accepts a
+`<textarea>` or `<select>`, labelling and validating it without the input
+contract, and adopts an `id` the page gave it — the host *is* the field root.
+Flags may sit on the field or on the control's own markup; the markup is read
+once, at connect, because afterwards those attributes are the field's own output
+and reading them back would make `disabled` impossible to remove. A test caught
+exactly that.
 
 ## Layering inside core
 
@@ -404,12 +468,12 @@ fold, or you get layout shift on upgrade.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 53 tests. Every transition of every machine, pure, milliseconds. |
-| contract | node | `icons.contract.test.ts` | 37 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 69 tests. Every transition of every machine, pure, milliseconds; `mergeProps`. |
+| contract | node | `icons.contract.test.ts` | 48 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 135 tests. One contract × three adapters. |
-| dom | jsdom | `elements.dom.test.ts` | 8 tests. What only custom elements have: properties, events, attribute fallbacks. |
+| dom | jsdom | `conformance.dom.test.ts` | 198 tests. One contract × three adapters. |
+| dom | jsdom | `elements.dom.test.ts` | 16 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
 
 **Machine tests** cover behaviour in depth, once, where it is cheap. They run with
 no DOM at all, which is also what keeps reducers from touching one.
@@ -462,8 +526,8 @@ Real, and deliberately left open:
   validation. Both need a hidden `<select>` instead.
 - **No positioning test in CI.** See above — needs Playwright.
 - **No SSR test.** Core should be import-safe on a server; unverified.
-- **Svelte has no `bind:value`.** The API mirrors React (`value` +
-  `onValueChange`). A bindable `value` is the idiomatic Svelte addition.
+- **Svelte Select and ChipGroup have no `bind:value`.** Their API mirrors React
+  (`value` + `onValueChange`). Input has one; the other two should follow.
 - **The chip dismiss "x" is not a button.** A chip that is itself a `<button>`
   cannot legally nest one, and two tab stops per chip wrecks roving tabindex. So
   it is a pointer affordance, `aria-hidden`, with `aria-keyshortcuts="Delete"`
@@ -484,15 +548,29 @@ Real, and deliberately left open:
   lines was out of scope for a first port.
 - **`data-accent` on a subtree is unverified in Instrument.** Its semantics are
   declared on `:root`; the port only exercised the attribute on `<html>`.
-- **Not ported from Instrument:** everything beyond these four components — prose,
-  forms, tables, overlays, the agent components, print styles, the contrast gate
-  and the component registry. The gates are the most valuable of those.
+- **Not ported from Instrument:** everything beyond these six components — prose,
+  the rest of forms (textarea, checkbox, radio, switch), tables, overlays, the
+  agent components and print styles.
 - **`onValueChange` fires when the user re-picks the already-selected value.**
   Intent semantics, not value-diff semantics. Correct for controlled components,
   mildly surprising otherwise.
 - **Instrument's other gates are not ported:** tap targets (`cmd/targets`),
   proportions (`cmd/proportion`), and the component registry (`cmd/registry`).
   Forced-colors behaviour is styled but not checked.
+- **The browser's validation bubble shows alongside the inline error** on a form
+  without `novalidate`. Suppressing it in the field would also suppress the
+  browser scrolling to and focusing the first invalid control, so it is left to
+  the form (see Field and Input).
+- **Form `reset` does not clear a field's error state.** The machine has a
+  `RESET` event; nothing listens for the form's `reset` yet.
+- **Only Input consumes a Field in React and Svelte.** `<gg-field>` wraps a native
+  textarea or select, but the framework Field has no Textarea or Select-as-control
+  to hand its props to. Select is a listbox, not a native control, and would need
+  its own wiring.
+- **No affixes.** No icon, prefix, suffix or clear button inside an input.
+- **`minlength` only applies after a real edit.** Browsers report `tooShort` for
+  user edits, not for a value set from script — native behaviour, but it means a
+  pre-filled short value passes until touched.
 - No Changesets, no docs site.
 
 ## Scope

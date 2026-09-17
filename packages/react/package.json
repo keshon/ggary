@@ -24,6 +24,14 @@
     "./chip-group": {
       "types": "./src/components/chip-group/index.ts",
       "default": "./src/components/chip-group/index.ts"
+    },
+    "./field": {
+      "types": "./src/components/field/index.ts",
+      "default": "./src/components/field/index.ts"
+    },
+    "./input": {
+      "types": "./src/components/input/index.ts",
+      "default": "./src/components/input/index.ts"
     }
   },
   "peerDependencies": {

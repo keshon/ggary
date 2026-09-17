@@ -3,7 +3,7 @@ import './shared.css'
 
 import { StrictMode, useState, type FormEvent } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Button, Chip, ChipGroup, Select } from '@ggary/react'
+import { Button, Chip, ChipGroup, Field, Input, Select } from '@ggary/react'
 import { frameworks, tags } from './demo-data'
 
 function App() {
@@ -12,6 +12,17 @@ function App() {
   const [items, setItems] = useState(tags)
   const [selection, setSelection] = useState<string[]>(['design'])
   const [formOutput, setFormOutput] = useState('submit to see the FormData the hidden input contributes')
+
+  const [taken, setTaken] = useState(false)
+  const [username, setUsername] = useState('garry')
+  const [signupOutput, setSignupOutput] = useState('submit empty to see every error at once')
+
+  const onSignup = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const form = event.currentTarget
+    if (!form.checkValidity()) return setSignupOutput('invalid — see the fields')
+    setSignupOutput([...new FormData(form).entries()].map(([k, v]) => `${k} = ${JSON.stringify(v)}`).join('\n'))
+  }
 
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -144,6 +155,68 @@ function App() {
           React owns the value here. The machine moves the highlight but never writes `value` — that is the
           five-line `controlled` branch in select.machine.ts.
         </p>
+      </section>
+
+      <section>
+        <h2>Field + Input</h2>
+        <div className="fields">
+          <Field label="Full name" hint="As it appears on your ID">
+            <Input name="name" autoComplete="name" />
+          </Field>
+          <Field label="Email" hint="Leave the field to validate" error="Enter a valid email address" required>
+            <Input type="email" placeholder="you@example.com" />
+          </Field>
+          <Field label="Disabled" disabled>
+            <Input defaultValue="Can't touch this" />
+          </Field>
+          <Field label="Read only" hint="Selectable, copyable, not editable" readOnly>
+            <Input defaultValue="INV-2041" />
+          </Field>
+        </div>
+        <p className="hint">
+          No error shows while you type the first time, only when you leave the field or submit, and once
+          shown it clears as you fix it.
+        </p>
+      </section>
+
+      <section>
+        <h2>Input — sizes</h2>
+        <div className="fields">
+          <Field label="Small"><Input size="sm" placeholder="sm" /></Field>
+          <Field label="Medium"><Input placeholder="md" /></Field>
+          <Field label="Large"><Input size="lg" placeholder="lg" /></Field>
+          <Input type="search" aria-label="Search" placeholder="No field, just an input" />
+        </div>
+      </section>
+
+      <section>
+        <h2>Field — invalid declared by the owner</h2>
+        <div className="row">
+          <Field label="Username" hint="Letters and digits" error="That username is taken" invalid={taken}>
+            <Input value={username} onValueChange={setUsername} />
+          </Field>
+          <Button onClick={() => setTaken((t) => !t)}>Toggle “taken”</Button>
+        </div>
+        <pre className="state">{`value    ${JSON.stringify(username)}\ninvalid  ${taken}`}</pre>
+      </section>
+
+      <section>
+        <h2>Field — a validated form</h2>
+        <form className="stack" noValidate onSubmit={onSignup}>
+          <Field label="Name" error="Tell us your name" required>
+            <Input name="name" />
+          </Field>
+          <Field label="Email" error="Enter a valid email address" required>
+            <Input name="email" type="email" />
+          </Field>
+          <Field label="Password" hint="At least 8 characters" error="Use 8 or more characters" required>
+            <Input name="password" type="password" minLength={8} />
+          </Field>
+          <div className="row">
+            <Button emphasis="high" type="submit">Create account</Button>
+          </div>
+        </form>
+        <pre className="state">{signupOutput}</pre>
       </section>
 
       <section>

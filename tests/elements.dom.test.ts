@@ -124,3 +124,76 @@ describe('light-DOM enhancement', () => {
     expect(chip.hasAttribute('tabindex')).toBe(false)
   })
 })
+
+describe('<gg-field> and <gg-input>', () => {
+  const mount = (html: string) => {
+    document.body.innerHTML = `<form>${html}</form>`
+    return document.querySelector('gg-field, gg-input') as HTMLElement
+  }
+  const control = <T extends Element = HTMLInputElement>() => document.querySelector('input, textarea, select') as unknown as T
+
+  it('<gg-field> reads required from the control’s own markup, and marks the label', () => {
+    mount('<gg-field label="Email"><input type="email" required></gg-field>')
+    expect(control().required).toBe(true)
+    expect(document.querySelector('[data-part="label"]')!.hasAttribute('data-required')).toBe(true)
+  })
+
+  it('a flag set on the field can be removed again, while one from the markup stays', () => {
+    const field = mount('<gg-field label="Name" disabled><input readonly></gg-field>')
+    expect(control().disabled).toBe(true)
+    field.removeAttribute('disabled')
+    expect(control().disabled).toBe(false)
+    expect(control().readOnly).toBe(true)
+  })
+
+  it('<gg-input> stands down inside a field; the field applies the input contract with its size', () => {
+    mount('<gg-field label="Code"><gg-input size="sm"><input></gg-input></gg-field>')
+    const input = control()
+    expect(input.dataset.scope).toBe('input')
+    expect(input.dataset.size).toBe('sm')
+    expect((document.querySelector('label') as HTMLLabelElement).htmlFor).toBe(input.id)
+  })
+
+  it('wraps a textarea and a select as plain controls: labelled, validated, no input contract', () => {
+    mount('<gg-field label="Notes" hint="Optional"><textarea></textarea></gg-field>')
+    const textarea = control<HTMLTextAreaElement>()
+    expect((document.querySelector('label') as HTMLLabelElement).htmlFor).toBe(textarea.id)
+    expect(textarea.getAttribute('aria-describedby')).toBe(document.querySelector('[data-part="hint"]')!.id)
+    expect(textarea.hasAttribute('data-scope')).toBe(false)
+
+    mount('<gg-field label="Plan" error="Pick a plan"><select required><option value=""></option><option>Pro</option></select></gg-field>')
+    const select = control<HTMLSelectElement>()
+    select.dispatchEvent(new Event('blur'))
+    expect(select.getAttribute('aria-invalid')).toBe('true')
+    expect(document.querySelector('[data-part="error"]')!.textContent).toBe('Pick a plan')
+  })
+
+  it('shows the error on a submit attempt: the form’s invalid event reaches the field', () => {
+    mount('<gg-field label="Email" error="Required"><input required></gg-field>')
+    ;(document.querySelector('form') as HTMLFormElement).requestSubmit()
+    expect(control().getAttribute('aria-invalid')).toBe('true')
+    expect((document.querySelector('[data-part="error"]') as HTMLElement).hidden).toBe(false)
+  })
+
+  it('adopts an id the page gave it, and derives the part ids from it', () => {
+    mount('<gg-field id="username" label="Username"><input></gg-field>')
+    expect(document.getElementById('username')!.tagName).toBe('GG-FIELD')
+    expect(control().id).toBe('username-control')
+  })
+
+  it('without a label attribute, renders no visible label', () => {
+    mount('<gg-field><input aria-label="Search"></gg-field>')
+    expect((document.querySelector('label') as HTMLElement).hidden).toBe(true)
+  })
+
+  it('<gg-input> alone keeps native attributes and toggles invalid', () => {
+    const host = mount('<gg-input><input type="search" required placeholder="Find"></gg-input>')
+    expect(control().type).toBe('search')
+    expect(control().required).toBe(true)
+    expect(control().placeholder).toBe('Find')
+    host.setAttribute('invalid', '')
+    expect(control().getAttribute('aria-invalid')).toBe('true')
+    host.removeAttribute('invalid')
+    expect(control().hasAttribute('aria-invalid')).toBe(false)
+  })
+})

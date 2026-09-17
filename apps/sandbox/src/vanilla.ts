@@ -88,6 +88,65 @@ app.innerHTML = `
   </section>
 
   <section>
+    <h2>Field + Input</h2>
+    <div class="fields">
+      <gg-field label="Full name" hint="As it appears on your ID"><input name="name" autocomplete="name"></gg-field>
+      <gg-field label="Email" hint="Leave the field to validate" error="Enter a valid email address">
+        <input type="email" required placeholder="you@example.com">
+      </gg-field>
+      <gg-field label="Disabled" disabled><input value="Can&#39;t touch this"></gg-field>
+      <gg-field label="Read only" hint="Selectable, copyable, not editable"><input readonly value="INV-2041"></gg-field>
+    </div>
+    <p class="hint">
+      &lt;gg-field&gt; wraps server markup: a plain &lt;input required&gt; is enough. No error shows while you
+      type the first time, only when you leave the field or submit, and once shown it clears as you fix it.
+    </p>
+  </section>
+
+  <section>
+    <h2>Input — sizes</h2>
+    <div class="fields">
+      <gg-field label="Small"><gg-input size="sm"><input placeholder="sm"></gg-input></gg-field>
+      <gg-field label="Medium"><input placeholder="md"></gg-field>
+      <gg-field label="Large" size="lg"><input placeholder="lg"></gg-field>
+      <gg-input><input type="search" aria-label="Search" placeholder="No field, just an input"></gg-input>
+    </div>
+  </section>
+
+  <section>
+    <h2>Field — invalid declared by the owner</h2>
+    <div class="row">
+      <gg-field id="username" label="Username" hint="Letters and digits" error="That username is taken">
+        <input value="garry">
+      </gg-field>
+      <gg-button><button id="taken">Toggle “taken”</button></gg-button>
+    </div>
+    <p class="hint">
+      A server answer is not a constraint the browser knows. <code>invalid</code> shows the error at once,
+      touched or not, and the error replaces the hint in the same slot.
+    </p>
+  </section>
+
+  <section>
+    <h2>Field — a validated form</h2>
+    <form class="stack" id="signup" novalidate>
+      <gg-field label="Name" error="Tell us your name"><input name="name" required></gg-field>
+      <gg-field label="Email" error="Enter a valid email address"><input name="email" type="email" required></gg-field>
+      <gg-field label="Password" hint="At least 8 characters" error="Use 8 or more characters">
+        <input name="password" type="password" minlength="8" required>
+      </gg-field>
+      <div class="row">
+        <gg-button emphasis="high"><button type="submit">Create account</button></gg-button>
+      </div>
+    </form>
+    <pre class="state" id="signup-output">submit empty to see every error at once</pre>
+    <p class="hint">
+      <code>novalidate</code> turns off the browser bubble; <code>checkValidity()</code> on submit still
+      fires each control's <code>invalid</code> event, which is what the fields listen to.
+    </p>
+  </section>
+
+  <section>
     <h2>Native form participation</h2>
     <form class="demo" id="demo-form">
       <gg-select id="form-select" name="framework" label="framework" placeholder="Required…"></gg-select>
@@ -176,4 +235,20 @@ form.addEventListener('submit', (event) => {
 form.addEventListener('reset', () => {
   document.querySelector<GgSelectElement>('#form-select')!.value = null
   output.textContent = 'reset'
+})
+
+// --- fields ------------------------------------------------------------------
+const username = document.getElementById('username')!
+document.getElementById('taken')!.addEventListener('click', () => username.toggleAttribute('invalid'))
+
+const signup = document.getElementById('signup') as HTMLFormElement
+const signupOutput = document.getElementById('signup-output')!
+signup.addEventListener('submit', (event) => {
+  event.preventDefault()
+  if (!signup.checkValidity()) {
+    signupOutput.textContent = 'invalid — see the fields'
+    return
+  }
+  const entries = [...new FormData(signup).entries()]
+  signupOutput.textContent = entries.map(([key, value]) => `${key} = ${JSON.stringify(value)}`).join('\n')
 })

@@ -1,0 +1,53 @@
+/* ==========================================================================
+   Instrument — field
+
+   Ported from instrument/src/forms.css (.inst-field, .inst-label,
+   .inst-field-hint, .inst-field-error, .inst-required).
+
+   The label stands further from the control than the hint does: a hint belongs
+   to the field more closely, and one identical gap glues three different things
+   into one. The difference comes from the base gap plus the label's own offset.
+
+   The hint and the error share one slot — an error REPLACES the hint rather
+   than pushing the form down. Instrument did that with :has(:user-invalid);
+   here core hides whichever part is not showing, so the same rule also covers
+   an owner-declared error and reaches aria-describedby.
+   ========================================================================== */
+
+[data-scope='field'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-inline-size: 13rem;
+}
+
+[data-scope='field'][data-part='label'] {
+  margin-block-end: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  line-height: var(--leading-ui);
+
+  &[data-disabled] { opacity: 0.5; }
+
+  /* .inst-required, drawn from state instead of markup: `required` on the
+     control is what assistive tech reads, and the alternative-text half of
+     `content` keeps the asterisk out of the accessible name. */
+  &[data-required]::after {
+    content: '*' / '';
+    margin-inline-start: 2px;
+    color: var(--err-text);
+  }
+}
+
+[data-scope='field'][data-part='hint'] {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  line-height: var(--leading-ui);
+}
+
+[data-scope='field'][data-part='error'] {
+  font-size: var(--text-xs);
+  color: var(--err-text);
+  line-height: var(--leading-ui);
+}

@@ -26,6 +26,14 @@
     "./chip-group": {
       "svelte": "./src/components/chip-group/index.ts",
       "default": "./src/components/chip-group/index.ts"
+    },
+    "./field": {
+      "svelte": "./src/components/field/index.ts",
+      "default": "./src/components/field/index.ts"
+    },
+    "./input": {
+      "svelte": "./src/components/input/index.ts",
+      "default": "./src/components/input/index.ts"
     }
   },
   "peerDependencies": {

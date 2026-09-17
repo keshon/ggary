@@ -16,6 +16,7 @@
 import type { ChipGroupMode, ChipGroupOrientation, ChipItem } from '../../packages/core/src/components/chip-group'
 import type { SelectItem } from '../../packages/core/src/components/select'
 import type { ButtonEmphasis, ButtonSize, ButtonTone } from '../../packages/core/src/components/button'
+import type { InputSize, InputType } from '../../packages/core/src/components/input'
 
 export interface ButtonProps {
   label: string
@@ -51,6 +52,32 @@ export interface ChipGroupProps {
   onRemove?: (value: string, item: ChipItem | null) => void
 }
 
+export interface InputProps {
+  type?: InputType
+  size?: InputSize
+  name?: string
+  placeholder?: string
+  disabled?: boolean
+  readOnly?: boolean
+  required?: boolean
+  invalid?: boolean
+  value?: string
+  defaultValue?: string
+  onValueChange?: (value: string) => void
+}
+
+/** A Field wrapping one Input. `input` configures the control inside. */
+export interface FieldProps {
+  label?: string
+  hint?: string
+  error?: string
+  invalid?: boolean
+  required?: boolean
+  disabled?: boolean
+  readOnly?: boolean
+  input?: InputProps
+}
+
 export interface Mounted<P> {
   /** The element the component was rendered into. Specs query inside it. */
   root: HTMLElement
@@ -76,6 +103,9 @@ export interface Adapter {
   button(props: ButtonProps, target: HTMLElement): Promise<Mounted<ButtonProps>>
   select(props: SelectProps, target: HTMLElement): Promise<Mounted<SelectProps>>
   chipGroup(props: ChipGroupProps, target: HTMLElement): Promise<Mounted<ChipGroupProps>>
+  input(props: InputProps, target: HTMLElement): Promise<Mounted<InputProps>>
+  /** Updates apply to the Field's own props; `input` is read at mount only. */
+  field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
 }
 
 // --- lifecycle -----------------------------------------------------------------
@@ -115,6 +145,19 @@ export const keydown = (target: Element, key: string) =>
   target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
 
 export const click = (target: Element) => (target as HTMLElement).click()
+
+/**
+ * Type into a native input the way a user does, for every framework. The value
+ * is written through the prototype's setter, not the element's own property:
+ * React tracks the last value it rendered on the instance, and a plain
+ * `el.value = x` would update that tracker too, so React would see no change and
+ * never call onChange.
+ */
+export function typeInto(input: HTMLInputElement, text: string) {
+  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+  setter.call(input, text)
+  input.dispatchEvent(new Event('input', { bubbles: true }))
+}
 
 export const part = (root: ParentNode, scope: string, name: string) =>
   root.querySelector<HTMLElement>(`[data-scope="${scope}"][data-part="${name}"]`)

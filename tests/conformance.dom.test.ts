@@ -4,6 +4,8 @@ import { react } from './conformance/adapters/react'
 import { svelte } from './conformance/adapters/svelte'
 import { buttonConformance } from './conformance/button.spec'
 import { chipGroupConformance } from './conformance/chip-group.spec'
+import { fieldConformance } from './conformance/field.spec'
+import { inputConformance } from './conformance/input.spec'
 import { selectConformance } from './conformance/select.spec'
 import { cleanup } from './conformance/harness'
 
@@ -27,5 +29,7 @@ for (const adapter of [elements, react, svelte]) {
     buttonConformance(adapter)
     selectConformance(adapter)
     chipGroupConformance(adapter)
+    inputConformance(adapter)
+    fieldConformance(adapter)
   })
 }

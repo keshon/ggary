@@ -1,0 +1,47 @@
+/* ==========================================================================
+   GGarry — field
+
+   Label, control, then one slot shared by the hint and the error: when an error
+   shows, core hides the hint, so the form never shifts as validity changes.
+   ========================================================================== */
+
+[data-scope='field'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ggarry-space-1);
+  min-width: 200px;
+}
+
+/* Same voice as the select label, so a form of mixed controls reads as one. */
+[data-scope='field'][data-part='label'] {
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+  color: var(--ggarry-text-muted);
+}
+
+/* The required mark is decoration drawn from state: the control's `required`
+   attribute is what assistive tech reads, so the asterisk is hidden from it
+   through the alternative-text half of `content`. */
+[data-scope='field'][data-part='label'][data-required]::after {
+  content: '*' / '';
+  margin-inline-start: 2px;
+  color: var(--ggarry-text-danger);
+}
+
+[data-scope='field'][data-part='label'][data-disabled] {
+  opacity: 0.55;
+}
+
+[data-scope='field'][data-part='hint'],
+[data-scope='field'][data-part='error'] {
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 1.4;
+}
+
+[data-scope='field'][data-part='hint'] {
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='field'][data-part='error'] {
+  color: var(--ggarry-text-danger);
+}

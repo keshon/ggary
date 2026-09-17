@@ -62,6 +62,12 @@ const pairs: Pair[] = [
   { label: 'field: trigger border on surface', fg: '--ggarry-border-control', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'field: trigger border on canvas', fg: '--ggarry-border-control', bg: ['--ggarry-bg-canvas'], min: LARGE },
 
+  // An invalid input's red border carries the error state on its own (the
+  // message may be absent), so it is load-bearing too.
+  { label: 'field: invalid border on surface', fg: '--ggarry-border-danger', bg: ['--ggarry-bg-surface'], min: LARGE },
+  // Readonly inputs sit on the subtle surface and keep full-colour, readable text.
+  { label: 'field: readonly text on subtle', fg: '--ggarry-text-default', bg: ['--ggarry-bg-subtle'], min: TEXT },
+
   // Focus ring against what it stands on.
   { label: 'focus: ring on surface', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'focus: ring on canvas', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-canvas'], min: LARGE },

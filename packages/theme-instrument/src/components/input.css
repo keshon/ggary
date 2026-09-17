@@ -1,0 +1,69 @@
+/* ==========================================================================
+   Instrument — input
+
+   Ported from instrument/src/forms.css (.inst-input).
+
+   A field is recognised by its BORDER, not by lightness. --surface-field equals
+   the panel's colour on purpose; what answers for the field is the load-bearing
+   --border-control at 3:1 — the same principle as a checkbox or a switch track,
+   where the border IS the control. It looks like a mistake without that note,
+   and gets "fixed".
+
+   The order of states is disabled > error > focus > hover, and hover is the one
+   that has to yield explicitly: `:hover:not(:disabled)` outranks the invalid
+   selector, so without the :not()s a cursor over an invalid field would hide
+   its red border.
+   ========================================================================== */
+
+[data-scope='input'][data-part='root'] {
+  inline-size: 100%;
+  min-block-size: var(--control-h-md);
+  padding-inline: var(--control-pad-sm);
+  border: var(--hairline) solid var(--border-control);
+  border-radius: var(--radius-control-md);
+  background: var(--surface-field);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  text-align: start;
+  transition: border-color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out);
+
+  &::placeholder { color: var(--text-muted); }
+
+  &:focus-visible { border-color: var(--accent-border); }
+
+  /* The error border. core sets data-invalid for both an owner-declared error
+     and a native one after the user has left the field — :user-invalid timing,
+     applied to the attribute so it also reaches aria-invalid. */
+  &[data-invalid] { border-color: var(--err-text); }
+
+  &:hover:not(:disabled):not(:read-only):not([data-invalid]) { border-color: var(--text-muted); }
+
+  /* Transparency, not grey: the control keeps its identity, and disabled stays
+     distinguishable from readonly below. */
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Readonly is not disabled. The value can be read, selected and copied, so it
+     keeps its text colour; only typing is unavailable. */
+  &:read-only:not(:disabled) {
+    background: var(--surface-sunken);
+    border-color: var(--border);
+    cursor: default;
+  }
+
+  &::-webkit-calendar-picker-indicator { opacity: 0.55; cursor: pointer; }
+  &::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+}
+
+/* Height and type size change with the scale; the inline padding does not —
+   text in a field is pushed to the edge rather than centred. */
+[data-scope='input'][data-part='root'][data-size='sm'] {
+  min-block-size: var(--control-h-sm);
+  border-radius: var(--radius-control-sm);
+  font-size: var(--text-xs);
+}
+
+[data-scope='input'][data-part='root'][data-size='lg'] {
+  min-block-size: var(--control-h-lg);
+  border-radius: var(--radius-control-lg);
+  font-size: var(--text-md);
+}

@@ -7,7 +7,7 @@ const isAbsent = (v: unknown) => v === undefined || v === null || v === false
 
 /**
  * React: handler keys and camelCase DOM props are already correct; only the
- * two historical renames need doing.
+ * historical renames need doing.
  */
 export const reactNormalizer: Normalizer = (props: Dict) => {
   const out: Dict = {}
@@ -15,6 +15,9 @@ export const reactNormalizer: Normalizer = (props: Dict) => {
     if (isAbsent(value)) continue
     if (key === 'class') out.className = value
     else if (key === 'for') out.htmlFor = value
+    // React names the native `input` event `onChange`, and a controlled input
+    // without onChange is read-only in React. Same event, React's word for it.
+    else if (key === 'onInput') out.onChange = value
     else out[key] = value
   }
   return out

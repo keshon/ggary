@@ -141,6 +141,11 @@ const pairs: Pair[] = [
   { label: 'readonly: text in inset', fg: '--text-primary', bg: ['--surface-sunken'], min: text },
   { label: 'file zone dashed border', fg: '--border-control', bg: ['--surface-raised', '--surface-field'], min: large },
   { label: 'required marker', fg: '--err-text', bg: ['--surface-raised'], min: text },
+  // Added by the port with the Input component: the placeholder is read, on the
+  // field surface itself, and the invalid border stands in for the error state.
+  { label: 'field: placeholder in field on panel', fg: '--text-muted', bg: ['--surface-raised', '--surface-field'], min: text },
+  { label: 'field: invalid border on panel', fg: '--err-text', bg: ['--surface-raised', '--surface-field'], min: large },
+  { label: 'field: hint on panel', fg: '--text-muted', bg: ['--surface-raised'], min: text },
 
   // Layout and navigation.
   { label: 'text on sidebar', fg: '--text-secondary', bg: ['--surface-sunken'], min: text },

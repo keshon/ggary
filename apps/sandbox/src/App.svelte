@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Chip, ChipGroup, Select } from '@ggary/svelte'
+  import { Button, Chip, ChipGroup, Field, Input, Select } from '@ggary/svelte'
   import { frameworks, tags } from './demo-data'
 
   let value = $state<string | null>('svelte')
@@ -7,6 +7,20 @@
   let items = $state(tags)
   let selection = $state<string[]>(['design'])
   let formOutput = $state('submit to see the FormData the hidden input contributes')
+
+  let taken = $state(false)
+  let username = $state('garry')
+  let signupOutput = $state('submit empty to see every error at once')
+
+  function onSignup(event: SubmitEvent) {
+    event.preventDefault()
+    const form = event.currentTarget as HTMLFormElement
+    if (!form.checkValidity()) {
+      signupOutput = 'invalid — see the fields'
+      return
+    }
+    signupOutput = [...new FormData(form).entries()].map(([k, v]) => `${k} = ${JSON.stringify(v)}`).join('\n')
+  }
 
   function onSubmit(event: SubmitEvent) {
     event.preventDefault()
@@ -132,6 +146,69 @@ last event  ${lastEvent}`}</pre>
     Identical behaviour to the React page, driven by the same machine and the same
     <code>connect()</code> — only the normalizer and the template differ.
   </p>
+</section>
+
+<section>
+  <h2>Field + Input</h2>
+  <div class="fields">
+    <Field label="Full name" hint="As it appears on your ID">
+      <Input name="name" autocomplete="name" />
+    </Field>
+    <Field label="Email" hint="Leave the field to validate" error="Enter a valid email address" required>
+      <Input type="email" placeholder="you@example.com" />
+    </Field>
+    <Field label="Disabled" disabled>
+      <Input defaultValue="Can't touch this" />
+    </Field>
+    <Field label="Read only" hint="Selectable, copyable, not editable" readOnly>
+      <Input defaultValue="INV-2041" />
+    </Field>
+  </div>
+  <p class="hint">
+    No error shows while you type the first time, only when you leave the field or submit, and once shown it
+    clears as you fix it.
+  </p>
+</section>
+
+<section>
+  <h2>Input — sizes</h2>
+  <div class="fields">
+    <Field label="Small"><Input size="sm" placeholder="sm" /></Field>
+    <Field label="Medium"><Input placeholder="md" /></Field>
+    <Field label="Large"><Input size="lg" placeholder="lg" /></Field>
+    <Input type="search" aria-label="Search" placeholder="No field, just an input" />
+  </div>
+</section>
+
+<section>
+  <h2>Field — invalid declared by the owner</h2>
+  <div class="row">
+    <Field label="Username" hint="Letters and digits" error="That username is taken" invalid={taken}>
+      <Input bind:value={username} />
+    </Field>
+    <Button onclick={() => (taken = !taken)}>Toggle “taken”</Button>
+  </div>
+  <pre class="state">{`value    ${JSON.stringify(username)}
+invalid  ${taken}`}</pre>
+</section>
+
+<section>
+  <h2>Field — a validated form</h2>
+  <form class="stack" novalidate onsubmit={onSignup}>
+    <Field label="Name" error="Tell us your name" required>
+      <Input name="name" />
+    </Field>
+    <Field label="Email" error="Enter a valid email address" required>
+      <Input name="email" type="email" />
+    </Field>
+    <Field label="Password" hint="At least 8 characters" error="Use 8 or more characters" required>
+      <Input name="password" type="password" minlength={8} />
+    </Field>
+    <div class="row">
+      <Button emphasis="high" type="submit">Create account</Button>
+    </div>
+  </form>
+  <pre class="state">{signupOutput}</pre>
 </section>
 
 <section>
