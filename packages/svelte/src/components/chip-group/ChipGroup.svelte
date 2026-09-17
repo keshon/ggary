@@ -8,6 +8,7 @@
   } from '@ggary/core/chip-group'
   import type { ChipEmphasis, ChipSize } from '@ggary/core/chip'
   import { rovingFocus, svelteNormalizer, uid } from '@ggary/core'
+  import { untrack } from 'svelte'
 
   type Props = {
     items: ChipItem[]
@@ -33,7 +34,7 @@
     orientation,
     emphasis,
     size,
-    removable = false,
+    removable,
     disabled = false,
     name,
     value,
@@ -45,18 +46,26 @@
 
   const id = uid('gg-chips')
 
-  const machine = createChipGroupMachine({
-    id,
-    items,
-    mode,
-    orientation,
-    disabled,
-    removable,
-    value,
-    defaultValue,
-    onSelectionChange: (selection, selected) => onSelectionChange?.(selection, selected),
-    onRemove: (removedValue, item) => onRemove?.(removedValue, item),
-  })
+  // The machine is built ONCE from the props as they are at mount, on purpose:
+  // every prop that can change afterwards reaches it through a SYNC effect below.
+  // `untrack` states that intent — and is what silences the compiler's
+  // state_referenced_locally warning honestly, instead of suppressing it.
+  // defaultValue is the one prop that is never synced: it is the initial
+  // selection of an uncontrolled group by definition.
+  const machine = untrack(() =>
+    createChipGroupMachine({
+      id,
+      items,
+      mode,
+      orientation,
+      disabled,
+      removable,
+      value,
+      defaultValue,
+      onSelectionChange: (selection, selected) => onSelectionChange?.(selection, selected),
+      onRemove: (removedValue, item) => onRemove?.(removedValue, item),
+    })
+  )
 
   let snapshot = $state(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))
@@ -65,6 +74,7 @@
 
   $effect(() => machine.send({ type: 'SYNC_ITEMS', items }))
   $effect(() => machine.send({ type: 'SYNC_DISABLED', disabled }))
+  $effect(() => machine.send({ type: 'SYNC_OPTIONS', mode, orientation, removable }))
   $effect(() => {
     if (value !== undefined) machine.send({ type: 'SYNC_SELECTION', selection: value })
   })
@@ -94,7 +104,7 @@
     {#each api.items as item, index (item.value)}
       <button {...api.getChipProps(item, index)}>
         <span {...api.getChipLabelProps()}>{item.label}</span>
-        {#if item.removable ?? removable}
+        {#if item.removable ?? removable ?? false}
           <span {...api.getChipRemoveProps(item, index)}><span {...api.getChipRemoveIconProps()}></span></span>
         {/if}
       </button>

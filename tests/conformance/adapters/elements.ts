@@ -99,7 +99,9 @@ export const elements: Adapter = {
       async update(patch) {
         current = { ...current, ...patch }
         if ('items' in patch) el.items = patch.items!
-        if ('disabled' in patch) setAttr(el, 'disabled', patch.disabled)
+        for (const key of ['disabled', 'mode', 'orientation', 'removable'] as const) {
+          if (key in patch) setAttr(el, key, patch[key])
+        }
       },
       unmount: async () => el.remove(),
     } satisfies Mounted<ChipGroupProps>)

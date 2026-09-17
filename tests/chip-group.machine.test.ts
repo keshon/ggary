@@ -166,6 +166,53 @@ describe('typeahead', () => {
   })
 })
 
+describe('options after construction', () => {
+  it('applies orientation, removable and mode', () => {
+    const state = run(setup({ removable: false }), {
+      type: 'SYNC_OPTIONS',
+      mode: 'single',
+      orientation: 'vertical',
+      removable: true,
+    })
+    expect([state.mode, state.orientation, state.removable]).toEqual(['single', 'vertical', true])
+  })
+
+  it('reads an absent option as its default, so removing a prop reverts it', () => {
+    const configured = setup({ mode: 'single', orientation: 'vertical', removable: true })
+    const state = run(configured, { type: 'SYNC_OPTIONS' })
+    expect([state.mode, state.orientation, state.removable]).toEqual(['multi', 'horizontal', false])
+  })
+
+  it('returns the same object when nothing changed, so subscribers do not fire', () => {
+    const state = setup({ removable: true })
+    expect(reducer(state, { type: 'SYNC_OPTIONS', removable: true })).toBe(state)
+  })
+
+  it('narrowing to single keeps only the first selected chip, in item order', () => {
+    const selected = run(setup(), { type: 'TOGGLE', index: 3 }, { type: 'TOGGLE', index: 0 })
+    const state = run(selected, { type: 'SYNC_OPTIONS', mode: 'single', removable: true })
+    expect(state.selection).toEqual(['design'])
+  })
+
+  // Reconfiguring is the owner's act, not the user's choice.
+  it('raises no intent when narrowing trims the selection', () => {
+    const selected = run(setup(), { type: 'TOGGLE', index: 0 }, { type: 'TOGGLE', index: 1 })
+    const state = run(selected, { type: 'SYNC_OPTIONS', mode: 'single', removable: true })
+    expect(state.intent.nonce).toBe(selected.intent.nonce)
+  })
+
+  it('leaves a controlled selection to its owner', () => {
+    const controlled = setup({ controlled: true, selection: ['design', 'code'] })
+    const state = run(controlled, { type: 'SYNC_OPTIONS', mode: 'single', removable: true })
+    expect(state.selection).toEqual(['design', 'code'])
+  })
+
+  it('gates removal on the synced value', () => {
+    const state = run(setup({ removable: true }), { type: 'SYNC_OPTIONS', removable: false })
+    expect(reducer(state, { type: 'REMOVE', index: 0 })).toBe(state)
+  })
+})
+
 describe('disabled group', () => {
   it('ignores every user intent', () => {
     const state = setup({ disabled: true })

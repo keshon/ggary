@@ -171,6 +171,46 @@ export function chipGroupConformance(adapter: Adapter) {
       })
     })
 
+    // Regression: mode, orientation and removable were read once, when the
+    // machine was created, and silently ignored after mount — in all three
+    // adapters. Nothing threw; the group just kept behaving the old way.
+    describe('config props after mount', () => {
+      it('follows an orientation change: the arrows that move focus change with it', async () => {
+        const { m, chips, key, focus } = await setup({ orientation: 'horizontal' })
+        await m.update({ orientation: 'vertical' })
+        expect(part(m.root, 'chip-group', 'list')!.getAttribute('aria-orientation')).toBe('vertical')
+
+        await focus(chips()[0])
+        await key(chips()[0], 'ArrowRight')
+        expect(document.activeElement).toBe(chips()[0])
+        await key(chips()[0], 'ArrowDown')
+        expect(document.activeElement).toBe(chips()[1])
+      })
+
+      it('follows a removable change: Delete stops removing and the dismiss target goes', async () => {
+        const onRemove = vi.fn()
+        const { m, chips, key, focus } = await setup({ removable: true, onRemove })
+        await m.update({ removable: false })
+
+        expect(part(chips()[0], 'chip', 'remove')).toBeNull()
+        expect(chips()[0].hasAttribute('aria-keyshortcuts')).toBe(false)
+        await focus(chips()[0])
+        await key(chips()[0], 'Delete')
+        expect(onRemove).not.toHaveBeenCalled()
+      })
+
+      it('follows a mode change: single mode replaces instead of accumulating', async () => {
+        const onSelectionChange = vi.fn()
+        const { m, chips, click } = await setup({ mode: 'multi', onSelectionChange })
+        await m.update({ mode: 'single' })
+
+        await click(chips()[0])
+        await click(chips()[1])
+        expect(onSelectionChange).toHaveBeenLastCalledWith(['code'], [expect.objectContaining(items[1])])
+        expect(chips().filter((c) => c.getAttribute('aria-pressed') === 'true')).toEqual([chips()[1]])
+      })
+    })
+
     describe('disabled', () => {
       it('disables every chip when the group is disabled', async () => {
         const { chips } = await setup({ disabled: true })

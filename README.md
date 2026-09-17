@@ -13,7 +13,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 247 tests
+npm test         # 263 tests
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
 ```
@@ -362,6 +362,28 @@ anything read uses `text-muted`.
 button: every red label is now 6.5:1 on white instead of 4.8:1, rather than
 keeping two reds.
 
+## Props after mount
+
+A machine is built once, from the props as they are at mount. Every prop that can
+change afterwards reaches it as a `SYNC_*` event — never by the machine reading
+props — and each component documents which props those are:
+
+| Component | Synced after mount | Read once, by definition |
+|---|---|---|
+| Select | `items`, `disabled`, `value` | `defaultValue` |
+| ChipGroup | `items`, `disabled`, `value`, `mode`, `orientation`, `removable` | `defaultValue` |
+
+`mode`, `orientation` and `removable` share one `SYNC_OPTIONS` event that carries
+the whole option set, with an absent option meaning its default: removing a prop
+reverts it, and no adapter has to know the defaults. They were first read only at
+construction and silently ignored afterwards, in all three adapters — the
+conformance suite now changes each one on a live group and checks the behaviour
+follows.
+
+In Svelte the one-time construction is wrapped in `untrack`, which states the
+intent and is what clears the compiler's `state_referenced_locally` warnings; the
+sandbox build prints none.
+
 ## Two custom-element patterns, on purpose
 
 `<gg-button>` **enhances** existing light-DOM markup:
@@ -382,11 +404,11 @@ fold, or you get layout shift on upgrade.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 46 tests. Every transition of every machine, pure, milliseconds. |
+| machine | node | `*.machine.test.ts` | 53 tests. Every transition of every machine, pure, milliseconds. |
 | contract | node | `icons.contract.test.ts` | 37 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 126 tests. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 135 tests. One contract × three adapters. |
 | dom | jsdom | `elements.dom.test.ts` | 8 tests. What only custom elements have: properties, events, attribute fallbacks. |
 
 **Machine tests** cover behaviour in depth, once, where it is cheap. They run with
@@ -468,10 +490,6 @@ Real, and deliberately left open:
 - **`onValueChange` fires when the user re-picks the already-selected value.**
   Intent semantics, not value-diff semantics. Correct for controlled components,
   mildly surprising otherwise.
-- **Some config props are read once, at construction.** `mode`, `orientation` and
-  `removable` on ChipGroup (and the build prints `state_referenced_locally`
-  warnings for them) are read at construction and ignored after mount, in all
-  three adapters. Queued as its own task.
 - **Instrument's other gates are not ported:** tap targets (`cmd/targets`),
   proportions (`cmd/proportion`), and the component registry (`cmd/registry`).
   Forced-colors behaviour is styled but not checked.

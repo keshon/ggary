@@ -92,8 +92,22 @@ export class GgChipGroupElement extends HTMLElement {
 
   attributeChangedCallback(name: string): void {
     if (!this.#machine) return
-    if (name === 'disabled') this.#machine.send({ type: 'SYNC_DISABLED', disabled: this.hasAttribute('disabled') })
-    else this.#render()
+    if (name === 'disabled') {
+      this.#machine.send({ type: 'SYNC_DISABLED', disabled: this.hasAttribute('disabled') })
+    } else if (name === 'mode' || name === 'orientation' || name === 'removable') {
+      // All three together: SYNC_OPTIONS reads an absent option as its default.
+      this.#machine.send({
+        type: 'SYNC_OPTIONS',
+        mode: (this.getAttribute('mode') as ChipGroupMode) ?? undefined,
+        orientation: (this.getAttribute('orientation') as ChipGroupOrientation) ?? undefined,
+        removable: this.hasAttribute('removable'),
+      })
+      // A no-op sync returns the same state and notifies nobody, so render here
+      // too: the attribute itself may be what a stylesheet reads.
+      this.#render()
+    } else {
+      this.#render()
+    }
   }
 
   #render(): void {

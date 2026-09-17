@@ -141,6 +141,24 @@ export function reducer(state: ChipGroupState, event: ChipGroupEvent): ChipGroup
       return { ...state, disabled: event.disabled }
     }
 
+    case 'SYNC_OPTIONS': {
+      // The event carries the WHOLE option set, and an absent option means its
+      // default — so removing a prop reverts it rather than leaving the last
+      // value stuck, and no adapter has to know what the defaults are.
+      const mode = event.mode ?? DEFAULTS.mode
+      const orientation = event.orientation ?? DEFAULTS.orientation
+      const removable = event.removable ?? DEFAULTS.removable
+      if (mode === state.mode && orientation === state.orientation && removable === state.removable) return state
+
+      // Narrowing multi to single cannot leave several chips selected. When the
+      // machine owns the selection it keeps the first, in item order. This is
+      // the owner reconfiguring the group, not the user choosing, so it raises
+      // no intent. A controlled owner's selection is left to the owner.
+      const selection =
+        mode === 'single' && !state.controlled && state.selection.length > 1 ? state.selection.slice(0, 1) : state.selection
+      return { ...state, mode, orientation, removable, selection }
+    }
+
     default:
       return state
   }
@@ -149,6 +167,9 @@ export function reducer(state: ChipGroupState, event: ChipGroupEvent): ChipGroup
 // ---------------------------------------------------------------------------
 // Factory
 // ---------------------------------------------------------------------------
+
+/** One home for the defaults, shared by construction and by SYNC_OPTIONS. */
+const DEFAULTS = { mode: 'multi', orientation: 'horizontal', removable: false } as const
 
 export interface ChipGroupConfig {
   id: string
@@ -172,10 +193,10 @@ export function initialState(config: ChipGroupConfig): ChipGroupState {
   return {
     id: config.id,
     items,
-    mode: config.mode ?? 'multi',
-    orientation: config.orientation ?? 'horizontal',
+    mode: config.mode ?? DEFAULTS.mode,
+    orientation: config.orientation ?? DEFAULTS.orientation,
     disabled: config.disabled ?? false,
-    removable: config.removable ?? false,
+    removable: config.removable ?? DEFAULTS.removable,
     controlled,
     selection,
     // nonce 0 means "never asked to move focus" — adapters must not steal focus

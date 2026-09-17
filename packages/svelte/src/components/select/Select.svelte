@@ -1,6 +1,7 @@
 <script lang="ts">
   import { connect, createSelectMachine, type SelectItem } from '@ggary/core/select'
   import { attachPositioner, scrollIntoViewIfNeeded, svelteNormalizer, trackDismissable, uid } from '@ggary/core'
+  import { untrack } from 'svelte'
 
   type Props = {
     items: SelectItem[]
@@ -26,14 +27,19 @@
 
   const id = uid('gg-select')
 
-  const machine = createSelectMachine({
-    id,
-    items,
-    value,
-    defaultValue,
-    disabled,
-    onValueChange: (next, item) => onValueChange?.(next, item),
-  })
+  // Built once from the props at mount; items, disabled and value reach it
+  // afterwards through the SYNC effects below, and defaultValue is initial by
+  // definition. See ChipGroup.svelte for why this is `untrack`.
+  const machine = untrack(() =>
+    createSelectMachine({
+      id,
+      items,
+      value,
+      defaultValue,
+      disabled,
+      onValueChange: (next, item) => onValueChange?.(next, item),
+    })
+  )
 
   let snapshot = $state(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))

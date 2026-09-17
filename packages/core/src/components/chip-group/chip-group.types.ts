@@ -47,3 +47,5 @@ export type ChipGroupEvent =
   | { type: 'SYNC_ITEMS'; items: ChipItem[] }
   | { type: 'SYNC_SELECTION'; selection: string[] }
   | { type: 'SYNC_DISABLED'; disabled: boolean }
+  /** The full option set as the owner now passes it; an absent option is its default. */
+  | { type: 'SYNC_OPTIONS'; mode?: ChipGroupMode; orientation?: ChipGroupOrientation; removable?: boolean }

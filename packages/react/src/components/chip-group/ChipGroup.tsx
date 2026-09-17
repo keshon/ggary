@@ -45,6 +45,10 @@ export function ChipGroup(props: ChipGroupProps) {
 
   useEffect(() => machine.send({ type: 'SYNC_ITEMS', items }), [machine, items])
   useEffect(() => machine.send({ type: 'SYNC_DISABLED', disabled }), [machine, disabled])
+  useEffect(
+    () => machine.send({ type: 'SYNC_OPTIONS', mode, orientation, removable }),
+    [machine, mode, orientation, removable]
+  )
   useEffect(() => {
     if (value !== undefined) machine.send({ type: 'SYNC_SELECTION', selection: value })
   }, [machine, value])
