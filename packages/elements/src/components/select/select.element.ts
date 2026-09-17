@@ -61,7 +61,13 @@ export class GgSelectElement extends HTMLElement {
   // --- lifecycle -------------------------------------------------------------
 
   connectedCallback(): void {
-    if (this.#machine) return
+    // Moved, not new: the DOM and the state are intact, only the subscription
+    // went away on disconnect. Returning here without it was a dead element.
+    if (this.#machine) {
+      this.#unsubscribe = this.#machine.subscribe(() => this.#render())
+      this.#render()
+      return
+    }
 
     // `items` may have been assigned before upgrade; JSON attribute is a fallback
     // for server-rendered pages that cannot set properties.
@@ -92,6 +98,10 @@ export class GgSelectElement extends HTMLElement {
     this.#unsubscribe?.()
     this.#teardownOpen?.()
     this.#unsubscribe = this.#teardownOpen = null
+    // An open listbox does not survive leaving the document: coming back open,
+    // with focus gone from the trigger, is a popup nobody is driving. Closing
+    // after unsubscribing changes state without rendering into a detached tree.
+    if (this.#machine?.getState().open) this.#machine.send({ type: 'CLOSE' })
   }
 
   attributeChangedCallback(name: string, _old: string | null, next: string | null): void {

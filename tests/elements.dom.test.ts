@@ -28,6 +28,13 @@ const selectItems: SelectItem[] = [
   { value: 'b', label: 'Bravo' },
 ]
 
+/** Detach and re-attach, as sorting a list or a drag-and-drop does. */
+function moveElsewhere(el: Element) {
+  const elsewhere = document.createElement('div')
+  document.body.append(elsewhere)
+  elsewhere.append(el)
+}
+
 const chipItems: ChipItem[] = [
   { value: 'design', label: 'Design' },
   { value: 'code', label: 'Code' },
@@ -63,6 +70,30 @@ describe('<gg-select>', () => {
     expect(el.querySelectorAll('[data-part="item"]')).toHaveLength(2)
     expect(el.value).toBe('a')
   })
+
+  it('keeps working after being moved in the document, keeping its value and its DOM', () => {
+    const el = mount()
+    el.items = selectItems
+    el.value = 'a'
+    moveElsewhere(el)
+
+    expect(el.querySelectorAll('[data-part="trigger"]')).toHaveLength(1)
+    el.value = 'b'
+    expect(el.querySelector('[data-part="trigger"]')!.textContent).toContain('Bravo')
+    const trigger = el.querySelector('[data-part="trigger"]') as HTMLElement
+    trigger.click()
+    expect(trigger.getAttribute('aria-expanded')).toBe('true')
+  })
+
+  it('closes when taken out of the document, rather than coming back open', () => {
+    const el = mount()
+    el.items = selectItems
+    const trigger = () => el.querySelector('[data-part="trigger"]') as HTMLElement
+    trigger().click()
+    expect(trigger().getAttribute('aria-expanded')).toBe('true')
+    moveElsewhere(el)
+    expect(trigger().getAttribute('aria-expanded')).toBe('false')
+  })
 })
 
 describe('<gg-chip-group>', () => {
@@ -93,6 +124,18 @@ describe('<gg-chip-group>', () => {
       ['selectionchange', { selection: ['design'], items: [chipItems[0]] }],
       ['chipremove', { value: 'code', item: chipItems[1] }],
     ])
+  })
+
+  it('keeps working after being moved in the document, keeping its selection and its DOM', () => {
+    const el = mount()
+    el.selection = ['design']
+    moveElsewhere(el)
+
+    expect(el.querySelectorAll('[role="toolbar"], [data-part="list"]').length).toBeGreaterThan(0)
+    expect(chips(el)).toHaveLength(2)
+    chips(el)[1].click()
+    expect(el.selection).toEqual(['design', 'code'])
+    expect(chips(el)[1].getAttribute('aria-pressed')).toBe('true')
   })
 })
 
@@ -193,9 +236,7 @@ describe('<gg-field>, <gg-input> and <gg-textarea>', () => {
 
   it('keeps working after being moved in the document', () => {
     const field = mount('<gg-field label="Email" error="Required"><input required></gg-field>')
-    const elsewhere = document.createElement('div')
-    document.body.append(elsewhere)
-    elsewhere.append(field)
+    moveElsewhere(field)
     control().dispatchEvent(new Event('blur'))
     expect(control().getAttribute('aria-invalid')).toBe('true')
     expect(document.querySelectorAll('gg-field label')).toHaveLength(1)

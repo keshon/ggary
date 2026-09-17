@@ -13,7 +13,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 419 tests
+npm test         # 422 tests
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
 ```
@@ -518,7 +518,7 @@ fold, or you get layout shift on upgrade.
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
 | dom | jsdom | `conformance.dom.test.ts` | 237 tests. One contract × three adapters. |
-| dom | jsdom | `elements.dom.test.ts` | 19 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
+| dom | jsdom | `elements.dom.test.ts` | 22 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 
 **Machine tests** cover behaviour in depth, once, where it is cheap. They run with
@@ -545,6 +545,12 @@ A failure names the adapter that drifted — `svelte > chip group > roving tabin
 and in Svelte: each failed under its own adapter's name and nowhere else. A spec
 skips what an adapter's API cannot express and says so (custom elements have no
 controlled mode), rather than faking it.
+
+Custom elements are also tested for being MOVED — detached and re-attached, as a
+sorted list or a drag-and-drop does. Disconnecting unsubscribes from the machine,
+so reconnecting has to subscribe again; the first version of every stateful
+element returned early instead and went dead. An open `<gg-select>` closes when
+it leaves the document.
 
 Every mount is tracked and unmounted after each test. Detaching a component's DOM
 does not unmount it: an open Select keeps its document-level Escape listener, and
@@ -615,9 +621,6 @@ Real, and deliberately left open:
   label, hint and validation is its own piece of work.
 - **No character counter.** `maxLength` is enforced by the browser, silently; a
   "12 / 280" readout (with a polite live region) belongs to Field.
-- **`<gg-select>` and `<gg-chip-group>` stop rendering after being moved** in the
-  document: they unsubscribe on disconnect and never re-subscribe. `<gg-field>`
-  had the same bug and is fixed, with a test.
 - **No affixes.** No icon, prefix, suffix or clear button inside an input.
 - **`minlength` only applies after a real edit.** Browsers report `tooShort` for
   user edits, not for a value set from script — native behaviour, but it means a

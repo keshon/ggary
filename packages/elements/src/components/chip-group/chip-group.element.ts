@@ -48,7 +48,12 @@ export class GgChipGroupElement extends HTMLElement {
   }
 
   connectedCallback(): void {
-    if (this.#machine) return
+    // Moved, not new: re-subscribe, as <gg-select> and <gg-field> do.
+    if (this.#machine) {
+      this.#unsubscribe = this.#machine.subscribe(() => this.#render())
+      this.#render()
+      return
+    }
 
     if (this.#items.length === 0 && this.hasAttribute('items')) {
       try {
