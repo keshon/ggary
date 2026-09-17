@@ -146,6 +146,32 @@ export function dialogConformance(adapter: Adapter) {
       expect(document.activeElement).toBe(trigger())
     })
 
+    describe('sheet', () => {
+      it('a dialog stands in the centre unless placed', async () => {
+        const { content } = await setup()
+        expect(content().dataset.placement).toBe('center')
+      })
+
+      it('Sheet is the same modal dialog at the end edge by default, and at the start edge on request', async () => {
+        const onOpenChange = vi.fn()
+        const end = await setup({ sheet: true, onOpenChange })
+        expect(end.content().tagName).toBe('DIALOG')
+        expect(end.content().dataset.placement).toBe('end')
+        await end.open()
+        expect(end.content().open).toBe(true)
+        expect(end.content().hasAttribute('data-modal')).toBe(true)
+        expect(document.getElementById(end.content().getAttribute('aria-labelledby')!)!.textContent).toBe('Rename')
+        expect(end.content().contains(document.activeElement)).toBe(true)
+        await end.escape()
+        expect(end.content().open).toBe(false)
+        expect(onOpenChange).toHaveBeenLastCalledWith(false, { reason: 'escape' })
+        expect(document.activeElement).toBe(end.trigger())
+
+        const start = await setup({ sheet: 'start', trigger: 'Sections' })
+        expect(start.content().dataset.placement).toBe('start')
+      })
+    })
+
     it('unmounted while open, it leaves nothing listening', async () => {
       const { m, open } = await setup()
       await open()

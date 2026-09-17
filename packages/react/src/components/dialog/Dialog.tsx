@@ -3,6 +3,7 @@ import {
   connect,
   createDialogMachine,
   type DialogChangeDetails,
+  type DialogPlacement,
   type DialogRole,
   type DialogSize,
 } from '@ggary/core/dialog'
@@ -21,6 +22,8 @@ export interface DialogProps {
   /** Renders the opener: spread the props onto a button, `<Button {...props}>Open</Button>`. */
   trigger?: (props: Dict) => ReactNode
   size?: DialogSize
+  /** `start` or `end` makes it a sheet at that edge. See also `Sheet`. */
+  placement?: DialogPlacement
   modal?: boolean
   role?: DialogRole
   closeOnEscape?: boolean
@@ -32,7 +35,7 @@ export interface DialogProps {
 
 export function Dialog(props: DialogProps) {
   const {
-    open, defaultOpen, onOpenChange, title, description, children, footer, trigger, size,
+    open, defaultOpen, onOpenChange, title, description, children, footer, trigger, size, placement,
     modal, role, closeOnEscape, closeOnOutside, closeButton = true, closeLabel,
   } = props
 
@@ -52,6 +55,7 @@ export function Dialog(props: DialogProps) {
     title: title != null,
     description: description != null,
     size,
+    placement,
     closeLabel,
   })
 

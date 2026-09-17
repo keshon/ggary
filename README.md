@@ -2,9 +2,9 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Seventeen components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
-Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Dialog, Popover, Tooltip,
-Menu and Menubar — built end to end to prove the architecture holds.
+Eighteen components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
+Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Dialog, Sheet, Popover,
+Tooltip, Menu and Menubar — built end to end to prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -36,11 +36,11 @@ packages/
   icons/             glyph SVGs -> --gg-icon-* tokens; the shared glyph compiler
   checks/            the theme gates: structure and contrast, run on every theme
   elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>,
-                     <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>, <gg-dialog>,
+                     <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>, <gg-dialog>, <gg-sheet>,
                      <gg-popover>, <gg-tooltip>, <gg-menu>, <gg-menubar>, <gg-fieldset>,
                      <gg-checkbox-group>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
-                     <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Popover>, <Tooltip>,
+                     <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Sheet>, <Popover>, <Tooltip>,
                      <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>
   svelte/            the same ten as React
 apps/sandbox/        the three demo pages
@@ -547,6 +547,27 @@ exercises the adapters' wiring, and nothing more; the conformance spec runs agai
 Chrome against the real thing, and `tests/dialog.browser.test.ts` covers what only
 a browser has — `:modal`, Tab never leaving, the scroll lock, a real backdrop click,
 real Escape presses through the stack, the form close, and a controlled refusal.
+
+### Sheet
+
+A full-height panel at the edge of the screen: settings, details, navigation on a
+narrow screen. As in Instrument, it is the modal dialog in a different layout, not a
+different component. The parts, focus, Escape, the backdrop and the scroll lock are
+all Dialog's. `Sheet` is Dialog with `placement` set from `side` (`end` by default,
+or `start`). The sides are logical, so a sheet mirrors in a right-to-left page.
+
+```tsx
+<Sheet side="end" title="Run parameters" trigger={(props) => <Button {...props}>Parameters…</Button>}>…</Sheet>
+```
+
+```html
+<gg-sheet side="start" heading="Sections"><gg-button slot="trigger"><button>Sections</button></gg-button>…</gg-sheet>
+```
+
+Each theme lays it out: full height with `100dvh`, so a phone browser's toolbar
+doesn't hide the footer. It sits flush with its edge, with no radius, and a border
+only on the side that faces the page. On a narrow screen it is full width. The
+rhythm test opens one at each edge in both themes and measures it.
 
 ### Popover and Tooltip
 
@@ -1064,9 +1085,9 @@ Real, and deliberately left open:
 - **Platform close requests** (a back gesture) are cancelled through the `cancel`
   event, which browsers may refuse to let a page cancel without recent user
   activation; the dialog then closes natively and reports `native`.
-- **Not ported from Instrument:** everything beyond these seventeen components —
-  prose, the rest of forms (number field, slider, choice cards), tables, the sheet
-  and toast overlays,
+- **Not ported from Instrument:** everything beyond these eighteen components —
+  prose, the rest of forms (number field, slider, choice cards), tables, the toast
+  overlay,
   the agent components (including the composer, a textarea with a toolbar in one
   frame) and print styles.
 - **`onValueChange` fires when the user re-picks the already-selected value.**

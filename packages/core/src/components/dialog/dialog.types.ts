@@ -15,6 +15,12 @@ export type DialogChangeReason =
 
 export type DialogSize = 'sm' | 'md' | 'lg'
 
+/**
+ * Where the dialog stands. `center` is the modal card; `start` and `end` make
+ * it a sheet: full height at that edge (logical, so it mirrors in RTL).
+ */
+export type DialogPlacement = 'center' | 'start' | 'end'
+
 export interface DialogChangeDetails {
   reason: DialogChangeReason
   /** Present when a <form method="dialog"> closed it: the submitting button's value. */

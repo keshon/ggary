@@ -14,6 +14,7 @@
     Popover,
     RadioGroup,
     Select,
+    Sheet,
     Switch,
     Textarea,
     Tooltip,
@@ -404,6 +405,29 @@ invalid  ${taken}`}</pre>
         <form method="dialog"><Button emphasis="high" type="submit" value="accept">Accept</Button></form>
       {/snippet}
     </Dialog>
+
+    <Sheet title="Run parameters" description="Applied to the next run." onOpenChange={logDialog('parameters sheet')}>
+      {#snippet trigger(props)}
+        <Button emphasis="low" {...props}>Parameters…</Button>
+      {/snippet}
+      <div class="dialog-fields">
+        <Select label="Model" items={roles} defaultValue="editor" />
+        <Field label="Agents" hint="1 to 12"><Input type="number" defaultValue="7" /></Field>
+        <Switch defaultChecked>Keep logs</Switch>
+      </div>
+      {#snippet footer()}
+        <form method="dialog"><Button emphasis="high" type="submit" value="apply">Apply</Button></form>
+      {/snippet}
+    </Sheet>
+
+    <Sheet side="start" size="sm" title="Sections" onOpenChange={logDialog('sections sheet')}>
+      {#snippet trigger(props)}
+        <Button emphasis="minimal" {...props}>Sections (start edge)</Button>
+      {/snippet}
+      <p>Runs</p>
+      <p>Artefacts</p>
+      <p>Settings</p>
+    </Sheet>
   </div>
   <pre class="state">{dialogLog}</pre>
 </section>

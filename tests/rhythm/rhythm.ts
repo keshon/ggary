@@ -1,7 +1,7 @@
 import { expect } from 'vitest'
 import { userEvent } from '@vitest/browser/context'
 import '../../packages/elements/src/index'
-import type { GgMenuElement, GgSelectElement } from '../../packages/elements/src/index'
+import type { GgMenuElement, GgSelectElement, GgSheetElement } from '../../packages/elements/src/index'
 
 /**
  * The spacing rules every theme owes, measured in a real browser on real
@@ -101,4 +101,27 @@ export async function expectConcentricMenu() {
   near(px(item.borderTopLeftRadius), expected)
   near(box(row.querySelector('[data-part="item-shortcut"]')!).right, box(row).right - px(item.paddingRight))
   await userEvent.keyboard('{Escape}')
+}
+
+/** A sheet stands full height, flush with its edge, and its footer sits at the bottom. */
+export async function expectSheetLayout() {
+  for (const side of ['end', 'start'] as const) {
+    const sheet = document.createElement('gg-sheet') as GgSheetElement
+    sheet.setAttribute('heading', 'Parameters')
+    sheet.setAttribute('side', side)
+    sheet.innerHTML = '<p>Body</p><footer><button type="button">Close</button></footer>'
+    document.body.append(sheet)
+    sheet.show()
+    await new Promise((resolve) => setTimeout(resolve, 250))
+    const content = sheet.querySelector('[data-part="content"]')!
+    const rect = box(content)
+    near(rect.top, 0)
+    near(rect.height, window.innerHeight)
+    if (side === 'end') near(rect.right, document.documentElement.clientWidth)
+    else near(rect.left, 0)
+    expect(rect.width).toBeLessThan(window.innerWidth)
+    near(box(sheet.querySelector('[data-part="footer"]')!).bottom, window.innerHeight)
+    sheet.close()
+    sheet.remove()
+  }
 }

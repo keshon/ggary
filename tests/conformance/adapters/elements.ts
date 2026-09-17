@@ -333,7 +333,8 @@ export const elements: Adapter = {
   },
 
   async dialog(props, target) {
-    const host = document.createElement('gg-dialog')
+    const host = document.createElement(props.sheet ? 'gg-sheet' : 'gg-dialog')
+    if (props.sheet && props.sheet !== true) host.setAttribute('side', props.sheet)
     if (props.trigger) {
       const trigger = document.createElement('button')
       trigger.textContent = props.trigger

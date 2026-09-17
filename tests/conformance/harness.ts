@@ -165,6 +165,8 @@ export interface DialogProps {
   triggerIsButton?: boolean
   modal?: boolean
   role?: 'dialog' | 'alertdialog'
+  /** Mount the Sheet component (Sheet, <gg-sheet>) at this side instead of a Dialog. */
+  sheet?: 'start' | 'end' | true
   closeOnEscape?: boolean
   closeOnOutside?: boolean
 }

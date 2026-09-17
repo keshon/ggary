@@ -7,6 +7,7 @@ import {
   ChipGroup,
   Dialog,
   Popover,
+  Sheet,
   Tooltip,
   Field,
   Fieldset,
@@ -96,9 +97,10 @@ export const react: Adapter = {
         : createElement(CheckboxGroup, { items, name, defaultValue: defaultValue as string[] | undefined }),
     ]),
   dialog: (props, target) =>
-    mount(Dialog, props, target, ({ trigger, triggerIsButton, body, footer, ...rest }: DialogProps) => [
+    mount(props.sheet ? Sheet : Dialog, props, target, ({ trigger, triggerIsButton, body, footer, sheet, ...rest }: DialogProps) => [
       {
         ...rest,
+        ...(sheet && sheet !== true ? { side: sheet } : {}),
         trigger: trigger
           ? (triggerProps: object) => createElement(triggerIsButton ? Button : 'button', triggerProps, trigger)
           : undefined,

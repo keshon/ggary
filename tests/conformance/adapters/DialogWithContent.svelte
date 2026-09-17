@@ -1,7 +1,9 @@
 <script lang="ts">
-  import { Button, Dialog } from '../../../packages/svelte/src/index'
+  import { Button, Dialog, Sheet } from '../../../packages/svelte/src/index'
 
-  let { trigger: triggerLabel, triggerIsButton, body = 'Body', footer: footerLabel, ...rest }: Record<string, any> = $props()
+  let { trigger: triggerLabel, triggerIsButton, body = 'Body', footer: footerLabel, sheet, ...rest }: Record<string, any> = $props()
+  const Component = sheet ? Sheet : Dialog
+  const side = sheet && sheet !== true ? { side: sheet } : {}
 </script>
 
 {#snippet trigger(props: Record<string, unknown>)}
@@ -16,7 +18,7 @@
   <button type="button">{footerLabel}</button>
 {/snippet}
 
-<Dialog {...rest} trigger={triggerLabel ? trigger : undefined} footer={footerLabel ? footer : undefined}>
+<Component {...rest} {...side} trigger={triggerLabel ? trigger : undefined} footer={footerLabel ? footer : undefined}>
   <p>{body}</p>
   <button type="button">Body action</button>
-</Dialog>
+</Component>

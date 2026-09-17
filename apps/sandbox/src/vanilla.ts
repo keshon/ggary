@@ -277,6 +277,24 @@ app.innerHTML = `
           <form method="dialog"><gg-button emphasis="high"><button value="accept">Accept</button></gg-button></form>
         </footer>
       </gg-dialog>
+
+      <gg-sheet id="parameters-sheet" heading="Run parameters" description="Applied to the next run.">
+        <gg-button slot="trigger" emphasis="low"><button>Parameters…</button></gg-button>
+        <div class="dialog-fields">
+          <gg-field label="Agents" hint="1 to 12"><input type="number" value="7"></gg-field>
+          <gg-switch><label><input type="checkbox" checked> Keep logs</label></gg-switch>
+        </div>
+        <footer>
+          <form method="dialog"><gg-button emphasis="high"><button value="apply">Apply</button></gg-button></form>
+        </footer>
+      </gg-sheet>
+
+      <gg-sheet id="sections-sheet" side="start" size="sm" heading="Sections">
+        <gg-button slot="trigger" emphasis="minimal"><button>Sections (start edge)</button></gg-button>
+        <p>Runs</p>
+        <p>Artefacts</p>
+        <p>Settings</p>
+      </gg-sheet>
     </div>
     <pre class="state" id="dialog-state">open a dialog</pre>
     <p class="hint">
@@ -502,7 +520,7 @@ paintPlan()
 // --- dialogs -------------------------------------------------------------------
 document.querySelector<GgSelectElement>('#role-select')!.items = roles
 const dialogState = document.getElementById('dialog-state')!
-for (const id of ['edit-dialog', 'delete-dialog', 'terms-dialog']) {
+for (const id of ['edit-dialog', 'delete-dialog', 'terms-dialog', 'parameters-sheet', 'sections-sheet']) {
   document.getElementById(id)!.addEventListener('openchange', (event) => {
     const { open, reason, returnValue } = (event as CustomEvent).detail
     dialogState.innerHTML = `${id}  <b>${open ? 'open' : 'closed'}</b>  reason <b>${reason}</b>${returnValue ? `  returnValue <b>${returnValue}</b>` : ''}`

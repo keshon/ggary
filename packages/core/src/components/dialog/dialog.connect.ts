@@ -1,6 +1,6 @@
 import type { Dict, Normalizer } from '../../types'
 import { dialogAnatomy } from './dialog.anatomy'
-import type { DialogChangeReason, DialogEvent, DialogSize, DialogState } from './dialog.types'
+import type { DialogChangeReason, DialogEvent, DialogPlacement, DialogSize, DialogState } from './dialog.types'
 
 export const dialogIds = (id: string) => ({
   trigger: `${id}-trigger`,
@@ -14,6 +14,8 @@ export interface DialogConnectOptions {
   title?: boolean
   description?: boolean
   size?: DialogSize
+  /** `start` or `end` for a sheet at that edge. Default `center`. */
+  placement?: DialogPlacement
   /** The close button's accessible name. */
   closeLabel?: string
 }
@@ -34,7 +36,7 @@ export function connect<T = Dict>(
   options: DialogConnectOptions = {}
 ) {
   const ids = dialogIds(state.id)
-  const { size = 'md', closeLabel = 'Close' } = options
+  const { size = 'md', placement = 'center', closeLabel = 'Close' } = options
   const stateAttr = state.open ? 'open' : 'closed'
 
   return {
@@ -75,6 +77,7 @@ export function connect<T = Dict>(
       tabIndex: -1,
       'data-state': stateAttr,
       'data-size': size,
+      'data-placement': placement,
       'data-modal': state.modal ? '' : undefined,
     }),
 

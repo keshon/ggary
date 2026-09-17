@@ -3,6 +3,7 @@
     connect,
     createDialogMachine,
     type DialogChangeDetails,
+    type DialogPlacement,
     type DialogRole,
     type DialogSize,
   } from '@ggary/core/dialog'
@@ -22,6 +23,8 @@
     /** The opener: `{#snippet trigger(props)}<Button {...props}>Open</Button>{/snippet}` */
     trigger?: Snippet<[Dict]>
     size?: DialogSize
+    /** `start` or `end` makes it a sheet at that edge. See also `Sheet`. */
+    placement?: DialogPlacement
     modal?: boolean
     role?: DialogRole
     closeOnEscape?: boolean
@@ -40,6 +43,7 @@
     footer,
     trigger,
     size,
+    placement,
     modal,
     role,
     closeOnEscape,
@@ -75,6 +79,7 @@
       title: title != null,
       description: description != null,
       size,
+      placement,
       closeLabel,
     })
   )

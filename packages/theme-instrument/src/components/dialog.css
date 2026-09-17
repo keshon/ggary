@@ -31,6 +31,34 @@
   &:not([data-modal]) { box-shadow: var(--shadow-popover); }
 }
 
+/* --- sheet ---------------------------------------------------------------
+
+   Ported from .inst-sheet: the same dialog, a different layout. Full height
+   (100dvh, so a mobile browser's toolbar does not cut off the footer), flush
+   with the edge, no radius, and a hairline only on the side facing the page.
+   On a narrow screen min(28rem, 100vw) is already the full width. */
+
+[data-scope='dialog'][data-part='content']:is([data-placement='start'], [data-placement='end']) {
+  margin-block: 0;
+  inline-size: min(28rem, 100vw);
+  block-size: 100dvh;
+  max-block-size: 100dvh;
+  border-block: 0;
+  border-radius: 0;
+
+  &[data-size='sm'] { inline-size: min(22rem, 100vw); }
+  &[data-size='lg'] { inline-size: min(40rem, 100vw); }
+}
+
+[data-scope='dialog'][data-part='content'][data-placement='end'] {
+  margin-inline: auto 0;
+  border-inline-end: 0;
+}
+[data-scope='dialog'][data-part='content'][data-placement='start'] {
+  margin-inline: 0 auto;
+  border-inline-start: 0;
+}
+
 /* The close cross is pinned to its corner and does not stretch the header:
    it has a column of its own, not the end of the title line. */
 [data-scope='dialog'][data-part='header'] {

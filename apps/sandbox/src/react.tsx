@@ -18,6 +18,7 @@ import {
   Popover,
   RadioGroup,
   Select,
+  Sheet,
   Switch,
   Textarea,
   Tooltip,
@@ -449,6 +450,48 @@ function App() {
               </p>
             ))}
           </Dialog>
+
+          <Sheet
+            title="Run parameters"
+            description="Applied to the next run."
+            onOpenChange={logDialog('parameters sheet')}
+            trigger={(props) => (
+              <Button emphasis="low" {...props}>
+                Parameters…
+              </Button>
+            )}
+            footer={
+              <form method="dialog">
+                <Button emphasis="high" type="submit" value="apply">
+                  Apply
+                </Button>
+              </form>
+            }
+          >
+            <div className="dialog-fields">
+              <Select label="Model" items={roles} defaultValue="editor" />
+              <Field label="Agents" hint="1 to 12">
+                <Input type="number" defaultValue="7" />
+              </Field>
+              <Switch defaultChecked>Keep logs</Switch>
+            </div>
+          </Sheet>
+
+          <Sheet
+            side="start"
+            size="sm"
+            title="Sections"
+            onOpenChange={logDialog('sections sheet')}
+            trigger={(props) => (
+              <Button emphasis="minimal" {...props}>
+                Sections (start edge)
+              </Button>
+            )}
+          >
+            <p>Runs</p>
+            <p>Artefacts</p>
+            <p>Settings</p>
+          </Sheet>
         </div>
         <pre className="state">{dialogLog}</pre>
       </section>

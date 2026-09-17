@@ -115,6 +115,33 @@
   display: contents;
 }
 
+/* --- sheet ---------------------------------------------------------------
+
+   The same dialog at an edge: full height, flush with the screen, a border
+   only on the side that faces the page. The footer stays at the bottom
+   because the body between them grows (@ggary/structure). */
+
+[data-scope='dialog'][data-part='content']:is([data-placement='start'], [data-placement='end']) {
+  --dialog-width: 420px;
+  margin-block: 0;
+  inline-size: min(var(--dialog-width), 100vw);
+  block-size: 100dvh;
+  max-block-size: 100dvh;
+  border-block: 0;
+  border-radius: 0;
+}
+[data-scope='dialog'][data-part='content']:is([data-placement='start'], [data-placement='end'])[data-size='sm'] { --dialog-width: 320px; }
+[data-scope='dialog'][data-part='content']:is([data-placement='start'], [data-placement='end'])[data-size='lg'] { --dialog-width: 640px; }
+
+[data-scope='dialog'][data-part='content'][data-placement='end'] {
+  margin-inline: auto 0;
+  border-inline-end: 0;
+}
+[data-scope='dialog'][data-part='content'][data-placement='start'] {
+  margin-inline: 0 auto;
+  border-inline-start: 0;
+}
+
 /* Entry: a short fade and rise. Exit is instant — the body unmounts with it. */
 [data-scope='dialog'][data-part='content'][open] {
   transition: opacity var(--ggarry-duration-normal) ease, translate var(--ggarry-duration-normal) ease;
@@ -125,6 +152,12 @@
     opacity: 0;
     translate: 0 8px;
   }
+}
+
+/* A sheet slides in from its own edge instead of rising. */
+@starting-style {
+  [data-scope='dialog'][data-part='content'][data-placement='end'][open] { translate: 24px 0; }
+  [data-scope='dialog'][data-part='content'][data-placement='start'][open] { translate: -24px 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

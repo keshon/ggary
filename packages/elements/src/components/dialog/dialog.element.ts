@@ -1,4 +1,4 @@
-import { connect, createDialogMachine, type DialogChangeReason, type DialogEvent, type DialogSize, type DialogState } from '@ggary/core/dialog'
+import { connect, createDialogMachine, type DialogChangeReason, type DialogEvent, type DialogSize, type DialogState, type DialogPlacement } from '@ggary/core/dialog'
 import { attachDialog, domNormalizer, uid, type AttachedDialog, type Machine } from '@ggary/core'
 import { h, spread } from '../../spread'
 
@@ -24,14 +24,18 @@ import { h, spread } from '../../spread'
  * `heading`, not `title`: a title attribute on the host would give the whole
  * element a browser tooltip.
  *
- * Attributes: open, heading, description, size, alert (role alertdialog),
+ * Attributes: open, heading, description, size, placement (center, start,
+ * end: a sheet at that edge), alert (role alertdialog),
  * non-modal, persistent (neither Escape nor an outside press closes it),
  * no-close-button, close-label. Methods: show(), close().
  */
 export class GgDialogElement extends HTMLElement {
   static observedAttributes = [
-    'open', 'heading', 'description', 'size', 'alert', 'non-modal', 'persistent', 'no-close-button', 'close-label',
+    'open', 'heading', 'description', 'size', 'placement', 'side', 'alert', 'non-modal', 'persistent', 'no-close-button', 'close-label',
   ]
+
+  /** Where a dialog stands without a `placement` attribute. <gg-sheet> overrides it. */
+  static defaultPlacement: DialogPlacement = 'center'
 
   #machine: Machine<DialogState, DialogEvent> | null = null
   #unsubscribe: (() => void) | null = null
@@ -151,6 +155,9 @@ export class GgDialogElement extends HTMLElement {
       title: heading !== null,
       description: description !== null,
       size: (this.getAttribute('size') as DialogSize) ?? undefined,
+      placement:
+        ((this.getAttribute('placement') ?? this.getAttribute('side')) as DialogPlacement | null) ??
+        (this.constructor as typeof GgDialogElement).defaultPlacement,
       closeLabel: this.getAttribute('close-label') ?? undefined,
     })
 
@@ -197,5 +204,21 @@ if (!customElements.get('gg-dialog')) customElements.define('gg-dialog', GgDialo
 declare global {
   interface HTMLElementTagNameMap {
     'gg-dialog': GgDialogElement
+  }
+}
+
+/**
+ * A full-height panel at the edge of the screen: <gg-dialog> with a sheet's
+ * layout. `side="start"` puts it at the start edge; the default is the end.
+ */
+export class GgSheetElement extends GgDialogElement {
+  static defaultPlacement: DialogPlacement = 'end'
+}
+
+if (!customElements.get('gg-sheet')) customElements.define('gg-sheet', GgSheetElement)
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'gg-sheet': GgSheetElement
   }
 }
