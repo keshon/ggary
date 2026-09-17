@@ -1,0 +1,60 @@
+/* ==========================================================================
+   Instrument — banner
+
+   Ported from instrument/src/feedback.css (.inst-banner). A ground in the
+   tone, the kit's hairline edge, the tone glyph in --tone-ink centred on the
+   first line. The measure clips the body, not the banner: the ground runs the
+   full width, the text does not.
+   ========================================================================== */
+
+/* A tone belongs to the element that states it: an untoned banner or note in a
+   toned card must not wear the card's tone. */
+:is([data-scope='banner'], [data-scope='note'])[data-part='root']:not([data-tone]) {
+  --tone-ink: initial;
+  --tone-ground: initial;
+  --tone-bg: initial;
+}
+
+[data-scope='banner'][data-part='root'] {
+  gap: var(--gap-inline);
+  padding: var(--pad-block-y) var(--pad-panel);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--tone-bg, var(--surface-sunken));
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-ui);
+}
+
+[data-scope='banner'][data-part='icon'] {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+  margin-block-start: calc((1lh - var(--size-icon)) / 2);
+  color: var(--tone-ink, var(--text-secondary));
+}
+
+/* The measure is on the lines, not the body: the body still fills the row, so
+   the actions sit at its end. */
+[data-scope='banner']:is([data-part='title'], [data-part='text']) { max-inline-size: var(--measure, 75ch); }
+[data-scope='banner'][data-part='title'] { font-weight: var(--weight-medium); }
+[data-scope='banner'][data-part='text'] { color: var(--text-secondary); }
+
+[data-scope='banner'][data-part='actions'] {
+  gap: var(--space-3);
+}
+
+/* Instrument has no close button: a state does not go away when its message
+   is closed. When an application wants one, it is a small ghost cross. */
+[data-scope='banner'][data-part='close'] {
+  inline-size: var(--control-h-sm);
+  block-size: var(--control-h-sm);
+  border-radius: var(--radius-control-sm);
+  color: var(--text-muted);
+
+  &:hover { background: var(--surface-hover); color: var(--text-primary); }
+}
+
+[data-scope='banner'][data-part='close-icon'] {
+  inline-size: var(--size-chevron);
+  block-size: var(--size-chevron);
+}

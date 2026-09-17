@@ -27,6 +27,7 @@ import type { Toaster, ToastPlacement } from '../../packages/core/src/components
 import type { BadgeVariant } from '../../packages/core/src/components/badge'
 import type { AvatarPerson, AvatarSize } from '../../packages/core/src/components/avatar'
 import type { StatusTone } from '../../packages/core/src/utils/tone'
+import type { HeadingLevel, LiveMode, RegionRank } from '../../packages/core/src/utils/region'
 
 export interface ButtonProps {
   label: string
@@ -266,6 +267,57 @@ export interface SkeletonProps {
   title?: boolean
 }
 
+/** A card whose body reads "Body". */
+export interface CardProps {
+  title?: string
+  subtitle?: string
+  headingLevel?: HeadingLevel
+  href?: string
+  interactive?: boolean
+  plain?: boolean
+  rank?: RegionRank
+  tone?: StatusTone
+}
+
+/** A panel whose body reads "Body"; `actions` puts a "Refresh" button in its header. */
+export interface PanelProps {
+  title?: string
+  headingLevel?: HeadingLevel
+  body?: 'padded' | 'flush' | 'list'
+  plain?: boolean
+  rank?: RegionRank
+  tone?: StatusTone
+  region?: boolean
+  scrollable?: boolean
+  actions?: boolean
+}
+
+/** `text` is the detail; `actions` puts a "Renew" button at the far edge. */
+export interface BannerProps {
+  tone?: StatusTone
+  title?: string
+  text?: string
+  live?: LiveMode
+  actions?: boolean
+  onDismiss?: () => void
+  dismissLabel?: string
+}
+
+export interface NoteProps {
+  text: string
+  tone?: StatusTone
+  live?: LiveMode
+}
+
+/** `action` puts a button with this label as the next step. */
+export interface EmptyStateProps {
+  title: string
+  description?: string
+  headingLevel?: HeadingLevel
+  live?: LiveMode
+  action?: string
+}
+
 export interface TooltipProps {
   content: string
   /** The trigger button's label. */
@@ -320,6 +372,11 @@ export interface Adapter {
      * attributes, so there a change the owner ignores still moves the component.
      */
     refusal: boolean
+    /**
+     * A component's root can be another element — a card that is an <a>. Not
+     * for custom elements: the host is the root, and a host cannot be a link.
+     */
+    linkRoot: boolean
   }
 
   /** Run a user interaction and wait for everything it causes to flush. */
@@ -351,6 +408,11 @@ export interface Adapter {
   avatarGroup(props: AvatarGroupProps, target: HTMLElement): Promise<Mounted<AvatarGroupProps>>
   spinner(props: SpinnerProps, target: HTMLElement): Promise<Mounted<SpinnerProps>>
   skeleton(props: SkeletonProps, target: HTMLElement): Promise<Mounted<SkeletonProps>>
+  card(props: CardProps, target: HTMLElement): Promise<Mounted<CardProps>>
+  panel(props: PanelProps, target: HTMLElement): Promise<Mounted<PanelProps>>
+  banner(props: BannerProps, target: HTMLElement): Promise<Mounted<BannerProps>>
+  note(props: NoteProps, target: HTMLElement): Promise<Mounted<NoteProps>>
+  emptyState(props: EmptyStateProps, target: HTMLElement): Promise<Mounted<EmptyStateProps>>
   /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
 }

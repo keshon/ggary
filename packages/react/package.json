@@ -13,6 +13,26 @@
       "types": "./src/components/button/index.ts",
       "default": "./src/components/button/index.ts"
     },
+    "./banner": {
+      "types": "./src/components/banner/index.ts",
+      "default": "./src/components/banner/index.ts"
+    },
+    "./card": {
+      "types": "./src/components/card/index.ts",
+      "default": "./src/components/card/index.ts"
+    },
+    "./empty-state": {
+      "types": "./src/components/empty-state/index.ts",
+      "default": "./src/components/empty-state/index.ts"
+    },
+    "./note": {
+      "types": "./src/components/note/index.ts",
+      "default": "./src/components/note/index.ts"
+    },
+    "./panel": {
+      "types": "./src/components/panel/index.ts",
+      "default": "./src/components/panel/index.ts"
+    },
     "./avatar": {
       "types": "./src/components/avatar/index.ts",
       "default": "./src/components/avatar/index.ts"

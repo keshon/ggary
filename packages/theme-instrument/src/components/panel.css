@@ -1,0 +1,42 @@
+/* ==========================================================================
+   Instrument — panel
+
+   Ported from instrument/src/surfaces.css (.inst-panel). NO RULE UNDER THE
+   HEADER and no bottom inset: the title stands one inset above the content, a
+   label on it rather than a compartment over it. The title sits a rung below
+   the base size — labels are quieter than the data they label.
+   ========================================================================== */
+
+[data-scope='panel'][data-part='root'] {
+  background: var(--region-ground, var(--surface-raised));
+  border: var(--hairline) solid var(--region-edge, var(--border));
+  border-radius: var(--region-radius, var(--radius-lg));
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-ui);
+}
+
+[data-scope='panel'][data-part='header'] {
+  gap: var(--gap-inline);
+  /* The height of a small control, so a header with actions and one without line up. */
+  min-block-size: calc(var(--control-h-sm) + var(--pad-block-y));
+  padding: var(--pad-block-y) var(--pad-panel) 0;
+}
+
+[data-scope='panel'][data-part='title'] {
+  font-size: var(--region-title-size, var(--region-title-default));
+  color: var(--region-title-ink, var(--text-primary));
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-ui);
+}
+
+[data-scope='panel'][data-part='actions'] {
+  gap: var(--space-2);
+}
+
+[data-scope='panel'][data-part='body'] {
+  padding: var(--pad-panel);
+
+  &[data-body='flush'] { padding: 0; }
+  &[data-body='list'] { padding: var(--gap-row); }
+}

@@ -1,20 +1,30 @@
 <script lang="ts">
   import {
+    Avatar,
+    AvatarGroup,
+    Badge,
+    Banner,
     Button,
+    Card,
     Checkbox,
     CheckboxGroup,
     Chip,
     ChipGroup,
     Dialog,
+    EmptyState,
     Field,
     Fieldset,
     Input,
     Menu,
     Menubar,
+    Note,
+    Panel,
     Popover,
     RadioGroup,
     Select,
     Sheet,
+    Skeleton,
+    Spinner,
     Switch,
     Tabs,
     Textarea,
@@ -22,10 +32,12 @@
     toast,
     Tooltip,
   } from '@ggary/svelte'
-  import { toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { badgeTones, people, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
+  let refreshes = $state(0)
+  let diskBanner = $state(true)
   let items = $state(tags)
   let selection = $state<string[]>(['design'])
   let formOutput = $state('submit to see the FormData the hidden input contributes')
@@ -616,6 +628,80 @@ invalid  ${taken}`}</pre>
   </div>
   <pre class="state">{menuLog}</pre>
   <p class="hint">A menu button: arrows walk every item, disabled ones too, and wrap; a letter jumps to an item; Enter or a click chooses. The view menu stays open while you toggle: the page owns the state and passes new items back.</p>
+</section>
+
+<section id="display">
+  <h2>Badge, Avatar, Spinner and Skeleton</h2>
+  <div class="row" style="align-items: center">
+    {#each badgeTones as { tone, label } (tone)}
+      <Badge {tone}>{label}</Badge>
+    {/each}
+    <Badge variant="outline">v2.4</Badge>
+    <Badge variant="count" tone="running">12</Badge>
+  </div>
+  <div class="row" style="align-items: center; margin-top: 16px">
+    <Avatar name="Ada Lovelace" size="sm" />
+    <Avatar name="Alan Turing" />
+    <Avatar name="Grace Hopper" size="lg" />
+    <AvatarGroup label="Reviewers" {people} max={3} />
+    <Spinner label="Loading runs" size="sm" />
+    <Spinner label="Loading runs" />
+    <Spinner label="Loading runs" size="lg" />
+  </div>
+  <div class="tiles">
+    <Card title="Loading…"><Skeleton title lines={3} /></Card>
+  </div>
+  <p class="hint">Badges state a status in words, never colour alone. An avatar shows initials until its picture has loaded, and keeps them if it fails. The spinner is a status with a name; the skeleton is hidden from assistive technology, so say what is loading elsewhere.</p>
+</section>
+
+<section id="regions">
+  <h2>Card and Panel</h2>
+  <div class="tiles">
+    <Card title="Deployments" subtitle="Last 24 hours" rank="lead">42 successful, 1 rolled back.</Card>
+    <Card title="Queue" interactive onclick={() => refreshes++}>Nothing waiting. Click to refresh.</Card>
+    <Card title="Archive" rank="support">Runs older than 90 days.</Card>
+    <Card title="Documentation" subtitle="docs.example.com" href="#regions">A link card: the whole card is the link.</Card>
+  </div>
+  <div class="panels">
+    <Panel title="Runners" region>
+      {#snippet actions()}
+        <Button emphasis="minimal" size="sm">Add runner</Button>
+      {/snippet}
+      <div class="banners">
+        <Card title="runner-01" tone="ok">Idle, last job 2 minutes ago.</Card>
+        <Note tone="warn">runner-02 has not reported for 5 minutes.</Note>
+      </div>
+    </Panel>
+    <Panel title="Artifacts">
+      <EmptyState title="No artifacts yet" description="Artifacts appear here after the first successful build.">
+        <Button emphasis="low" size="sm">Start a build</Button>
+      </EmptyState>
+    </Panel>
+  </div>
+  <pre class="state">{refreshes ? `refreshed the queue ${refreshes}×` : '—'}</pre>
+  <p class="hint">A card is an object on the page, a panel is a place. Rank sets the ground, the edge and the title size: lead, default, support. A region inside a region recedes. A tone tints only the ground.</p>
+</section>
+
+<section id="banners">
+  <h2>Banner and Note</h2>
+  <div class="banners">
+    {#if diskBanner}
+      <Banner tone="warn" title="Disk almost full" onDismiss={() => (diskBanner = false)}>
+        Old snapshots will be pruned tonight.
+        {#snippet actions()}
+          <Button emphasis="low" size="sm">Review</Button>
+        {/snippet}
+      </Banner>
+    {/if}
+    <Banner tone="error" title="Build failed" live="alert">3 tests failed on main.</Banner>
+    <Banner>Maintenance on Sunday, 02:00 UTC.</Banner>
+    <Note>Notes are asides: the bar only groups, the words carry the meaning.</Note>
+    <Note tone="error">Deleting a project cannot be undone.</Note>
+  </div>
+  <div class="row" style="margin-top: 12px">
+    <Button emphasis="minimal" onclick={() => (diskBanner = true)}>Show the banner again</Button>
+  </div>
+  <p class="hint">A banner is about the whole screen and can carry actions; whether closing one hides it is for the page to decide. A note is an aside. With live set to alert, a message is announced when it appears.</p>
 </section>
 
 <section>

@@ -6,6 +6,7 @@ import PopoverWithContent from './PopoverWithContent.svelte'
 import TooltipWithTrigger from './TooltipWithTrigger.svelte'
 import MenuWithTrigger from './MenuWithTrigger.svelte'
 import TabsWithPanels from './TabsWithPanels.svelte'
+import DisplayWithContent from './DisplayWithContent.svelte'
 import FieldsetWithGroup from './FieldsetWithGroup.svelte'
 import { type Adapter, type ButtonProps, type CheckboxProps, type Mounted, track } from '../harness'
 import { reactiveProps } from './svelte-props.svelte'
@@ -52,7 +53,7 @@ const withLabel = (p: Partial<CheckboxProps>) => {
 
 export const svelte: Adapter = {
   name: 'svelte',
-  supports: { controlled: true, refusal: false },
+  supports: { controlled: true, refusal: false, linkRoot: true },
 
   async act(interaction) {
     interaction()
@@ -92,6 +93,12 @@ export const svelte: Adapter = {
   avatarGroup: (props, target) => mountSvelte(AvatarGroup as Component<any>, props, target),
   spinner: (props, target) => mountSvelte(Spinner as Component<any>, props, target),
   skeleton: (props, target) => mountSvelte(Skeleton as Component<any>, props, target),
+  card: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'card' })),
+  panel: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'panel' })),
+  banner: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'banner' })),
+  note: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'note' })),
+  emptyState: (props, target) =>
+    mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'empty-state' })),
   // A Field's children are a snippet, and a raw snippet cannot render a
   // component, so a two-line wrapper composes the pair as an app would.
   field: (props, target) => mountSvelte(FieldWithControl as Component<any>, props, target),

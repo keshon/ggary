@@ -1,0 +1,80 @@
+/* ==========================================================================
+   GGarry — card and the region channel
+
+   A card is an object on the page; a panel (panel.css) is a place. Both read
+   one channel — ground, edge, title size and ink — which rank, tone, plain
+   and nesting set, so the two cannot drift apart. No shadow: a shadow means
+   floating and about to leave.
+
+   The tone map below is GGarry's one statement of what a tone looks like as a
+   ground; the banner and the note read it too.
+   ========================================================================== */
+
+[data-tone='neutral'] { --tone-ground: var(--ggarry-bg-subtle); --tone-ink: var(--ggarry-text-muted); }
+[data-tone='running'] { --tone-ground: var(--ggarry-bg-accent-subtle); --tone-ink: var(--ggarry-text-accent); }
+[data-tone='ok'] { --tone-ground: var(--ggarry-bg-success-subtle); --tone-ink: var(--ggarry-text-success); }
+[data-tone='warn'] { --tone-ground: var(--ggarry-bg-warning-subtle); --tone-ink: var(--ggarry-text-warning); }
+[data-tone='error'] { --tone-ground: var(--ggarry-bg-danger-subtle); --tone-ink: var(--ggarry-text-danger); }
+
+:where([data-scope='card'], [data-scope='panel'])[data-part='root'] {
+  --region-ground: var(--ggarry-bg-surface);
+  --region-edge: var(--ggarry-border-default);
+  --region-title-size: var(--ggarry-font-size-md);
+  --region-title-ink: var(--ggarry-text-default);
+}
+
+/* A region inside a region recedes rather than rises: white cannot get whiter. */
+/* The outer region is :where so nesting sits below rank, plain and tone. */
+:where([data-scope='card'], [data-scope='panel'])[data-part='root'] :is([data-scope='card'], [data-scope='panel'])[data-part='root'] {
+  --region-ground: var(--ggarry-bg-subtle);
+}
+
+:is([data-scope='card'], [data-scope='panel'])[data-part='root'][data-rank='lead'] {
+  --region-title-size: var(--ggarry-font-size-lg);
+}
+:is([data-scope='card'], [data-scope='panel'])[data-part='root'][data-rank='support'] {
+  --region-ground: var(--ggarry-bg-subtle);
+  --region-edge: transparent;
+  --region-title-size: var(--ggarry-font-size-sm);
+  --region-title-ink: var(--ggarry-text-muted);
+}
+:is([data-scope='card'], [data-scope='panel'])[data-part='root'][data-plain] {
+  --region-edge: transparent;
+}
+/* The tone is the ground only; the edge stays, one statement of one fact. */
+:is([data-scope='card'], [data-scope='panel'])[data-part='root'][data-tone] {
+  --region-ground: var(--tone-ground);
+}
+
+[data-scope='card'][data-part='root'] {
+  gap: var(--ggarry-space-3);
+  padding: var(--ggarry-space-5);
+  background: var(--region-ground);
+  border: 1px solid var(--region-edge);
+  border-radius: var(--ggarry-radius-lg);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  line-height: 1.5;
+}
+
+[data-scope='card'][data-part='root'][data-interactive] {
+  cursor: pointer;
+  transition: border-color var(--ggarry-duration-fast) ease, background-color var(--ggarry-duration-fast) ease;
+}
+[data-scope='card'][data-part='root'][data-interactive]:hover {
+  border-color: var(--ggarry-border-strong);
+}
+
+[data-scope='card'][data-part='title'] {
+  font-size: var(--region-title-size);
+  font-weight: var(--ggarry-font-weight-semibold);
+  color: var(--region-title-ink);
+  line-height: 1.35;
+}
+
+[data-scope='card'][data-part='subtitle'] {
+  margin-block-start: 2px;
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-muted);
+}

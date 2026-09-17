@@ -26,6 +26,11 @@ import {
   type AvatarGroupProps,
   type SpinnerProps,
   type SkeletonProps,
+  type CardProps,
+  type PanelProps,
+  type BannerProps,
+  type NoteProps,
+  type EmptyStateProps,
   track,
 } from '../harness'
 
@@ -199,7 +204,7 @@ function applyButton(host: HTMLElement, props: Partial<ButtonProps>) {
 
 export const elements: Adapter = {
   name: 'elements',
-  supports: { controlled: false, refusal: false },
+  supports: { controlled: false, refusal: false, linkRoot: false },
 
   async act(interaction) {
     interaction()
@@ -478,6 +483,114 @@ export const elements: Adapter = {
     apply(props)
     target.append(host)
     return track({ root: host, update: async (patch) => apply(patch), unmount: async () => host.remove() } satisfies Mounted<SkeletonProps>)
+  },
+
+  async card(props, target) {
+    const host = document.createElement('gg-card')
+    host.textContent = 'Body'
+    const apply = (p: Partial<CardProps>) => {
+      if ('title' in p) setAttr(host, 'heading', p.title)
+      if ('subtitle' in p) setAttr(host, 'subtitle', p.subtitle)
+      if ('headingLevel' in p) setAttr(host, 'heading-level', p.headingLevel)
+      if ('interactive' in p) setAttr(host, 'interactive', p.interactive)
+      if ('plain' in p) setAttr(host, 'plain', p.plain)
+      if ('rank' in p) setAttr(host, 'rank', p.rank)
+      if ('tone' in p) setAttr(host, 'tone', p.tone)
+    }
+    apply(props)
+    target.append(host)
+    return track({ root: host, update: async (patch) => apply(patch), unmount: async () => host.remove() } satisfies Mounted<CardProps>)
+  },
+
+  async panel(props, target) {
+    const host = document.createElement('gg-panel')
+    if (props.actions) {
+      const refresh = document.createElement('button')
+      refresh.type = 'button'
+      refresh.slot = 'actions'
+      refresh.textContent = 'Refresh'
+      host.append(refresh)
+    }
+    host.append('Body')
+    const apply = (p: Partial<PanelProps>) => {
+      if ('title' in p) setAttr(host, 'heading', p.title)
+      if ('headingLevel' in p) setAttr(host, 'heading-level', p.headingLevel)
+      if ('body' in p) setAttr(host, 'body', p.body)
+      if ('plain' in p) setAttr(host, 'plain', p.plain)
+      if ('rank' in p) setAttr(host, 'rank', p.rank)
+      if ('tone' in p) setAttr(host, 'tone', p.tone)
+      if ('region' in p) setAttr(host, 'region', p.region)
+      if ('scrollable' in p) setAttr(host, 'scrollable', p.scrollable)
+    }
+    apply(props)
+    target.append(host)
+    return track({ root: host, update: async (patch) => apply(patch), unmount: async () => host.remove() } satisfies Mounted<PanelProps>)
+  },
+
+  async banner(props, target) {
+    const host = document.createElement('gg-banner')
+    if (props.text !== undefined) host.append(props.text)
+    if (props.actions) {
+      const renew = document.createElement('button')
+      renew.type = 'button'
+      renew.slot = 'actions'
+      renew.textContent = 'Renew'
+      host.append(renew)
+    }
+    let current = props
+    const apply = (p: Partial<BannerProps>) => {
+      if ('tone' in p) setAttr(host, 'tone', p.tone)
+      if ('title' in p) setAttr(host, 'heading', p.title)
+      if ('live' in p) setAttr(host, 'live', p.live)
+      if ('dismissLabel' in p) setAttr(host, 'dismiss-label', p.dismissLabel)
+      if ('onDismiss' in p) setAttr(host, 'dismissible', !!p.onDismiss)
+    }
+    // The owner decides what closing means, as React and Svelte owners do: the element does not hide itself.
+    host.addEventListener('dismiss', (event) => {
+      event.preventDefault()
+      current.onDismiss?.()
+    })
+    apply(props)
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => {
+        current = { ...current, ...patch }
+        apply(patch)
+      },
+      unmount: async () => host.remove(),
+    } satisfies Mounted<BannerProps>)
+  },
+
+  async note(props, target) {
+    const host = document.createElement('gg-note')
+    host.append(props.text)
+    const apply = (p: Partial<NoteProps>) => {
+      if ('tone' in p) setAttr(host, 'tone', p.tone)
+      if ('live' in p) setAttr(host, 'live', p.live)
+    }
+    apply(props)
+    target.append(host)
+    return track({ root: host, update: async (patch) => apply(patch), unmount: async () => host.remove() } satisfies Mounted<NoteProps>)
+  },
+
+  async emptyState(props, target) {
+    const host = document.createElement('gg-empty-state')
+    if (props.action !== undefined) {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.textContent = props.action
+      host.append(button)
+    }
+    const apply = (p: Partial<EmptyStateProps>) => {
+      if ('title' in p) setAttr(host, 'heading', p.title)
+      if ('description' in p) setAttr(host, 'description', p.description)
+      if ('headingLevel' in p) setAttr(host, 'heading-level', p.headingLevel)
+      if ('live' in p) setAttr(host, 'live', p.live)
+    }
+    apply(props)
+    target.append(host)
+    return track({ root: host, update: async (patch) => apply(patch), unmount: async () => host.remove() } satisfies Mounted<EmptyStateProps>)
   },
 
   async toaster(props, target) {

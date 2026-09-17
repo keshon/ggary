@@ -1,0 +1,23 @@
+/* ==========================================================================
+   GGarry — note
+
+   An aside: a bar at the leading edge and, with a tone, an icon. The bar only
+   groups; the icon and the words carry the meaning.
+   ========================================================================== */
+
+[data-scope='note'][data-part='root'] {
+  gap: var(--ggarry-space-3);
+  padding: var(--ggarry-space-2) var(--ggarry-space-4);
+  border-inline-start: 3px solid var(--tone-ink, var(--ggarry-border-strong));
+  color: var(--ggarry-text-muted);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  line-height: 1.5;
+}
+
+[data-scope='note'][data-part='icon'] {
+  inline-size: 16px;
+  block-size: 16px;
+  margin-block-start: calc((1lh - 16px) / 2);
+  color: var(--tone-ink);
+}

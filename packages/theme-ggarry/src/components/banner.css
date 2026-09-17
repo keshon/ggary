@@ -1,0 +1,68 @@
+/* ==========================================================================
+   GGarry — banner
+
+   A message about the whole screen: a ground in its tone, an edge, an icon in
+   the tone's ink, and room for an action. The tone map is card.css's.
+   ========================================================================== */
+
+/* A tone belongs to the element that states it: an untoned banner or note in a
+   toned card must not wear the card's tone. */
+:is([data-scope='banner'], [data-scope='note'])[data-part='root']:not([data-tone]) {
+  --tone-ink: initial;
+  --tone-ground: initial;
+  --tone-bg: initial;
+}
+
+[data-scope='banner'][data-part='root'] {
+  gap: var(--ggarry-space-3);
+  padding: var(--ggarry-space-3) var(--ggarry-space-3) var(--ggarry-space-3) var(--ggarry-space-4);
+  background: var(--tone-ground, var(--ggarry-bg-subtle));
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-md);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  line-height: 1.5;
+}
+
+[data-scope='banner'][data-part='icon'] {
+  inline-size: 18px;
+  block-size: 18px;
+  margin-block-start: calc((1lh - 18px) / 2);
+  color: var(--tone-ink, var(--ggarry-text-muted));
+}
+
+[data-scope='banner']:is([data-part='title'], [data-part='text']) {
+  max-inline-size: 75ch;
+}
+
+[data-scope='banner'][data-part='title'] {
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+
+/* Default ink: muted misses 4.5:1 on the running and error grounds, and GGarry
+   has no tier between; the semibold title carries the hierarchy. */
+[data-scope='banner'][data-part='text'] {
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-sm);
+}
+
+[data-scope='banner'][data-part='actions'] {
+  gap: var(--ggarry-space-2);
+  align-self: center;
+}
+
+[data-scope='banner'][data-part='close'] {
+  inline-size: 24px;
+  block-size: 24px;
+  border-radius: var(--ggarry-radius-md);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='banner'][data-part='close']:hover {
+  background: color-mix(in oklab, var(--ggarry-text-default) 8%, transparent);
+  color: var(--ggarry-text-default);
+}
+[data-scope='banner'][data-part='close-icon'] {
+  inline-size: 14px;
+  block-size: 14px;
+}

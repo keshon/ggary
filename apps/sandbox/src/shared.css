@@ -70,6 +70,10 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
 
 .stack { display: grid; gap: 10px; justify-items: start; margin-top: 16px; }
 .nested { display: grid; gap: 10px; justify-items: start; padding-inline-start: 26px; }
+/* Display demos: tiles of cards and a pair of panels. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
+.panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 16px; }
+.banners { display: grid; gap: 12px; }
 .choices { display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: flex-start; }
 
 /* Stacks of fields and groups take the theme's group rhythm, from the public contract. */

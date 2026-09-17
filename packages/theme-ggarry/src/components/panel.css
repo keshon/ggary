@@ -1,0 +1,42 @@
+/* ==========================================================================
+   GGarry — panel
+
+   A named region of the application. The title is a label on the content,
+   not a heading over a compartment: no rule under the header, and it stands
+   one inset above the body. The region channel is card.css's.
+   ========================================================================== */
+
+[data-scope='panel'][data-part='root'] {
+  background: var(--region-ground);
+  border: 1px solid var(--region-edge);
+  border-radius: var(--ggarry-radius-lg);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  line-height: 1.5;
+}
+
+[data-scope='panel'][data-part='header'] {
+  gap: var(--ggarry-space-3);
+  /* A small control's height below the inset, so headers with and without actions line up. */
+  min-block-size: calc(var(--ggarry-size-control-sm) + var(--ggarry-space-3));
+  padding: var(--ggarry-space-3) var(--ggarry-space-4) 0;
+}
+
+/* A step under the data it names; rank moves it (card.css). */
+[data-scope='panel'][data-part='title'] {
+  font-size: calc(var(--region-title-size) - 1px);
+  font-weight: var(--ggarry-font-weight-semibold);
+  color: var(--region-title-ink);
+  line-height: 1.35;
+}
+
+[data-scope='panel'][data-part='actions'] {
+  gap: var(--ggarry-space-1);
+}
+
+[data-scope='panel'][data-part='body'] {
+  padding: var(--ggarry-space-4);
+}
+[data-scope='panel'][data-part='body'][data-body='flush'] { padding: 0; }
+[data-scope='panel'][data-part='body'][data-body='list'] { padding: var(--ggarry-space-2) 0; }

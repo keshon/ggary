@@ -2,8 +2,8 @@ import './theme'
 import './shared.css'
 import '@ggary/elements'
 import { toast } from '@ggary/elements'
-import type { GgCheckboxElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
-import { toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import type { GgAvatarGroupElement, GgCheckboxElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
+import { badgeTones, people, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
 
@@ -423,6 +423,71 @@ app.innerHTML = `
     <p class="hint">A menu button: arrows walk every item, disabled ones too, and wrap; a letter jumps to an item; Enter or a click chooses. The view menu stays open while you toggle: the page owns the state and passes new items back.</p>
   </section>
 
+  <section id="display">
+    <h2>Badge, Avatar, Spinner and Skeleton</h2>
+    <div class="row" style="align-items: center">
+      ${badgeTones.map(({ tone, label }) => `<gg-badge tone="${tone}">${label}</gg-badge>`).join('')}
+      <gg-badge variant="outline">v2.4</gg-badge>
+      <gg-badge variant="count" tone="running">12</gg-badge>
+    </div>
+    <div class="row" style="align-items: center; margin-top: 16px">
+      <gg-avatar name="Ada Lovelace" size="sm"></gg-avatar>
+      <gg-avatar name="Alan Turing"></gg-avatar>
+      <gg-avatar name="Grace Hopper" size="lg"></gg-avatar>
+      <gg-avatar-group id="team" label="Reviewers" max="3"></gg-avatar-group>
+      <gg-spinner label="Loading runs" size="sm"></gg-spinner>
+      <gg-spinner label="Loading runs"></gg-spinner>
+      <gg-spinner label="Loading runs" size="lg"></gg-spinner>
+    </div>
+    <div class="tiles">
+      <gg-card heading="Loading…"><gg-skeleton title lines="3"></gg-skeleton></gg-card>
+    </div>
+    <p class="hint">Badges state a status in words, never colour alone. An avatar shows initials until its picture has loaded, and keeps them if it fails. The spinner is a status with a name; the skeleton is hidden from assistive technology, so say what is loading elsewhere.</p>
+  </section>
+
+  <section id="regions">
+    <h2>Card and Panel</h2>
+    <div class="tiles">
+      <gg-card heading="Deployments" subtitle="Last 24 hours" rank="lead">42 successful, 1 rolled back.</gg-card>
+      <gg-card id="queue-card" heading="Queue" interactive>Nothing waiting. Click to refresh.</gg-card>
+      <gg-card heading="Archive" rank="support">Runs older than 90 days.</gg-card>
+    </div>
+    <div class="panels">
+      <gg-panel heading="Runners" region>
+        <gg-button slot="actions" emphasis="minimal" size="sm"><button>Add runner</button></gg-button>
+        <div class="banners">
+          <gg-card heading="runner-01" tone="ok">Idle, last job 2 minutes ago.</gg-card>
+          <gg-note tone="warn">runner-02 has not reported for 5 minutes.</gg-note>
+        </div>
+      </gg-panel>
+      <gg-panel heading="Artifacts">
+        <gg-empty-state heading="No artifacts yet" description="Artifacts appear here after the first successful build.">
+          <gg-button emphasis="low" size="sm"><button>Start a build</button></gg-button>
+        </gg-empty-state>
+      </gg-panel>
+    </div>
+    <pre class="state" id="regions-state">—</pre>
+    <p class="hint">A card is an object on the page, a panel is a place. Rank sets the ground, the edge and the title size: lead, default, support. A region inside a region recedes. A tone tints only the ground. Link cards are React and Svelte only: an element cannot become an anchor.</p>
+  </section>
+
+  <section id="banners">
+    <h2>Banner and Note</h2>
+    <div class="banners">
+      <gg-banner id="disk-banner" tone="warn" heading="Disk almost full" dismissible>
+        Old snapshots will be pruned tonight.
+        <gg-button slot="actions" emphasis="low" size="sm"><button>Review</button></gg-button>
+      </gg-banner>
+      <gg-banner tone="error" heading="Build failed" live="alert">3 tests failed on main.</gg-banner>
+      <gg-banner>Maintenance on Sunday, 02:00 UTC.</gg-banner>
+      <gg-note>Notes are asides: the bar only groups, the words carry the meaning.</gg-note>
+      <gg-note tone="error">Deleting a project cannot be undone.</gg-note>
+    </div>
+    <div class="row" style="margin-top: 12px">
+      <gg-button emphasis="minimal"><button id="banner-restore">Show the banner again</button></gg-button>
+    </div>
+    <p class="hint">A banner is about the whole screen and can carry actions; whether closing one hides it is for the page to decide. A note is an aside. With live set to alert, a message is announced when it appears.</p>
+  </section>
+
   <section>
     <h2>Native form participation</h2>
     <form class="demo" id="demo-form">
@@ -639,3 +704,13 @@ document.getElementById('toast-saving')!.addEventListener('click', () => {
 document.getElementById('toast-undo')!.addEventListener('click', () => {
   toast({ title: 'Task deleted', action: { label: 'Undo', onClick: () => toast({ title: 'Task restored' }) } })
 })
+
+// --- display -----------------------------------------------------------------------
+;(document.getElementById('team') as GgAvatarGroupElement).people = people
+let refreshes = 0
+document.getElementById('queue-card')!.addEventListener('click', () => {
+  document.getElementById('regions-state')!.textContent = `refreshed the queue ${++refreshes}×`
+})
+// Unprevented, a dismissed banner hides itself; showing it again is the page's.
+const diskBanner = document.getElementById('disk-banner')!
+document.getElementById('banner-restore')!.addEventListener('click', () => diskBanner.removeAttribute('hidden'))

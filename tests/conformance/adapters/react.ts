@@ -20,6 +20,11 @@ import {
   Tabs,
   Toaster,
   Avatar,
+  Banner,
+  Card,
+  EmptyState,
+  Note,
+  Panel,
   AvatarGroup,
   Badge,
   Skeleton,
@@ -81,7 +86,7 @@ async function mount<P extends object>(
 
 export const react: Adapter = {
   name: 'react',
-  supports: { controlled: true, refusal: true },
+  supports: { controlled: true, refusal: true, linkRoot: true },
 
   async act(interaction) {
     await act(async () => interaction())
@@ -140,6 +145,23 @@ export const react: Adapter = {
   avatarGroup: (props, target) => mount(AvatarGroup, props, target),
   spinner: (props, target) => mount(Spinner, props, target),
   skeleton: (props, target) => mount(Skeleton, props, target),
+  card: (props, target) => mount(Card, props, target, (p) => [p, 'Body']),
+  panel: (props, target) =>
+    mount(Panel, props, target, ({ actions, ...rest }: { actions?: boolean }) => [
+      { ...rest, actions: actions ? createElement('button', { type: 'button' }, 'Refresh') : undefined },
+      'Body',
+    ]),
+  banner: (props, target) =>
+    mount(Banner, props, target, ({ text, actions, ...rest }: { text?: string; actions?: boolean }) => [
+      { ...rest, actions: actions ? createElement('button', { type: 'button' }, 'Renew') : undefined },
+      ...(text === undefined ? [] : [text]),
+    ]),
+  note: (props, target) => mount(Note, props, target, ({ text, ...rest }: { text: string }) => [rest, text]),
+  emptyState: (props, target) =>
+    mount(EmptyState, props, target, ({ action, ...rest }: { action?: string }) => [
+      rest,
+      ...(action === undefined ? [] : [createElement('button', { type: 'button' }, action)]),
+    ]),
   tabs: (props, target) =>
     mount(Tabs, props, target, ({ panels = true, ...rest }: TabsProps) => [
       panels ? { ...rest, children: (item: { label: string }) => `Panel ${item.label}` } : rest,

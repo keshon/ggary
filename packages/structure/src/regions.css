@@ -1,0 +1,119 @@
+/* Card, panel, banner, note and empty state: the layout each needs whatever the
+   theme. A panel is an inline-size container named `panel`, so what is inside
+   answers to the panel's width; it clips to its corner, so anything that pops
+   up from it must use the top layer — every overlay in this kit does. */
+
+[data-scope='card'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='card'][data-part='root'][data-link] {
+  color: inherit;
+  text-decoration: none;
+}
+[data-scope='card'][data-part='title'],
+[data-scope='card'][data-part='subtitle'] {
+  margin: 0;
+}
+
+[data-scope='panel'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow: hidden;
+  container: panel / inline-size;
+}
+[data-scope='panel'][data-part='header'] {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+[data-scope='panel'][data-part='header'][hidden] {
+  display: none;
+}
+/* The title takes the free space, so the actions sit at the end: a theme's
+   reset may zero margins, which would lose an auto margin. */
+[data-scope='panel'][data-part='title'] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  margin: 0;
+}
+[data-scope='panel'][data-part='actions'] {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+[data-scope='panel'][data-part='body'] {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow: auto;
+}
+
+[data-scope='banner'][data-part='root'] {
+  display: flex;
+  align-items: flex-start;
+}
+[data-scope='banner'][data-part='root'][hidden] {
+  display: none;
+}
+[data-scope='banner'][data-part='body'] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+[data-scope='banner'][data-part='title'] {
+  margin: 0;
+}
+[data-scope='banner'][data-part='actions'] {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-inline-start: auto;
+}
+[data-scope='banner'][data-part='close'] {
+  appearance: none;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+[data-scope='banner'][data-part='icon'],
+[data-scope='note'][data-part='icon'] {
+  flex: none;
+}
+
+[data-scope='note'][data-part='root'] {
+  display: flex;
+  align-items: flex-start;
+}
+[data-scope='note'][data-part='body'] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+[data-scope='empty-state'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+[data-scope='empty-state'][data-part='title'],
+[data-scope='empty-state'][data-part='description'] {
+  margin: 0;
+}
+[data-scope='empty-state'][data-part='actions'] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media print {
+  [data-scope='banner'][data-part='root'],
+  [data-scope='note'][data-part='root'] { break-inside: avoid; }
+}

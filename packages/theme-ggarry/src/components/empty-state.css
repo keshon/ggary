@@ -1,0 +1,31 @@
+/* ==========================================================================
+   GGarry — empty state
+
+   Why it is empty and what to do next, centred in the space it fills. No
+   illustration: the meaning is in the words.
+   ========================================================================== */
+
+[data-scope='empty-state'][data-part='root'] {
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-8) var(--ggarry-space-6);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  line-height: 1.5;
+}
+
+[data-scope='empty-state'][data-part='title'] {
+  font-size: var(--ggarry-font-size-md);
+  font-weight: var(--ggarry-font-weight-semibold);
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='empty-state'][data-part='description'] {
+  max-inline-size: 44ch;
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='empty-state'][data-part='actions'] {
+  gap: var(--ggarry-space-2);
+  margin-block-start: var(--ggarry-space-2);
+}

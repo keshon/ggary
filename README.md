@@ -2,9 +2,11 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Twenty components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
+Thirty components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
 Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Tabs, Dialog, Sheet,
-Popover, Tooltip, Toast, Menu and Menubar — built end to end to prove the architecture holds.
+Popover, Tooltip, Toast, Menu, Menubar, Badge, Avatar, AvatarGroup, Spinner,
+Skeleton, Card, Panel, Banner, Note and EmptyState — built end to end to prove the
+architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -14,7 +16,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 1707 tests, 675 of them in headless Chrome
+npm test         # 1915 tests, 756 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -38,10 +40,14 @@ packages/
   elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>,
                      <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>, <gg-dialog>, <gg-sheet>,
                      <gg-popover>, <gg-tooltip>, <gg-menu>, <gg-menubar>, <gg-fieldset>,
-                     <gg-checkbox-group>, <gg-tabs>, <gg-toaster>
+                     <gg-checkbox-group>, <gg-tabs>, <gg-toaster>, <gg-badge>, <gg-avatar>,
+                     <gg-avatar-group>, <gg-spinner>, <gg-skeleton>, <gg-card>, <gg-panel>,
+                     <gg-banner>, <gg-note>, <gg-empty-state>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
                      <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Sheet>, <Popover>, <Tooltip>,
-                     <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>, <Tabs>, <Toaster>
+                     <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>, <Tabs>, <Toaster>,
+                     <Badge>, <Avatar>, <AvatarGroup>, <Spinner>, <Skeleton>, <Card>,
+                     <Panel>, <Banner>, <Note>, <EmptyState>
   svelte/            the same components as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
@@ -859,6 +865,92 @@ Found on the way:
 - **A closing menu handing focus to its own bar item** looked like the user moving
   the tab stop. While a menu is open the bar ignores focus arriving on its items.
 
+## Display components
+
+Nine components that show things rather than take input: Badge, Avatar and
+AvatarGroup, Spinner, Skeleton, Card, Panel, Banner, Note and EmptyState. None has a
+machine. Each is a `connect(props, normalize)` in core, like Button and Chip, so the
+three adapters are thin. They are still real components in every adapter, not CSS
+recipes: the roles, the heading levels, the icons and the live regions come from
+core, and the conformance suite checks them under all three adapters.
+
+```tsx
+<Badge tone="ok">Passed</Badge>
+<AvatarGroup label="Reviewers" people={people} max={3} />
+<Spinner label="Loading runs" />
+<Panel title="Runners" region actions={<Button size="sm">Add runner</Button>}>
+  <Card title="runner-01" tone="ok">Idle</Card>
+  <Note tone="warn">runner-02 has not reported for 5 minutes.</Note>
+</Panel>
+<Banner tone="error" title="Build failed" live="alert" onDismiss={hide}>3 tests failed.</Banner>
+<EmptyState title="No artifacts yet" description="They appear after the first build." />
+```
+
+```html
+<gg-panel heading="Runners" region>
+  <gg-button slot="actions" size="sm"><button>Add runner</button></gg-button>
+  <gg-card heading="runner-01" tone="ok">Idle</gg-card>
+</gg-panel>
+<gg-banner tone="warn" heading="Disk almost full" dismissible>Old snapshots are pruned tonight.</gg-banner>
+```
+
+Elements take `heading`, not `title`: `title` is a global HTML attribute, and it would
+show as a tooltip on the whole host.
+
+Status tones are shared vocabulary in core (`utils/tone.ts`): `neutral · running ·
+ok · warn · error`, and the glyph for each. Toast, Badge, Banner and Note all read
+it, so a warning looks the same wherever it is said.
+
+- **Badge.** A status in words. The dot is decoration and hidden from assistive
+  technology, and the label alone must carry the meaning. Variants: `solid`
+  (a subtle plate), `outline`, and `count`. A running badge's dot pulses.
+- **Avatar.** The initials are drawn first, and the picture covers them once it has
+  loaded. A picture that fails is removed, so there is never a broken image. The
+  avatar is `role="img"` named by the person, unless `decorative` is set because the
+  name is already next to it. A browser test loads a real image and a broken one.
+  **AvatarGroup** is a named group that shows `max` people and a `+N` for the rest.
+- **Spinner** is `role="status"` with a name: "Loading" unless `label` says what is
+  loading. **Skeleton** is hidden from assistive technology, so the page has to
+  say what is loading somewhere else. Reduced motion slows both and does not stop
+  them: an indicator that stops looks like a hang.
+- **Card and Panel** share one channel of four values: ground, edge, title size and
+  title ink. `rank` (`lead`, default, `support`), `plain`, `tone` and nesting set those
+  values. A card is an object on the page: its title is an `h3` by default, and with
+  `href` the whole card is an `<a>`. A panel is a place: an `h2`, `actions` at the end
+  of the header, and a body that is `padded`, `flush` or `list`. `region` makes it a
+  landmark named by its title. `scrollable` makes the body a named group you can
+  reach with Tab, so a keyboard can scroll it. A panel is an inline-size container
+  (`container: panel`), so its content can respond to the panel's width. A region
+  inside a region recedes rather than rises. A tone tints the ground only; the edge
+  stays.
+- **Banner** is a message about the whole screen: a tone icon, a title, text and
+  actions. `live="alert"` makes it `role="alert"`, and `live="polite"` makes it
+  `role="status"`. Without `live` it is silent, which is right for a banner the page
+  already had when it loaded. Closing is the owner's decision. In React and Svelte,
+  `onDismiss` asks and the page removes the banner. `<gg-banner>` fires a cancelable
+  `dismiss` event, and hides itself unless the event is prevented.
+- **Note** is an aside with a bar at its leading edge. A toned note also carries the
+  tone's icon, so warn and error never differ by colour alone.
+- **EmptyState** says why a space is empty and what to do next. Its title is a
+  paragraph unless `headingLevel` is set: an empty list is rarely a document section.
+
+Found on the way:
+
+- **Muted text missed 4.5:1 on GGarry's tinted grounds.** It measured 4.36:1 on the
+  running banner and 4.35:1 on the error banner. GGarry has no text tier between
+  muted and default, so banner text uses the default colour and the semibold title
+  carries the hierarchy. Instrument has a secondary tier and keeps it.
+- **A toned card inside a panel lost its tone.** The rule for nested regions had
+  more specificity than the tone rule. The outer region is now matched with
+  `:where`, so nesting ranks below rank, plain and tone.
+- **An untoned note inside a toned card would wear the card's tone.** Tones are
+  custom properties, and custom properties inherit. A banner or note without a tone
+  resets them.
+- **Instrument's reset zeroes margins** after structure, so an auto margin cannot
+  push a panel's actions to the end of the header. The title takes the free space
+  instead. The banner's 75ch measure moved from its body to its lines, so the body
+  still fills the row and the actions sit at its end.
+
 ## Layering inside core
 
 ```
@@ -1064,18 +1156,19 @@ one needs JS anyway; the children themselves stay the author's.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 185 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers. |
-| contract | node | `icons.contract.test.ts` | 127 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `icons.contract.test.ts` | 176 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 636 tests. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 714 tests, 16 of them skipped where an adapter cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 636 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 714 tests, 13 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
 | browser | Chrome | `tabs.browser.test.ts` | 4 tests. One tab stop under the real Tab key, vertical tabs beside their panel, a long strip scrolling to the focused tab, a real click closing a tab without losing focus. |
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
+| browser | Chrome | `display.browser.test.ts` | 3 tests. An avatar's picture really loading over the initials, a broken one removed, and a picture not drawn while it loads. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 | dom | jsdom | `svelte-bind.dom.test.ts` | 3 tests. `bind:value` on Select, ChipGroup, RadioGroup and CheckboxGroup writes back to the owner and follows it. |
 
@@ -1177,10 +1270,22 @@ Real, and deliberately left open:
 - **Platform close requests** (a back gesture) are cancelled through the `cancel`
   event, which browsers may refuse to let a page cancel without recent user
   activation; the dialog then closes natively and reports `native`.
-- **Not ported from Instrument:** everything beyond these twenty components —
+- **Not ported from Instrument:** everything beyond these thirty components —
   prose, the rest of forms (number field, slider, choice cards), tables,
   the agent components (including the composer, a textarea with a toolbar in one
   frame) and print styles.
+- **Instrument's Tag is Chip.** A static chip is a tag, so there is no separate
+  component.
+- **`<gg-card>` cannot be a link card.** A custom element cannot become an `<a>`.
+  Put the link inside the card, or use React or Svelte, where `href` renders the
+  card as an anchor. The conformance test for link cards skips the elements adapter
+  and says why.
+- **A dismissed banner is hidden in elements, and removed in React and Svelte.**
+  An element cannot remove itself from markup that someone else owns. It sets
+  `hidden` unless the `dismiss` event is prevented.
+- **Instrument's support rank uses `--surface-recessed`.** The port has no separate
+  support film token for the region channel, and a nested region takes the same
+  recess.
 - **`onValueChange` fires when the user re-picks the already-selected value.**
   Intent semantics, not value-diff semantics. Correct for controlled components,
   mildly surprising otherwise.

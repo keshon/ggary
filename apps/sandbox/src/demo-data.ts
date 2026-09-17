@@ -209,6 +209,23 @@ export const openFiles: TabItem[] = [
 let untitled = 0
 export const newFile = (): TabItem => ({ value: `untitled-${++untitled}`, label: `untitled-${untitled}.css`, closable: true, modified: true })
 
+/** People for the avatar group, the same on every page. Pictures are left out on purpose: the initials are the demo. */
+export const people = [
+  { name: 'Ada Lovelace' },
+  { name: 'Alan Turing' },
+  { name: 'Grace Hopper' },
+  { name: 'Edsger Dijkstra' },
+  { name: 'Barbara Liskov' },
+]
+
+export const badgeTones = [
+  { tone: 'neutral', label: 'Draft' },
+  { tone: 'running', label: 'Running' },
+  { tone: 'ok', label: 'Passed' },
+  { tone: 'warn', label: 'Flaky' },
+  { tone: 'error', label: 'Failed' },
+] as const
+
 /** The toasts the demo buttons show, the same on every page. */
 export const toastDemos = {
   queued: { tone: 'ok', title: 'The run is queued', text: 'worldbox-1 · seventh in the queue' },
