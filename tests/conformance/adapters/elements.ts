@@ -1,5 +1,5 @@
 import '../../../packages/elements/src/index'
-import type { GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
+import type { GgAvatarGroupElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
 import {
   type Adapter,
   type ButtonProps,
@@ -21,6 +21,11 @@ import {
   type MenubarProps,
   type TabsProps,
   type ToasterProps,
+  type BadgeProps,
+  type AvatarProps,
+  type AvatarGroupProps,
+  type SpinnerProps,
+  type SkeletonProps,
   track,
 } from '../harness'
 
@@ -409,6 +414,70 @@ export const elements: Adapter = {
       update: async (patch) => applyPopoverHost(host, patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<PopoverProps>)
+  },
+
+  async badge(props, target) {
+    const host = document.createElement('gg-badge')
+    const apply = (p: Partial<BadgeProps>) => {
+      if ('label' in p) host.textContent = p.label!
+      if ('tone' in p) setAttr(host, 'tone', p.tone)
+      if ('variant' in p) setAttr(host, 'variant', p.variant)
+      if ('dot' in p) {
+        setAttr(host, 'dot', p.dot === true)
+        setAttr(host, 'no-dot', p.dot === false)
+      }
+    }
+    apply(props)
+    target.append(host)
+    return track({ root: host, update: async (patch) => apply(patch), unmount: async () => host.remove() } satisfies Mounted<BadgeProps>)
+  },
+
+  async avatar(props, target) {
+    const host = document.createElement('gg-avatar')
+    const apply = (p: Partial<AvatarProps>) => {
+      if ('name' in p) setAttr(host, 'name', p.name)
+      if ('src' in p) setAttr(host, 'src', p.src)
+      if ('size' in p) setAttr(host, 'size', p.size)
+      if ('decorative' in p) setAttr(host, 'decorative', p.decorative)
+    }
+    apply(props)
+    target.append(host)
+    return track({ root: host, update: async (patch) => apply(patch), unmount: async () => host.remove() } satisfies Mounted<AvatarProps>)
+  },
+
+  async avatarGroup(props, target) {
+    const host = document.createElement('gg-avatar-group') as GgAvatarGroupElement
+    const apply = (p: Partial<AvatarGroupProps>) => {
+      if ('label' in p) setAttr(host, 'label', p.label)
+      if ('max' in p) setAttr(host, 'max', p.max)
+      if ('size' in p) setAttr(host, 'size', p.size)
+      if ('people' in p) host.people = p.people!
+    }
+    apply(props)
+    target.append(host)
+    return track({ root: host, update: async (patch) => apply(patch), unmount: async () => host.remove() } satisfies Mounted<AvatarGroupProps>)
+  },
+
+  async spinner(props, target) {
+    const host = document.createElement('gg-spinner')
+    const apply = (p: Partial<SpinnerProps>) => {
+      if ('label' in p) setAttr(host, 'label', p.label)
+      if ('size' in p) setAttr(host, 'size', p.size)
+    }
+    apply(props)
+    target.append(host)
+    return track({ root: host, update: async (patch) => apply(patch), unmount: async () => host.remove() } satisfies Mounted<SpinnerProps>)
+  },
+
+  async skeleton(props, target) {
+    const host = document.createElement('gg-skeleton')
+    const apply = (p: Partial<SkeletonProps>) => {
+      if ('lines' in p) setAttr(host, 'lines', p.lines)
+      if ('title' in p) setAttr(host, 'title', p.title)
+    }
+    apply(props)
+    target.append(host)
+    return track({ root: host, update: async (patch) => apply(patch), unmount: async () => host.remove() } satisfies Mounted<SkeletonProps>)
   },
 
   async toaster(props, target) {

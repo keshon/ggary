@@ -47,6 +47,17 @@ const pairs: Pair[] = [
   { label: 'danger: text on canvas', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-canvas'], min: TEXT },
   // Menu rows. The highlighted row reuses the accent and danger fills above.
   { label: 'menu: shortcut on surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'badge: neutral word on its plate', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'badge: running word on its plate', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-accent-subtle'], min: TEXT },
+  { label: 'badge: ok word on its plate', fg: '--ggarry-text-success', bg: ['--ggarry-bg-success-subtle'], min: TEXT },
+  { label: 'badge: warn word on its plate', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-warning-subtle'], min: TEXT },
+  { label: 'badge: error word on its plate', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-danger-subtle'], min: TEXT },
+  { label: 'badge: count on its fill', fg: '--ggarry-text-on-accent', bg: ['--ggarry-bg-accent'], min: TEXT },
+  { label: 'badge: plain dot on its plate', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: LARGE },
+  { label: 'avatar: initials on the disc', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  // The arc against the surface, not the track: the arc says busy, the track only draws the circle.
+  { label: 'spinner: arc on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'skeleton: bar off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
   { label: 'toast: detail text on the surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'toast: action on the surface', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'toast: action on its hover tint', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface', '--ggarry-bg-accent-subtle'], min: TEXT },

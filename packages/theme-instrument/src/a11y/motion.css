@@ -19,4 +19,7 @@
   }
 
   [data-scope='button'][data-part='root'][aria-busy='true']::after { animation-duration: 2.4s; }
+  [data-scope='spinner'][data-part='arc'] { animation-duration: 2.4s; }
+  [data-scope='skeleton'][data-part='bar'] { animation-duration: 3s; }
+  [data-scope='badge'][data-part='root'][data-tone='running'] > [data-part='dot'] { animation-duration: 3.2s; }
 }

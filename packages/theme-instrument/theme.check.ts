@@ -123,6 +123,13 @@ const pairs: Pair[] = [
   { label: 'menu: dangerous item highlighted', fg: '--err-text', bg: ['--surface-overlay', '--err-bg'], min: text },
   { label: 'menu: item highlighted', fg: '--text-primary', bg: ['--surface-overlay', '--surface-hover'], min: text },
   { label: 'menu: shortcut on highlighted row', fg: '--text-secondary', bg: ['--surface-overlay', '--surface-hover'], min: text },
+  { label: 'avatar: initials on the disc', fg: '--text-secondary', bg: ['--surface-raised', '--surface-recessed'], min: text },
+  { label: 'badge: plain word on its plate', fg: '--text-secondary', bg: ['--surface-raised', '--surface-recessed'], min: text },
+  { label: 'badge: count on its fill', fg: '--accent-on', bg: ['--accent-solid'], min: text },
+  // Instrument's doc says the arc holds 3:1 against the track; measured, the pair is
+  // 1.3 to 1.4:1. The load-bearing contrast is the arc on its ground.
+  { label: 'spinner: arc on the panel', fg: '--accent-mark', bg: ['--surface-raised'], min: large },
+  { label: 'spinner: arc on the page', fg: '--accent-mark', bg: ['--surface-page'], min: large },
   { label: 'toast: detail text', fg: '--text-secondary', bg: ['--surface-overlay'], min: text },
   { label: 'toast: action on its hover plate', fg: '--text-primary', bg: ['--surface-overlay', '--surface-hover'], min: text },
   { label: 'toast: ok icon', fg: '--ok-text', bg: ['--surface-overlay'], min: large },

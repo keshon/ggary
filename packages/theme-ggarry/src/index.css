@@ -21,6 +21,8 @@
 
 @import './base/reset.css' layer(gg.base);
 
+@import './components/avatar.css' layer(gg.components);
+@import './components/badge.css' layer(gg.components);
 @import './components/button.css' layer(gg.components);
 @import './components/checkbox.css' layer(gg.components);
 @import './components/checkbox-group.css' layer(gg.components);
@@ -35,6 +37,8 @@
 @import './components/popover.css' layer(gg.components);
 @import './components/radio-group.css' layer(gg.components);
 @import './components/select.css' layer(gg.components);
+@import './components/skeleton.css' layer(gg.components);
+@import './components/spinner.css' layer(gg.components);
 @import './components/switch.css' layer(gg.components);
 @import './components/tabs.css' layer(gg.components);
 @import './components/toast.css' layer(gg.components);

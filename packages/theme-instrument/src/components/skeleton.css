@@ -1,0 +1,25 @@
+/* ==========================================================================
+   Instrument — skeleton
+
+   Ported from instrument/src/agent.css (.inst-skeleton). --track rather than
+   a sunken surface: the step between neighbouring surfaces nearly vanishes at
+   the ends of the ramp, and --track is alpha, so it shows on any ground. A
+   pulse in opacity, never a sheen: gradients are banned in this language.
+   ========================================================================== */
+
+[data-scope='skeleton'][data-part='root'] {
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  line-height: var(--leading-ui);
+}
+
+[data-scope='skeleton'][data-part='bar'] {
+  border-radius: var(--radius-xs);
+  background: var(--track);
+  animation: inst-fade 1.6s var(--ease-in-out) infinite;
+}
+
+@keyframes inst-fade {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}

@@ -18,6 +18,7 @@ import { resetConformance } from './reset.spec'
 import { selectConformance } from './select.spec'
 import { tabsConformance } from './tabs.spec'
 import { toastConformance } from './toast.spec'
+import { displayConformance } from './display.spec'
 import { textareaConformance } from './textarea.spec'
 
 /**
@@ -52,6 +53,7 @@ export function runConformance() {
       menubarConformance(adapter)
       tabsConformance(adapter)
       toastConformance(adapter)
+      displayConformance(adapter)
     })
   }
 }

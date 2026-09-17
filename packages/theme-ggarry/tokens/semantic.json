@@ -9,6 +9,9 @@
     "accent-hover": "{color.brand.700}",
     "accent-subtle": "{color.brand.50}",
     "danger": "{color.danger.600}",
+    "danger-subtle": "{color.danger.50}",
+    "success-subtle": "{color.success.50}",
+    "warning-subtle": "{color.warning.50}",
     "scrim": "rgba(15, 23, 42, 0.45)"
   },
   "text": {

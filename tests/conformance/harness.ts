@@ -24,6 +24,9 @@ import type { MenuEntry, MenuItem } from '../../packages/core/src/components/men
 import type { MenubarMenu } from '../../packages/core/src/components/menubar'
 import type { TabItem, TabsActivation, TabsOrientation, TabsVariant } from '../../packages/core/src/components/tabs'
 import type { Toaster, ToastPlacement } from '../../packages/core/src/components/toast'
+import type { BadgeVariant } from '../../packages/core/src/components/badge'
+import type { AvatarPerson, AvatarSize } from '../../packages/core/src/components/avatar'
+import type { StatusTone } from '../../packages/core/src/utils/tone'
 
 export interface ButtonProps {
   label: string
@@ -231,6 +234,38 @@ export interface ToasterProps {
   label?: string
 }
 
+export interface BadgeProps {
+  /** The word inside. */
+  label: string
+  tone?: StatusTone
+  variant?: BadgeVariant
+  dot?: boolean
+}
+
+export interface AvatarProps {
+  name: string
+  src?: string
+  size?: AvatarSize
+  decorative?: boolean
+}
+
+export interface AvatarGroupProps {
+  label: string
+  people: AvatarPerson[]
+  max?: number
+  size?: AvatarSize
+}
+
+export interface SpinnerProps {
+  label?: string
+  size?: 'sm' | 'md' | 'lg'
+}
+
+export interface SkeletonProps {
+  lines?: number
+  title?: boolean
+}
+
 export interface TooltipProps {
   content: string
   /** The trigger button's label. */
@@ -311,6 +346,11 @@ export interface Adapter {
   menubar(props: MenubarProps, target: HTMLElement): Promise<Mounted<MenubarProps>>
   tabs(props: TabsProps, target: HTMLElement): Promise<Mounted<TabsProps>>
   toaster(props: ToasterProps, target: HTMLElement): Promise<Mounted<ToasterProps>>
+  badge(props: BadgeProps, target: HTMLElement): Promise<Mounted<BadgeProps>>
+  avatar(props: AvatarProps, target: HTMLElement): Promise<Mounted<AvatarProps>>
+  avatarGroup(props: AvatarGroupProps, target: HTMLElement): Promise<Mounted<AvatarGroupProps>>
+  spinner(props: SpinnerProps, target: HTMLElement): Promise<Mounted<SpinnerProps>>
+  skeleton(props: SkeletonProps, target: HTMLElement): Promise<Mounted<SkeletonProps>>
   /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
 }

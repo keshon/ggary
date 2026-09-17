@@ -15,6 +15,22 @@
       "svelte": "./src/components/button/index.ts",
       "default": "./src/components/button/index.ts"
     },
+    "./avatar": {
+      "svelte": "./src/components/avatar/index.ts",
+      "default": "./src/components/avatar/index.ts"
+    },
+    "./badge": {
+      "svelte": "./src/components/badge/index.ts",
+      "default": "./src/components/badge/index.ts"
+    },
+    "./skeleton": {
+      "svelte": "./src/components/skeleton/index.ts",
+      "default": "./src/components/skeleton/index.ts"
+    },
+    "./spinner": {
+      "svelte": "./src/components/spinner/index.ts",
+      "default": "./src/components/spinner/index.ts"
+    },
     "./checkbox": {
       "svelte": "./src/components/checkbox/index.ts",
       "default": "./src/components/checkbox/index.ts"

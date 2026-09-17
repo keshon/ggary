@@ -1,0 +1,86 @@
+/* The small display components: what they need to be the shape they are,
+   whatever the theme.
+
+   Avatar: the image lies over the initials and shows only once loaded, so a
+   slow or broken picture leaves the initials rather than a gap.
+   Spinner: two stacked glyphs, the arc turning over the track.
+   Skeleton: bars one line tall, in the widths of the text they stand for. */
+
+[data-scope='badge'][data-part='root'] {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+[data-scope='badge'][data-part='dot'] {
+  display: inline-block;
+  flex: none;
+}
+
+[data-scope='avatar'][data-part='root'] {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  vertical-align: middle;
+  overflow: hidden;
+  user-select: none;
+}
+[data-scope='avatar'][data-part='image'] {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+[data-scope='avatar'][data-part='image']:not([data-status='loaded']) {
+  visibility: hidden;
+}
+[data-scope='avatar'][data-part='group'] {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+[data-scope='spinner'][data-part='root'] {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+[data-scope='spinner'][data-part='track'],
+[data-scope='spinner'][data-part='arc'] {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+[data-scope='spinner'][data-part='arc'] {
+  animation: gg-spin 0.7s linear infinite;
+}
+@keyframes gg-spin {
+  to { rotate: 360deg; }
+}
+
+[data-scope='skeleton'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+}
+[data-scope='skeleton'][data-part='bar'] {
+  display: block;
+  block-size: 1lh;
+}
+[data-scope='skeleton'][data-part='bar'][data-shape='title'] { inline-size: 40%; }
+[data-scope='skeleton'][data-part='bar'][data-shape='line'] { inline-size: 100%; }
+[data-scope='skeleton'][data-part='bar'][data-shape='short'] { inline-size: 62%; }
+
+/* Endless activity is slowed under reduced motion, never stopped: a stopped
+   spinner says the work has halted. Every theme's motion rules may override. */
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='spinner'][data-part='arc'] { animation-duration: 2.4s; }
+}
+
+@media print {
+  [data-scope='spinner'][data-part='root'],
+  [data-scope='skeleton'][data-part='root'] { display: none; }
+}

@@ -1,0 +1,65 @@
+/* ==========================================================================
+   GGarry — badge
+
+   A state as a word on a tinted plate, with a dot in the tone. The plate and
+   the ink come from one tone map, so a badge and its dot cannot disagree.
+   ========================================================================== */
+
+[data-scope='badge'][data-part='root'] {
+  --badge-ink: var(--ggarry-text-muted);
+  /* subtle, not muted: a muted word on muted is 4.34:1 in light mode. */
+  --badge-plate: var(--ggarry-bg-subtle);
+  --badge-dot: var(--ggarry-text-muted);
+
+  gap: var(--ggarry-space-1);
+  min-block-size: 20px;
+  padding-inline: var(--ggarry-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--ggarry-radius-sm);
+  background: var(--badge-plate);
+  color: var(--badge-ink);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-medium);
+  line-height: 1;
+}
+
+[data-scope='badge'][data-part='root'][data-tone='neutral'] { --badge-dot: var(--ggarry-text-muted); }
+[data-scope='badge'][data-part='root'][data-tone='running'] { --badge-ink: var(--ggarry-text-accent); --badge-plate: var(--ggarry-bg-accent-subtle); --badge-dot: var(--ggarry-text-accent); }
+[data-scope='badge'][data-part='root'][data-tone='ok'] { --badge-ink: var(--ggarry-text-success); --badge-plate: var(--ggarry-bg-success-subtle); --badge-dot: var(--ggarry-text-success); }
+[data-scope='badge'][data-part='root'][data-tone='warn'] { --badge-ink: var(--ggarry-text-warning); --badge-plate: var(--ggarry-bg-warning-subtle); --badge-dot: var(--ggarry-text-warning); }
+[data-scope='badge'][data-part='root'][data-tone='error'] { --badge-ink: var(--ggarry-text-danger); --badge-plate: var(--ggarry-bg-danger-subtle); --badge-dot: var(--ggarry-text-danger); }
+
+[data-scope='badge'][data-part='dot'] {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--badge-dot);
+}
+[data-scope='badge'][data-part='root'][data-tone='running'] > [data-part='dot'] {
+  animation: ggarry-pulse 1.6s ease-in-out infinite;
+}
+@keyframes ggarry-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* The tone on the border alone, for a badge among glyphs. */
+[data-scope='badge'][data-part='root'][data-variant='outline'] {
+  background: transparent;
+  border-color: color-mix(in oklab, var(--badge-ink) 40%, transparent);
+}
+
+/* A number over a glyph: round, never narrower than tall, a solid fill. */
+[data-scope='badge'][data-part='root'][data-variant='count'] {
+  justify-content: center;
+  min-inline-size: 20px;
+  padding-inline: var(--ggarry-space-1);
+  border-radius: 999px;
+  background: var(--ggarry-bg-accent);
+  color: var(--ggarry-text-on-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='badge'][data-part='root'][data-tone='running'] > [data-part='dot'] { animation-duration: 3.2s; }
+}

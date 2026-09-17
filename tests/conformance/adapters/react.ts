@@ -19,6 +19,11 @@ import {
   Switch,
   Tabs,
   Toaster,
+  Avatar,
+  AvatarGroup,
+  Badge,
+  Skeleton,
+  Spinner,
   Textarea,
 } from '../../../packages/react/src/index'
 import {
@@ -130,6 +135,11 @@ export const react: Adapter = {
     ]),
   menubar: (props, target) => mount(Menubar, props, target),
   toaster: (props, target) => mount(Toaster, props, target),
+  badge: (props, target) => mount(Badge, props, target, ({ label, ...rest }: { label: string }) => [rest, label]),
+  avatar: (props, target) => mount(Avatar, props, target),
+  avatarGroup: (props, target) => mount(AvatarGroup, props, target),
+  spinner: (props, target) => mount(Spinner, props, target),
+  skeleton: (props, target) => mount(Skeleton, props, target),
   tabs: (props, target) =>
     mount(Tabs, props, target, ({ panels = true, ...rest }: TabsProps) => [
       panels ? { ...rest, children: (item: { label: string }) => `Panel ${item.label}` } : rest,

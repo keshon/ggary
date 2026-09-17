@@ -21,3 +21,8 @@ export { default as Toaster } from './components/toast/Toaster.svelte'
 // The queue is framework-free: re-exported so `toast()` comes from the same package as the region.
 export { createToaster, toast, toaster } from '@ggary/core/toast'
 export type { ToastOptions, ToastTone, Toaster as ToasterStore } from '@ggary/core/toast'
+export { default as Avatar } from './components/avatar/Avatar.svelte'
+export { default as AvatarGroup } from './components/avatar/AvatarGroup.svelte'
+export { default as Badge } from './components/badge/Badge.svelte'
+export { default as Skeleton } from './components/skeleton/Skeleton.svelte'
+export { default as Spinner } from './components/spinner/Spinner.svelte'

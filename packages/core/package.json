@@ -13,6 +13,22 @@
       "types": "./src/components/button/index.ts",
       "default": "./src/components/button/index.ts"
     },
+    "./avatar": {
+      "types": "./src/components/avatar/index.ts",
+      "default": "./src/components/avatar/index.ts"
+    },
+    "./badge": {
+      "types": "./src/components/badge/index.ts",
+      "default": "./src/components/badge/index.ts"
+    },
+    "./skeleton": {
+      "types": "./src/components/skeleton/index.ts",
+      "default": "./src/components/skeleton/index.ts"
+    },
+    "./spinner": {
+      "types": "./src/components/spinner/index.ts",
+      "default": "./src/components/spinner/index.ts"
+    },
     "./checkbox": {
       "types": "./src/components/checkbox/index.ts",
       "default": "./src/components/checkbox/index.ts"

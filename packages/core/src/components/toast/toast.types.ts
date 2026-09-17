@@ -1,5 +1,7 @@
-/** Instrument's vocabulary: an informational message is `neutral`, and a destructive result is `error`. */
-export type ToastTone = 'neutral' | 'running' | 'ok' | 'warn' | 'error'
+import type { StatusTone } from '../../utils/tone'
+
+/** The kit's tone vocabulary: an informational message is `neutral`, a destructive result `error`. */
+export type ToastTone = StatusTone
 
 /** Where the region stands. Toasts grow from the edge: newest nearest it. */
 export type ToastPlacement = 'bottom-end' | 'bottom-start' | 'top-end' | 'top-start'

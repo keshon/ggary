@@ -2,7 +2,8 @@ import type { IconName } from '@ggary/icons'
 import type { Dict, Normalizer } from '../../types'
 import { toastAnatomy } from './toast.anatomy'
 import type { Toaster } from './toast.store'
-import type { Toast, ToasterState, ToastPlacement, ToastTone } from './toast.types'
+import { TONE_ICONS } from '../../utils/tone'
+import type { Toast, ToasterState, ToastPlacement } from './toast.types'
 
 export interface ToasterConnectOptions {
   /** The region's accessible name. Default "Notifications". */
@@ -12,13 +13,6 @@ export interface ToasterConnectOptions {
   closeLabel?: string
 }
 
-const TONE_ICONS: Record<ToastTone, IconName> = {
-  neutral: 'status-info',
-  running: 'status-info',
-  ok: 'status-ok',
-  warn: 'status-warn',
-  error: 'status-error',
-}
 
 /**
  * The region toasts appear in, and each toast in it.

@@ -1,0 +1,29 @@
+/* ==========================================================================
+   GGarry — skeleton
+
+   Muted bars that breathe in opacity. No travelling sheen: it pretends the
+   block is filling up, and it is not.
+   ========================================================================== */
+
+[data-scope='skeleton'][data-part='root'] {
+  gap: var(--ggarry-space-2);
+  font-size: var(--ggarry-font-size-md);
+  line-height: 1.4;
+}
+
+[data-scope='skeleton'][data-part='bar'] {
+  border-radius: var(--ggarry-radius-sm);
+  /* border-default, not bg-muted: muted is a step from white that reads as a
+     printing defect under a pulse, as Instrument warned about its own ramp. */
+  background: var(--ggarry-border-default);
+  animation: ggarry-fade 1.6s ease-in-out infinite;
+}
+
+@keyframes ggarry-fade {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='skeleton'][data-part='bar'] { animation-duration: 3s; }
+}

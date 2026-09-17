@@ -1,0 +1,17 @@
+/* ==========================================================================
+   GGarry — spinner
+
+   A quarter arc in the accent over a quiet track. The arc owes 3:1 against the
+   surface: it is what says "busy". The track only draws the circle out, and
+   stays out of the way.
+   ========================================================================== */
+
+[data-scope='spinner'][data-part='root'] {
+  inline-size: 16px;
+  block-size: 16px;
+}
+[data-scope='spinner'][data-part='root'][data-size='sm'] { inline-size: 12px; block-size: 12px; }
+[data-scope='spinner'][data-part='root'][data-size='lg'] { inline-size: 24px; block-size: 24px; }
+
+[data-scope='spinner'][data-part='track'] { color: var(--ggarry-border-default); }
+[data-scope='spinner'][data-part='arc'] { color: var(--ggarry-bg-accent); }

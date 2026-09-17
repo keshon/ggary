@@ -1,0 +1,40 @@
+/* ==========================================================================
+   GGarry — avatar
+
+   Initials on a muted disc, the picture over them. Sizes follow the control
+   ladder, so an avatar lines up with a button of the same size.
+   ========================================================================== */
+
+[data-scope='avatar'][data-part='root'] {
+  --avatar-size: var(--ggarry-size-control-md);
+
+  inline-size: var(--avatar-size);
+  block-size: var(--avatar-size);
+  border-radius: 50%;
+  /* subtle, not muted: muted initials on muted are 4.34:1 in light mode. */
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-muted);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+  line-height: 1;
+}
+[data-scope='avatar'][data-part='root'][data-size='sm'] { --avatar-size: var(--ggarry-size-control-sm); font-size: var(--ggarry-font-size-xs); }
+[data-scope='avatar'][data-part='root'][data-size='lg'] { --avatar-size: var(--ggarry-size-control-lg); font-size: var(--ggarry-font-size-md); }
+
+/* A ring in the surface's colour parts overlapping neighbours, so the stack
+   reads as several faces rather than one blob. On another surface, set
+   --avatar-ring. */
+[data-scope='avatar'][data-part='group'] > [data-part='root'] {
+  box-shadow: 0 0 0 2px var(--avatar-ring, var(--ggarry-bg-surface));
+}
+[data-scope='avatar'][data-part='group'] > [data-part='root'] + [data-part='root'] {
+  margin-inline-start: calc(var(--ggarry-space-2) * -1);
+}
+
+[data-scope='avatar'][data-part='more'] {
+  margin-inline-start: var(--ggarry-space-2);
+  color: var(--ggarry-text-muted);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+}
