@@ -1,6 +1,6 @@
 import { beforeEach, describe, it } from 'vitest'
 import '../packages/theme-ggarry/src/index.css'
-import { expectConcentricListbox, expectConcentricMenu, expectRhythm, expectSheetLayout, mountGroups } from './rhythm/rhythm'
+import { expectConcentricChipTabs, expectConcentricListbox, expectConcentricMenu, expectRhythm, expectSheetLayout, mountGroups } from './rhythm/rhythm'
 
 describe('GGarry rhythm, measured', () => {
   beforeEach(() => mountGroups())
@@ -12,6 +12,7 @@ describe('GGarry rhythm, measured', () => {
       await expectConcentricListbox()
       await expectConcentricMenu()
       await expectSheetLayout()
+      await expectConcentricChipTabs()
     })
   }
 })

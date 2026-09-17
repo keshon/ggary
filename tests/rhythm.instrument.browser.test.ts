@@ -1,6 +1,6 @@
 import { beforeEach, describe, it } from 'vitest'
 import '../packages/theme-instrument/src/index.css'
-import { expectConcentricListbox, expectConcentricMenu, expectRhythm, expectSheetLayout, mountGroups } from './rhythm/rhythm'
+import { expectConcentricChipTabs, expectConcentricListbox, expectConcentricMenu, expectRhythm, expectSheetLayout, mountGroups } from './rhythm/rhythm'
 
 describe('Instrument rhythm, measured', () => {
   beforeEach(() => mountGroups())
@@ -13,6 +13,7 @@ describe('Instrument rhythm, measured', () => {
       await expectConcentricListbox()
       await expectConcentricMenu()
       await expectSheetLayout()
+      await expectConcentricChipTabs()
     })
   }
 })

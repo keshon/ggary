@@ -61,16 +61,22 @@
 
 /* The row is a track: recessed under, raised on top, two steps apart. */
 [data-scope='tabs'][data-part='list'][data-variant='chips'] {
+  --tabs-track-radius: var(--radius-md);
+  --tabs-track-inset: var(--space-2);
+
   gap: var(--space-1);
-  padding: var(--space-2);
+  padding: var(--tabs-track-inset);
   background: var(--surface-recessed);
-  border-radius: var(--radius-md);
+  border-radius: var(--tabs-track-radius);
 
   & > [data-part='tab'] {
     gap: var(--space-2);
     min-block-size: var(--control-h-sm);
     padding-inline: var(--control-pad-sm);
-    border-radius: var(--radius-control-md);
+    /* Concentric with the track: its radius less the padding between them.
+       The control radius here drew a chip as round as the track it lies in,
+       so its corners bulged against the track's curve. */
+    border-radius: max(2px, calc(var(--tabs-track-radius) - var(--tabs-track-inset)));
     color: var(--text-secondary);
 
     &[data-closable] { padding-inline-end: var(--space-2); }

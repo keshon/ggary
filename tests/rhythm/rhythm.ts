@@ -125,3 +125,17 @@ export async function expectSheetLayout() {
     sheet.remove()
   }
 }
+
+/** A chip tab is concentric with the track it lies in, as a listbox row is with its panel. */
+export async function expectConcentricChipTabs() {
+  const tabs = document.createElement('gg-tabs')
+  tabs.setAttribute('variant', 'chips')
+  tabs.setAttribute('label', 'Open files')
+  tabs.innerHTML = '<section data-tab="a" data-label="tokens.css" data-closable>A</section><section data-tab="b" data-label="layout.css">B</section>'
+  document.body.append(tabs)
+  const list = getComputedStyle(tabs.querySelector('[data-part="list"]')!)
+  const tab = getComputedStyle(tabs.querySelector('[data-part="tab"]')!)
+  const expected = Math.max(2, px(list.borderTopLeftRadius) - px(list.paddingTop) - px(list.borderTopWidth))
+  near(px(tab.borderTopLeftRadius), expected)
+  tabs.remove()
+}

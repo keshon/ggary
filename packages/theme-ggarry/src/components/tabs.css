@@ -65,11 +65,14 @@
 /* --- chips --------------------------------------------------------------- */
 
 [data-scope='tabs'][data-part='list'][data-variant='chips'] {
+  --tabs-track-radius: var(--ggarry-radius-lg);
+  --tabs-track-inset: var(--ggarry-space-1);
+
   gap: var(--ggarry-space-1);
-  padding: var(--ggarry-space-1);
+  padding: var(--tabs-track-inset);
   /* subtle, not muted: a resting muted label on muted is 4.34:1 in light mode. */
   background: var(--ggarry-bg-subtle);
-  border-radius: var(--ggarry-radius-lg);
+  border-radius: var(--tabs-track-radius);
 }
 
 [data-scope='tabs'][data-part='list'][data-variant='chips'] > [data-part='tab'] {
@@ -77,7 +80,8 @@
   min-block-size: var(--ggarry-size-control-sm);
   padding-inline: var(--ggarry-space-3);
   border: 1px solid transparent;
-  border-radius: var(--ggarry-radius-md);
+  /* Concentric with the track: its radius less the padding between them. */
+  border-radius: max(2px, calc(var(--tabs-track-radius) - var(--tabs-track-inset)));
   color: var(--ggarry-text-muted);
   font-size: var(--ggarry-font-size-sm);
 }
