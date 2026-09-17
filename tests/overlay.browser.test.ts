@@ -4,7 +4,7 @@ import '../packages/structure/src/index.css'
 import '../packages/elements/src/index'
 import { coolDownTooltips } from '../packages/core/src/components/tooltip/tooltip.machine'
 import { openLayerCount } from '../packages/core/src/utils/dismissable'
-import type { GgDialogElement, GgPopoverElement } from '../packages/elements/src/index'
+import type { GgDialogElement, GgPopoverElement, GgSelectElement } from '../packages/elements/src/index'
 
 /**
  * Popover and Tooltip where only a browser can answer: real placement and
@@ -94,6 +94,56 @@ describe('popover in a real browser', () => {
     await userEvent.keyboard('{Escape}')
     await settle()
     expect(dialog.open).toBe(false)
+  })
+})
+
+describe('select in a real browser', () => {
+  const plans = [
+    { value: 'free', label: 'Free' },
+    { value: 'team', label: 'Team' },
+    { value: 'business', label: 'Business' },
+    { value: 'enterprise', label: 'Enterprise' },
+  ]
+
+  /** Every option can be hit where it is drawn: nothing clips the listbox. */
+  const allOptionsReachable = (select: Element) =>
+    [...select.querySelectorAll('[data-part="item"]')].map((item) => {
+      const r = box(item)
+      const hit = document.elementFromPoint(r.left + 8, r.top + r.height / 2)
+      return !!hit && item.contains(hit)
+    })
+
+  it('is not clipped by an ancestor that hides overflow', async () => {
+    const host = mount(`
+      <div style="position: absolute; top: 40px; left: 40px; width: 220px; height: 70px; overflow: hidden">
+        <gg-select label="Plan"></gg-select>
+      </div>`)
+    const select = host.querySelector('gg-select') as GgSelectElement
+    select.items = plans
+    await userEvent.click(select.querySelector('[data-part="trigger"]')!)
+    await settle()
+    expect(allOptionsReachable(select)).toEqual([true, true, true, true])
+  })
+
+  it('opens out of a dialog body instead of inside its scroll box', async () => {
+    const host = mount(`
+      <gg-dialog heading="Upgrade">
+        <gg-select label="Plan"></gg-select>
+        <div style="height: 400px">More settings below</div>
+      </gg-dialog>`)
+    const dialog = host.querySelector('gg-dialog') as GgDialogElement
+    const select = host.querySelector('gg-select') as GgSelectElement
+    // Long enough that a listbox kept inside the dialog body must shrink or be cut.
+    select.items = [...plans, ...plans.map((plan) => ({ value: `${plan.value}-yearly`, label: `${plan.label}, yearly` }))]
+    // A theme caps a dialog's height and its body scrolls; this dialog is short.
+    host.querySelector('dialog')!.style.maxHeight = '200px'
+    dialog.show()
+    await userEvent.click(select.querySelector('[data-part="trigger"]')!)
+    await settle()
+    expect(allOptionsReachable(select)).toEqual(Array(8).fill(true))
+    await userEvent.click([...select.querySelectorAll('[data-part="item"]')][7])
+    expect(select.value).toBe('enterprise-yearly')
+    expect(dialog.open).toBe(true)
   })
 })
 

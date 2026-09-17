@@ -1,12 +1,5 @@
 import { connect, createSelectMachine, type SelectItem } from '@ggary/core/select'
-import {
-  attachPositioner,
-  domNormalizer,
-  scrollIntoViewIfNeeded,
-  trackDismissable,
-  uid,
-  type Machine,
-} from '@ggary/core'
+import { attachPopover, domNormalizer, scrollIntoViewIfNeeded, uid, type Machine } from '@ggary/core'
 import { h, spread } from '../../spread'
 
 /**
@@ -188,18 +181,16 @@ export class GgSelectElement extends HTMLElement {
 
   #syncOpenState(state: { open: boolean; highlightedIndex: number }, api: ReturnType<typeof connect<any>>): void {
     if (state.open && !this.#teardownOpen) {
-      const stopPositioning = attachPositioner(this.#trigger!, this.#positioner!)
-      const stopDismiss = trackDismissable(this.#positioner!, {
-        exclude: [this.#trigger!],
+      // Focus stays on the trigger (aria-activedescendant), so no focus management.
+      const popover = attachPopover(this.#trigger!, this.#positioner!, {
+        sameWidth: true,
+        gutter: 4,
         onDismiss: () => {
           this.#machine!.send({ type: 'CLOSE' })
           this.#trigger!.focus()
         },
       })
-      this.#teardownOpen = () => {
-        stopPositioning()
-        stopDismiss()
-      }
+      this.#teardownOpen = () => popover.destroy()
     } else if (!state.open && this.#teardownOpen) {
       this.#teardownOpen()
       this.#teardownOpen = null

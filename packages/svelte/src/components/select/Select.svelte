@@ -1,6 +1,6 @@
 <script lang="ts">
   import { connect, createSelectMachine, type SelectItem } from '@ggary/core/select'
-  import { attachPositioner, scrollIntoViewIfNeeded, svelteNormalizer, trackDismissable, uid } from '@ggary/core'
+  import { attachPopover, scrollIntoViewIfNeeded, svelteNormalizer, uid } from '@ggary/core'
   import { untrack } from 'svelte'
 
   type Props = {
@@ -60,18 +60,16 @@
 
   $effect(() => {
     if (!snapshot.open || !triggerEl || !positionerEl) return
-    const stopPositioning = attachPositioner(triggerEl, positionerEl)
-    const stopDismiss = trackDismissable(positionerEl, {
-      exclude: [triggerEl],
+    // Focus stays on the trigger (aria-activedescendant), so no focus management.
+    const popover = attachPopover(triggerEl, positionerEl, {
+      sameWidth: true,
+      gutter: 4,
       onDismiss: () => {
         machine.send({ type: 'CLOSE' })
         triggerEl?.focus()
       },
     })
-    return () => {
-      stopPositioning()
-      stopDismiss()
-    }
+    return () => popover.destroy()
   })
 
   $effect(() => {

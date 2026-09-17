@@ -170,8 +170,11 @@ export function connect<T = Dict>(
       'data-state': state.open ? 'open' : 'closed',
     }),
 
+    // A manual popover: in the top layer while open, so no dialog body or
+    // overflow: hidden ancestor clips the listbox. Placed by attachPopover.
     positionerProps: normalize({
       ...selectAnatomy.attrs('positioner'),
+      popover: 'manual',
       'data-state': state.open ? 'open' : 'closed',
     }),
 

@@ -14,7 +14,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 1103 tests, 422 of them in headless Chrome
+npm test         # 1105 tests, 424 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -484,6 +484,12 @@ timers are effects:
 A tooltip is a **passive** layer on the stack: it takes Escape, but a press
 elsewhere while it shows still reaches the popover beneath it.
 
+**Select** moved onto the same layer: its listbox is a manual popover handed to
+`attachPopover` (focus stays on the trigger — it uses `aria-activedescendant`). It
+used to be absolutely positioned inside the select, and a dialog body or any
+`overflow: hidden` ancestor cut it off; two browser tests now open a select inside
+each and hit every option where it is drawn. Both failed before the move.
+
 Open and close requests for all three overlays share one rule,
 `utils/open-intent.ts`: a request is judged against the current state, reported
 through intent, and in controlled mode moves nothing until the owner answers.
@@ -713,7 +719,7 @@ one needs JS anyway; the children themselves stay the author's.
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
 | browser | Chrome | `conformance.browser.test.ts` | 408 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
-| browser | Chrome | `overlay.browser.test.ts` | 6 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, real hover and Tab for tooltips, nested and passive layers. |
+| browser | Chrome | `overlay.browser.test.ts` | 8 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, real hover and Tab for tooltips, nested and passive layers. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 
 **Machine tests** cover behaviour in depth, once, where it is cheap. They run with
@@ -773,9 +779,6 @@ Real, and deliberately left open:
   source, which is why edits in `packages/` hot-reload with no build step. Add
   tsup and point `exports` at `dist` before publishing. The per-component
   `exports` entry points are already in place.
-- **The positioner is not portaled.** It lives inside the component root, so an
-  ancestor with `overflow: hidden` will clip the dropdown. Portalling means three
-  adapter-specific implementations.
 - **Form participation is a hidden `<input>`.** It submits correctly, but native
   `reset` does not clear the Select and there is no `required`/constraint
   validation. Both need a hidden `<select>` instead.
@@ -803,9 +806,6 @@ Real, and deliberately left open:
   lines was out of scope for a first port.
 - **`data-accent` on a subtree is unverified in Instrument.** Its semantics are
   declared on `:root`; the port only exercised the attribute on `<html>`.
-- **A Select inside a Dialog is still positioned in the dialog's flow.** Its
-  listbox can be clipped by the dialog body's scroll box. Moving Select's listbox
-  to the top layer is the next step of the overlay plan.
 - **A tooltip on a disabled button never shows.** A disabled button fires no
   pointer or focus events; wrap it in a focusable element, or say why it is
   disabled in visible text.

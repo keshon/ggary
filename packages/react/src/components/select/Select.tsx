@@ -4,7 +4,7 @@ import {
   createSelectMachine,
   type SelectItem,
 } from '@ggary/core/select'
-import { attachPositioner, reactNormalizer, scrollIntoViewIfNeeded, trackDismissable } from '@ggary/core'
+import { attachPopover, reactNormalizer, scrollIntoViewIfNeeded } from '@ggary/core'
 
 export interface SelectProps {
   items: SelectItem[]
@@ -56,18 +56,16 @@ export function Select(props: SelectProps) {
 
   useLayoutEffect(() => {
     if (!state.open || !triggerRef.current || !positionerRef.current) return
-    const stopPositioning = attachPositioner(triggerRef.current, positionerRef.current)
-    const stopDismiss = trackDismissable(positionerRef.current, {
-      exclude: [triggerRef.current],
+    // Focus stays on the trigger (aria-activedescendant), so no focus management.
+    const popover = attachPopover(triggerRef.current, positionerRef.current, {
+      sameWidth: true,
+      gutter: 4,
       onDismiss: () => {
         machine.send({ type: 'CLOSE' })
         triggerRef.current?.focus()
       },
     })
-    return () => {
-      stopPositioning()
-      stopDismiss()
-    }
+    return () => popover.destroy()
   }, [machine, state.open])
 
   useEffect(() => {

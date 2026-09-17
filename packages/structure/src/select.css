@@ -1,16 +1,23 @@
-/* The positioner is placed by Floating UI through `transform`, so it has to be
-   absolutely positioned from the root's top-left corner and free to move. */
-[data-scope='select'][data-part='root'] {
-  position: relative;
-}
+/* The positioner is a manual popover in the top layer, placed by Floating UI
+   with a transform measured from the viewport's corner. The browser's own
+   popover box — centred, bordered, padded, painted — is removed, as for
+   Popover and Tooltip in popover.css; the theme paints the listbox.
 
+   It used to be absolutely positioned inside the select root, and a dialog
+   body or any overflow: hidden ancestor cut it off. */
 [data-scope='select'][data-part='positioner'] {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: var(--gg-z-popover, 50);
+  position: fixed;
+  inset: 0 auto auto 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
 }
 
+/* Closed is the platform's display: none for a popover that is not shown;
+   this keeps it for a listbox rendered before the popover API is available. */
 [data-scope='select'][data-part='positioner'][data-state='closed'] {
   display: none;
 }
