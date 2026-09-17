@@ -5,6 +5,7 @@ import {
   type SelectItem,
 } from '@ggary/core/select'
 import { attachPopover, reactNormalizer, scrollIntoViewIfNeeded } from '@ggary/core'
+import { useFormReset } from '../../utils/use-form-reset'
 
 export interface SelectProps {
   items: SelectItem[]
@@ -51,6 +52,9 @@ export function Select(props: SelectProps) {
   }, [machine, value])
 
   const triggerRef = useRef<HTMLButtonElement>(null)
+  useFormReset(triggerRef, () => {
+    if (value === undefined) machine.send({ type: 'SYNC_VALUE', value: defaultValue ?? null })
+  })
   const positionerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLUListElement>(null)
 

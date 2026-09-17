@@ -1,6 +1,6 @@
 <script lang="ts">
   import { connect, type CheckboxProps, type CheckedState } from '@ggary/core/checkbox'
-  import { mergeProps, svelteNormalizer } from '@ggary/core'
+  import { mergeProps, onFormReset, svelteNormalizer } from '@ggary/core'
   import { getContext, untrack, type Snippet } from 'svelte'
   import { FIELD_CONTEXT, type FieldContext } from '../field/context'
 
@@ -31,6 +31,7 @@
   untrack(() => {
     if (checked === undefined) checked = defaultChecked ?? false
   })
+  const initial = untrack(() => checked)
 
   const field = getContext<FieldContext | undefined>(FIELD_CONTEXT)
 
@@ -47,6 +48,17 @@
   const attrs = $derived(mergeProps(rest, api.inputProps))
 
   let element: HTMLInputElement
+
+  // A native form reset rewrites the DOM without an event. Svelte sets these
+  // as properties, not the attributes a reset restores to, so the initial state
+  // is written back to the binding AND to the element.
+  $effect(() =>
+    onFormReset(element, () => {
+      checked = initial
+      element.checked = initial === true
+      element.indeterminate = initial === 'indeterminate'
+    })
+  )
   // A property, not an attribute: no prop bag can carry it.
   $effect(() => {
     element.indeterminate = api.indeterminate

@@ -1,7 +1,9 @@
-import { forwardRef, useState, type InputHTMLAttributes, type ReactNode } from 'react'
+import { forwardRef, useRef, useState, type InputHTMLAttributes, type ReactNode } from 'react'
 import { connect, type SwitchProps as CoreSwitchProps } from '@ggary/core/switch'
 import { mergeProps, reactNormalizer } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
+import { useMergedRef } from '../../utils/use-merged-ref'
+import { useFormReset } from '../../utils/use-form-reset'
 
 export interface SwitchProps
   extends CoreSwitchProps,
@@ -35,10 +37,14 @@ export const Switch = forwardRef<HTMLInputElement, SwitchProps>(function Switch(
     }
   )
 
+  const element = useRef<HTMLInputElement | null>(null)
+  const mergedRef = useMergedRef(element, ref)
+  useFormReset(element, () => setUncontrolled(defaultChecked))
+
   return (
     <label {...api.rootProps}>
       <span {...api.controlProps}>
-        <input ref={ref} {...mergeProps(rest, api.inputProps)} />
+        <input ref={mergedRef} {...mergeProps(rest, api.inputProps)} />
         <span {...api.thumbProps} />
       </span>
       {children != null && <span {...api.labelProps}>{children}</span>}

@@ -3,6 +3,7 @@ import { connect, type CheckboxProps as CoreCheckboxProps, type CheckedState } f
 import { mergeProps, reactNormalizer } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
 import { useMergedRef } from '../../utils/use-merged-ref'
+import { useFormReset } from '../../utils/use-form-reset'
 
 export interface CheckboxProps
   extends CoreCheckboxProps,
@@ -40,6 +41,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
 
   const element = useRef<HTMLInputElement | null>(null)
   const ref = useMergedRef(element, forwardedRef)
+  useFormReset(element, () => setUncontrolled(defaultChecked))
 
   // A property, not an attribute: no prop bag can carry it.
   useLayoutEffect(() => {

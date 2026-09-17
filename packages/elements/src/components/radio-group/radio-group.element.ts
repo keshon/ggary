@@ -1,6 +1,6 @@
 import { connect as connectRadios, type RadioGroupOrientation } from '@ggary/core/radio-group'
 import { connect as connectCheckboxes } from '@ggary/core/checkbox-group'
-import { domNormalizer, uid, type GroupContext } from '@ggary/core'
+import { onFormReset, domNormalizer, uid, type GroupContext } from '@ggary/core'
 import { h, spread } from '../../spread'
 import { buildChoice, renderChoice, type ChoiceDom } from '../checkbox/choice'
 
@@ -33,7 +33,12 @@ abstract class ChoiceGroupElement extends HTMLElement implements GroupConsumer {
   #list: HTMLDivElement | null = null
   #group: GroupContext | null = null
 
+  #stopReset: (() => void) | null = null
+
   connectedCallback(): void {
+    // The browser resets the inputs; the state attributes and validity need a render.
+    this.#stopReset?.()
+    this.#stopReset = onFormReset(this, () => this.render())
     if (!this.#list) {
       const inputs = Array.from(this.querySelectorAll<HTMLInputElement>(`input[type="${this.inputType}"]`))
       if (inputs.length === 0) {
@@ -66,6 +71,11 @@ abstract class ChoiceGroupElement extends HTMLElement implements GroupConsumer {
     // As a checkbox does inside a field: ask the fieldset to push its state now that the parts exist.
     if (fieldset && 'refresh' in fieldset) fieldset.refresh()
     this.render()
+  }
+
+  disconnectedCallback(): void {
+    this.#stopReset?.()
+    this.#stopReset = null
   }
 
   attributeChangedCallback(): void {

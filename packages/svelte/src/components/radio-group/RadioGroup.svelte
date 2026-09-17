@@ -1,6 +1,6 @@
 <script lang="ts">
   import { connect, type RadioGroupOrientation, type RadioItem } from '@ggary/core/radio-group'
-  import { svelteNormalizer, uid } from '@ggary/core'
+  import { onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { getContext, untrack } from 'svelte'
   import { FIELDSET_CONTEXT, type FieldsetContext } from '../fieldset/context'
 
@@ -36,6 +36,18 @@
   untrack(() => {
     if (value === undefined) value = defaultValue ?? null
   })
+  const initial = untrack(() => value ?? null)
+
+  let root: HTMLDivElement
+  // A native form reset rewrites the DOM without an event. Svelte sets these
+  // as properties, not the attributes a reset restores to, so the initial state
+  // is written back to the binding AND to the element.
+  $effect(() =>
+    onFormReset(root, () => {
+      value = initial
+      for (const input of root.querySelectorAll('input')) input.checked = input.value === initial
+    })
+  )
 
   const fieldset = getContext<FieldsetContext | undefined>(FIELDSET_CONTEXT)
 
@@ -50,7 +62,7 @@
   )
 </script>
 
-<div {...api.rootProps}>
+<div bind:this={root} {...api.rootProps}>
   {#if label}
     <span {...api.labelProps}>{label}</span>
   {/if}

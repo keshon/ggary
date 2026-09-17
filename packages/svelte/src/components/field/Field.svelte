@@ -1,6 +1,6 @@
 <script lang="ts">
   import { connect, createFieldMachine } from '@ggary/core/field'
-  import { svelteNormalizer, uid } from '@ggary/core'
+  import { onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { setContext, untrack, type Snippet } from 'svelte'
   import { FIELD_CONTEXT, type FieldContext } from './context'
 
@@ -30,6 +30,10 @@
 
   $effect(() => machine.send({ type: 'SYNC', invalid, required, disabled, readOnly }))
 
+  // A reset form starts over: no error until the user leaves the control again.
+  let root: HTMLDivElement
+  $effect(() => onFormReset(root, () => machine.send({ type: 'RESET' })))
+
   setContext<FieldContext>(FIELD_CONTEXT, {
     get control() {
       return api.control
@@ -37,7 +41,7 @@
   })
 </script>
 
-<div {...api.rootProps}>
+<div bind:this={root} {...api.rootProps}>
   {#if label != null}
     <!-- svelte-ignore a11y_label_has_associated_control -->
     <label {...api.labelProps}>{label}</label>

@@ -1,6 +1,6 @@
 import { connect as connectCheckbox, type CheckedState } from '@ggary/core/checkbox'
 import { connect as connectSwitch } from '@ggary/core/switch'
-import { domNormalizer, type Dict } from '@ggary/core'
+import { onFormReset, domNormalizer, type Dict } from '@ggary/core'
 import { buildChoice, renderChoice, type ChoiceDom, type FieldConsumer } from './choice'
 
 /**
@@ -25,7 +25,12 @@ abstract class ChoiceElement extends HTMLElement implements FieldConsumer {
   /** The input's own flags, read before this element first writes to it — as <gg-field> does. */
   #native = { disabled: false, required: false }
 
+  #stopReset: (() => void) | null = null
+
   connectedCallback(): void {
+    // The browser resets the input itself; the state attributes need a render.
+    this.#stopReset?.()
+    this.#stopReset = onFormReset(this, () => this.render())
     if (!this.dom) {
       const input = this.querySelector<HTMLInputElement>('input[type="checkbox"]')
       if (!input) {
@@ -41,6 +46,11 @@ abstract class ChoiceElement extends HTMLElement implements FieldConsumer {
     // field not yet upgraded has no refresh(), and will push once it is.
     if (field && 'refresh' in field) field.refresh()
     this.render()
+  }
+
+  disconnectedCallback(): void {
+    this.#stopReset?.()
+    this.#stopReset = null
   }
 
   attributeChangedCallback(): void {

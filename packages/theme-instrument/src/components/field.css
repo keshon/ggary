@@ -14,15 +14,18 @@
    an owner-declared error and reaches aria-describedby.
    ========================================================================== */
 
+/* The label and the hint stand a --gap-option from the control, as a group
+   label and a legend stand from what they head: one rule across Field,
+   RadioGroup, CheckboxGroup and Fieldset, moving with density. (The source had
+   4px above the label's own 4px margin; a group label had its own value.) */
 [data-scope='field'][data-part='root'] {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--gap-option);
   min-inline-size: 13rem;
 }
 
 [data-scope='field'][data-part='label'] {
-  margin-block-end: var(--space-2);
   font-size: var(--text-sm);
   font-weight: var(--weight-medium);
   color: var(--text-primary);

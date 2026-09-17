@@ -182,7 +182,7 @@ function applyButton(host: HTMLElement, props: Partial<ButtonProps>) {
 
 export const elements: Adapter = {
   name: 'elements',
-  supports: { controlled: false },
+  supports: { controlled: false, refusal: false },
 
   async act(interaction) {
     interaction()

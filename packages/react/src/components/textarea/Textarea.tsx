@@ -3,6 +3,7 @@ import { connect, type TextareaProps as CoreTextareaProps } from '@ggary/core/te
 import { attachAutosize, mergeProps, reactNormalizer, type Autosize } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
 import { useMergedRef } from '../../utils/use-merged-ref'
+import { useFormReset } from '../../utils/use-form-reset'
 
 export interface TextareaProps
   extends CoreTextareaProps,
@@ -29,6 +30,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   const autosize = useRef<Autosize | null>(null)
 
   const ref = useMergedRef(element, forwardedRef)
+  // The reset wrote a value without an input event: measure it.
+  useFormReset(element, () => autosize.current?.update())
 
   // Layout effects, so the first paint already has the measured height.
   useLayoutEffect(() => {

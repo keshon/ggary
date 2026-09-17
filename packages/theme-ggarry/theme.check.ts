@@ -5,7 +5,7 @@
  * coverage rule in @ggary/checks lists any it misses — and on the stacks
  * those colours actually sit on.
  */
-import { LARGE, TEXT, defineThemeCheck, type Pair } from '@ggary/checks'
+import { LARGE, STEP, TEXT, defineThemeCheck, type Pair } from '@ggary/checks'
 
 const pairs: Pair[] = [
   // Body text on every surface a component stands on.
@@ -51,6 +51,12 @@ const pairs: Pair[] = [
     bg: ['--ggarry-bg-surface', 'color-mix(in oklab, var(--ggarry-bg-danger) 10%, transparent)'],
     min: TEXT,
   },
+
+  // The low-emphasis chip is a plate and nothing else — no border — so its fill
+  // has to stand off the surface it sits on, and hover has to be a visible step.
+  { label: 'chip: low plate off the surface', fg: '--ggarry-bg-muted', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'chip: hover step from the plate', fg: '--ggarry-border-default', bg: ['--ggarry-bg-muted'], min: STEP },
+  { label: 'chip: label on hover plate', fg: '--ggarry-text-default', bg: ['--ggarry-border-default'], min: TEXT },
 
   // The high-emphasis chip: inverted plate.
   { label: 'chip: label on inverted plate', fg: '--ggarry-text-on-inverted', bg: ['--ggarry-bg-inverted'], min: TEXT },

@@ -14,7 +14,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 1204 tests, 468 of them in headless Chrome
+npm test         # 1236 tests, 482 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -446,6 +446,38 @@ bottom of a listbox is concentric with the panel — the panel's radius less its
 padding and border — rather than a second, tighter token that happened to be close.
 Both themes now derive it; restoring the old radius fails the test by a pixel.
 
+A Field's label and its control, and the control and its hint, are the same
+distance: `--gg-space-option`. "A label and what it labels" is one rule whether the
+thing labelled is an input or a list of options. The rhythm test measures both;
+restoring GGarry's old 4px gap fails it.
+
+## Form reset
+
+A native `reset` restores values and checked states without firing `input` or
+`change`, so everything a component derived from them goes stale: its state, its
+`data-state`, a shown error, a select's displayed and submitted value.
+`onFormReset` in core listens on the enclosing form and calls back a task *after*
+the event — the event fires before the browser restores the controls, and can be
+cancelled — and every adapter uses it:
+
+| Component | After a reset |
+|---|---|
+| Field, Fieldset | `RESET`: no error until the user leaves the control again |
+| Checkbox, Switch, RadioGroup, CheckboxGroup | back to the default, drawn and validated again |
+| Select, ChipGroup | back to the default value, shown and submitted |
+| Input, Textarea | the owner's value follows; Textarea measures again |
+
+Svelte needed more than a listener. It sets `checked` and `value` as properties,
+never the attributes a reset restores to, so a box that started checked resets to
+*unchecked* while the component's state — which never changed — says checked. The
+Svelte adapters write the initial state back to the binding and to the element.
+`tests/conformance/reset.spec.ts` covers it for all three adapters; making
+`onFormReset` a no-op fails all of it, and dropping the Svelte write-back fails
+the default-checked test alone.
+
+A controlled React owner is not told: its value is the value, and the component
+renders it again over the reset.
+
 ## The overlay layer, and Dialog
 
 Everything before Dialog sat in the page's normal flow. An overlay does not, and
@@ -773,17 +805,18 @@ one needs JS anyway; the children themselves stay the author's.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 111 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers. |
-| contract | node | `icons.contract.test.ts` | 97 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `icons.contract.test.ts` | 98 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 447 tests. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 461 tests. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 447 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 461 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
-| browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm and the listbox corners, measured in pixels, per theme, mode and density. |
+| browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — and the listbox corners, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 8 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, real hover and Tab for tooltips, nested and passive layers. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
+| dom | jsdom | `svelte-bind.dom.test.ts` | 3 tests. `bind:value` on Select, ChipGroup, RadioGroup and CheckboxGroup writes back to the owner and follows it. |
 
 **Machine tests** cover behaviour in depth, once, where it is cheap. They run with
 no DOM at all, which is also what keeps reducers from touching one.
@@ -842,13 +875,13 @@ Real, and deliberately left open:
   source, which is why edits in `packages/` hot-reload with no build step. Add
   tsup and point `exports` at `dist` before publishing. The per-component
   `exports` entry points are already in place.
-- **Form participation is a hidden `<input>`.** It submits correctly, but native
-  `reset` does not clear the Select and there is no `required`/constraint
-  validation. Both need a hidden `<select>` instead.
-- **No positioning test in CI.** See above — needs Playwright.
+- **Select's form participation is a hidden `<input>`.** It submits and resets
+  correctly, but there is no `required`/constraint validation; that needs a hidden
+  `<select>` instead.
 - **No SSR test.** Core should be import-safe on a server; unverified.
-- **Svelte Select and ChipGroup have no `bind:value`.** Their API mirrors React
-  (`value` + `onValueChange`). Input has one; the other two should follow.
+- **A Svelte Select or ChipGroup cannot refuse a choice.** They support
+  `bind:value`, so a pick moves them and writes the binding; only a controlled
+  React owner can show a value other than the one picked.
 - **The chip dismiss "x" is not a button.** A chip that is itself a `<button>`
   cannot legally nest one, and two tab stops per chip wrecks roving tabindex. So
   it is a pointer affordance, `aria-hidden`, with `aria-keyshortcuts="Delete"`
@@ -858,8 +891,6 @@ Real, and deliberately left open:
 - **ChipGroup uses `role="toolbar"` with `aria-pressed` chips.** Right for filter
   chips, which deselect on re-click. Exclusive choice that cannot be undone wants
   a real `radiogroup` instead.
-- **Subtle chips are low-contrast in GGarry's dark mode.** `--ggarry-bg-muted`
-  sits close to `--ggarry-bg-surface` there. A one-line token change.
 - **In Instrument a destructive primary does not look destructive.** High emphasis
   + danger keeps the accent fill, by Instrument's rule that a solid fill belongs
   to the accent alone. Faithful to the language, but a real loss of meaning: a
@@ -874,9 +905,8 @@ Real, and deliberately left open:
   disabled in visible text.
 - **No arrows** on popovers or tooltips, and no CSS anchor positioning: Floating
   UI places everything, which works in every browser the kit targets.
-- **Popover and Tooltip have no exit animation**, for the same reason as Dialog.
 - **No exit animation.** A dialog's body unmounts as it closes, so there is nothing
-  left to animate out; opening fades in.
+  left to animate out; opening fades in. Popover and Tooltip, likewise.
 - **Svelte and the custom elements cannot refuse a close.** `bind:open` and the
   `open` attribute follow the dialog; only a controlled React owner can keep it
   open against a request.
@@ -901,8 +931,6 @@ Real, and deliberately left open:
   without `novalidate`. Suppressing it in the field would also suppress the
   browser scrolling to and focusing the first invalid control, so it is left to
   the form (see Field and Input).
-- **Form `reset` does not clear a field's error state.** The machine has a
-  `RESET` event; nothing listens for the form's `reset` yet.
 - **Select does not consume a Field or a Fieldset.** It is a listbox with its own
   label, not a native control. Option groups belong in a Fieldset; `<gg-field>`
   should not wrap one — it would treat the first option as its control.
@@ -910,14 +938,10 @@ Real, and deliberately left open:
   while some are checked is still built by hand, as the sandbox's Checkbox demo does.
 - **Fieldset has no framed variant** (Instrument's `.inst-fieldset--framed`) and no
   side-by-side label layout.
-- **The rhythm tokens cover options and groups only.** Field's own label-to-control
-  gap and a dialog or popover title's distance to its content are still each
-  component's.
+- **A dialog or popover title's distance to its content is not on the rhythm
+  tokens.** It is still each theme's own.
 - **No option descriptions.** A radio or checkbox with a second line of help
   text (Instrument's choice card) is not built.
-- **After a native form reset, React and Svelte state is stale.** The boxes look
-  right — the theme follows `:checked` — but the adapters' own state, the
-  `data-state` attributes and a controlled owner never hear of it.
 - **No character counter.** `maxLength` is enforced by the browser, silently; a
   "12 / 280" readout (with a polite live region) belongs to Field.
 - **No affixes.** No icon, prefix, suffix or clear button inside an input.

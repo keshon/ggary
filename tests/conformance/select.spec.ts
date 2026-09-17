@@ -167,7 +167,8 @@ export function selectConformance(adapter: Adapter) {
 
       // Regression: the first machine diffed `value` to decide when to report, so
       // a controlled select — whose value never moves on its own — was inert.
-      run('reports the user\'s choice but shows only what the owner passes', async () => {
+      const refusal = adapter.supports.refusal ? it : it.skip
+      refusal('reports the user\'s choice but shows only what the owner passes', async () => {
         const onValueChange = vi.fn()
         const { m, trigger, options, click } = await setup({ value: 'a', onValueChange })
         await click(trigger())

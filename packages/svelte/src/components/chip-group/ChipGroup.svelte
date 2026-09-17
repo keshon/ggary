@@ -7,7 +7,7 @@
     type ChipItem,
   } from '@ggary/core/chip-group'
   import type { ChipEmphasis, ChipSize } from '@ggary/core/chip'
-  import { rovingFocus, svelteNormalizer, uid } from '@ggary/core'
+  import { onFormReset, rovingFocus, svelteNormalizer, uid } from '@ggary/core'
   import { untrack } from 'svelte'
 
   type Props = {
@@ -20,6 +20,7 @@
     removable?: boolean
     disabled?: boolean
     name?: string
+    /** Bindable: `bind:value`. A one-way `value` works too. */
     value?: string[]
     defaultValue?: string[]
     onSelectionChange?: (selection: string[], items: ChipItem[]) => void
@@ -37,7 +38,7 @@
     removable,
     disabled = false,
     name,
-    value,
+    value = $bindable(),
     defaultValue,
     onSelectionChange,
     onRemove,
@@ -50,8 +51,9 @@
   // every prop that can change afterwards reaches it through a SYNC effect below.
   // `untrack` states that intent — and is what silences the compiler's
   // state_referenced_locally warning honestly, instead of suppressing it.
-  // defaultValue is the one prop that is never synced: it is the initial
-  // selection of an uncontrolled group by definition.
+  // Uncontrolled at heart, as `bind:value` is: a toggle moves the group and
+  // writes the binding, and a new `value` arrives through SYNC_SELECTION.
+  const initial = untrack(() => value ?? defaultValue ?? [])
   const machine = untrack(() =>
     createChipGroupMachine({
       id,
@@ -60,9 +62,11 @@
       orientation,
       disabled,
       removable,
-      value,
-      defaultValue,
-      onSelectionChange: (selection, selected) => onSelectionChange?.(selection, selected),
+      defaultValue: initial,
+      onSelectionChange: (selection, selected) => {
+        value = selection
+        onSelectionChange?.(selection, selected)
+      },
       onRemove: (removedValue, item) => onRemove?.(removedValue, item),
     })
   )
@@ -79,6 +83,14 @@
     if (value !== undefined) machine.send({ type: 'SYNC_SELECTION', selection: value })
   })
 
+  let root: HTMLDivElement
+  $effect(() =>
+    onFormReset(root, () => {
+      value = initial
+      machine.send({ type: 'SYNC_SELECTION', selection: initial })
+    })
+  )
+
   // Identical rule to the React adapter: act on the nonce, and only when it
   // actually changed. `api` is re-derived on every state change, so an effect
   // that merely reads it would re-focus constantly and steal focus back from
@@ -92,7 +104,7 @@
   })
 </script>
 
-<div {...api.rootProps}>
+<div bind:this={root} {...api.rootProps}>
   {#if label}
     <span {...api.labelProps}>{label}</span>
   {/if}

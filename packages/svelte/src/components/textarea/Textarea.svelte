@@ -1,6 +1,6 @@
 <script lang="ts">
   import { connect, type TextareaProps } from '@ggary/core/textarea'
-  import { attachAutosize, mergeProps, svelteNormalizer, type Autosize } from '@ggary/core'
+  import { attachAutosize, mergeProps, onFormReset, svelteNormalizer, type Autosize } from '@ggary/core'
   import { getContext, untrack } from 'svelte'
   import { FIELD_CONTEXT, type FieldContext } from '../field/context'
 
@@ -36,6 +36,7 @@
   untrack(() => {
     if (value === undefined && defaultValue !== undefined) value = defaultValue
   })
+  const initial = untrack(() => value)
 
   const field = getContext<FieldContext | undefined>(FIELD_CONTEXT)
 
@@ -50,6 +51,16 @@
   const attrs = $derived(mergeProps(rest, api.rootProps))
 
   let element: HTMLTextAreaElement
+  // A native form reset rewrites the DOM without an event. Svelte sets these
+  // as properties, not the attributes a reset restores to, so the initial state
+  // is written back to the binding AND to the element.
+  $effect(() =>
+    onFormReset(element, () => {
+      value = initial
+      element.value = initial ?? ''
+      autosize?.update()
+    })
+  )
   // Not state: the effects below must depend on the props, not on this handle.
   let autosize: Autosize | null = null
 

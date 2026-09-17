@@ -1,6 +1,6 @@
 <script lang="ts">
   import { connect, createFieldsetMachine } from '@ggary/core/fieldset'
-  import { svelteNormalizer, uid } from '@ggary/core'
+  import { onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { setContext, untrack, type Snippet } from 'svelte'
   import { FIELDSET_CONTEXT, type FieldsetContext } from './context'
 
@@ -27,6 +27,9 @@
 
   $effect(() => machine.send({ type: 'SYNC', invalid, required, disabled }))
 
+  let root: HTMLFieldSetElement
+  $effect(() => onFormReset(root, () => machine.send({ type: 'RESET' })))
+
   setContext<FieldsetContext>(FIELDSET_CONTEXT, {
     get group() {
       return api.group
@@ -34,7 +37,7 @@
   })
 </script>
 
-<fieldset {...api.rootProps}>
+<fieldset bind:this={root} {...api.rootProps}>
   {#if legend != null}
     <legend {...api.legendProps}>{legend}</legend>
   {/if}

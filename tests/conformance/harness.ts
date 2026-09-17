@@ -227,7 +227,16 @@ export interface Adapter {
    * Custom elements have no controlled mode: an attribute cannot be owned by
    * the page and the element at once.
    */
-  supports: { controlled: boolean }
+  supports: {
+    controlled: boolean
+    /**
+     * The owner can REFUSE a change: pass a `value`, ignore the callback, and the
+     * component keeps showing the owner's value. React only. Svelte's `bind:`
+     * model writes the change back, and the custom elements follow their own
+     * attributes, so there a change the owner ignores still moves the component.
+     */
+    refusal: boolean
+  }
 
   /** Run a user interaction and wait for everything it causes to flush. */
   act(interaction: () => void): Promise<void>

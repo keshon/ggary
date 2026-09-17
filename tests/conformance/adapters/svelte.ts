@@ -50,7 +50,7 @@ const withLabel = (p: Partial<CheckboxProps>) => {
 
 export const svelte: Adapter = {
   name: 'svelte',
-  supports: { controlled: true },
+  supports: { controlled: true, refusal: false },
 
   async act(interaction) {
     interaction()

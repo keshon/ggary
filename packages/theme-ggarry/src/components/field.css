@@ -5,10 +5,13 @@
    shows, core hides the hint, so the form never shifts as validity changes.
    ========================================================================== */
 
+/* A label stands as far above its control as a group label above its first
+   option, and the hint as far below: one rule for "a label and what it labels"
+   across Field, RadioGroup, CheckboxGroup and Fieldset. */
 [data-scope='field'][data-part='root'] {
   display: flex;
   flex-direction: column;
-  gap: var(--ggarry-space-1);
+  gap: var(--ggarry-rhythm-option);
   min-width: 200px;
 }
 

@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalSto
 import { connect, createChipGroupMachine, type ChipGroupMode, type ChipGroupOrientation, type ChipItem } from '@ggary/core/chip-group'
 import type { ChipEmphasis, ChipSize } from '@ggary/core/chip'
 import { reactNormalizer, rovingFocus } from '@ggary/core'
+import { useFormReset } from '../../utils/use-form-reset'
 
 export interface ChipGroupProps {
   items: ChipItem[]
@@ -63,6 +64,11 @@ export function ChipGroup(props: ChipGroupProps) {
   // is a fresh object every render, so a dep-array version re-runs constantly
   // and will drag focus back into the group from wherever the user actually
   // moved it.
+  const root = useRef<HTMLDivElement>(null)
+  useFormReset(root, () => {
+    if (value === undefined) machine.send({ type: 'SYNC_SELECTION', selection: defaultValue ?? [] })
+  })
+
   const lastFocusNonce = useRef(0)
   useLayoutEffect(() => {
     if (api.focusNonce === 0 || api.focusNonce === lastFocusNonce.current || api.focusedIndex < 0) return
@@ -71,7 +77,7 @@ export function ChipGroup(props: ChipGroupProps) {
   })
 
   return (
-    <div {...api.rootProps}>
+    <div ref={root} {...api.rootProps}>
       {label && <span {...api.labelProps}>{label}</span>}
 
       <div {...api.listProps}>

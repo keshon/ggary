@@ -1,6 +1,6 @@
 import { connect, createFieldMachine, type FieldEvent, type FieldState } from '@ggary/core/field'
 import { connect as connectInput, type InputSize, type InputType } from '@ggary/core/input'
-import { domNormalizer, uid, type Autosize, type Machine } from '@ggary/core'
+import { onFormReset, domNormalizer, uid, type Autosize, type Machine } from '@ggary/core'
 import { h, spread } from '../../spread'
 import { applyTextarea, textareaProps } from '../textarea/textarea.element'
 import type { FieldConsumer } from '../checkbox/choice'
@@ -34,7 +34,12 @@ export class GgFieldElement extends HTMLElement {
   #native = { required: false, disabled: false, readOnly: false }
   #autosize: Autosize | null = null
 
+  #stopReset: (() => void) | null = null
+
   connectedCallback(): void {
+    // A reset form starts over: no error until the user leaves the control again.
+    this.#stopReset?.()
+    this.#stopReset = onFormReset(this, () => this.#machine?.send({ type: 'RESET' }))
     // Moved, not new: the parts are already in place, only the subscription
     // (and auto-resize) went away on disconnect.
     if (this.#machine) {
@@ -70,6 +75,8 @@ export class GgFieldElement extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    this.#stopReset?.()
+    this.#stopReset = null
     this.#unsubscribe?.()
     this.#unsubscribe = null
     this.#autosize?.destroy()

@@ -1,5 +1,5 @@
 import { connect, type TextareaProps, type TextareaResize, type TextareaSize } from '@ggary/core/textarea'
-import { attachAutosize, domNormalizer, type Autosize, type AutosizeOptions, type Dict } from '@ggary/core'
+import { onFormReset, attachAutosize, domNormalizer, type Autosize, type AutosizeOptions, type Dict } from '@ggary/core'
 import { spread } from '../../spread'
 
 /**
@@ -56,7 +56,12 @@ export class GgTextareaElement extends HTMLElement {
   #textarea: HTMLTextAreaElement | null = null
   #autosize: Autosize | null = null
 
+  #stopReset: (() => void) | null = null
+
   connectedCallback(): void {
+    // A reset writes the value without an input event: measure it again.
+    this.#stopReset?.()
+    this.#stopReset = onFormReset(this, () => this.#autosize?.update())
     const field = this.closest('gg-field')
     if (field) return
     this.#textarea = this.querySelector('textarea')
@@ -68,6 +73,8 @@ export class GgTextareaElement extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    this.#stopReset?.()
+    this.#stopReset = null
     this.#autosize?.destroy()
     this.#autosize = null
   }

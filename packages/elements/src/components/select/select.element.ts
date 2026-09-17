@@ -1,5 +1,5 @@
 import { connect, createSelectMachine, type SelectItem } from '@ggary/core/select'
-import { attachPopover, domNormalizer, scrollIntoViewIfNeeded, uid, type Machine } from '@ggary/core'
+import { onFormReset, attachPopover, domNormalizer, scrollIntoViewIfNeeded, uid, type Machine } from '@ggary/core'
 import { h, spread } from '../../spread'
 
 /**
@@ -53,7 +53,14 @@ export class GgSelectElement extends HTMLElement {
 
   // --- lifecycle -------------------------------------------------------------
 
+  #stopReset: (() => void) | null = null
+
   connectedCallback(): void {
+    // A reset form puts the select back to the value its markup gave it.
+    this.#stopReset?.()
+    this.#stopReset = onFormReset(this, () =>
+      this.#machine?.send({ type: 'SYNC_VALUE', value: this.getAttribute('value') })
+    )
     // Moved, not new: the DOM and the state are intact, only the subscription
     // went away on disconnect. Returning here without it was a dead element.
     if (this.#machine) {
@@ -88,6 +95,8 @@ export class GgSelectElement extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    this.#stopReset?.()
+    this.#stopReset = null
     this.#unsubscribe?.()
     this.#teardownOpen?.()
     this.#unsubscribe = this.#teardownOpen = null

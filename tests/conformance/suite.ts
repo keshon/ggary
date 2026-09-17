@@ -12,6 +12,7 @@ import { cleanup } from './harness'
 import { inputConformance } from './input.spec'
 import { popoverConformance, tooltipConformance } from './popover.spec'
 import { radioGroupConformance } from './radio-group.spec'
+import { resetConformance } from './reset.spec'
 import { selectConformance } from './select.spec'
 import { textareaConformance } from './textarea.spec'
 
@@ -38,6 +39,7 @@ export function runConformance() {
       radioGroupConformance(adapter)
       checkboxGroupConformance(adapter)
       fieldsetConformance(adapter)
+      resetConformance(adapter)
       fieldConformance(adapter)
       dialogConformance(adapter)
       popoverConformance(adapter)

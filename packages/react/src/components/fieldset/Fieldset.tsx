@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useId, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { connect, createFieldsetMachine, type GroupContext } from '@ggary/core/fieldset'
 import { reactNormalizer } from '@ggary/core'
+import { useFormReset } from '../../utils/use-form-reset'
 
 const FieldsetContext = createContext<GroupContext | null>(null)
 
@@ -31,8 +32,11 @@ export function Fieldset(props: FieldsetProps) {
     [machine, invalid, required, disabled]
   )
 
+  const root = useRef<HTMLFieldSetElement>(null)
+  useFormReset(root, () => machine.send({ type: 'RESET' }))
+
   return (
-    <fieldset {...api.rootProps}>
+    <fieldset ref={root} {...api.rootProps}>
       {legend != null && <legend {...api.legendProps}>{legend}</legend>}
       <div {...api.contentProps}>
         <FieldsetContext.Provider value={api.group}>{children}</FieldsetContext.Provider>

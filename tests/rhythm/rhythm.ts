@@ -9,7 +9,8 @@ import type { GgSelectElement } from '../../packages/elements/src/index'
  *
  *   - an option list has one rhythm: label to first option = option to option
  *     = --gg-space-option, for checkboxes and radios alike;
- *   - a legend stands the same distance above its content;
+ *   - a legend stands the same distance above its content, and a field's label
+ *     above its control, with the field's hint the same distance below;
  *   - groups inside a fieldset are --gg-space-group apart, which is more than
  *     an option step, so a group reads as one thing;
  *   - a highlighted option in the listbox is concentric with the panel.
@@ -39,6 +40,7 @@ export function mountGroups() {
         </gg-radio-group>
       </gg-fieldset>
       <gg-select label="Plan"></gg-select>
+      <gg-field label="Email" hint="Work address"><input type="email"></gg-field>
     </div>`
   const select = document.querySelector('gg-select') as GgSelectElement
   select.items = ['Free', 'Team', 'Business'].map((label) => ({ value: label.toLowerCase(), label }))
@@ -63,6 +65,12 @@ export async function expectRhythm() {
   const content = document.querySelector('[data-scope="fieldset"][data-part="content"]')!
   near(gap(legend, content), option)
   near(gap(document.querySelector('gg-checkbox-group')!, document.querySelector('gg-radio-group')!), group)
+
+  // A field's label and hint sit the same step from its control.
+  const field = document.querySelector('gg-field')!
+  const control = field.querySelector('input')!
+  near(gap(field.querySelector('[data-part="label"]')!, control), option)
+  near(gap(control, field.querySelector('[data-part="hint"]')!), option)
 }
 
 export async function expectConcentricListbox() {

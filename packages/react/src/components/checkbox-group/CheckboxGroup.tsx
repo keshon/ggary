@@ -2,6 +2,7 @@ import { useId, useLayoutEffect, useRef, useState } from 'react'
 import { connect, type CheckboxGroupOrientation, type CheckboxItem } from '@ggary/core/checkbox-group'
 import { reactNormalizer } from '@ggary/core'
 import { useFieldsetGroup } from '../fieldset/Fieldset'
+import { useFormReset } from '../../utils/use-form-reset'
 
 export interface CheckboxGroupProps {
   items: CheckboxItem[]
@@ -43,6 +44,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
 
   // "At least one" has no attribute; it is a custom validity on the first box.
   const list = useRef<HTMLDivElement>(null)
+  useFormReset(list, () => setUncontrolled(defaultValue))
   useLayoutEffect(() => {
     list.current?.querySelector('input')?.setCustomValidity(api.validationMessage)
   }, [api.validationMessage, items])

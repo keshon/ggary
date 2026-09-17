@@ -1,6 +1,6 @@
 <script lang="ts">
   import { connect, type InputProps } from '@ggary/core/input'
-  import { mergeProps, svelteNormalizer } from '@ggary/core'
+  import { mergeProps, onFormReset, svelteNormalizer } from '@ggary/core'
   import { getContext, untrack } from 'svelte'
   import { FIELD_CONTEXT, type FieldContext } from '../field/context'
 
@@ -33,6 +33,18 @@
   untrack(() => {
     if (value === undefined && defaultValue !== undefined) value = defaultValue
   })
+  const initial = untrack(() => value)
+
+  let element: HTMLInputElement
+  // A native form reset rewrites the DOM without an event. Svelte sets these
+  // as properties, not the attributes a reset restores to, so the initial state
+  // is written back to the binding AND to the element.
+  $effect(() =>
+    onFormReset(element, () => {
+      value = initial
+      element.value = initial ?? ''
+    })
+  )
 
   const field = getContext<FieldContext | undefined>(FIELD_CONTEXT)
 
@@ -48,4 +60,4 @@
   const attrs = $derived(mergeProps(rest, api.rootProps))
 </script>
 
-<input {...attrs} bind:value />
+<input bind:this={element} {...attrs} bind:value />

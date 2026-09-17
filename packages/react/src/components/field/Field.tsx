@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useId, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useId, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { connect, createFieldMachine } from '@ggary/core/field'
 import { reactNormalizer, type Dict } from '@ggary/core'
+import { useFormReset } from '../../utils/use-form-reset'
 
 /**
  * The canonical control props of the nearest Field, or null. A control merges
@@ -35,8 +36,12 @@ export function Field(props: FieldProps) {
     [machine, invalid, required, disabled, readOnly]
   )
 
+  // A reset form starts over: no error until the user leaves the control again.
+  const root = useRef<HTMLDivElement>(null)
+  useFormReset(root, () => machine.send({ type: 'RESET' }))
+
   return (
-    <div {...api.rootProps}>
+    <div ref={root} {...api.rootProps}>
       {label != null && <label {...api.labelProps}>{label}</label>}
       <FieldContext.Provider value={api.control}>{children}</FieldContext.Provider>
       {hint != null && <div {...api.hintProps}>{hint}</div>}

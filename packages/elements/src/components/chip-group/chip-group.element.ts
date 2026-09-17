@@ -5,7 +5,7 @@ import {
   type ChipGroupOrientation,
   type ChipItem,
 } from '@ggary/core/chip-group'
-import { domNormalizer, rovingFocus, uid, type Machine } from '@ggary/core'
+import { onFormReset, domNormalizer, rovingFocus, uid, type Machine } from '@ggary/core'
 import { h, spread } from '../../spread'
 
 /**
@@ -47,7 +47,14 @@ export class GgChipGroupElement extends HTMLElement {
     this.#machine?.send({ type: 'SYNC_SELECTION', selection: next ?? [] })
   }
 
+  #stopReset: (() => void) | null = null
+  #initialSelection: string[] | null = null
+
   connectedCallback(): void {
+    this.#stopReset?.()
+    this.#stopReset = onFormReset(this, () =>
+      this.#machine?.send({ type: 'SYNC_SELECTION', selection: this.#initialSelection ?? [] })
+    )
     // Moved, not new: re-subscribe, as <gg-select> and <gg-field> do.
     if (this.#machine) {
       this.#unsubscribe = this.#machine.subscribe(() => this.#render())
@@ -86,11 +93,14 @@ export class GgChipGroupElement extends HTMLElement {
     this.#root.append(this.#label, this.#list, this.#inputs)
     this.append(this.#root)
 
+    this.#initialSelection ??= this.#machine.getState().selection
     this.#unsubscribe = this.#machine.subscribe(() => this.#render())
     this.#render()
   }
 
   disconnectedCallback(): void {
+    this.#stopReset?.()
+    this.#stopReset = null
     this.#unsubscribe?.()
     this.#unsubscribe = null
   }

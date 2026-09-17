@@ -1,5 +1,5 @@
 import { connect, createFieldsetMachine, type FieldsetEvent, type FieldsetState } from '@ggary/core/fieldset'
-import { domNormalizer, uid, type Machine } from '@ggary/core'
+import { onFormReset, domNormalizer, uid, type Machine } from '@ggary/core'
 import { h, spread } from '../../spread'
 import type { GroupConsumer } from '../radio-group/radio-group.element'
 
@@ -28,7 +28,11 @@ export class GgFieldsetElement extends HTMLElement {
   #hint: HTMLDivElement | null = null
   #error: HTMLDivElement | null = null
 
+  #stopReset: (() => void) | null = null
+
   connectedCallback(): void {
+    this.#stopReset?.()
+    this.#stopReset = onFormReset(this, () => this.#machine?.send({ type: 'RESET' }))
     if (!this.#machine) {
       this.#fieldset = h('fieldset')
       this.#legend = h('legend')
@@ -45,6 +49,8 @@ export class GgFieldsetElement extends HTMLElement {
   }
 
   disconnectedCallback(): void {
+    this.#stopReset?.()
+    this.#stopReset = null
     this.#unsubscribe?.()
     this.#unsubscribe = null
   }

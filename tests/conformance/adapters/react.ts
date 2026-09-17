@@ -69,7 +69,7 @@ async function mount<P extends object>(
 
 export const react: Adapter = {
   name: 'react',
-  supports: { controlled: true },
+  supports: { controlled: true, refusal: true },
 
   async act(interaction) {
     await act(async () => interaction())

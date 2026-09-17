@@ -1,12 +1,13 @@
 <script lang="ts">
   import { connect, createSelectMachine, type SelectItem } from '@ggary/core/select'
-  import { attachPopover, scrollIntoViewIfNeeded, svelteNormalizer, uid } from '@ggary/core'
+  import { attachPopover, onFormReset, scrollIntoViewIfNeeded, svelteNormalizer, uid } from '@ggary/core'
   import { untrack } from 'svelte'
 
   type Props = {
     items: SelectItem[]
     label?: string
     placeholder?: string
+    /** Bindable: `bind:value`. A one-way `value` works too. */
     value?: string | null
     defaultValue?: string | null
     disabled?: boolean
@@ -18,7 +19,7 @@
     items,
     label,
     placeholder,
-    value,
+    value = $bindable(),
     defaultValue,
     disabled = false,
     name,
@@ -28,16 +29,21 @@
   const id = uid('gg-select')
 
   // Built once from the props at mount; items, disabled and value reach it
-  // afterwards through the SYNC effects below, and defaultValue is initial by
-  // definition. See ChipGroup.svelte for why this is `untrack`.
+  // afterwards through the SYNC effects below. See ChipGroup.svelte for why
+  // this is `untrack`. Uncontrolled at heart, as `bind:value` is (and as
+  // RadioGroup and Dialog are): a choice moves the select and writes the
+  // binding, and a new `value` from outside arrives through SYNC_VALUE.
+  const initial = untrack(() => (value !== undefined ? value : (defaultValue ?? null)))
   const machine = untrack(() =>
     createSelectMachine({
       id,
       items,
-      value,
-      defaultValue,
+      defaultValue: initial,
       disabled,
-      onValueChange: (next, item) => onValueChange?.(next, item),
+      onValueChange: (next, item) => {
+        value = next
+        onValueChange?.(next, item)
+      },
     })
   )
 
@@ -55,6 +61,14 @@
   })
 
   let triggerEl = $state<HTMLButtonElement | null>(null)
+
+  // A reset form puts the select back where it started.
+  $effect(() =>
+    onFormReset(triggerEl, () => {
+      value = initial
+      machine.send({ type: 'SYNC_VALUE', value: initial })
+    })
+  )
   let positionerEl = $state<HTMLDivElement | null>(null)
   let contentEl = $state<HTMLUListElement | null>(null)
 

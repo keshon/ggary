@@ -1,7 +1,8 @@
-import { useId, useState } from 'react'
+import { useId, useRef, useState } from 'react'
 import { connect, type RadioGroupOrientation, type RadioItem } from '@ggary/core/radio-group'
 import { reactNormalizer } from '@ggary/core'
 import { useFieldsetGroup } from '../fieldset/Fieldset'
+import { useFormReset } from '../../utils/use-form-reset'
 
 export interface RadioGroupProps {
   items: RadioItem[]
@@ -36,8 +37,11 @@ export function RadioGroup(props: RadioGroupProps) {
     }
   )
 
+  const root = useRef<HTMLDivElement>(null)
+  useFormReset(root, () => setUncontrolled(defaultValue))
+
   return (
-    <div {...api.rootProps}>
+    <div ref={root} {...api.rootProps}>
       {label && <span {...api.labelProps}>{label}</span>}
       <div {...api.listProps}>
         {items.map((item, index) => {
