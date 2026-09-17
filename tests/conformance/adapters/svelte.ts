@@ -1,6 +1,6 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Button, ChipGroup, Input, Select } from '../../../packages/svelte/src/index'
-import FieldWithInput from './FieldWithInput.svelte'
+import { Button, ChipGroup, Input, Select, Textarea } from '../../../packages/svelte/src/index'
+import FieldWithControl from './FieldWithControl.svelte'
 import { type Adapter, type ButtonProps, type Mounted, track } from '../harness'
 import { reactiveProps } from './svelte-props.svelte'
 
@@ -56,7 +56,8 @@ export const svelte: Adapter = {
   select: (props, target) => mountSvelte(Select as Component<any>, props, target),
   chipGroup: (props, target) => mountSvelte(ChipGroup as Component<any>, props, target),
   input: (props, target) => mountSvelte(Input as Component<any>, props, target),
+  textarea: (props, target) => mountSvelte(Textarea as Component<any>, props, target),
   // A Field's children are a snippet, and a raw snippet cannot render a
   // component, so a two-line wrapper composes the pair as an app would.
-  field: (props, target) => mountSvelte(FieldWithInput as Component<any>, props, target),
+  field: (props, target) => mountSvelte(FieldWithControl as Component<any>, props, target),
 }

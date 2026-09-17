@@ -8,6 +8,7 @@ import {
   type InputProps,
   type Mounted,
   type SelectProps,
+  type TextareaProps,
   track,
 } from '../harness'
 
@@ -34,6 +35,30 @@ function nativeInput(props: InputProps): HTMLInputElement {
   if (props.defaultValue !== undefined) input.value = props.defaultValue
   if (props.onValueChange) input.addEventListener('input', () => props.onValueChange!(input.value))
   return input
+}
+
+/** A native <textarea> as server markup would render it. */
+function nativeTextarea(props: TextareaProps): HTMLTextAreaElement {
+  const textarea = document.createElement('textarea')
+  setAttr(textarea, 'name', props.name)
+  setAttr(textarea, 'placeholder', props.placeholder)
+  setAttr(textarea, 'rows', props.rows)
+  setAttr(textarea, 'maxlength', props.maxLength)
+  setAttr(textarea, 'required', props.required)
+  setAttr(textarea, 'disabled', props.disabled)
+  setAttr(textarea, 'readonly', props.readOnly)
+  if (props.defaultValue !== undefined) textarea.value = props.defaultValue
+  if (props.onValueChange) textarea.addEventListener('input', () => props.onValueChange!(textarea.value))
+  return textarea
+}
+
+/** <gg-textarea>'s own attributes; the rest are native, on the textarea. */
+function applyTextareaHost(host: HTMLElement, props: Partial<TextareaProps>) {
+  if ('size' in props) setAttr(host, 'size', props.size)
+  if ('invalid' in props) setAttr(host, 'invalid', props.invalid)
+  if ('resize' in props) setAttr(host, 'resize', props.resize)
+  if ('autoResize' in props) setAttr(host, 'autoresize', props.autoResize)
+  if ('maxRows' in props) setAttr(host, 'max-rows', props.maxRows)
 }
 
 function applyButton(host: HTMLElement, props: Partial<ButtonProps>) {
@@ -114,6 +139,24 @@ export const elements: Adapter = {
     } satisfies Mounted<InputProps>)
   },
 
+  async textarea(props, target) {
+    const host = document.createElement('gg-textarea')
+    const textarea = nativeTextarea(props)
+    applyTextareaHost(host, props)
+    host.append(textarea)
+    target.append(host)
+    return track({
+      root: host,
+      async update(patch) {
+        applyTextareaHost(host, patch)
+        if ('disabled' in patch) setAttr(textarea, 'disabled', patch.disabled)
+        if ('readOnly' in patch) setAttr(textarea, 'readonly', patch.readOnly)
+        if ('required' in patch) setAttr(textarea, 'required', patch.required)
+      },
+      unmount: async () => host.remove(),
+    } satisfies Mounted<TextareaProps>)
+  },
+
   async field(props, target) {
     const host = document.createElement('gg-field')
     const apply = (patch: Partial<FieldProps>) => {
@@ -122,9 +165,17 @@ export const elements: Adapter = {
       }
       if ('readOnly' in patch) setAttr(host, 'readonly', patch.readOnly)
     }
-    const input = props.input ?? {}
-    setAttr(host, 'size', input.size)
-    host.append(nativeInput(input))
+    if (props.textarea) {
+      // Through a <gg-textarea>, which stands down and hands its attributes to the field.
+      const wrapper = document.createElement('gg-textarea')
+      applyTextareaHost(wrapper, props.textarea)
+      wrapper.append(nativeTextarea(props.textarea))
+      host.append(wrapper)
+    } else {
+      const input = props.input ?? {}
+      setAttr(host, 'size', input.size)
+      host.append(nativeInput(input))
+    }
     apply(props)
     target.append(host)
     return track({

@@ -2,8 +2,8 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Six components — Button, Chip, ChipGroup, Select, Field and Input — built end to
-end to prove the architecture holds.
+Seven components — Button, Chip, ChipGroup, Select, Field, Input and Textarea —
+built end to end to prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -13,7 +13,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 361 tests
+npm test         # 419 tests
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
 ```
@@ -33,9 +33,9 @@ packages/
   theme-instrument/  Instrument: OKLCH token tiers, component CSS, the --gg-* contract
   icons/             glyph SVGs -> --gg-icon-* tokens; the shared glyph compiler
   checks/            the theme gates: structure and contrast, run on every theme
-  elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>
-  react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>
-  svelte/            <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>
+  elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>, <gg-textarea>
+  react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>
+  svelte/            <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
 ```
@@ -268,13 +268,58 @@ validated form does exactly that.
 **In the elements, the outermost enhancer owns the control.** `<gg-input>` inside
 a `<gg-field>` does nothing; the field applies the input contract itself and reads
 the wrapper's `size`. Two elements spreading props onto one `<input>` would each
-strip the other's attributes on every render. `<gg-field>` also accepts a
-`<textarea>` or `<select>`, labelling and validating it without the input
-contract, and adopts an `id` the page gave it — the host *is* the field root.
+strip the other's attributes on every render. `<gg-textarea>` stands down the
+same way, and a wrapper whose attributes change asks the field to render again
+(`refresh()`). `<gg-field>` also accepts a bare `<select>`, labelling and
+validating it without a contract of its own, and adopts an `id` the page gave
+it — the host *is* the field root.
 Flags may sit on the field or on the control's own markup; the markup is read
 once, at connect, because afterwards those attributes are the field's own output
 and reading them back would make `disabled` impossible to remove. A test caught
 exactly that.
+
+## Textarea
+
+Input's shape — no machine, the value in the native element, Field props merged
+in — plus the two things only a textarea has:
+
+```tsx
+<Field label="Notes" hint="Grows with the text, up to 8 lines">
+  <Textarea rows={2} autoResize maxRows={8} />
+</Field>
+```
+
+```html
+<gg-field label="Notes">
+  <gg-textarea autoresize max-rows="8"><textarea rows="2"></textarea></gg-textarea>
+</gg-field>
+```
+
+**A resting height.** Both themes size a textarea from the control height of its
+size — two and a half controls tall, Instrument's definition — so it keeps scale
+with the inputs and buttons in its row. `rows` can make it taller, not shorter.
+Themes share one rule set for the field look: `input.css` styles
+`:is([data-scope='input'], [data-scope='textarea'])`, and `textarea.css` holds only
+what differs. Two copies of the state rules would drift.
+
+**Auto-resize**, from `rows` up to `maxRows` lines, then it scrolls. It needs the
+DOM, so it lives in core as `attachAutosize` — like `attachPositioner` — and the
+adapters only attach and destroy it; `connect()` returns `autosize` options or
+null. The resize handle turns off while it is on (`data-resize="none"`, applied by
+`@ggary/structure`), since the next keystroke would undo a drag.
+
+It is JS rather than `field-sizing: content`, which has no max-rows and is not in
+every browser a kit supports. The measure collapses to `height: auto` and reads
+`scrollHeight`, which is what lets a textarea shrink as text is deleted.
+
+A height is only right for the metrics it was measured under, and most of the
+ways those change fire nothing on the textarea: switching theme, mode or density,
+a stylesheet loading, a web font arriving after the first paint. The sandbox
+showed it — type five lines, switch theme, and the old height stayed. So one
+shared watcher (attributes on `<html>`, stylesheet changes in `<head>`,
+`document.fonts`) re-measures every live instance in a microtask. A change scoped
+to a subtree is not watched; call `update()` (`measure()` on `<gg-textarea>`)
+after one, and after setting a value from code in the custom element.
 
 ## Layering inside core
 
@@ -469,11 +514,12 @@ fold, or you get layout shift on upgrade.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 69 tests. Every transition of every machine, pure, milliseconds; `mergeProps`. |
-| contract | node | `icons.contract.test.ts` | 48 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `icons.contract.test.ts` | 53 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 198 tests. One contract × three adapters. |
-| dom | jsdom | `elements.dom.test.ts` | 16 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
+| dom | jsdom | `conformance.dom.test.ts` | 237 tests. One contract × three adapters. |
+| dom | jsdom | `elements.dom.test.ts` | 19 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
+| dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 
 **Machine tests** cover behaviour in depth, once, where it is cheap. They run with
 no DOM at all, which is also what keeps reducers from touching one.
@@ -548,9 +594,10 @@ Real, and deliberately left open:
   lines was out of scope for a first port.
 - **`data-accent` on a subtree is unverified in Instrument.** Its semantics are
   declared on `:root`; the port only exercised the attribute on `<html>`.
-- **Not ported from Instrument:** everything beyond these six components — prose,
-  the rest of forms (textarea, checkbox, radio, switch), tables, overlays, the
-  agent components and print styles.
+- **Not ported from Instrument:** everything beyond these seven components —
+  prose, the rest of forms (checkbox, radio, switch, number field), tables,
+  overlays, the agent components (including the composer, a textarea with a
+  toolbar in one frame) and print styles.
 - **`onValueChange` fires when the user re-picks the already-selected value.**
   Intent semantics, not value-diff semantics. Correct for controlled components,
   mildly surprising otherwise.
@@ -563,10 +610,14 @@ Real, and deliberately left open:
   the form (see Field and Input).
 - **Form `reset` does not clear a field's error state.** The machine has a
   `RESET` event; nothing listens for the form's `reset` yet.
-- **Only Input consumes a Field in React and Svelte.** `<gg-field>` wraps a native
-  textarea or select, but the framework Field has no Textarea or Select-as-control
-  to hand its props to. Select is a listbox, not a native control, and would need
-  its own wiring.
+- **Select does not consume a Field.** Input and Textarea do. Select is a
+  listbox, not a native control, and has its own label; wiring it to Field's
+  label, hint and validation is its own piece of work.
+- **No character counter.** `maxLength` is enforced by the browser, silently; a
+  "12 / 280" readout (with a polite live region) belongs to Field.
+- **`<gg-select>` and `<gg-chip-group>` stop rendering after being moved** in the
+  document: they unsubscribe on disconnect and never re-subscribe. `<gg-field>`
+  had the same bug and is fixed, with a test.
 - **No affixes.** No icon, prefix, suffix or clear button inside an input.
 - **`minlength` only applies after a real edit.** Browsers report `tooShort` for
   user edits, not for a value set from script — native behaviour, but it means a

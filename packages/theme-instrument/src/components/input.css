@@ -1,7 +1,8 @@
 /* ==========================================================================
-   Instrument — input
+   Instrument — input, and the field look a textarea shares
 
-   Ported from instrument/src/forms.css (.inst-input).
+   Ported from instrument/src/forms.css (.inst-input, .inst-textarea), where the
+   two already share one rule set. What only a textarea has is in textarea.css.
 
    A field is recognised by its BORDER, not by lightness. --surface-field equals
    the panel's colour on purpose; what answers for the field is the load-bearing
@@ -15,7 +16,7 @@
    its red border.
    ========================================================================== */
 
-[data-scope='input'][data-part='root'] {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root'] {
   inline-size: 100%;
   min-block-size: var(--control-h-md);
   padding-inline: var(--control-pad-sm);
@@ -56,13 +57,13 @@
 
 /* Height and type size change with the scale; the inline padding does not —
    text in a field is pushed to the edge rather than centred. */
-[data-scope='input'][data-part='root'][data-size='sm'] {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root'][data-size='sm'] {
   min-block-size: var(--control-h-sm);
   border-radius: var(--radius-control-sm);
   font-size: var(--text-xs);
 }
 
-[data-scope='input'][data-part='root'][data-size='lg'] {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root'][data-size='lg'] {
   min-block-size: var(--control-h-lg);
   border-radius: var(--radius-control-lg);
   font-size: var(--text-md);

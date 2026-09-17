@@ -125,10 +125,10 @@ describe('light-DOM enhancement', () => {
   })
 })
 
-describe('<gg-field> and <gg-input>', () => {
+describe('<gg-field>, <gg-input> and <gg-textarea>', () => {
   const mount = (html: string) => {
     document.body.innerHTML = `<form>${html}</form>`
-    return document.querySelector('gg-field, gg-input') as HTMLElement
+    return document.querySelector('gg-field, gg-input, gg-textarea') as HTMLElement
   }
   const control = <T extends Element = HTMLInputElement>() => document.querySelector('input, textarea, select') as unknown as T
 
@@ -154,12 +154,12 @@ describe('<gg-field> and <gg-input>', () => {
     expect((document.querySelector('label') as HTMLLabelElement).htmlFor).toBe(input.id)
   })
 
-  it('wraps a textarea and a select as plain controls: labelled, validated, no input contract', () => {
+  it('wraps a textarea with its own contract, and a select as a plain control: labelled, validated', () => {
     mount('<gg-field label="Notes" hint="Optional"><textarea></textarea></gg-field>')
     const textarea = control<HTMLTextAreaElement>()
     expect((document.querySelector('label') as HTMLLabelElement).htmlFor).toBe(textarea.id)
     expect(textarea.getAttribute('aria-describedby')).toBe(document.querySelector('[data-part="hint"]')!.id)
-    expect(textarea.hasAttribute('data-scope')).toBe(false)
+    expect(textarea.dataset.scope).toBe('textarea')
 
     mount('<gg-field label="Plan" error="Pick a plan"><select required><option value=""></option><option>Pro</option></select></gg-field>')
     const select = control<HTMLSelectElement>()
@@ -179,6 +179,34 @@ describe('<gg-field> and <gg-input>', () => {
     mount('<gg-field id="username" label="Username"><input></gg-field>')
     expect(document.getElementById('username')!.tagName).toBe('GG-FIELD')
     expect(control().id).toBe('username-control')
+  })
+
+  it('re-renders when a wrapper inside it changes its attributes', () => {
+    mount('<gg-field label="Notes"><gg-textarea size="sm"><textarea></textarea></gg-textarea></gg-field>')
+    const wrapper = document.querySelector('gg-textarea')!
+    expect(control<HTMLTextAreaElement>().dataset.size).toBe('sm')
+    wrapper.setAttribute('size', 'lg')
+    wrapper.setAttribute('autoresize', '')
+    expect(control<HTMLTextAreaElement>().dataset.size).toBe('lg')
+    expect(control<HTMLTextAreaElement>().dataset.resize).toBe('none')
+  })
+
+  it('keeps working after being moved in the document', () => {
+    const field = mount('<gg-field label="Email" error="Required"><input required></gg-field>')
+    const elsewhere = document.createElement('div')
+    document.body.append(elsewhere)
+    elsewhere.append(field)
+    control().dispatchEvent(new Event('blur'))
+    expect(control().getAttribute('aria-invalid')).toBe('true')
+    expect(document.querySelectorAll('gg-field label')).toHaveLength(1)
+  })
+
+  it('<gg-textarea> re-measures on demand, for values set from code', () => {
+    const host = mount('<gg-textarea autoresize><textarea></textarea></gg-textarea>') as HTMLElement & { measure(): void }
+    const textarea = control<HTMLTextAreaElement>()
+    textarea.style.removeProperty('height')
+    host.measure()
+    expect(textarea.style.height).not.toBe('')
   })
 
   it('without a label attribute, renders no visible label', () => {

@@ -1,0 +1,16 @@
+/* ==========================================================================
+   GGarry — textarea
+
+   The border, surface, states and sizes come from input.css, which styles both.
+   A textarea rests at two and a half controls tall at each size, so it lines up
+   with its row neighbours' scale. `rows` and auto-resize can make it taller;
+   nothing makes it shorter than that.
+   ========================================================================== */
+
+[data-scope='textarea'][data-part='root'] {
+  display: block;
+  height: auto;
+  min-height: calc(var(--input-height) * 2.5);
+  padding-block: var(--ggarry-space-2);
+  line-height: 1.5;
+}

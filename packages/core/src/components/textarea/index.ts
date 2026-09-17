@@ -1,0 +1,5 @@
+export { textareaAnatomy } from './textarea.anatomy'
+export type { TextareaPart } from './textarea.anatomy'
+export { connect } from './textarea.connect'
+export type { TextareaConnectOptions } from './textarea.connect'
+export type { TextareaProps, TextareaResize, TextareaSize } from './textarea.types'

@@ -119,6 +119,44 @@ export function fieldConformance(adapter: Adapter) {
       })
     })
 
+    describe('around a textarea', () => {
+      const withTextarea = (props: FieldProps = {}) =>
+        adapter.field({ label: 'Message', ...props, textarea: { rows: 3, ...props.textarea } }, freshTarget('form'))
+      const textareaIn = (root: Element) => part(root, 'textarea', 'root') as HTMLTextAreaElement
+
+      it('labels and describes a textarea that keeps its own contract', async () => {
+        const m = await withTextarea({ hint: 'Markdown works', textarea: { size: 'sm' } })
+        const textarea = textareaIn(m.root)
+        expect(textarea.tagName).toBe('TEXTAREA')
+        expect((part(m.root, 'field', 'label') as HTMLLabelElement).htmlFor).toBe(textarea.id)
+        expect(textarea.getAttribute('aria-describedby')).toBe(part(m.root, 'field', 'hint')!.id)
+        expect(textarea.dataset.size).toBe('sm')
+        expect(textarea.rows).toBe(3)
+      })
+
+      it('validates it on the same timing', async () => {
+        const m = await withTextarea({ required: true, error: 'Say something' })
+        const textarea = textareaIn(m.root)
+        await adapter.act(() => typeInto(textarea, ''))
+        expect(textarea.hasAttribute('aria-invalid')).toBe(false)
+        await adapter.act(() => {
+          textarea.focus()
+          textarea.blur()
+        })
+        expect(textarea.getAttribute('aria-invalid')).toBe('true')
+        expect(part(m.root, 'field', 'error')!.textContent).toBe('Say something')
+        await adapter.act(() => typeInto(textarea, 'hello'))
+        expect(textarea.hasAttribute('aria-invalid')).toBe(false)
+      })
+
+      it('auto-resizes inside a field', async () => {
+        const m = await withTextarea({ textarea: { autoResize: true, maxRows: 5 } })
+        const textarea = textareaIn(m.root)
+        expect(textarea.dataset.resize).toBe('none')
+        expect(textarea.style.overflowY).toBe('hidden')
+      })
+    })
+
     describe('owner-declared invalid', () => {
       it('shows at once, untouched, and clears when the owner says so', async () => {
         const { m, control, error } = await setup({ invalid: true, error: 'That name is taken' })

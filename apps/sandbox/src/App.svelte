@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Chip, ChipGroup, Field, Input, Select } from '@ggary/svelte'
+  import { Button, Chip, ChipGroup, Field, Input, Select, Textarea } from '@ggary/svelte'
   import { frameworks, tags } from './demo-data'
 
   let value = $state<string | null>('svelte')
@@ -181,6 +181,21 @@ last event  ${lastEvent}`}</pre>
 </section>
 
 <section>
+  <h2>Textarea</h2>
+  <div class="fields">
+    <Field label="Description" hint="Drag the corner to resize">
+      <Textarea name="description" rows={3} />
+    </Field>
+    <Field label="Notes" hint="Grows with the text, up to 8 lines">
+      <Textarea rows={2} autoResize maxRows={8} placeholder="Start typing…" />
+    </Field>
+    <Field label="Release notes" hint="Read only" readOnly>
+      <Textarea rows={3} defaultValue={'v2.4.0\n- Field and Input in all three adapters\n- Textarea with auto-resize'} />
+    </Field>
+  </div>
+</section>
+
+<section>
   <h2>Field — invalid declared by the owner</h2>
   <div class="row">
     <Field label="Username" hint="Letters and digits" error="That username is taken" invalid={taken}>
@@ -203,6 +218,9 @@ invalid  ${taken}`}</pre>
     </Field>
     <Field label="Password" hint="At least 8 characters" error="Use 8 or more characters" required>
       <Input name="password" type="password" minlength={8} />
+    </Field>
+    <Field label="About you" hint="Optional, up to 280 characters">
+      <Textarea name="about" rows={2} maxLength={280} autoResize maxRows={6} />
     </Field>
     <div class="row">
       <Button emphasis="high" type="submit">Create account</Button>

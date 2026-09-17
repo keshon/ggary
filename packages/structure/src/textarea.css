@@ -1,0 +1,9 @@
+/* The resize handle follows data-resize. Without this a textarea that sizes
+   itself would still offer a handle whose result the next keystroke undoes. */
+[data-scope='textarea'][data-part='root'][data-resize='vertical'] {
+  resize: vertical;
+}
+
+[data-scope='textarea'][data-part='root'][data-resize='none'] {
+  resize: none;
+}

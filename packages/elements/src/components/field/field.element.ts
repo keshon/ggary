@@ -1,7 +1,8 @@
 import { connect, createFieldMachine, type FieldEvent, type FieldState } from '@ggary/core/field'
 import { connect as connectInput, type InputSize, type InputType } from '@ggary/core/input'
-import { domNormalizer, uid, type Machine } from '@ggary/core'
+import { domNormalizer, uid, type Autosize, type Machine } from '@ggary/core'
 import { h, spread } from '../../spread'
+import { applyTextarea, textareaProps } from '../textarea/textarea.element'
 
 /**
  * Light-DOM enhancement around a native control:
@@ -30,9 +31,16 @@ export class GgFieldElement extends HTMLElement {
   #error: HTMLDivElement | null = null
   /** The control's own flags, read once before this element first writes to it. */
   #native = { required: false, disabled: false, readOnly: false }
+  #autosize: Autosize | null = null
 
   connectedCallback(): void {
-    if (this.#machine) return
+    // Moved, not new: the parts are already in place, only the subscription
+    // (and auto-resize) went away on disconnect.
+    if (this.#machine) {
+      this.#unsubscribe = this.#machine.subscribe(() => this.#render())
+      this.#render()
+      return
+    }
     this.#control = this.querySelector('input, textarea, select')
     if (!this.#control) {
       console.warn('<gg-field> expects an input, textarea or select inside it.', this)
@@ -63,6 +71,16 @@ export class GgFieldElement extends HTMLElement {
   disconnectedCallback(): void {
     this.#unsubscribe?.()
     this.#unsubscribe = null
+    this.#autosize?.destroy()
+    this.#autosize = null
+  }
+
+  /**
+   * Render again. A <gg-input> or <gg-textarea> inside the field calls this when
+   * its own attributes change, since the field is what applies them.
+   */
+  refresh(): void {
+    if (this.isConnected) this.#render()
   }
 
   attributeChangedCallback(name: string): void {
@@ -125,6 +143,9 @@ export class GgFieldElement extends HTMLElement {
         { field: api.control }
       )
       spread(control, input.rootProps)
+    } else if (control instanceof HTMLTextAreaElement) {
+      const props = textareaProps(control.closest('gg-textarea'), this)
+      this.#autosize = applyTextarea(control, props, this.#autosize, api.control)
     } else {
       spread(control, domNormalizer(api.control))
     }

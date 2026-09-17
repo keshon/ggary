@@ -16,6 +16,7 @@
   [data-scope='button'][data-part='root'],
   [data-scope='select'][data-part='trigger'],
   [data-scope='input'][data-part='root'],
+  [data-scope='textarea'][data-part='root'],
   [data-scope='select'][data-part='content'],
   [data-scope='chip'][data-part='root'] {
     border: var(--stroke) solid CanvasText;

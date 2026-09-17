@@ -114,6 +114,27 @@ app.innerHTML = `
   </section>
 
   <section>
+    <h2>Textarea</h2>
+    <div class="fields">
+      <gg-field label="Description" hint="Drag the corner to resize">
+        <textarea name="description" rows="3"></textarea>
+      </gg-field>
+      <gg-field label="Notes" hint="Grows with the text, up to 8 lines">
+        <gg-textarea autoresize max-rows="8"><textarea rows="2" placeholder="Start typing…"></textarea></gg-textarea>
+      </gg-field>
+      <gg-field label="Release notes" hint="Read only">
+        <textarea readonly rows="3">v2.4.0
+- Field and Input in all three adapters
+- Textarea with auto-resize</textarea>
+      </gg-field>
+    </div>
+    <p class="hint">
+      A textarea shares the input's field look and states; it rests at two and a half controls tall.
+      <code>autoresize</code> grows it from its <code>rows</code> to <code>max-rows</code>, then it scrolls.
+    </p>
+  </section>
+
+  <section>
     <h2>Field — invalid declared by the owner</h2>
     <div class="row">
       <gg-field id="username" label="Username" hint="Letters and digits" error="That username is taken">
@@ -134,6 +155,9 @@ app.innerHTML = `
       <gg-field label="Email" error="Enter a valid email address"><input name="email" type="email" required></gg-field>
       <gg-field label="Password" hint="At least 8 characters" error="Use 8 or more characters">
         <input name="password" type="password" minlength="8" required>
+      </gg-field>
+      <gg-field label="About you" hint="Optional, up to 280 characters">
+        <gg-textarea autoresize max-rows="6"><textarea name="about" rows="2" maxlength="280"></textarea></gg-textarea>
       </gg-field>
       <div class="row">
         <gg-button emphasis="high"><button type="submit">Create account</button></gg-button>

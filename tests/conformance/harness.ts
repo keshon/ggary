@@ -17,6 +17,7 @@ import type { ChipGroupMode, ChipGroupOrientation, ChipItem } from '../../packag
 import type { SelectItem } from '../../packages/core/src/components/select'
 import type { ButtonEmphasis, ButtonSize, ButtonTone } from '../../packages/core/src/components/button'
 import type { InputSize, InputType } from '../../packages/core/src/components/input'
+import type { TextareaResize, TextareaSize } from '../../packages/core/src/components/textarea'
 
 export interface ButtonProps {
   label: string
@@ -66,7 +67,28 @@ export interface InputProps {
   onValueChange?: (value: string) => void
 }
 
-/** A Field wrapping one Input. `input` configures the control inside. */
+export interface TextareaProps {
+  size?: TextareaSize
+  name?: string
+  placeholder?: string
+  rows?: number
+  maxLength?: number
+  disabled?: boolean
+  readOnly?: boolean
+  required?: boolean
+  invalid?: boolean
+  resize?: TextareaResize
+  autoResize?: boolean
+  maxRows?: number
+  value?: string
+  defaultValue?: string
+  onValueChange?: (value: string) => void
+}
+
+/**
+ * A Field wrapping one control: a Textarea when `textarea` is given, otherwise
+ * an Input configured by `input`.
+ */
 export interface FieldProps {
   label?: string
   hint?: string
@@ -76,6 +98,7 @@ export interface FieldProps {
   disabled?: boolean
   readOnly?: boolean
   input?: InputProps
+  textarea?: TextareaProps
 }
 
 export interface Mounted<P> {
@@ -104,7 +127,8 @@ export interface Adapter {
   select(props: SelectProps, target: HTMLElement): Promise<Mounted<SelectProps>>
   chipGroup(props: ChipGroupProps, target: HTMLElement): Promise<Mounted<ChipGroupProps>>
   input(props: InputProps, target: HTMLElement): Promise<Mounted<InputProps>>
-  /** Updates apply to the Field's own props; `input` is read at mount only. */
+  textarea(props: TextareaProps, target: HTMLElement): Promise<Mounted<TextareaProps>>
+  /** Updates apply to the Field's own props; `input` and `textarea` are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
 }
 
@@ -153,8 +177,9 @@ export const click = (target: Element) => (target as HTMLElement).click()
  * `el.value = x` would update that tracker too, so React would see no change and
  * never call onChange.
  */
-export function typeInto(input: HTMLInputElement, text: string) {
-  const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!
+export function typeInto(input: HTMLInputElement | HTMLTextAreaElement, text: string) {
+  const prototype = input instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype
+  const setter = Object.getOwnPropertyDescriptor(prototype, 'value')!.set!
   setter.call(input, text)
   input.dispatchEvent(new Event('input', { bubbles: true }))
 }

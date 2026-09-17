@@ -1,5 +1,9 @@
 /* ==========================================================================
-   GGarry — input
+   GGarry — input, and the field look a textarea shares
+
+   Every rule here also styles a textarea: a textarea is the same field with
+   more lines, and two copies of the state rules would drift. What differs —
+   height, padding, line-height — is in textarea.css.
 
    The border is the input's only boundary, so it uses border-control (3:1),
    not the decorative border-strong a button outline uses.
@@ -9,7 +13,7 @@
    repaint an invalid field's red border the moment the cursor crossed it.
    ========================================================================== */
 
-[data-scope='input'][data-part='root'] {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root'] {
   --input-height: var(--ggarry-size-control-md);
   --input-font-size: var(--ggarry-font-size-md);
 
@@ -26,47 +30,47 @@
 }
 
 /* A placeholder is read: readable text, not the decorative subtle step. */
-[data-scope='input'][data-part='root']::placeholder {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root']::placeholder {
   color: var(--ggarry-text-muted);
   opacity: 1;
 }
 
-[data-scope='input'][data-part='root']:hover:not(:disabled):not(:read-only):not([data-invalid]) {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root']:hover:not(:disabled):not(:read-only):not([data-invalid]) {
   border-color: var(--ggarry-border-accent);
 }
 
-[data-scope='input'][data-part='root']:focus-visible:not([data-invalid]) {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root']:focus-visible:not([data-invalid]) {
   border-color: var(--ggarry-border-accent);
 }
 
-[data-scope='input'][data-part='root'][data-invalid] {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root'][data-invalid] {
   border-color: var(--ggarry-border-danger);
 }
 
 /* Readonly is not disabled. The value stays fully readable and selectable;
    only the surface says it cannot be typed into. */
-[data-scope='input'][data-part='root']:read-only:not(:disabled) {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root']:read-only:not(:disabled) {
   background: var(--ggarry-bg-subtle);
   border-color: var(--ggarry-border-default);
   cursor: default;
 }
 
-[data-scope='input'][data-part='root']:disabled {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root']:disabled {
   opacity: 0.55;
   cursor: not-allowed;
   background: var(--ggarry-bg-subtle);
 }
 
-[data-scope='input'][data-part='root'][data-size='sm'] {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root'][data-size='sm'] {
   --input-height: var(--ggarry-size-control-sm);
   --input-font-size: var(--ggarry-font-size-sm);
 }
 
-[data-scope='input'][data-part='root'][data-size='lg'] {
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root'][data-size='lg'] {
   --input-height: var(--ggarry-size-control-lg);
   --input-font-size: var(--ggarry-font-size-lg);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-scope='input'][data-part='root'] { transition: none; }
+  :is([data-scope='input'], [data-scope='textarea'])[data-part='root'] { transition: none; }
 }

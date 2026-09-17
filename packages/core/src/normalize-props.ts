@@ -2,6 +2,20 @@ import type { Dict, Normalizer } from './types'
 
 const isHandler = (key: string) => /^on[A-Z]/.test(key)
 
+/**
+ * Canonical props are React-cased (`readOnly`, `maxLength`); outside React they
+ * are plain attributes, whose names are lowercase.
+ */
+const ATTRIBUTE_NAMES: Record<string, string> = {
+  tabIndex: 'tabindex',
+  readOnly: 'readonly',
+  htmlFor: 'for',
+  maxLength: 'maxlength',
+  minLength: 'minlength',
+  autoComplete: 'autocomplete',
+  inputMode: 'inputmode',
+}
+
 /** Drop `undefined` (absent) and `false` (absent boolean attribute). */
 const isAbsent = (v: unknown) => v === undefined || v === null || v === false
 
@@ -32,10 +46,7 @@ export const svelteNormalizer: Normalizer = (props: Dict) => {
   for (const [key, value] of Object.entries(props)) {
     if (isAbsent(value)) continue
     if (isHandler(key)) out[key.toLowerCase()] = value
-    else if (key === 'tabIndex') out.tabindex = value
-    else if (key === 'readOnly') out.readonly = value
-    else if (key === 'htmlFor') out.for = value
-    else out[key] = value
+    else out[ATTRIBUTE_NAMES[key] ?? key] = value
   }
   return out
 }
@@ -58,7 +69,7 @@ export const domNormalizer: Normalizer<DomProps> = (props: Dict) => {
       listeners[key.slice(2).toLowerCase()] = value
       continue
     }
-    const name = key === 'tabIndex' ? 'tabindex' : key === 'readOnly' ? 'readonly' : key === 'htmlFor' ? 'for' : key
+    const name = ATTRIBUTE_NAMES[key] ?? key
     attrs[name] = value === true ? '' : String(value)
   }
   return { attrs, listeners }

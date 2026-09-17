@@ -46,6 +46,7 @@
 @import './components/field.css' layer(gg.components);
 @import './components/input.css' layer(gg.components);
 @import './components/select.css' layer(gg.components);
+@import './components/textarea.css' layer(gg.components);
 
 @import './a11y/forced.css' layer(gg.forced);
 @import './a11y/motion.css' layer(gg.motion);

@@ -1,6 +1,6 @@
 import { act, createElement, type ComponentType, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Button, ChipGroup, Field, Input, Select } from '../../../packages/react/src/index'
+import { Button, ChipGroup, Field, Input, Select, Textarea } from '../../../packages/react/src/index'
 import { type Adapter, type ButtonProps, type FieldProps, type Mounted, track } from '../harness'
 
 /**
@@ -54,6 +54,10 @@ export const react: Adapter = {
   select: (props, target) => mount(Select, props, target),
   chipGroup: (props, target) => mount(ChipGroup, props, target),
   input: (props, target) => mount(Input, props, target),
+  textarea: (props, target) => mount(Textarea, props, target),
   field: (props, target) =>
-    mount(Field, props, target, ({ input, ...field }: FieldProps) => [field, createElement(Input, input ?? {})]),
+    mount(Field, props, target, ({ input, textarea, ...field }: FieldProps) => [
+      field,
+      textarea ? createElement(Textarea, textarea) : createElement(Input, input ?? {}),
+    ]),
 }

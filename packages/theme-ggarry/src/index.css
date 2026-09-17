@@ -27,3 +27,4 @@
 @import './components/field.css' layer(gg.components);
 @import './components/input.css' layer(gg.components);
 @import './components/select.css' layer(gg.components);
+@import './components/textarea.css' layer(gg.components);

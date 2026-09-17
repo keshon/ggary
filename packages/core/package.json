@@ -32,6 +32,10 @@
     "./select": {
       "types": "./src/components/select/index.ts",
       "default": "./src/components/select/index.ts"
+    },
+    "./textarea": {
+      "types": "./src/components/textarea/index.ts",
+      "default": "./src/components/textarea/index.ts"
     }
   },
   "dependencies": {
