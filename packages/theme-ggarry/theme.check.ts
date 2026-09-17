@@ -47,6 +47,7 @@ const pairs: Pair[] = [
   { label: 'danger: text on canvas', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-canvas'], min: TEXT },
   // Menu rows. The highlighted row reuses the accent and danger fills above.
   { label: 'menu: shortcut on surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'menubar: item on its hover and open plate', fg: '--ggarry-text-default', bg: ['--ggarry-bg-muted'], min: TEXT },
   { label: 'menu: submenu chevron on the open row plate', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-muted'], min: LARGE },
   // Disabled text is exempt from 1.4.3; it is held to the decor tier, as the
   // disabled option above. subtle on this plate failed even that (2.89:1).

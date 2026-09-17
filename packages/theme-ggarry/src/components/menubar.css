@@ -1,0 +1,32 @@
+/* ==========================================================================
+   GGarry — menubar
+
+   Minimal buttons in a row: nothing until the pointer or a menu arrives. The
+   open item keeps the plate its menu hangs from. The menus are menu.css.
+   ========================================================================== */
+
+[data-scope='menubar'][data-part='root'] {
+  gap: var(--ggarry-space-1);
+  padding: var(--ggarry-space-1);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='menubar'][data-part='item'] {
+  height: var(--ggarry-size-control-sm);
+  padding-inline: var(--ggarry-space-3);
+  border-radius: var(--ggarry-radius-md);
+  cursor: pointer;
+  transition: background-color var(--ggarry-duration-fast) ease;
+}
+
+[data-scope='menubar'][data-part='item']:hover:not([data-disabled]),
+[data-scope='menubar'][data-part='item'][data-state='open'] {
+  background: var(--ggarry-bg-muted);
+}
+
+[data-scope='menubar'][data-part='item'][data-disabled] {
+  color: var(--ggarry-text-subtle);
+  cursor: not-allowed;
+}

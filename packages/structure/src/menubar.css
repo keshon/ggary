@@ -1,0 +1,30 @@
+/* A menubar is a row. Its menus are the Menu's own parts, in menu.css.
+
+   An item is a <button>: the browser's button box is removed here, so a
+   theme starts from text on nothing, as a menubar item is in every desktop
+   toolkit. */
+[data-scope='menubar'][data-part='root'] {
+  display: flex;
+  align-items: center;
+}
+
+[data-scope='menubar'][data-part='item'] {
+  appearance: none;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* The access key is underlined only while it is live: Alt held, or the bar
+   reached with F10. Always underlined, a bar of menus reads as a row of links. */
+[data-scope='menubar'][data-part='mnemonic'] {
+  text-decoration: none;
+}
+[data-scope='menubar'][data-part='root'][data-mnemonics] [data-part='mnemonic'] {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}

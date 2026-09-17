@@ -49,6 +49,10 @@
       "types": "./src/components/menu/index.ts",
       "default": "./src/components/menu/index.ts"
     },
+    "./menubar": {
+      "types": "./src/components/menubar/index.ts",
+      "default": "./src/components/menubar/index.ts"
+    },
     "./popover": {
       "types": "./src/components/popover/index.ts",
       "default": "./src/components/popover/index.ts"

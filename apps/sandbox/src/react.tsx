@@ -14,6 +14,7 @@ import {
   Fieldset,
   Input,
   Menu,
+  Menubar,
   Popover,
   RadioGroup,
   Select,
@@ -21,7 +22,7 @@ import {
   Textarea,
   Tooltip,
 } from '@ggary/react'
-import { applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -553,6 +554,22 @@ function App() {
           />
         </div>
         <pre className="state">{overlayLog}</pre>
+      </section>
+
+      <section id="menubar">
+        <h2>Menubar</h2>
+        <Menubar
+          label="Application"
+          mnemonics
+          menus={appMenus(view)}
+          onSelect={(value, { checked, menu }) => {
+            const next = applyView(view, value, checked)
+            setView(next)
+            setMenuLog(next === view ? `chose ${menu} / ${value}` : describeView(next))
+          }}
+        />
+        <pre className="state">{menuLog}</pre>
+        <p className="hint">A menubar: Tab reaches it once, arrows walk it, Enter or ArrowDown opens a menu. While a menu is open, ArrowLeft and ArrowRight move between menus, and so does the pointer. Hold Alt to see the access keys; Alt+F opens File, F10 goes to the bar.</p>
       </section>
 
       <section id="menu">

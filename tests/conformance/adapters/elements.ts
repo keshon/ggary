@@ -1,5 +1,5 @@
 import '../../../packages/elements/src/index'
-import type { GgChipGroupElement, GgMenuElement, GgSelectElement } from '../../../packages/elements/src/index'
+import type { GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement } from '../../../packages/elements/src/index'
 import {
   type Adapter,
   type ButtonProps,
@@ -18,6 +18,7 @@ import {
   type PopoverProps,
   type TooltipProps,
   type MenuProps,
+  type MenubarProps,
   track,
 } from '../harness'
 
@@ -401,6 +402,32 @@ export const elements: Adapter = {
       update: async (patch) => applyPopoverHost(host, patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<PopoverProps>)
+  },
+
+  async menubar(props, target) {
+    const host = document.createElement('gg-menubar') as GgMenubarElement
+    let current = props
+    const apply = (patch: Partial<MenubarProps>) => {
+      if ('menus' in patch) host.menus = patch.menus!
+      if ('label' in patch) setAttr(host, 'label', patch.label)
+      if ('mnemonics' in patch) setAttr(host, 'mnemonics', patch.mnemonics)
+      if ('closeOnSelect' in patch) setAttr(host, 'keep-open', patch.closeOnSelect === false)
+    }
+    apply(props)
+    host.addEventListener('itemselect', (e) => {
+      const { value, ...details } = (e as CustomEvent).detail
+      current.onSelect?.(value, details)
+    })
+    host.addEventListener('openchange', (e) => current.onOpenChange?.((e as CustomEvent).detail.menu))
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => {
+        current = { ...current, ...patch }
+        apply(patch)
+      },
+      unmount: async () => host.remove(),
+    } satisfies Mounted<MenubarProps>)
   },
 
   async menu(props, target) {

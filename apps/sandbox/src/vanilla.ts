@@ -1,8 +1,8 @@
 import './theme'
 import './shared.css'
 import '@ggary/elements'
-import type { GgCheckboxElement, GgChipGroupElement, GgMenuElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
-import { applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import type { GgCheckboxElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
+import { appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
 
@@ -349,6 +349,13 @@ app.innerHTML = `
     </p>
   </section>
 
+  <section id="menubar">
+    <h2>Menubar</h2>
+    <gg-menubar id="app-menubar" label="Application" mnemonics></gg-menubar>
+    <pre class="state" id="menubar-state">choose something</pre>
+    <p class="hint">A menubar: Tab reaches it once, arrows walk it, Enter or ArrowDown opens a menu. While a menu is open, ArrowLeft and ArrowRight move between menus, and so does the pointer. Hold Alt to see the access keys; Alt+F opens File, F10 goes to the bar.</p>
+  </section>
+
   <section id="menu">
     <h2>Menu</h2>
     <div class="row" style="align-items: center">
@@ -527,5 +534,19 @@ viewMenuEl.addEventListener('itemselect', (event) => {
   const { value, checked } = (event as CustomEvent).detail
   view = applyView(view, value, checked)
   viewMenuEl.items = viewMenu(view)
+  menubar.menus = appMenus(view)
   menuState.textContent = describeView(view)
+})
+
+// --- menubar ------------------------------------------------------------------
+const menubarState = document.getElementById('menubar-state')!
+const menubar = document.getElementById('app-menubar') as GgMenubarElement
+menubar.menus = appMenus(view)
+menubar.addEventListener('itemselect', (event) => {
+  const { value, checked, menu } = (event as CustomEvent).detail
+  const next = applyView(view, value, checked)
+  menubarState.textContent = next === view ? `chose ${menu} / ${value}` : describeView(next)
+  view = next
+  menubar.menus = appMenus(view)
+  viewMenuEl.items = viewMenu(view)
 })

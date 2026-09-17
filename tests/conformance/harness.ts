@@ -21,6 +21,7 @@ import type { TextareaResize, TextareaSize } from '../../packages/core/src/compo
 import type { CheckedState } from '../../packages/core/src/components/checkbox'
 import type { RadioGroupOrientation, RadioItem } from '../../packages/core/src/components/radio-group'
 import type { MenuEntry, MenuItem } from '../../packages/core/src/components/menu'
+import type { MenubarMenu } from '../../packages/core/src/components/menubar'
 
 export interface ButtonProps {
   label: string
@@ -196,6 +197,15 @@ export interface MenuProps {
   label?: string
 }
 
+export interface MenubarProps {
+  menus: MenubarMenu[]
+  onSelect?: (value: string, details: { item: MenuItem; checked?: boolean; menu: string }) => void
+  onOpenChange?: (menu: string | null) => void
+  label?: string
+  mnemonics?: boolean
+  closeOnSelect?: boolean
+}
+
 export interface TooltipProps {
   content: string
   /** The trigger button's label. */
@@ -270,6 +280,7 @@ export interface Adapter {
   popover(props: PopoverProps, target: HTMLElement): Promise<Mounted<PopoverProps>>
   tooltip(props: TooltipProps, target: HTMLElement): Promise<Mounted<TooltipProps>>
   menu(props: MenuProps, target: HTMLElement): Promise<Mounted<MenuProps>>
+  menubar(props: MenubarProps, target: HTMLElement): Promise<Mounted<MenubarProps>>
   /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
 }

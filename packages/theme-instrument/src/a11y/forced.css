@@ -48,6 +48,7 @@
   /* A selection that is only a fill has to survive the reset. */
   [data-scope='select'][data-part='item'][data-highlighted],
   [data-scope='menu'][data-part='item'][data-highlighted],
+  [data-scope='menubar'][data-part='item'][data-state='open'],
   [data-scope='chip-group'] [data-scope='chip'][data-part='root'][data-selected] {
     background: Highlight;
     color: HighlightText;

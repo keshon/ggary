@@ -10,6 +10,7 @@
     Fieldset,
     Input,
     Menu,
+    Menubar,
     Popover,
     RadioGroup,
     Select,
@@ -17,7 +18,7 @@
     Textarea,
     Tooltip,
   } from '@ggary/svelte'
-  import { applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -488,6 +489,22 @@ invalid  ${taken}`}</pre>
     </Tooltip>
   </div>
   <pre class="state">{overlayLog}</pre>
+</section>
+
+<section id="menubar">
+  <h2>Menubar</h2>
+  <Menubar
+    label="Application"
+    mnemonics
+    menus={appMenus(view)}
+    onSelect={(value, { checked, menu }) => {
+      const next = applyView(view, value, checked)
+      menuLog = next === view ? `chose ${menu} / ${value}` : describeView(next)
+      view = next
+    }}
+  />
+  <pre class="state">{menuLog}</pre>
+  <p class="hint">A menubar: Tab reaches it once, arrows walk it, Enter or ArrowDown opens a menu. While a menu is open, ArrowLeft and ArrowRight move between menus, and so does the pointer. Hold Alt to see the access keys; Alt+F opens File, F10 goes to the bar.</p>
 </section>
 
 <section id="menu">

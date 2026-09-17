@@ -1,5 +1,6 @@
 import type { ChipItem } from '@ggary/core/chip-group'
 import type { MenuEntry } from '@ggary/core/menu'
+import type { MenubarMenu } from '@ggary/core/menubar'
 import type { SelectItem } from '@ggary/core/select'
 
 export const frameworks: SelectItem[] = [
@@ -130,3 +131,55 @@ export function applyView(view: ViewState, value: string, checked?: boolean): Vi
 
 export const describeView = (view: ViewState) =>
   `grid ${view.grid ? 'on' : 'off'}  rulers ${view.rulers ? 'on' : 'off'}  density ${view.density}`
+
+/** An application menubar. `&` marks each menu's access key. The View menu is the view menu above. */
+export function appMenus(view: ViewState): MenubarMenu[] {
+  return [
+    {
+      value: 'file',
+      label: '&File',
+      items: [
+        { value: 'new', label: 'New', shortcut: 'Ctrl+N' },
+        { value: 'open', label: 'Open…', shortcut: 'Ctrl+O' },
+        {
+          type: 'submenu',
+          value: 'recent',
+          label: 'Open Recent',
+          items: [
+            { value: 'recent-atlas', label: 'atlas.md' },
+            { value: 'recent-notes', label: 'notes.txt' },
+            { type: 'separator' },
+            { value: 'recent-clear', label: 'Clear Recent' },
+          ],
+        },
+        { type: 'separator' },
+        { value: 'save', label: 'Save', shortcut: 'Ctrl+S' },
+        { value: 'save-as', label: 'Save As…', shortcut: 'Ctrl+Shift+S' },
+        { type: 'separator' },
+        { value: 'quit', label: 'Quit', shortcut: 'Ctrl+Q' },
+      ],
+    },
+    {
+      value: 'edit',
+      label: '&Edit',
+      items: [
+        { value: 'undo', label: 'Undo', shortcut: 'Ctrl+Z' },
+        { value: 'redo', label: 'Redo (nothing to redo)', shortcut: 'Ctrl+Y', disabled: true },
+        { type: 'separator' },
+        { value: 'cut', label: 'Cut', shortcut: 'Ctrl+X' },
+        { value: 'copy', label: 'Copy', shortcut: 'Ctrl+C' },
+        { value: 'paste', label: 'Paste', shortcut: 'Ctrl+V' },
+      ],
+    },
+    { value: 'view', label: '&View', items: viewMenu(view) },
+    { value: 'window', label: '&Window (disabled)', disabled: true, items: [] },
+    {
+      value: 'help',
+      label: '&Help',
+      items: [
+        { value: 'docs', label: 'Documentation', href: '#menubar' },
+        { value: 'about', label: 'About ggary-ui' },
+      ],
+    },
+  ]
+}

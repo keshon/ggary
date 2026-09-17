@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Button, Checkbox, CheckboxGroup, ChipGroup, Input, RadioGroup, Select, Switch, Textarea } from '../../../packages/svelte/src/index'
+import { Button, Checkbox, CheckboxGroup, ChipGroup, Input, Menubar, RadioGroup, Select, Switch, Textarea } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import DialogWithContent from './DialogWithContent.svelte'
 import PopoverWithContent from './PopoverWithContent.svelte'
@@ -77,6 +77,7 @@ export const svelte: Adapter = {
   popover: (props, target) => mountSvelte(PopoverWithContent as Component<any>, props, target),
   tooltip: (props, target) => mountSvelte(TooltipWithTrigger as Component<any>, props, target),
   menu: (props, target) => mountSvelte(MenuWithTrigger as Component<any>, props, target),
+  menubar: (props, target) => mountSvelte(Menubar as Component<any>, props, target),
   // A Field's children are a snippet, and a raw snippet cannot render a
   // component, so a two-line wrapper composes the pair as an app would.
   field: (props, target) => mountSvelte(FieldWithControl as Component<any>, props, target),

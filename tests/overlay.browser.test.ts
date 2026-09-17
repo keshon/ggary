@@ -4,7 +4,7 @@ import '../packages/structure/src/index.css'
 import '../packages/elements/src/index'
 import { coolDownTooltips } from '../packages/core/src/components/tooltip/tooltip.machine'
 import { openLayerCount } from '../packages/core/src/utils/dismissable'
-import type { GgDialogElement, GgMenuElement, GgPopoverElement, GgSelectElement } from '../packages/elements/src/index'
+import type { GgDialogElement, GgMenuElement, GgMenubarElement, GgPopoverElement, GgSelectElement } from '../packages/elements/src/index'
 
 /**
  * Popover and Tooltip where only a browser can answer: real placement and
@@ -390,5 +390,95 @@ describe('menu in a real browser', () => {
     await settle()
     expect(menu.open).toBe(false)
     expect(dialog.open).toBe(true)
+  })
+})
+
+describe('menubar in a real browser', () => {
+  const menus = [
+    {
+      value: 'file',
+      label: '&File',
+      items: [
+        { value: 'new', label: 'New' },
+        { type: 'submenu' as const, value: 'recent', label: 'Open Recent', items: [{ value: 'a', label: 'a.txt' }] },
+        { value: 'quit', label: 'Quit' },
+      ],
+    },
+    { value: 'edit', label: '&Edit', items: [{ value: 'undo', label: 'Undo' }, { value: 'redo', label: 'Redo' }] },
+    { value: 'view', label: '&View', items: [{ value: 'zoom', label: 'Zoom' }] },
+  ]
+
+  const setup = () => {
+    const host = mount(`<button id="before">Before</button><gg-menubar label="Application" mnemonics></gg-menubar>`)
+    const bar = host.querySelector('gg-menubar') as GgMenubarElement
+    bar.menus = menus
+    const chosen: string[] = []
+    bar.addEventListener('itemselect', (event) => chosen.push(`${(event as CustomEvent).detail.menu}/${(event as CustomEvent).detail.value}`))
+    const barItem = (text: string) =>
+      [...host.querySelectorAll<HTMLElement>('[data-scope="menubar"][data-part="item"]')].find((el) => el.textContent === text)!
+    const row = (label: string) =>
+      [...host.querySelectorAll<HTMLElement>('[data-scope="menu"][data-part="item"]')].find(
+        (el) => el.querySelector(':scope > [data-part="item-text"]')!.textContent === label
+      )!
+    const label = () => (document.activeElement as HTMLElement).querySelector(':scope > [data-part="item-text"]')?.textContent ?? document.activeElement?.textContent
+    return { host, bar, chosen, barItem, row, label }
+  }
+
+  it('the keyboard alone: one tab stop, arrows along the bar and between open menus, a menu under its item', async () => {
+    const { host, chosen, barItem, label } = setup()
+    ;(host.querySelector('#before') as HTMLElement).focus()
+    await userEvent.tab()
+    expect(document.activeElement).toBe(barItem('File'))
+    await userEvent.keyboard('{ArrowRight}')
+    expect(document.activeElement).toBe(barItem('Edit'))
+    await userEvent.keyboard('{ArrowDown}')
+    await settle()
+    expect(label()).toBe('Undo')
+    const content = document.getElementById(barItem('Edit').getAttribute('aria-controls')!)!
+    expect(Math.round(box(content).top)).toBe(Math.round(box(barItem('Edit')).bottom + 4))
+    expect(Math.round(box(content).left)).toBe(Math.round(box(barItem('Edit')).left))
+
+    await userEvent.keyboard('{ArrowLeft}')
+    expect(label()).toBe('New')
+    await userEvent.keyboard('{ArrowDown}{ArrowRight}')
+    expect(label()).toBe('a.txt')
+    await userEvent.keyboard('{Enter}')
+    await settle()
+    expect(chosen).toEqual(['file/a'])
+    expect(document.activeElement).toBe(barItem('File'))
+    // Shift+Tab leaves the bar from its one stop.
+    await userEvent.tab({ shift: true })
+    expect(document.activeElement?.id).toBe('before')
+  })
+
+  it('Alt+key opens a menu by its access key, and F10 goes to the bar', async () => {
+    const { host, bar, barItem, label } = setup()
+    ;(host.querySelector('#before') as HTMLElement).focus()
+    await userEvent.keyboard('{Alt>}v{/Alt}')
+    await settle()
+    expect(label()).toBe('Zoom')
+    await userEvent.keyboard('{Escape}')
+    ;(host.querySelector('#before') as HTMLElement).focus()
+    await userEvent.keyboard('{F10}')
+    expect(document.activeElement).toBe(barItem('File'))
+    expect(bar.querySelector('[data-part="root"]')!.hasAttribute('data-mnemonics')).toBe(true)
+  })
+
+  it('a real pointer: a press opens a menu, moving along the bar switches, a click chooses', async () => {
+    const { chosen, barItem, row } = setup()
+    await userEvent.click(barItem('File'))
+    await settle()
+    expect(barItem('File').getAttribute('aria-expanded')).toBe('true')
+    await userEvent.hover(barItem('View'))
+    await settle()
+    expect(barItem('File').getAttribute('aria-expanded')).toBe('false')
+    expect(barItem('View').getAttribute('aria-expanded')).toBe('true')
+    await userEvent.hover(barItem('Edit'))
+    await settle()
+    await userEvent.click(row('Redo'))
+    await settle()
+    expect(chosen).toEqual(['edit/redo'])
+    expect(barItem('Edit').getAttribute('aria-expanded')).toBe('false')
+    expect(openLayerCount()).toBe(0)
   })
 })

@@ -12,6 +12,7 @@ import {
   Fieldset,
   Input,
   Menu,
+  Menubar,
   RadioGroup,
   Select,
   Switch,
@@ -116,6 +117,7 @@ export const react: Adapter = {
     mount(Tooltip, props, target, ({ trigger, ...rest }: TooltipProps) => [
       { ...rest, trigger: (triggerProps: object) => createElement('button', triggerProps, trigger) },
     ]),
+  menubar: (props, target) => mount(Menubar, props, target),
   menu: (props, target) =>
     mount(Menu, props, target, ({ trigger, ...rest }: MenuProps) => [
       { ...rest, trigger: (triggerProps: object) => createElement('button', triggerProps, trigger) },

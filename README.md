@@ -2,9 +2,9 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Sixteen components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
-Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Dialog, Popover, Tooltip
-and Menu — built end to end to prove the architecture holds.
+Seventeen components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
+Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Dialog, Popover, Tooltip,
+Menu and Menubar — built end to end to prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -14,7 +14,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 1422 tests, 558 of them in headless Chrome
+npm test         # 1524 tests, 600 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -37,10 +37,11 @@ packages/
   checks/            the theme gates: structure and contrast, run on every theme
   elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>,
                      <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>, <gg-dialog>,
-                     <gg-popover>, <gg-tooltip>, <gg-menu>, <gg-fieldset>, <gg-checkbox-group>
+                     <gg-popover>, <gg-tooltip>, <gg-menu>, <gg-menubar>, <gg-fieldset>,
+                     <gg-checkbox-group>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
                      <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Popover>, <Tooltip>,
-                     <Menu>, <Fieldset>, <CheckboxGroup>
+                     <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>
   svelte/            the same ten as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
@@ -697,6 +698,56 @@ browser's `display: none` for a closed popover, so every closed menu was drawn. 
 auto margins in `@ggary/structure` lost to Instrument's `* { margin: 0 }` in a later
 layer, so shortcuts sat next to the label. The label now takes the slack with `flex`.
 
+### Menubar
+
+The classic application menubar (WAI-ARIA APG menubar): File, Edit, View, for
+desktop-style and hybrid apps. Each menu is the Menu above, with its bar item as
+its trigger; the bar only decides which menu is open.
+
+```tsx
+<Menubar
+  label="Application"
+  mnemonics
+  menus={[
+    { value: 'file', label: '&File', items: [{ value: 'save', label: 'Save', shortcut: 'Ctrl+S' }] },
+    { value: 'edit', label: '&Edit', items: [...] },
+  ]}
+  onSelect={(value, { menu }) => …}
+/>
+```
+
+```html
+<gg-menubar label="Application" mnemonics></gg-menubar>
+<!-- bar.menus = [...]; itemselect ({ value, item, checked?, menu }), openchange ({ menu }) -->
+```
+
+- **One tab stop.** ArrowLeft and ArrowRight walk the bar, disabled menus included,
+  and wrap. Enter, Space or ArrowDown opens a menu on its first row; ArrowUp opens it
+  on its last.
+- **Between open menus.** ArrowRight on a row with no submenu, at any depth, opens
+  the next menu, skipping disabled ones. ArrowLeft on a menu's own level opens the
+  previous one; in a submenu it closes the submenu first. While a menu is open,
+  moving the pointer onto another bar item opens that menu. The menu reducer
+  reports these keys by returning the same state, and the bar reacts to that, so
+  no adapter decides it.
+- Choosing an item, Escape and Tab close the menu and return focus to its bar item.
+  `onOpenChange` reports the open menu's value, or `null`.
+- **Access keys** are opt-in (`mnemonics`), because on a web page Alt and F10 may
+  belong to the browser. `&File` marks F, and `&&` is a literal ampersand. The
+  marker never shows. Alt+F opens File on its first row. A held Alt underlines the
+  keys, and F10 moves focus to the first menu. A key matches by the character
+  typed or by the physical key, so a Latin access key still works on a Cyrillic
+  layout. A Cyrillic label (`&Файл`) works too. Items announce the key with
+  `aria-keyshortcuts`.
+
+Found on the way:
+
+- **F10 from inside a menu** first landed back on the menu that closed. That menu's
+  focus return ran after the bar's own move. Focus now moves to the bar before the
+  menu closes, so there is nothing for the menu to hand back.
+- **A closing menu handing focus to its own bar item** looked like the user moving
+  the tab stop. While a menu is open the bar ignores focus arriving on its items.
+
 ## Layering inside core
 
 ```
@@ -901,17 +952,17 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 142 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor. |
-| contract | node | `icons.contract.test.ts` | 108 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 158 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys. |
+| contract | node | `icons.contract.test.ts` | 113 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 530 tests. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 569 tests. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 530 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 569 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, and a menu row's shortcut at its edge, measured in pixels, per theme, mode and density. |
-| browser | Chrome | `overlay.browser.test.ts` | 15 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, nested and passive layers. |
+| browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 | dom | jsdom | `svelte-bind.dom.test.ts` | 3 tests. `bind:value` on Select, ChipGroup, RadioGroup and CheckboxGroup writes back to the owner and follows it. |
 
@@ -1013,7 +1064,7 @@ Real, and deliberately left open:
 - **Platform close requests** (a back gesture) are cancelled through the `cancel`
   event, which browsers may refuse to let a page cancel without recent user
   activation; the dialog then closes natively and reports `native`.
-- **Not ported from Instrument:** everything beyond these sixteen components —
+- **Not ported from Instrument:** everything beyond these seventeen components —
   prose, the rest of forms (number field, slider, choice cards), tables, the sheet
   and toast overlays,
   the agent components (including the composer, a textarea with a toolbar in one
@@ -1046,6 +1097,12 @@ Real, and deliberately left open:
 - **`<gg-menu>` items are data only** — the `items` property or a JSON attribute.
   There is no markup form (`<button>` children) to enhance.
 - **Menu item values must be unique.** Rows are keyed and reused by value.
+- **Menubar is uncontrolled.** `onOpenChange` reports the open menu, but there is no
+  prop that opens one.
+- **Access keys cover the bar only.** Inside an open menu a letter moves to the item it
+  starts, as typeahead; it does not activate an item marked with `&`.
+- **No context menu yet.** The Menu machine and content are ready for one opened at
+  the pointer; the trigger is not built.
 - **No option descriptions.** A radio or checkbox with a second line of help
   text (Instrument's choice card) is not built.
 - **No character counter.** `maxLength` is enforced by the browser, silently; a
