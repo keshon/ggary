@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Instrument — breadcrumbs
+
+   Ported from instrument/src/layout.css (.inst-crumbs). The chevron is drawn
+   by `item + item::before` — a pseudo-element rather than a character in the
+   markup — so the separator reaches neither the text nor the accessibility
+   tree, and the shape comes as a mask over a token colour.
+
+   A CRUMB CARRIES ITS OWN COLOUR. Inheriting it held only while nothing stood
+   between: prose makes its links accent-coloured and underlined, and
+   breadcrumbs sit above prose often enough that a crumb would start reading as
+   a link in a sentence — the one thing a breadcrumb must not be.
+   ========================================================================== */
+
+[data-scope='breadcrumbs'][data-part='list'] {
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+[data-scope='breadcrumbs'][data-part='item'] {
+  gap: var(--space-2);
+}
+
+[data-scope='breadcrumbs'][data-part='item'] + [data-part='item']::before {
+  content: '';
+  flex: none;
+  inline-size: var(--size-chevron);
+  block-size: var(--size-chevron);
+  background-color: var(--text-faint);
+  mask: var(--gg-icon-chevron-right) center / contain no-repeat;
+}
+
+[data-scope='breadcrumbs'][data-part='link'] {
+  color: inherit;
+  text-decoration: none;
+
+  /* The full colour AND an underline: an underline works where a change of
+     shade is not told apart. */
+  &:hover { color: var(--text-primary); text-decoration: underline; }
+}
+
+[data-scope='breadcrumbs'][data-part='current'] {
+  color: var(--text-primary);
+}

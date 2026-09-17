@@ -5,10 +5,12 @@ import { reactNormalizer } from '@ggary/core'
 export interface PanelProps extends CorePanelProps, Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   /** Controls in the header, at its far edge. */
   actions?: ReactNode
+  /** A strip of tools between the header and the body; see Toolbar. */
+  toolbar?: ReactNode
   children?: ReactNode
 }
 
-export function Panel({ title, headingLevel, body, plain, rank, tone, region, scrollable, actions, children, ...rest }: PanelProps) {
+export function Panel({ title, headingLevel, body, plain, rank, tone, region, scrollable, actions, toolbar, children, ...rest }: PanelProps) {
   const id = `gg-panel-${useId().replace(/:/g, '')}`
   const api = connect({ id, title, headingLevel, body, plain, rank, tone, region, scrollable }, reactNormalizer)
   const Title = api.titleElement
@@ -20,6 +22,7 @@ export function Panel({ title, headingLevel, body, plain, rank, tone, region, sc
           {actions !== undefined && <div {...api.actionsProps}>{actions}</div>}
         </div>
       )}
+      {toolbar}
       <div {...api.bodyProps}>{children}</div>
     </div>
   )

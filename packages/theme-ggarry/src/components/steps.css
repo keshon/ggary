@@ -1,0 +1,51 @@
+/* ==========================================================================
+   GGarry — steps
+
+   The bar above a step says where the process is; the word under the name
+   says it again in language, which is what survives a printout and a reader
+   who does not tell the shades apart.
+   ========================================================================== */
+
+[data-scope='steps'][data-part='root'] {
+  gap: var(--ggarry-space-3);
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='steps'][data-part='item'] {
+  gap: var(--ggarry-space-1);
+  padding-block-start: calc(3px + var(--ggarry-space-3));
+}
+
+/* The bar is the full width of the item, so it cannot part from its label. */
+[data-scope='steps'][data-part='item']::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: 3px;
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-border-control);
+}
+[data-scope='steps'][data-part='item'][data-state='done']::before,
+[data-scope='steps'][data-part='item'][data-state='current']::before {
+  background: var(--ggarry-bg-accent);
+}
+
+[data-scope='steps'][data-part='name'] {
+  font-size: var(--ggarry-font-size-md);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='steps'][data-part='name'][data-state='current'] {
+  color: var(--ggarry-text-default);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+
+[data-scope='steps'][data-part='note'] {
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-muted);
+}
+
+@media (forced-colors: active) {
+  [data-scope='steps'][data-part='item']::before { background: CanvasText; }
+  [data-scope='steps'][data-part='item'][data-state='todo']::before { background: GrayText; }
+}

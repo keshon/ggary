@@ -154,6 +154,26 @@
     "./search": {
       "svelte": "./src/components/search/index.ts",
       "default": "./src/components/search/index.ts"
+    },
+    "./breadcrumbs": {
+      "svelte": "./src/components/breadcrumbs/index.ts",
+      "default": "./src/components/breadcrumbs/index.ts"
+    },
+    "./nav": {
+      "svelte": "./src/components/nav/index.ts",
+      "default": "./src/components/nav/index.ts"
+    },
+    "./pagination": {
+      "svelte": "./src/components/pagination/index.ts",
+      "default": "./src/components/pagination/index.ts"
+    },
+    "./steps": {
+      "svelte": "./src/components/steps/index.ts",
+      "default": "./src/components/steps/index.ts"
+    },
+    "./toolbar": {
+      "svelte": "./src/components/toolbar/index.ts",
+      "default": "./src/components/toolbar/index.ts"
     }
   },
   "peerDependencies": {

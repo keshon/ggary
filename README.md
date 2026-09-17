@@ -2,12 +2,12 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Thirty-eight components — Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Forty-three components — Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
-Dialog, Sheet, Popover, Tooltip, Toast, Menu, Menubar, Badge, Avatar, AvatarGroup,
-Spinner, Skeleton, Card, Panel, Banner, Note and EmptyState — built end to end to
-prove the architecture holds.
+Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
+Menu, Menubar, Badge, Avatar, AvatarGroup, Spinner, Skeleton, Card, Panel, Banner,
+Note and EmptyState — built end to end to prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -17,7 +17,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 2206 tests, 881 of them in headless Chrome
+npm test         # 2349 tests, 940 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -45,14 +45,16 @@ packages/
                      <gg-avatar-group>, <gg-spinner>, <gg-skeleton>, <gg-card>, <gg-panel>,
                      <gg-banner>, <gg-note>, <gg-empty-state>, <gg-segmented-control>,
                      <gg-slider>, <gg-number-field>, <gg-choice-cards>, <gg-search>,
-                     <gg-input-group>, <gg-file-drop>, <gg-button-group>
+                     <gg-input-group>, <gg-file-drop>, <gg-button-group>, <gg-breadcrumbs>,
+                     <gg-nav>, <gg-pagination>, <gg-steps>, <gg-toolbar>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
                      <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Sheet>, <Popover>, <Tooltip>,
                      <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>, <Tabs>, <Toaster>,
                      <Badge>, <Avatar>, <AvatarGroup>, <Spinner>, <Skeleton>, <Card>,
                      <Panel>, <Banner>, <Note>, <EmptyState>, <SegmentedControl>,
                      <Slider>, <NumberField>, <ChoiceCardGroup>, <Search>, <InputGroup>,
-                     <FileDrop>, <ButtonGroup>
+                     <FileDrop>, <ButtonGroup>, <Breadcrumbs>, <Nav>, <Pagination>,
+                     <Steps>, <Toolbar>
   svelte/            the same components as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
@@ -1098,6 +1100,76 @@ Found on the way:
   so an anatomy with a title and a description would not typecheck; it now takes
   any anatomy that includes them.
 
+## Breadcrumbs, Nav, Pagination, Steps and Toolbar
+
+Navigation is markup: links and ordered lists, which the browser already knows
+how to traverse, open in a new tab and copy. So four of these five components
+add no behaviour at all — they add the roles, the landmarks and the states that
+the markup is supposed to carry and usually does not.
+
+```tsx
+<Breadcrumbs items={[{ label: 'Projects', href: '/projects' }, { label: 'Run #4127' }]} />
+<Nav label="Sections" groups={[{ label: 'Work', items: [{ label: 'Runs', href: '/runs', icon: 'grid', count: 7, current: true }] }]} />
+<Pagination items={paginationRange({ page, pages: 24, previousLabel: 'Back', nextLabel: 'Forward' })} onPageChange={go} />
+<Steps items={[{ name: 'Source', state: 'done' }, { name: 'Check', state: 'current' }]} />
+<Panel title="Runs" toolbar={<Toolbar label="Run tools">…<ToolbarSpacer /><Badge>7 running</Badge></Toolbar>}>…</Panel>
+```
+
+```html
+<gg-breadcrumbs label="Breadcrumbs">
+  <a href="/projects">Projects</a><span>Run #4127</span>
+</gg-breadcrumbs>
+
+<gg-nav label="Sections">
+  <div data-group="Work"><a href="/runs" data-icon="grid" aria-current="page">Runs<span data-count>7</span></a></div>
+</gg-nav>
+```
+
+- **Breadcrumbs** are an ordered list inside a named landmark: the order is part
+  of the meaning, and a screen reader reads the length of the path from the list.
+  The last crumb is the page itself — text with `aria-current="page"`, never a
+  link, because a link to where you already are is a false action. The separator
+  is a pseudo-element with a glyph token, so it reaches neither the accessibility
+  tree nor a copy of the path: you get "Projects worldgen Run #4127".
+- **Nav** is the side column, and every item is a real `<a href>`: a button
+  breaks the middle click, "open in a new tab" and copying the address. The
+  current item is `aria-current="page"` in the markup — the component never
+  decides which page it is on — and the theme marks it with a bar at its inner
+  edge as well as a surface. A group is a `group` only when it has a name.
+- **Pagination** is links too, and `paginationRange()` builds the list: the ends,
+  the current page with its neighbours, and an ellipsis for what is left out —
+  but never for a single page, because a gap costs the same room as the page and
+  takes away a destination. At the edges the link keeps its place in the tab
+  order with `aria-disabled`; removing it would move the focus mid-journey.
+- **Steps** is an ordered list, so "3 of 5" comes free, and every step carries
+  both a bar and a WORD — "done", "now", "next". The word is the second carrier
+  of the state: it survives a printout and a reader who cannot tell the shades
+  apart. The current step is `aria-current="step"`.
+- **Toolbar** is the one with behaviour, and it is opt-in. `role="toolbar"`
+  promises one tab stop and arrow keys, so the role is only taken when the strip
+  is named — then `utils/toolbar` keeps the promise: the arrows walk the tools,
+  wrap at the ends, skip what is disabled, and the tab stop stays on the tool
+  last used. Instrument leaves the role out entirely and says the behaviour
+  belongs to the application; here the behaviour comes with the name. A field
+  inside the strip keeps its own arrows, because there they move the caret.
+
+`Panel` gained a `toolbar` slot for it: the strip stands between the header and
+the body and brings the line below itself, so the header gives up its own.
+
+Found on the way:
+
+- **A gap that hides one page.** `paginationRange` drew an ellipsis wherever two
+  shown pages were not adjacent, which at page 3 of 5 replaced page 4 with "…".
+  The unit test was written for that rule and failed on the first run.
+- **`data-icon` on a link hides the link.** A masked element clips everything
+  inside it, glyph and text alike, so `<gg-nav>` reads the name off the anchor
+  and takes the attribute away — the mask belongs on the icon's own span. The
+  sandbox showed a column of icons with no words.
+- **An auto margin cannot live in the structure layer.** Instrument's reset
+  zeroes margins and stands above it, so the toolbar's spacer pushed nothing.
+  The margin moved into both themes, and a browser test now measures the tail
+  against the strip's own inset.
+
 ## Layering inside core
 
 ```
@@ -1302,19 +1374,20 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 189 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers. |
-| contract | node | `icons.contract.test.ts` | 218 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 195 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers. |
+| contract | node | `icons.contract.test.ts` | 245 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 834 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 885 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 834 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 885 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
 | browser | Chrome | `tabs.browser.test.ts` | 4 tests. One tab stop under the real Tab key, vertical tabs beside their panel, a long strip scrolling to the focused tab, a real click closing a tab without losing focus. |
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
+| browser | Chrome | `navigation.browser.test.ts` | 8 tests. A toolbar under the real Tab and arrow keys — wrapping, skipping what is disabled, returning to the tool last used — a field inside it keeping its own arrows, the spacer measured against the strip's inset, the drawn chevron that is in no text, and a step's bar spanning its item. |
 | browser | Chrome | `controls.browser.test.ts` | 5 tests. One tab stop and the arrow keys on a segmented control, a radio really covering its segment, a range input stepped by the keyboard with the fill following as a computed property, and a real pointer dragging an axis letter under capture. |
 | browser | Chrome | `display.browser.test.ts` | 3 tests. An avatar's picture really loading over the initials, a broken one removed, and a picture not drawn while it loads. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
@@ -1422,6 +1495,10 @@ Real, and deliberately left open:
   prose, the rest of forms (number field, slider, choice cards), tables,
   the agent components (including the composer, a textarea with a toolbar in one
   frame) and print styles.
+- **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
+  with a tab stop each; that is Instrument's position, and it stays available.
+- **No Shell.** The side column, the drawer and the responsive strip Instrument's
+  shell provides are layout, and this kit has no layout components yet.
 - **An affix names nothing.** "$" and "per hour" are text beside the field, not a
   label: a screen reader announces the field's own name, so put the unit in the
   label or the hint as well.

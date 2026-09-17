@@ -12,8 +12,13 @@ import {
   type CheckboxProps,
   type SwitchProps,
   type RadioGroupProps,
+  type BreadcrumbsProps,
   type ButtonGroupProps,
   type ChoiceCardGroupProps,
+  type NavProps,
+  type PaginationProps,
+  type StepsProps,
+  type ToolbarProps,
   type FileDropProps,
   type InputGroupProps,
   type SearchProps,
@@ -580,6 +585,131 @@ export const elements: Adapter = {
       update: async (patch) => apply(patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<ButtonGroupProps>)
+  },
+
+  async breadcrumbs(props, target) {
+    const host = document.createElement('gg-breadcrumbs')
+    for (const item of props.items) {
+      const crumb = document.createElement(item.href ? 'a' : 'span')
+      if (item.href) crumb.setAttribute('href', item.href)
+      crumb.textContent = item.label
+      host.append(crumb)
+    }
+    setAttr(host, 'label', props.label)
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => setAttr(host, 'label', patch.label),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<BreadcrumbsProps>)
+  },
+
+  async nav(props, target) {
+    const host = document.createElement('gg-nav')
+    for (const group of props.groups) {
+      const container = document.createElement('div')
+      if (group.label !== undefined) container.dataset.group = group.label
+      for (const item of group.items) {
+        const anchor = document.createElement('a')
+        anchor.href = item.href
+        anchor.textContent = item.label
+        if (item.icon) anchor.dataset.icon = item.icon
+        if (item.current) anchor.setAttribute('aria-current', 'page')
+        if (item.count !== undefined) {
+          const count = document.createElement('span')
+          count.dataset.count = ''
+          count.textContent = String(item.count)
+          anchor.append(count)
+        }
+        container.append(anchor)
+      }
+      host.append(container)
+    }
+    setAttr(host, 'label', props.label)
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => setAttr(host, 'label', patch.label),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<NavProps>)
+  },
+
+  async pagination(props, target) {
+    const host = document.createElement('gg-pagination')
+    for (const item of props.items) {
+      const link = document.createElement(item.gap ? 'span' : 'a')
+      link.textContent = item.label
+      if (item.href) link.setAttribute('href', item.href)
+      if (item.page !== undefined) (link as HTMLElement).dataset.page = String(item.page)
+      if (item.current) link.setAttribute('aria-current', 'page')
+      if (item.disabled) link.setAttribute('aria-disabled', 'true')
+      host.append(link)
+    }
+    setAttr(host, 'label', props.label)
+    if (props.onPageChange) {
+      host.addEventListener('pagechange', (e) => {
+        const detail = (e as CustomEvent).detail
+        props.onPageChange!(detail.page, detail.event)
+      })
+    }
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => setAttr(host, 'label', patch.label),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<PaginationProps>)
+  },
+
+  async steps(props, target) {
+    const host = document.createElement('gg-steps')
+    for (const step of props.items) {
+      const item = document.createElement('div')
+      item.dataset.state = step.state
+      item.append(step.name)
+      if (step.note) {
+        const note = document.createElement('span')
+        note.slot = 'note'
+        note.textContent = step.note
+        item.append(note)
+      }
+      host.append(item)
+    }
+    setAttr(host, 'label', props.label)
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => setAttr(host, 'label', patch.label),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<StepsProps>)
+  },
+
+  async toolbar(props, target) {
+    const host = document.createElement('gg-toolbar')
+    for (const label of props.tools ?? ['Move', 'Rotate', 'Scale']) {
+      if (label === '|' || label === '>') {
+        const span = document.createElement('span')
+        span.toggleAttribute(label === '|' ? 'data-separator' : 'data-spacer', true)
+        host.append(span)
+        continue
+      }
+      const wrapper = document.createElement('gg-button')
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.textContent = label
+      wrapper.append(button)
+      host.append(wrapper)
+    }
+    const apply = (patch: Partial<ToolbarProps>) => {
+      if ('label' in patch) setAttr(host, 'label', patch.label)
+      if ('orientation' in patch) setAttr(host, 'orientation', patch.orientation)
+    }
+    apply(props)
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => apply(patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<ToolbarProps>)
   },
 
   async checkboxGroup(props, target) {

@@ -367,6 +367,146 @@ export interface ButtonGroupProps {
   buttons?: string[]
 }
 
+export interface BreadcrumbsProps {
+  items: { label: string; href?: string }[]
+  label?: string
+}
+
+export interface NavProps {
+  label: string
+  groups: { label?: string; items: { label: string; href: string; icon?: string; count?: number | string; current?: boolean }[] }[]
+}
+
+export interface PaginationProps {
+  items: { label: string; href?: string; page?: number; current?: boolean; disabled?: boolean; gap?: boolean }[]
+  label?: string
+  onPageChange?: (page: number, event: Event) => void
+}
+
+export interface StepsProps {
+  items: { name: string; note?: string; state: 'done' | 'current' | 'todo' }[]
+  label?: string
+}
+
+export interface ToolbarProps {
+  label?: string
+  orientation?: 'horizontal' | 'vertical'
+  /** The labels of the buttons in the strip; a `|` is a separator and a `>` the spacer. */
+  tools?: string[]
+}
+
+export interface BreadcrumbsProps {
+  items: { label: string; href?: string }[]
+  label?: string
+}
+
+export interface NavProps {
+  label: string
+  groups: { label?: string; items: { label: string; href: string; icon?: string; count?: number | string; current?: boolean }[] }[]
+}
+
+export interface PaginationProps {
+  items: { label: string; href?: string; page?: number; current?: boolean; disabled?: boolean; gap?: boolean }[]
+  label?: string
+  onPageChange?: (page: number, event: Event) => void
+}
+
+export interface StepsProps {
+  items: { name: string; note?: string; state: 'done' | 'current' | 'todo' }[]
+  label?: string
+}
+
+export interface ToolbarProps {
+  label?: string
+  orientation?: 'horizontal' | 'vertical'
+  /** The labels of the buttons in the strip; a `|` is a separator and a `>` the spacer. */
+  tools?: string[]
+}
+
+export interface BreadcrumbsProps {
+  items: { label: string; href?: string }[]
+  label?: string
+}
+
+export interface NavProps {
+  label: string
+  groups: { label?: string; items: { label: string; href: string; icon?: string; count?: number | string; current?: boolean }[] }[]
+}
+
+export interface PaginationProps {
+  items: { label: string; href?: string; page?: number; current?: boolean; disabled?: boolean; gap?: boolean }[]
+  label?: string
+  onPageChange?: (page: number, event: Event) => void
+}
+
+export interface StepsProps {
+  items: { name: string; note?: string; state: 'done' | 'current' | 'todo' }[]
+  label?: string
+}
+
+export interface ToolbarProps {
+  label?: string
+  orientation?: 'horizontal' | 'vertical'
+  /** The labels of the buttons in the strip; a `|` is a separator and a `>` the spacer. */
+  tools?: string[]
+}
+
+export interface BreadcrumbsProps {
+  items: { label: string; href?: string }[]
+  label?: string
+}
+
+export interface NavProps {
+  label: string
+  groups: { label?: string; items: { label: string; href: string; icon?: string; count?: number | string; current?: boolean }[] }[]
+}
+
+export interface PaginationProps {
+  items: { label: string; href?: string; page?: number; current?: boolean; disabled?: boolean; gap?: boolean }[]
+  label?: string
+  onPageChange?: (page: number, event: Event) => void
+}
+
+export interface StepsProps {
+  items: { name: string; note?: string; state: 'done' | 'current' | 'todo' }[]
+  label?: string
+}
+
+export interface ToolbarProps {
+  label?: string
+  orientation?: 'horizontal' | 'vertical'
+  /** The labels of the buttons in the strip; a `|` is a separator and a `>` the spacer. */
+  tools?: string[]
+}
+
+export interface BreadcrumbsProps {
+  items: { label: string; href?: string }[]
+  label?: string
+}
+
+export interface NavProps {
+  label: string
+  groups: { label?: string; items: { label: string; href: string; icon?: string; count?: number | string; current?: boolean }[] }[]
+}
+
+export interface PaginationProps {
+  items: { label: string; href?: string; page?: number; current?: boolean; disabled?: boolean; gap?: boolean }[]
+  label?: string
+  onPageChange?: (page: number, event: Event) => void
+}
+
+export interface StepsProps {
+  items: { name: string; note?: string; state: 'done' | 'current' | 'todo' }[]
+  label?: string
+}
+
+export interface ToolbarProps {
+  label?: string
+  orientation?: 'horizontal' | 'vertical'
+  /** The labels of the buttons in the strip; a `|` is a separator and a `>` the spacer. */
+  tools?: string[]
+}
+
 export interface CheckboxGroupProps {
   items: RadioItem[]
   name?: string
@@ -645,16 +785,31 @@ export interface Adapter {
   inputGroup(props: InputGroupProps, target: HTMLElement): Promise<Mounted<InputGroupProps>>
   fileDrop(props: FileDropProps, target: HTMLElement): Promise<Mounted<FileDropProps>>
   buttonGroup(props: ButtonGroupProps, target: HTMLElement): Promise<Mounted<ButtonGroupProps>>
-  choiceCards(props: ChoiceCardGroupProps, target: HTMLElement): Promise<Mounted<ChoiceCardGroupProps>>
-  search(props: SearchProps, target: HTMLElement): Promise<Mounted<SearchProps>>
-  inputGroup(props: InputGroupProps, target: HTMLElement): Promise<Mounted<InputGroupProps>>
-  fileDrop(props: FileDropProps, target: HTMLElement): Promise<Mounted<FileDropProps>>
-  buttonGroup(props: ButtonGroupProps, target: HTMLElement): Promise<Mounted<ButtonGroupProps>>
-  choiceCards(props: ChoiceCardGroupProps, target: HTMLElement): Promise<Mounted<ChoiceCardGroupProps>>
-  search(props: SearchProps, target: HTMLElement): Promise<Mounted<SearchProps>>
-  inputGroup(props: InputGroupProps, target: HTMLElement): Promise<Mounted<InputGroupProps>>
-  fileDrop(props: FileDropProps, target: HTMLElement): Promise<Mounted<FileDropProps>>
-  buttonGroup(props: ButtonGroupProps, target: HTMLElement): Promise<Mounted<ButtonGroupProps>>
+  breadcrumbs(props: BreadcrumbsProps, target: HTMLElement): Promise<Mounted<BreadcrumbsProps>>
+  nav(props: NavProps, target: HTMLElement): Promise<Mounted<NavProps>>
+  pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
+  steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
+  toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
+  breadcrumbs(props: BreadcrumbsProps, target: HTMLElement): Promise<Mounted<BreadcrumbsProps>>
+  nav(props: NavProps, target: HTMLElement): Promise<Mounted<NavProps>>
+  pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
+  steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
+  toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
+  breadcrumbs(props: BreadcrumbsProps, target: HTMLElement): Promise<Mounted<BreadcrumbsProps>>
+  nav(props: NavProps, target: HTMLElement): Promise<Mounted<NavProps>>
+  pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
+  steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
+  toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
+  breadcrumbs(props: BreadcrumbsProps, target: HTMLElement): Promise<Mounted<BreadcrumbsProps>>
+  nav(props: NavProps, target: HTMLElement): Promise<Mounted<NavProps>>
+  pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
+  steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
+  toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
+  breadcrumbs(props: BreadcrumbsProps, target: HTMLElement): Promise<Mounted<BreadcrumbsProps>>
+  nav(props: NavProps, target: HTMLElement): Promise<Mounted<NavProps>>
+  pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
+  steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
+  toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
   /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */
   fieldset(props: FieldsetProps, target: HTMLElement): Promise<Mounted<FieldsetProps>>

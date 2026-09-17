@@ -14,16 +14,20 @@ import {
   Input,
   Menu,
   Menubar,
+  Breadcrumbs,
   ButtonGroup,
   ChoiceCardGroup,
   FileDrop,
   InputGroup,
+  Nav,
   NumberField,
+  Pagination,
   RadioGroup,
   Search,
   SegmentedControl,
   Select,
   Slider,
+  Steps,
   Switch,
   Tabs,
   Toaster,
@@ -38,10 +42,14 @@ import {
   Skeleton,
   Spinner,
   Textarea,
+  Toolbar,
+  ToolbarSeparator,
+  ToolbarSpacer,
 } from '../../../packages/react/src/index'
 import {
   type Adapter,
   type ButtonGroupProps,
+  type ToolbarProps,
   type ButtonProps,
   type InputGroupProps,
   type CheckboxProps,
@@ -125,6 +133,21 @@ export const react: Adapter = {
   inputGroup: (props, target) =>
     mount(InputGroup, props, target, ({ input, ...rest }: InputGroupProps) => [rest, createElement(Input, input ?? {})]),
   fileDrop: (props, target) => mount(FileDrop, props, target),
+  breadcrumbs: (props, target) => mount(Breadcrumbs, props, target),
+  nav: (props, target) => mount(Nav, props, target),
+  pagination: (props, target) => mount(Pagination, props, target),
+  steps: (props, target) => mount(Steps, props, target),
+  toolbar: (props, target) =>
+    mount(Toolbar, props, target, ({ tools, ...rest }: ToolbarProps) => [
+      rest,
+      (tools ?? ['Move', 'Rotate', 'Scale']).map((label, index) =>
+        label === '|'
+          ? createElement(ToolbarSeparator, { key: index })
+          : label === '>'
+            ? createElement(ToolbarSpacer, { key: index })
+            : createElement(Button, { key: index, size: 'sm' }, label)
+      ),
+    ]),
   buttonGroup: (props, target) =>
     mount(ButtonGroup, props, target, ({ buttons, ...rest }: ButtonGroupProps) => [
       rest,

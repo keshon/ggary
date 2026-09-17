@@ -3,7 +3,7 @@ import './shared.css'
 import '@ggary/elements'
 import { toast } from '@ggary/elements'
 import type { GgAvatarGroupElement, GgCheckboxElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
-import { agentsText, badgeTones, densities, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, navGroups, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
 
@@ -471,6 +471,66 @@ app.innerHTML = `
     <p class="hint">Drag the axis letter sideways to change the number — Shift is ten times faster, Alt a tenth. The letter is a handle, not a label: each field is named "Position X" in full, because three squares marked X, Y and Z say nothing on their own.</p>
   </section>
 
+  <section id="navigation">
+    <h2>Breadcrumbs</h2>
+    <gg-breadcrumbs label="Breadcrumbs">
+      ${crumbs.map((crumb) => (crumb.href ? `<a href="${crumb.href}">${crumb.label}</a>` : `<span>${crumb.label}</span>`)).join('')}
+    </gg-breadcrumbs>
+    <p class="hint">Breadcrumbs answer "where am I and how do I get one level up" — not "what else is there". An ordered list inside a named landmark, and the last crumb is the page itself: text, never a link to where you already are. The chevron is drawn, so it reaches neither a screen reader nor a copy of the path.</p>
+
+    <h2 style="margin-top: 32px">Nav</h2>
+    <div class="nav-demo">
+      <gg-nav label="Sections">
+        ${navGroups
+          .map(
+            (group) =>
+              `<div data-group="${group.label}">${group.items
+                .map(
+                  (item, index) =>
+                    `<a href="${item.href}" data-icon="${item.icon}"${group.label === 'Work' && index === 0 ? ' aria-current="page"' : ''}>${item.label}${
+                      'count' in item ? `<span data-count>${item.count}</span>` : ''
+                    }</a>`
+                )
+                .join('')}</div>`
+          )
+          .join('')}
+      </gg-nav>
+      <gg-panel heading="Runs">
+        <gg-toolbar label="Run tools" slot="toolbar">
+          <gg-button size="sm" emphasis="minimal"><button>Filter</button></gg-button>
+          <gg-button size="sm" emphasis="minimal"><button>Sort</button></gg-button>
+          <span data-separator></span>
+          <gg-button size="sm" emphasis="minimal"><button>Export</button></gg-button>
+          <span data-spacer></span>
+          <gg-badge tone="running">7 running</gg-badge>
+        </gg-toolbar>
+        <p>Rows would stand here.</p>
+      </gg-panel>
+    </div>
+    <p class="hint">Every item is a real link, so the middle click and "open in a new tab" work. The current one is marked by a bar at its edge as well as a surface, and by aria-current — never by colour alone. Naming a strip makes it a toolbar: one Tab stop, and the arrows move between the tools — so the name is only taken when the behaviour is there. A separator groups; one spacer pushes the tail to the far edge.</p>
+
+    <h2 style="margin-top: 32px">Pagination</h2>
+    <gg-pagination id="pages" label="Pages">
+      <a href="#p7" data-page="7">Back</a>
+      <a href="#p1" data-page="1">1</a>
+      <span>…</span>
+      <a href="#p7" data-page="7">7</a>
+      <a href="#p8" data-page="8" aria-current="page">8</a>
+      <a href="#p9" data-page="9">9</a>
+      <span>…</span>
+      <a href="#p24" data-page="24">24</a>
+      <a href="#p9" data-page="9">Forward</a>
+    </gg-pagination>
+    <pre class="state" id="pages-state">—</pre>
+    <p class="hint">Pages are addresses, so these are links. At the edges the link stays reachable and is spoken as unavailable (aria-disabled): removing it would move the focus mid-journey. An ellipsis is only drawn when it stands for more than one page.</p>
+
+    <h2 style="margin-top: 32px">Steps</h2>
+    <gg-steps label="Import">
+      ${importSteps.map((step) => `<div data-state="${step.state}">${step.name}</div>`).join('')}
+    </gg-steps>
+    <p class="hint">The bar says where the process is; the word under the name says it again in language, which is what survives a printout and a reader who cannot tell the shades apart.</p>
+  </section>
+
   <section id="fields">
     <h2>Choice cards</h2>
     <div class="form-column">
@@ -856,4 +916,13 @@ const filesState = document.getElementById('files-state')!
 document.querySelector('gg-file-drop')!.addEventListener('fileschange', (event) => {
   const { files } = (event as CustomEvent).detail as { files: File[] }
   filesState.textContent = files.map((file) => `${file.name} (${Math.ceil(file.size / 1024)} KB)`).join(', ')
+})
+
+// --- navigation ---------------------------------------------------------------------
+const pagesState = document.getElementById('pages-state')!
+document.getElementById('pages')!.addEventListener('pagechange', (event) => {
+  const { page, event: press } = (event as CustomEvent).detail as { page: number; event: Event }
+  // The demo has nowhere to go, so it keeps the page and only reports it.
+  press.preventDefault()
+  pagesState.textContent = `page ${page}`
 })

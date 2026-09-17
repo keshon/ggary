@@ -152,6 +152,26 @@
     "./search": {
       "types": "./src/components/search/index.ts",
       "default": "./src/components/search/index.ts"
+    },
+    "./breadcrumbs": {
+      "types": "./src/components/breadcrumbs/index.ts",
+      "default": "./src/components/breadcrumbs/index.ts"
+    },
+    "./nav": {
+      "types": "./src/components/nav/index.ts",
+      "default": "./src/components/nav/index.ts"
+    },
+    "./pagination": {
+      "types": "./src/components/pagination/index.ts",
+      "default": "./src/components/pagination/index.ts"
+    },
+    "./steps": {
+      "types": "./src/components/steps/index.ts",
+      "default": "./src/components/steps/index.ts"
+    },
+    "./toolbar": {
+      "types": "./src/components/toolbar/index.ts",
+      "default": "./src/components/toolbar/index.ts"
     }
   },
   "dependencies": {

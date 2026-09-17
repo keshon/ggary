@@ -1,0 +1,5 @@
+export { paginationAnatomy } from './pagination.anatomy'
+export type { PaginationPart } from './pagination.anatomy'
+export { connect, paginationRange } from './pagination.connect'
+export type { PaginationConnectOptions } from './pagination.connect'
+export type { PageItem, PaginationProps, PaginationRangeOptions } from './pagination.types'

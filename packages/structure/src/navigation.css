@@ -1,0 +1,112 @@
+/* Breadcrumbs, Nav, Pagination, Steps and Toolbar: the layout each needs
+   whatever the theme. All five are markup — links and lists — so this file
+   mostly undoes what a list brings with it. */
+
+/* --- lists that are not lists to the eye ------------------------------------- */
+
+:is([data-scope='breadcrumbs'], [data-scope='pagination'])[data-part='list'],
+[data-scope='steps'][data-part='root'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* --- breadcrumbs ---------------------------------------------------------------- */
+
+[data-scope='breadcrumbs'][data-part='item'] {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+}
+:is([data-scope='breadcrumbs'][data-part='link'], [data-scope='breadcrumbs'][data-part='current']) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --- nav -------------------------------------------------------------------------- */
+
+[data-scope='nav'][data-part='root'],
+[data-scope='nav'][data-part='group'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+[data-scope='nav'][data-part='item'] {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  text-decoration: none;
+}
+
+/* The count goes to the far edge of the item, whatever the label's length. */
+[data-scope='nav'][data-part='count'] {
+  margin-inline-start: auto;
+  flex: none;
+}
+
+/* --- pagination --------------------------------------------------------------------- */
+
+[data-scope='pagination'][data-part='item'] {
+  display: flex;
+}
+:is([data-scope='pagination'][data-part='link'], [data-scope='pagination'][data-part='gap']) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+/* A link has no `disabled`: aria-disabled keeps it in the tab order and spoken,
+   and only the pointer is taken away. Blocking the press is the page's. */
+[data-scope='pagination'][data-part='link'][aria-disabled='true'] {
+  pointer-events: none;
+}
+
+/* --- steps ------------------------------------------------------------------------- */
+
+/* A step takes a share of the row and wraps by itself, so a strip of any
+   length needs no media query. */
+[data-scope='steps'][data-part='item'] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 10rem;
+  min-inline-size: 0;
+}
+
+/* --- toolbar ----------------------------------------------------------------------- */
+
+[data-scope='toolbar'][data-part='root'] {
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+[data-scope='toolbar'][data-part='root'][data-orientation='vertical'] {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+[data-scope='toolbar'][data-part='separator'] {
+  flex: none;
+  align-self: stretch;
+}
+
+/* One per strip: everything after it goes to the far edge. The auto margin
+   itself is set by the theme — a reset in gg.base zeroes margins, and this
+   layer stands below it. */
+[data-scope='toolbar'][data-part='spacer'] {
+  flex: none;
+}
+
+/* The chrome of an application is not data: none of it belongs on paper. */
+@media print {
+  [data-scope='nav'][data-part='root'],
+  [data-scope='pagination'][data-part='root'],
+  [data-scope='toolbar'][data-part='root'] {
+    display: none;
+  }
+}

@@ -1,7 +1,8 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, Button, Checkbox, CheckboxGroup, ChipGroup, ChoiceCardGroup, FileDrop, Input, Menubar, NumberField, RadioGroup, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, Button, Checkbox, CheckboxGroup, ChipGroup, Breadcrumbs, ChoiceCardGroup, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
+import ToolbarWithTools from './ToolbarWithTools.svelte'
 import DialogWithContent from './DialogWithContent.svelte'
 import PopoverWithContent from './PopoverWithContent.svelte'
 import TooltipWithTrigger from './TooltipWithTrigger.svelte'
@@ -86,6 +87,11 @@ export const svelte: Adapter = {
   inputGroup: (props, target) => mountSvelte(GroupWithControl as Component<any>, props, target),
   fileDrop: (props, target) => mountSvelte(FileDrop as Component<any>, props, target),
   buttonGroup: (props, target) => mountSvelte(GroupWithControl as Component<any>, props, target, (p) => ({ ...p, group: 'buttons' })),
+  breadcrumbs: (props, target) => mountSvelte(Breadcrumbs as Component<any>, props, target),
+  nav: (props, target) => mountSvelte(Nav as Component<any>, props, target),
+  pagination: (props, target) => mountSvelte(Pagination as Component<any>, props, target),
+  steps: (props, target) => mountSvelte(Steps as Component<any>, props, target),
+  toolbar: (props, target) => mountSvelte(ToolbarWithTools as Component<any>, props, target),
   checkboxGroup: (props, target) => mountSvelte(CheckboxGroup as Component<any>, props, target),
   fieldset: (props, target) => mountSvelte(FieldsetWithGroup as Component<any>, props, target),
   // Snippets for the trigger, body and footer, as an app writes them.

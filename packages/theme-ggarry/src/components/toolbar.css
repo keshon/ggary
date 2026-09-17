@@ -1,0 +1,51 @@
+/* ==========================================================================
+   GGarry — toolbar
+
+   A strip of tools inside a panel, with a line under it: it belongs to the
+   content below rather than to the header above. A panel header that is
+   followed by a toolbar gives up its own line — two rules within thirty
+   pixels is one too many.
+   ========================================================================== */
+
+[data-scope='toolbar'][data-part='root'] {
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-2) var(--ggarry-space-4);
+  border-block-end: 1px solid var(--ggarry-border-default);
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='toolbar'][data-part='root'][data-orientation='vertical'] {
+  padding: var(--ggarry-space-2);
+  border-block-end: 0;
+  border-inline-end: 1px solid var(--ggarry-border-default);
+}
+
+/* A toolbar inside a panel keeps the panel's inset and its line. */
+[data-scope='panel'][data-part='root'] > [data-scope='toolbar'][data-part='root'] {
+  padding-inline: var(--ggarry-space-4);
+}
+[data-scope='panel'][data-part='header']:has(+ [data-scope='toolbar']) {
+  padding-block-end: var(--ggarry-space-2);
+}
+
+[data-scope='toolbar'][data-part='separator'] {
+  inline-size: 1px;
+  margin-inline: var(--ggarry-space-1);
+  background: var(--ggarry-border-default);
+}
+[data-scope='toolbar'][data-part='root'][data-orientation='vertical'] > [data-part='separator'] {
+  inline-size: auto;
+  block-size: 1px;
+  margin-inline: 0;
+  margin-block: var(--ggarry-space-1);
+}
+
+/* The auto margin lives here rather than in the structure layer: a theme's
+   reset zeroes margins, and gg.components is what outranks it. */
+[data-scope='toolbar'][data-part='spacer'] {
+  margin-inline-start: auto;
+}
+[data-scope='toolbar'][data-part='root'][data-orientation='vertical'] > [data-part='spacer'] {
+  margin-inline-start: 0;
+  margin-block-start: auto;
+}

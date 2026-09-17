@@ -209,6 +209,32 @@ export const openFiles: TabItem[] = [
 let untitled = 0
 export const newFile = (): TabItem => ({ value: `untitled-${++untitled}`, label: `untitled-${untitled}.css`, closable: true, modified: true })
 
+/** The navigation demos, the same on every page. */
+export const crumbs = [
+  { label: 'Projects', href: '#projects' },
+  { label: 'worldgen', href: '#worldgen' },
+  { label: 'Run #4127' },
+]
+
+export const navGroups = [
+  {
+    label: 'Work',
+    items: [
+      { label: 'Runs', href: '#runs', icon: 'grid' as const, count: 7 },
+      { label: 'Queue', href: '#queue', icon: 'list' as const },
+      { label: 'Reports', href: '#reports', icon: 'chart' as const },
+    ],
+  },
+  { label: 'Setup', items: [{ label: 'Parameters', href: '#parameters', icon: 'settings' as const }] },
+]
+
+export const importSteps = [
+  { name: 'Source', state: 'done' as const },
+  { name: 'Rules', state: 'done' as const },
+  { name: 'Check', state: 'current' as const },
+  { name: 'Launch', state: 'todo' as const },
+]
+
 /** The choice cards, the same on every page. */
 export const runModes = [
   { value: 'parallel', title: 'In parallel', description: 'Up to 12 agents at once. Faster, but the token spend is higher and the order of the output is not guaranteed.' },

@@ -70,6 +70,10 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
 
 .stack { display: grid; gap: 10px; justify-items: start; margin-top: 16px; }
 .nested { display: grid; gap: 10px; justify-items: start; padding-inline-start: 26px; }
+.nav-demo { display: grid; grid-template-columns: minmax(0, 13rem) minmax(0, 1fr); gap: 24px; margin-top: 16px; align-items: start; }
+.nav-demo > nav, .nav-demo > gg-nav { padding: 8px; border-radius: 10px; background: var(--gg-surface-sunken); }
+.panel-demo { margin-top: 16px; max-inline-size: 520px; }
+
 .form-column { display: grid; gap: 20px; max-inline-size: 520px; margin-top: 16px; }
 
 /* A vector of number fields: equal shares, so a six-digit number does not skew it. */

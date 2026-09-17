@@ -13,6 +13,7 @@ import { checkboxGroupConformance, fieldsetConformance } from './fieldset.spec'
 import { cleanup } from './harness'
 import { inputConformance } from './input.spec'
 import { menuConformance } from './menu.spec'
+import { breadcrumbsConformance, navConformance, paginationConformance, stepsConformance, toolbarConformance } from './navigation.spec'
 import { menubarConformance } from './menubar.spec'
 import { popoverConformance, tooltipConformance } from './popover.spec'
 import { radioGroupConformance } from './radio-group.spec'
@@ -52,6 +53,11 @@ export function runConformance() {
       inputGroupConformance(adapter)
       fileDropConformance(adapter)
       buttonGroupConformance(adapter)
+      breadcrumbsConformance(adapter)
+      navConformance(adapter)
+      paginationConformance(adapter)
+      stepsConformance(adapter)
+      toolbarConformance(adapter)
       checkboxGroupConformance(adapter)
       fieldsetConformance(adapter)
       resetConformance(adapter)

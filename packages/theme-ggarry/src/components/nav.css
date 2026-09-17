@@ -1,0 +1,79 @@
+/* ==========================================================================
+   GGarry — nav
+
+   The side column. The current item carries a bar at its inner edge as well
+   as a surface, so the mark does not depend on colour, and `aria-current`
+   says the same thing to a screen reader.
+   ========================================================================== */
+
+[data-scope='nav'][data-part='root'] {
+  gap: var(--ggarry-space-1);
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='nav'][data-part='group'] {
+  gap: var(--ggarry-space-1);
+}
+/* The gap goes BETWEEN groups, not around each: around, the first group would
+   stand twice as far from the top of the column as from its sides. */
+[data-scope='nav'][data-part='group'] + [data-part='group'] {
+  margin-block-start: var(--ggarry-space-5);
+}
+
+[data-scope='nav'][data-part='group-label'] {
+  padding-inline: var(--ggarry-space-3);
+  font-size: var(--ggarry-font-size-xs);
+  color: var(--ggarry-text-muted);
+  /* No capitals: a label has no right to sound louder than what it labels. */
+  line-height: 1.6;
+}
+
+[data-scope='nav'][data-part='item'] {
+  gap: var(--ggarry-space-2);
+  min-block-size: var(--ggarry-size-control-md);
+  padding-inline: var(--ggarry-space-3);
+  border-radius: var(--ggarry-radius-md);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-md);
+  transition: background-color var(--ggarry-duration-fast) ease, color var(--ggarry-duration-fast) ease;
+}
+
+[data-scope='nav'][data-part='item']:hover {
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='nav'][data-part='item'][data-current] {
+  background: var(--ggarry-bg-accent-subtle);
+  color: var(--ggarry-text-accent);
+  font-weight: var(--ggarry-font-weight-medium);
+  box-shadow: inset 3px 0 0 0 var(--ggarry-text-accent);
+}
+
+[data-scope='nav'][data-part='icon'] {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+[data-scope='nav'][data-part='count'] {
+  padding-inline: var(--ggarry-space-2);
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-bg-muted);
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 1.6;
+}
+[data-scope='nav'][data-part='item'][data-current] > [data-part='count'] {
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-accent);
+}
+
+@media (forced-colors: active) {
+  [data-scope='nav'][data-part='item'][data-current] {
+    outline: 1px solid Highlight;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='nav'][data-part='item'] { transition: none; }
+}

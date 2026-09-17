@@ -6,11 +6,13 @@
   type Props = PanelProps & {
     /** Controls in the header, at its far edge. */
     actions?: Snippet
+    /** A strip of tools between the header and the body; see Toolbar. */
+    toolbar?: Snippet
     children?: Snippet
     [key: string]: unknown
   }
 
-  let { title, headingLevel, body, plain, rank, tone, region, scrollable, actions, children, ...rest }: Props = $props()
+  let { title, headingLevel, body, plain, rank, tone, region, scrollable, actions, toolbar, children, ...rest }: Props = $props()
   const id = uid('gg-panel')
   const api = $derived(connect({ id, title, headingLevel, body, plain, rank, tone, region, scrollable }, svelteNormalizer))
 </script>
@@ -26,5 +28,6 @@
       {/if}
     </div>
   {/if}
+  {@render toolbar?.()}
   <div {...api.bodyProps}>{@render children?.()}</div>
 </div>

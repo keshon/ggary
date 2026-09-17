@@ -1,0 +1,45 @@
+/* ==========================================================================
+   GGarry — breadcrumbs
+
+   The path is quieter than the title it precedes, so it takes the small size
+   and the muted ink. The chevron between crumbs is a pseudo-element with a
+   glyph token: it stays out of the text, so a screen reader and a copy get
+   "Projects worldgen Run #4127" rather than a line of angle brackets.
+   ========================================================================== */
+
+[data-scope='breadcrumbs'][data-part='list'] {
+  gap: var(--ggarry-space-2);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='breadcrumbs'][data-part='item'] {
+  gap: var(--ggarry-space-2);
+}
+
+[data-scope='breadcrumbs'][data-part='item'] + [data-part='item']::before {
+  content: '';
+  flex: none;
+  inline-size: 12px;
+  block-size: 12px;
+  background-color: var(--ggarry-text-subtle);
+  mask: var(--gg-icon-chevron-right) center / contain no-repeat;
+}
+
+[data-scope='breadcrumbs'][data-part='link'] {
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--ggarry-radius-sm);
+}
+/* Under the pointer a crumb takes the full ink AND an underline: an underline
+   works where a change of colour is not told apart. */
+[data-scope='breadcrumbs'][data-part='link']:hover {
+  color: var(--ggarry-text-default);
+  text-decoration: underline;
+}
+
+[data-scope='breadcrumbs'][data-part='current'] {
+  color: var(--ggarry-text-default);
+  font-weight: var(--ggarry-font-weight-medium);
+}

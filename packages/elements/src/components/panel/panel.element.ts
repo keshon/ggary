@@ -3,7 +3,8 @@ import { domNormalizer, uid, type HeadingLevel, type RegionRank, type StatusTone
 import { h, spread } from '../../spread'
 
 /**
- * Enhancement: the host is the panel. Children with slot="actions" go to the
+ * Enhancement: the host is the panel. Children with slot="toolbar" stand
+ * between the header and the body. Children with slot="actions" go to the
  * header's far edge; everything else becomes the body.
  *
  *   <gg-panel heading="Runs" body="flush">
@@ -26,13 +27,16 @@ export class GgPanelElement extends HTMLElement {
   connectedCallback(): void {
     if (!this.#body) {
       const actions = [...this.children].filter((child) => child.getAttribute('slot') === 'actions')
-      const content = [...this.childNodes].filter((node) => !actions.includes(node as Element))
+      const toolbars = [...this.children].filter((child) => child.getAttribute('slot') === 'toolbar')
+      const content = [...this.childNodes].filter(
+        (node) => !actions.includes(node as Element) && !toolbars.includes(node as Element)
+      )
       this.#header = h('div')
       this.#actions = h('div')
       this.#actions.append(...actions)
       this.#body = h('div')
       this.#body.append(...content)
-      this.append(this.#header, this.#body)
+      this.append(this.#header, ...toolbars, this.#body)
     }
     this.#render()
   }

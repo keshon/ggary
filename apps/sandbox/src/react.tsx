@@ -9,6 +9,7 @@ import {
   Badge,
   Banner,
   Button,
+  Breadcrumbs,
   ButtonGroup,
   Card,
   Checkbox,
@@ -25,8 +26,10 @@ import {
   InputGroup,
   Menu,
   Menubar,
+  Nav,
   Note,
   NumberField,
+  Pagination,
   Panel,
   Popover,
   RadioGroup,
@@ -37,14 +40,19 @@ import {
   Skeleton,
   Slider,
   Spinner,
+  Steps,
   Switch,
   Tabs,
   Textarea,
+  paginationRange,
   Toaster,
   toast,
+  Toolbar,
+  ToolbarSeparator,
+  ToolbarSpacer,
   Tooltip,
 } from '@ggary/react'
-import { agentsText, badgeTones, densities, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, navGroups, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -58,6 +66,7 @@ function App() {
   const [mode, setMode] = useState('parallel')
   const [extras, setExtras] = useState<string[]>([])
   const [chosenFiles, setChosenFiles] = useState<File[]>([])
+  const [page, setPage] = useState(8)
   const [items, setItems] = useState(tags)
   const [selection, setSelection] = useState<string[]>(['design'])
   const [formOutput, setFormOutput] = useState('submit to see the FormData the hidden input contributes')
@@ -766,6 +775,54 @@ function App() {
         </div>
         <pre className="state">{`x ${position.x}  y ${position.y}  z ${position.z}`}</pre>
         <p className="hint">Drag the axis letter sideways to change the number — Shift is ten times faster, Alt a tenth. The letter is a handle, not a label: each field is named "Position X" in full, because three squares marked X, Y and Z say nothing on their own.</p>
+      </section>
+
+      <section id="navigation">
+        <h2>Breadcrumbs</h2>
+        <Breadcrumbs items={crumbs} />
+        <p className="hint">Breadcrumbs answer "where am I and how do I get one level up" — not "what else is there". An ordered list inside a named landmark, and the last crumb is the page itself: text, never a link to where you already are. The chevron is drawn, so it reaches neither a screen reader nor a copy of the path.</p>
+
+        <h2 style={{ marginTop: 32 }}>Nav</h2>
+        <div className="nav-demo">
+          <Nav
+            label="Sections"
+            groups={navGroups.map((group, index) => ({
+              ...group,
+              items: group.items.map((item, itemIndex) => ({ ...item, current: index === 0 && itemIndex === 0 })),
+            }))}
+          />
+          <Panel
+            title="Runs"
+            toolbar={
+              <Toolbar label="Run tools">
+                <Button size="sm" emphasis="minimal">Filter</Button>
+                <Button size="sm" emphasis="minimal">Sort</Button>
+                <ToolbarSeparator />
+                <Button size="sm" emphasis="minimal">Export</Button>
+                <ToolbarSpacer />
+                <Badge tone="running">7 running</Badge>
+              </Toolbar>
+            }
+          >
+            <p>Rows would stand here.</p>
+          </Panel>
+        </div>
+        <p className="hint">Every item is a real link, so the middle click and "open in a new tab" work. The current one is marked by a bar at its edge as well as a surface, and by aria-current — never by colour alone. Naming a strip makes it a toolbar: one Tab stop, and the arrows move between the tools — so the name is only taken when the behaviour is there. A separator groups; one spacer pushes the tail to the far edge.</p>
+
+        <h2 style={{ marginTop: 32 }}>Pagination</h2>
+        <Pagination
+          items={paginationRange({ page, pages: 24, previousLabel: 'Back', nextLabel: 'Forward', href: (n: number) => `#p${n}` })}
+          onPageChange={(next, event) => {
+            event.preventDefault()
+            setPage(next)
+          }}
+        />
+        <pre className="state">{`page ${page}`}</pre>
+        <p className="hint">Pages are addresses, so these are links. At the edges the link stays reachable and is spoken as unavailable (aria-disabled): removing it would move the focus mid-journey. An ellipsis is only drawn when it stands for more than one page.</p>
+
+        <h2 style={{ marginTop: 32 }}>Steps</h2>
+        <Steps items={importSteps} label="Import" />
+        <p className="hint">The bar says where the process is; the word under the name says it again in language, which is what survives a printout and a reader who cannot tell the shades apart.</p>
       </section>
 
       <section id="fields">
