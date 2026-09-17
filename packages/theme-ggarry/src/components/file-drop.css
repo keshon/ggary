@@ -1,0 +1,59 @@
+/* ==========================================================================
+   GGarry — file drop
+
+   The one dashed line in the kit: nothing else says "something can be put
+   here" as plainly. A drag over the zone brings up the accent, so the drop
+   is visibly going to land.
+   ========================================================================== */
+
+[data-scope='file-drop'][data-part='root'] {
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-6) var(--ggarry-space-5);
+  border: 1px dashed var(--ggarry-border-control);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  line-height: 1.5;
+  transition: border-color var(--ggarry-duration-fast) ease, background-color var(--ggarry-duration-fast) ease;
+}
+
+[data-scope='file-drop'][data-part='root']:hover:not([data-disabled]),
+[data-scope='file-drop'][data-part='root'][data-dragging] {
+  border-color: var(--ggarry-border-accent);
+  background: var(--ggarry-bg-accent-subtle);
+}
+
+[data-scope='file-drop'][data-part='root'][data-invalid] {
+  border-color: var(--ggarry-border-danger);
+}
+
+[data-scope='file-drop'][data-part='root']:has(> [data-part='input']:focus-visible) {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+
+[data-scope='file-drop'][data-part='root'][data-disabled] {
+  opacity: 0.55;
+}
+
+[data-scope='file-drop'][data-part='icon'] {
+  inline-size: 20px;
+  block-size: 20px;
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='file-drop'][data-part='files'] {
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+
+[data-scope='file-drop'][data-part='hint'] {
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='file-drop'][data-part='root'] { transition: none; }
+}

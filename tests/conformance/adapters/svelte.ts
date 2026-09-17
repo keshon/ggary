@@ -1,6 +1,7 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, Button, Checkbox, CheckboxGroup, ChipGroup, Input, Menubar, NumberField, RadioGroup, SegmentedControl, Select, Skeleton, Slider, Spinner, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, Button, Checkbox, CheckboxGroup, ChipGroup, ChoiceCardGroup, FileDrop, Input, Menubar, NumberField, RadioGroup, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
+import GroupWithControl from './GroupWithControl.svelte'
 import DialogWithContent from './DialogWithContent.svelte'
 import PopoverWithContent from './PopoverWithContent.svelte'
 import TooltipWithTrigger from './TooltipWithTrigger.svelte'
@@ -80,6 +81,11 @@ export const svelte: Adapter = {
   segmentedControl: (props, target) => mountSvelte(SegmentedControl as Component<any>, props, target),
   slider: (props, target) => mountSvelte(Slider as Component<any>, props, target),
   numberField: (props, target) => mountSvelte(NumberField as Component<any>, props, target),
+  choiceCards: (props, target) => mountSvelte(ChoiceCardGroup as Component<any>, props, target),
+  search: (props, target) => mountSvelte(Search as Component<any>, props, target),
+  inputGroup: (props, target) => mountSvelte(GroupWithControl as Component<any>, props, target),
+  fileDrop: (props, target) => mountSvelte(FileDrop as Component<any>, props, target),
+  buttonGroup: (props, target) => mountSvelte(GroupWithControl as Component<any>, props, target, (p) => ({ ...p, group: 'buttons' })),
   checkboxGroup: (props, target) => mountSvelte(CheckboxGroup as Component<any>, props, target),
   fieldset: (props, target) => mountSvelte(FieldsetWithGroup as Component<any>, props, target),
   // Snippets for the trigger, body and footer, as an app writes them.

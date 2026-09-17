@@ -50,7 +50,11 @@ export interface ChoiceOptions {
   field?: Dict
 }
 
-export function choice<P extends ChoicePart | 'indicator' | 'thumb'>(anatomy: Anatomy<P>, options: ChoiceOptions) {
+/**
+ * `P` is whatever else the component's anatomy has — a choice card adds a title
+ * and a description — so one anatomy serves both this and the component's own parts.
+ */
+export function choice<P extends string>(anatomy: Anatomy<ChoicePart | 'indicator' | 'thumb' | P>, options: ChoiceOptions) {
   const { type, role, id, name, value, checked, indeterminate = false, required, nativeChecked, restoresChecked, onCheckedChange } =
     options
   // A checkbox has no native readonly. The Field's flag is taken here and turned
@@ -70,7 +74,7 @@ export function choice<P extends ChoicePart | 'indicator' | 'thumb'>(anatomy: An
   }
 
   const own: Dict = {
-    ...anatomy.attrs('input' as P),
+    ...anatomy.attrs('input'),
     ...stateAttrs,
     type,
     role,
@@ -99,10 +103,10 @@ export function choice<P extends ChoicePart | 'indicator' | 'thumb'>(anatomy: An
     state,
     disabled,
     readOnly,
-    rootProps: { ...anatomy.attrs('root' as P), ...stateAttrs } as Dict,
-    controlProps: { ...anatomy.attrs('control' as P), ...stateAttrs } as Dict,
+    rootProps: { ...anatomy.attrs('root'), ...stateAttrs } as Dict,
+    controlProps: { ...anatomy.attrs('control'), ...stateAttrs } as Dict,
     inputProps: mergeProps(own, field),
-    labelProps: { ...anatomy.attrs('label' as P), ...stateAttrs } as Dict,
+    labelProps: { ...anatomy.attrs('label'), ...stateAttrs } as Dict,
     stateAttrs,
   }
 }

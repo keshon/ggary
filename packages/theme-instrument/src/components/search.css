@@ -1,0 +1,39 @@
+/* ==========================================================================
+   Instrument — search
+
+   Ported from instrument/src/forms.css (.inst-search). The field look is
+   input.css's; here only the room for the glyph and the native cross, brought
+   into the kit's register rather than hidden. A cross of our own would need a
+   script, and Escape would stop clearing the field.
+
+   One difference from the source: the magnifier is an element with a glyph
+   token rather than a pseudo-element with an inline SVG, so a theme can
+   reshape it the way it reshapes every other icon.
+   ========================================================================== */
+
+[data-scope='search'][data-part='root'] > [data-scope='input'][data-part='root'] {
+  padding-inline-start: calc(var(--control-pad-sm) + var(--size-icon) + var(--space-3));
+}
+
+[data-scope='search'][data-part='icon'] {
+  inset-inline-start: var(--control-pad-sm);
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+  color: var(--text-muted);
+}
+
+[data-scope='search'][data-part='root'][data-disabled] > [data-part='icon'] {
+  opacity: 0.5;
+}
+
+[data-scope='search'][data-part='root'] > [data-scope='input']::-webkit-search-cancel-button {
+  appearance: none;
+  inline-size: var(--size-chevron);
+  block-size: var(--size-chevron);
+  background-color: var(--text-muted);
+  mask: var(--gg-icon-close) center / contain no-repeat;
+  cursor: pointer;
+}
+[data-scope='search'][data-part='root'] > [data-scope='input']::-webkit-search-cancel-button:hover {
+  background-color: var(--text-primary);
+}

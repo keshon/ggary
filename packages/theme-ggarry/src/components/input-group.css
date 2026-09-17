@@ -1,0 +1,60 @@
+/* ==========================================================================
+   GGarry — input group
+
+   The border belongs to the group, not to the field inside it: on the join
+   two borders give two lines, and focus would ring half the control. The
+   affix sits on the subtle plate, one step under the field it explains.
+   ========================================================================== */
+
+[data-scope='input-group'][data-part='root'] {
+  --group-height: var(--ggarry-size-control-md);
+
+  min-block-size: var(--group-height);
+  border: 1px solid var(--ggarry-border-control);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-surface);
+  font-family: var(--ggarry-font-family-sans);
+  transition: border-color var(--ggarry-duration-fast) ease;
+}
+[data-scope='input-group'][data-part='root'][data-size='sm'] {
+  --group-height: var(--ggarry-size-control-sm);
+  border-radius: var(--ggarry-radius-sm);
+}
+[data-scope='input-group'][data-part='root'][data-size='lg'] {
+  --group-height: var(--ggarry-size-control-lg);
+}
+
+[data-scope='input-group'][data-part='root']:hover:not([data-disabled]):not([data-invalid]) {
+  border-color: var(--ggarry-border-accent);
+}
+[data-scope='input-group'][data-part='root']:focus-within:not([data-invalid]) {
+  border-color: var(--ggarry-border-accent);
+}
+[data-scope='input-group'][data-part='root'][data-invalid] {
+  border-color: var(--ggarry-border-danger);
+}
+[data-scope='input-group'][data-part='root'][data-disabled] {
+  opacity: 0.55;
+  background: var(--ggarry-bg-subtle);
+}
+
+/* The field hands its box outwards: the group draws the border, the
+   background and the corners, and the field keeps only its text. */
+[data-scope='input-group'][data-part='root'] > :is([data-scope='input'], [data-scope='select'])[data-part='root'] {
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+:is([data-scope='input-group'][data-part='prefix'], [data-scope='input-group'][data-part='suffix']) {
+  padding-inline: var(--ggarry-space-3);
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-sm);
+}
+
+/* A button flush in the group: square where it meets the field. */
+[data-scope='input-group'][data-part='root'] > [data-scope='button'][data-part='root'] {
+  border-radius: 0;
+}

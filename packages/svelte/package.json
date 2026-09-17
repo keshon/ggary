@@ -134,6 +134,26 @@
     "./slider": {
       "svelte": "./src/components/slider/index.ts",
       "default": "./src/components/slider/index.ts"
+    },
+    "./button-group": {
+      "svelte": "./src/components/button-group/index.ts",
+      "default": "./src/components/button-group/index.ts"
+    },
+    "./choice-card": {
+      "svelte": "./src/components/choice-card/index.ts",
+      "default": "./src/components/choice-card/index.ts"
+    },
+    "./file-drop": {
+      "svelte": "./src/components/file-drop/index.ts",
+      "default": "./src/components/file-drop/index.ts"
+    },
+    "./input-group": {
+      "svelte": "./src/components/input-group/index.ts",
+      "default": "./src/components/input-group/index.ts"
+    },
+    "./search": {
+      "svelte": "./src/components/search/index.ts",
+      "default": "./src/components/search/index.ts"
     }
   },
   "peerDependencies": {

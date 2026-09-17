@@ -175,6 +175,198 @@ export interface NumberFieldProps {
   invalid?: boolean
 }
 
+export interface ChoiceCardItem {
+  value: string
+  title: string
+  description?: string
+  disabled?: boolean
+}
+
+export interface ChoiceCardGroupProps {
+  items: ChoiceCardItem[]
+  type?: 'radio' | 'checkbox'
+  name?: string
+  value?: string | string[] | null
+  defaultValue?: string | string[] | null
+  onValueChange?: (value: any) => void
+  label?: string
+  orientation?: RadioGroupOrientation
+  disabled?: boolean
+  required?: boolean
+  invalid?: boolean
+}
+
+export interface SearchProps {
+  value?: string
+  defaultValue?: string
+  onValueChange?: (value: string) => void
+  size?: 'sm' | 'md' | 'lg'
+  name?: string
+  placeholder?: string
+  label?: string
+  disabled?: boolean
+  readOnly?: boolean
+  required?: boolean
+  invalid?: boolean
+}
+
+export interface InputGroupProps {
+  prefix?: string
+  suffix?: string
+  size?: 'sm' | 'md' | 'lg'
+  disabled?: boolean
+  invalid?: boolean
+  /** The field inside the group. */
+  input?: InputProps
+}
+
+export interface FileDropProps {
+  name?: string
+  accept?: string
+  multiple?: boolean
+  label?: string
+  hint?: string
+  disabled?: boolean
+  required?: boolean
+  invalid?: boolean
+  onFilesChange?: (files: File[]) => void
+}
+
+export interface ButtonGroupProps {
+  size?: 'sm' | 'md' | 'lg'
+  label?: string
+  /** The labels of the buttons inside. */
+  buttons?: string[]
+}
+
+export interface ChoiceCardItem {
+  value: string
+  title: string
+  description?: string
+  disabled?: boolean
+}
+
+export interface ChoiceCardGroupProps {
+  items: ChoiceCardItem[]
+  type?: 'radio' | 'checkbox'
+  name?: string
+  value?: string | string[] | null
+  defaultValue?: string | string[] | null
+  onValueChange?: (value: any) => void
+  label?: string
+  orientation?: RadioGroupOrientation
+  disabled?: boolean
+  required?: boolean
+  invalid?: boolean
+}
+
+export interface SearchProps {
+  value?: string
+  defaultValue?: string
+  onValueChange?: (value: string) => void
+  size?: 'sm' | 'md' | 'lg'
+  name?: string
+  placeholder?: string
+  label?: string
+  disabled?: boolean
+  readOnly?: boolean
+  required?: boolean
+  invalid?: boolean
+}
+
+export interface InputGroupProps {
+  prefix?: string
+  suffix?: string
+  size?: 'sm' | 'md' | 'lg'
+  disabled?: boolean
+  invalid?: boolean
+  /** The field inside the group. */
+  input?: InputProps
+}
+
+export interface FileDropProps {
+  name?: string
+  accept?: string
+  multiple?: boolean
+  label?: string
+  hint?: string
+  disabled?: boolean
+  required?: boolean
+  invalid?: boolean
+  onFilesChange?: (files: File[]) => void
+}
+
+export interface ButtonGroupProps {
+  size?: 'sm' | 'md' | 'lg'
+  label?: string
+  /** The labels of the buttons inside. */
+  buttons?: string[]
+}
+
+export interface ChoiceCardItem {
+  value: string
+  title: string
+  description?: string
+  disabled?: boolean
+}
+
+export interface ChoiceCardGroupProps {
+  items: ChoiceCardItem[]
+  type?: 'radio' | 'checkbox'
+  name?: string
+  value?: string | string[] | null
+  defaultValue?: string | string[] | null
+  onValueChange?: (value: any) => void
+  label?: string
+  orientation?: RadioGroupOrientation
+  disabled?: boolean
+  required?: boolean
+  invalid?: boolean
+}
+
+export interface SearchProps {
+  value?: string
+  defaultValue?: string
+  onValueChange?: (value: string) => void
+  size?: 'sm' | 'md' | 'lg'
+  name?: string
+  placeholder?: string
+  label?: string
+  disabled?: boolean
+  readOnly?: boolean
+  required?: boolean
+  invalid?: boolean
+}
+
+export interface InputGroupProps {
+  prefix?: string
+  suffix?: string
+  size?: 'sm' | 'md' | 'lg'
+  disabled?: boolean
+  invalid?: boolean
+  /** The field inside the group. */
+  input?: InputProps
+}
+
+export interface FileDropProps {
+  name?: string
+  accept?: string
+  multiple?: boolean
+  label?: string
+  hint?: string
+  disabled?: boolean
+  required?: boolean
+  invalid?: boolean
+  onFilesChange?: (files: File[]) => void
+}
+
+export interface ButtonGroupProps {
+  size?: 'sm' | 'md' | 'lg'
+  label?: string
+  /** The labels of the buttons inside. */
+  buttons?: string[]
+}
+
 export interface CheckboxGroupProps {
   items: RadioItem[]
   name?: string
@@ -392,6 +584,8 @@ export interface FieldProps {
   textarea?: TextareaProps
   slider?: SliderProps
   numberField?: NumberFieldProps
+  search?: SearchProps
+  fileDrop?: FileDropProps
   checkbox?: CheckboxProps
   switch?: SwitchProps
 }
@@ -446,6 +640,21 @@ export interface Adapter {
   segmentedControl(props: SegmentedControlProps, target: HTMLElement): Promise<Mounted<SegmentedControlProps>>
   slider(props: SliderProps, target: HTMLElement): Promise<Mounted<SliderProps>>
   numberField(props: NumberFieldProps, target: HTMLElement): Promise<Mounted<NumberFieldProps>>
+  choiceCards(props: ChoiceCardGroupProps, target: HTMLElement): Promise<Mounted<ChoiceCardGroupProps>>
+  search(props: SearchProps, target: HTMLElement): Promise<Mounted<SearchProps>>
+  inputGroup(props: InputGroupProps, target: HTMLElement): Promise<Mounted<InputGroupProps>>
+  fileDrop(props: FileDropProps, target: HTMLElement): Promise<Mounted<FileDropProps>>
+  buttonGroup(props: ButtonGroupProps, target: HTMLElement): Promise<Mounted<ButtonGroupProps>>
+  choiceCards(props: ChoiceCardGroupProps, target: HTMLElement): Promise<Mounted<ChoiceCardGroupProps>>
+  search(props: SearchProps, target: HTMLElement): Promise<Mounted<SearchProps>>
+  inputGroup(props: InputGroupProps, target: HTMLElement): Promise<Mounted<InputGroupProps>>
+  fileDrop(props: FileDropProps, target: HTMLElement): Promise<Mounted<FileDropProps>>
+  buttonGroup(props: ButtonGroupProps, target: HTMLElement): Promise<Mounted<ButtonGroupProps>>
+  choiceCards(props: ChoiceCardGroupProps, target: HTMLElement): Promise<Mounted<ChoiceCardGroupProps>>
+  search(props: SearchProps, target: HTMLElement): Promise<Mounted<SearchProps>>
+  inputGroup(props: InputGroupProps, target: HTMLElement): Promise<Mounted<InputGroupProps>>
+  fileDrop(props: FileDropProps, target: HTMLElement): Promise<Mounted<FileDropProps>>
+  buttonGroup(props: ButtonGroupProps, target: HTMLElement): Promise<Mounted<ButtonGroupProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
   /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */
   fieldset(props: FieldsetProps, target: HTMLElement): Promise<Mounted<FieldsetProps>>

@@ -5,16 +5,20 @@
     Badge,
     Banner,
     Button,
+    ButtonGroup,
     Card,
     Checkbox,
     CheckboxGroup,
     Chip,
     ChipGroup,
+    ChoiceCardGroup,
     Dialog,
     EmptyState,
     Field,
     Fieldset,
+    FileDrop,
     Input,
+    InputGroup,
     Menu,
     Menubar,
     Note,
@@ -22,6 +26,7 @@
     Panel,
     Popover,
     RadioGroup,
+    Search,
     Select,
     SegmentedControl,
     Sheet,
@@ -35,7 +40,7 @@
     toast,
     Tooltip,
   } from '@ggary/svelte'
-  import { agentsText, badgeTones, densities, people, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { agentsText, badgeTones, densities, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -45,6 +50,9 @@
   let density = $state('regular')
   let agents = $state(6)
   let position = $state({ x: 128, y: 0, z: -64 })
+  let mode = $state('parallel')
+  let extras = $state<string[]>([])
+  let chosenFiles = $state<File[]>([])
   let items = $state(tags)
   let selection = $state<string[]>(['design'])
   let formOutput = $state('submit to see the FormData the hidden input contributes')
@@ -668,6 +676,53 @@ invalid  ${taken}`}</pre>
   </div>
   <pre class="state">x {position.x}  y {position.y}  z {position.z}</pre>
   <p class="hint">Drag the axis letter sideways to change the number — Shift is ten times faster, Alt a tenth. The letter is a handle, not a label: each field is named "Position X" in full, because three squares marked X, Y and Z say nothing on their own.</p>
+</section>
+
+<section id="fields">
+  <h2>Choice cards</h2>
+  <div class="form-column">
+    <ChoiceCardGroup items={runModes} label="Run mode" name="mode" bind:value={mode} />
+    <ChoiceCardGroup items={runExtras} type="checkbox" label="Also" name="extras" orientation="horizontal" bind:value={extras} />
+  </div>
+  <pre class="state">mode {mode}  ·  also {extras.join(', ') || 'nothing'}</pre>
+  <p class="hint">A card is a bigger target for a real radio or checkbox — the box inside is the plain control, drawn by one rule. The heading and the explanation are inside the label, so both are the option’s name; the chosen one carries a border, a bar and its own check, never colour alone.</p>
+
+  <h2 style="margin-top: 32px">Search, and a field with affixes</h2>
+  <div class="form-column">
+    <Field label="Search the runs" hint="By name, id or the agent that started it">
+      <Search name="q" placeholder="worldgen" />
+    </Field>
+    <Field label="Budget" hint="Per agent, in dollars an hour">
+      <InputGroup prefix="$" suffix="per hour">
+        <Input type="number" name="budget" defaultValue="12" min={0} />
+      </InputGroup>
+    </Field>
+    <InputGroup suffix=".example.com" size="sm">
+      <Input name="subdomain" defaultValue="worldbox" aria-label="Subdomain" size="sm" />
+    </InputGroup>
+  </div>
+  <p class="hint">A native search field: the clear cross and Escape are the browser’s, so no script is needed. The magnifier is decoration and hidden from screen readers — the work is named by the label. The border belongs to the group, not to the field inside it: two borders at the join give two lines, and focus would ring half the control. An affix names nothing, so put the unit in the label or the hint too.</p>
+
+  <h2 style="margin-top: 32px">File drop</h2>
+  <div class="form-column">
+    <FileDrop name="import" accept=".json,.csv" multiple hint="Up to 20 MB, the formats .json and .csv" onFilesChange={(list) => (chosenFiles = list)} />
+  </div>
+  <pre class="state">{chosenFiles.map((file) => `${file.name} (${Math.ceil(file.size / 1024)} KB)`).join(', ') || '—'}</pre>
+  <p class="hint">Drag a file onto the zone, or press it and choose one. The input is clipped to a pixel rather than hidden, so Tab still reaches the zone; a drop writes the files into it, so the form submits them as if they had been chosen.</p>
+
+  <h2 style="margin-top: 32px">Button group</h2>
+  <div class="row">
+    <ButtonGroup size="sm" label="Alignment">
+      <Button size="sm" emphasis="medium">Left</Button>
+      <Button size="sm" emphasis="medium">Centre</Button>
+      <Button size="sm" emphasis="medium">Right</Button>
+    </ButtonGroup>
+    <ButtonGroup>
+      <Button emphasis="medium">Run</Button>
+      <Button emphasis="medium">Schedule</Button>
+    </ButtonGroup>
+  </div>
+  <p class="hint">Several different actions standing flush — unlike a segmented control, a group has no chosen one. Tab goes through every button, because each does its own thing.</p>
 </section>
 
 <section id="display">

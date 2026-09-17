@@ -8,6 +8,7 @@ import { chipGroupConformance } from './chip-group.spec'
 import { numberFieldConformance, segmentedControlConformance, sliderConformance } from './controls.spec'
 import { dialogConformance } from './dialog.spec'
 import { fieldConformance } from './field.spec'
+import { buttonGroupConformance, choiceCardsConformance, fileDropConformance, inputGroupConformance, searchConformance } from './fields.spec'
 import { checkboxGroupConformance, fieldsetConformance } from './fieldset.spec'
 import { cleanup } from './harness'
 import { inputConformance } from './input.spec'
@@ -46,6 +47,11 @@ export function runConformance() {
       segmentedControlConformance(adapter)
       sliderConformance(adapter)
       numberFieldConformance(adapter)
+      choiceCardsConformance(adapter)
+      searchConformance(adapter)
+      inputGroupConformance(adapter)
+      fileDropConformance(adapter)
+      buttonGroupConformance(adapter)
       checkboxGroupConformance(adapter)
       fieldsetConformance(adapter)
       resetConformance(adapter)

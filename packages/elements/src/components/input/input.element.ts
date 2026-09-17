@@ -11,7 +11,8 @@ import { spread } from '../../spread'
  * its value and its native attributes. This element adds the attribute
  * contract a theme styles against.
  *
- * INSIDE A <gg-field> IT DOES NOTHING. The outermost enhancer owns the control:
+ * INSIDE A <gg-field> OR A <gg-input-group> IT DOES NOTHING. The outermost
+ * enhancer owns the control:
  * two elements spreading props onto one <input> would each remove the other's
  * attributes on every update. The field applies the input contract itself, and
  * reads this element's `size` to do it.
@@ -22,7 +23,7 @@ export class GgInputElement extends HTMLElement {
   #input: HTMLInputElement | null = null
 
   connectedCallback(): void {
-    if (this.closest('gg-field')) return
+    if (this.closest('gg-field, gg-input-group')) return
     this.#input = this.querySelector('input')
     if (!this.#input) {
       console.warn('<gg-input> expects an <input> child to enhance.', this)

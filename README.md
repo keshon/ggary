@@ -2,11 +2,12 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Thirty-three components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
-Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, SegmentedControl, Slider,
-NumberField, Tabs, Dialog, Sheet, Popover, Tooltip, Toast, Menu, Menubar, Badge,
-Avatar, AvatarGroup, Spinner, Skeleton, Card, Panel, Banner, Note and EmptyState —
-built end to end to prove the architecture holds.
+Thirty-eight components — Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
+RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
+Dialog, Sheet, Popover, Tooltip, Toast, Menu, Menubar, Badge, Avatar, AvatarGroup,
+Spinner, Skeleton, Card, Panel, Banner, Note and EmptyState — built end to end to
+prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -16,7 +17,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 2059 tests, 821 of them in headless Chrome
+npm test         # 2206 tests, 881 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -43,13 +44,15 @@ packages/
                      <gg-checkbox-group>, <gg-tabs>, <gg-toaster>, <gg-badge>, <gg-avatar>,
                      <gg-avatar-group>, <gg-spinner>, <gg-skeleton>, <gg-card>, <gg-panel>,
                      <gg-banner>, <gg-note>, <gg-empty-state>, <gg-segmented-control>,
-                     <gg-slider>, <gg-number-field>
+                     <gg-slider>, <gg-number-field>, <gg-choice-cards>, <gg-search>,
+                     <gg-input-group>, <gg-file-drop>, <gg-button-group>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
                      <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Sheet>, <Popover>, <Tooltip>,
                      <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>, <Tabs>, <Toaster>,
                      <Badge>, <Avatar>, <AvatarGroup>, <Spinner>, <Skeleton>, <Card>,
                      <Panel>, <Banner>, <Note>, <EmptyState>, <SegmentedControl>,
-                     <Slider>, <NumberField>
+                     <Slider>, <NumberField>, <ChoiceCardGroup>, <Search>, <InputGroup>,
+                     <FileDrop>, <ButtonGroup>
   svelte/            the same components as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
@@ -1027,6 +1030,74 @@ Found on the way:
 - **`PageUp` does not step a number input** — that is a range input's behaviour. A
   browser test claimed it and failed, which is what a browser test is for.
 
+## ChoiceCards, Search, InputGroup, FileDrop and ButtonGroup
+
+The rest of the form vocabulary, and the same rule as the wave before it: where
+the platform has the behaviour, the kit only dresses it.
+
+```tsx
+<ChoiceCardGroup items={modes} label="Run mode" name="mode" value={mode} onValueChange={setMode} />
+<ChoiceCardGroup items={extras} type="checkbox" label="Also" value={also} onValueChange={setAlso} />
+<Field label="Search the runs"><Search name="q" placeholder="worldgen" /></Field>
+<InputGroup prefix="$" suffix="per hour"><Input type="number" name="budget" /></InputGroup>
+<FileDrop name="import" accept=".json,.csv" multiple hint="Up to 20 MB" onFilesChange={keep} />
+<ButtonGroup size="sm" label="Alignment">…</ButtonGroup>
+```
+
+```html
+<gg-choice-cards label="Run mode" name="mode">
+  <label><input type="radio" value="parallel" checked>In parallel<span slot="description">Up to 12 agents at once.</span></label>
+</gg-choice-cards>
+
+<gg-search><input type="search" name="q"></gg-search>
+<gg-input-group prefix="$" suffix="per hour"><input type="number" name="budget"></gg-input-group>
+<gg-file-drop hint="Up to 20 MB"><input type="file" name="import" multiple></gg-file-drop>
+```
+
+- **ChoiceCards** are RadioGroup and CheckboxGroup with room for consequences:
+  "in parallel — up to 12 agents at once, more tokens, no guaranteed order". The
+  card is the option's `<label>`, and the box inside it is the plain control's own
+  parts, with the checkbox's or the radio's scope — so one theme rule draws both,
+  and a card cannot drift from a toggle. The heading and the description are
+  inside the label, which makes them the option's accessible name; an `aria-label`
+  here would hide exactly what the user needs in order to choose. `type="radio"`
+  is a radiogroup, `type="checkbox"` a plain group with an array for a value.
+- **Search** is `type="search"`, so the clear cross and Escape are the browser's.
+  The input inside is an `input` part, not a `search` one: the field look is
+  input.css's, and search.css only makes room for the glyph and recolours the
+  native cross. The magnifier is decoration and hidden from assistive technology.
+- **InputGroup** puts "$" or "per hour" or a button flush against a field. The
+  border belongs to the GROUP: two borders at the join give two lines, and focus
+  would ring half the control — so the field inside hands its box outwards. In
+  Instrument the affix's recess is relative and compounds by itself, which is how
+  the source keeps one step under the field on a page, in a panel and in a modal.
+- **FileDrop** is a `<label>` around a real `input[type=file]`, so a press
+  anywhere opens the system dialog and Tab reaches the zone. The input is taken
+  away by a clip, never by `display: none`, which would drop it out of the tab
+  order. Instrument's zone has no script and cannot answer a drag; `utils/file-drop`
+  adds one: a depth-counted drag state, and a drop that writes the files into the
+  input through a DataTransfer, then sends the same `input` and `change` the
+  dialog would — so a form submits them as if they had been chosen by hand.
+- **ButtonGroup** is several actions standing flush, which is the whole difference
+  from a SegmentedControl: no chosen one, and no roving tabindex — Tab goes through
+  every button, because each does its own thing. It takes a role only when it is
+  named. The corners follow the size the group is told its buttons are; Instrument
+  reads that from the children with `:has()`, which cannot see through a
+  `<gg-button>` wrapper, so here it is said out loud.
+
+Found on the way:
+
+- **A rule in `gg.structure` cannot undo a theme's field look.** The group's input
+  kept its own border until the "hand the box outwards" rules moved into each
+  theme's `input-group.css`: layer order is `tokens, structure, base, components`,
+  and the field look is a component rule.
+- **jsdom has no `DataTransfer`**, so a drop cannot even be staged there. Those two
+  conformance cases skip under jsdom and run in the Chrome pass, where they check
+  the real thing: the files land in the input, and the zone lights up for a drag.
+- **`choice()` needed a wider generic.** It used to take only its own four parts,
+  so an anatomy with a title and a description would not typecheck; it now takes
+  any anatomy that includes them.
+
 ## Layering inside core
 
 ```
@@ -1232,13 +1303,13 @@ one needs JS anyway; the children themselves stay the author's.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 189 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers. |
-| contract | node | `icons.contract.test.ts` | 191 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `icons.contract.test.ts` | 218 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 774 tests, 19 of them skipped where an adapter cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 834 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 774 tests, 16 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 834 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
@@ -1351,6 +1422,12 @@ Real, and deliberately left open:
   prose, the rest of forms (number field, slider, choice cards), tables,
   the agent components (including the composer, a textarea with a toolbar in one
   frame) and print styles.
+- **An affix names nothing.** "$" and "per hour" are text beside the field, not a
+  label: a screen reader announces the field's own name, so put the unit in the
+  label or the hint as well.
+- **FileDrop shows what was chosen and nothing else.** No progress, no removing one
+  file of several, no upload: the component chooses files, the page sends them.
+- **No Cascader and no Inserts** from Instrument's inputs yet.
 - **A segmented control cannot be links.** Instrument's variant carries the state
   on `aria-current="page"` when the options are addresses. Here the options are
   radios, so a row of links is a nav, not this component.

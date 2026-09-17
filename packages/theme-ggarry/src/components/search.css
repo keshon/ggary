@@ -1,0 +1,36 @@
+/* ==========================================================================
+   GGarry — search
+
+   A field with a magnifier and the browser's own clear cross. The field look
+   is input.css's, because the input inside a search IS an input; this file
+   only makes room for the glyph and brings the native cross into the kit.
+   ========================================================================== */
+
+[data-scope='search'][data-part='root'] > [data-scope='input'][data-part='root'] {
+  padding-inline-start: calc(var(--ggarry-space-3) + 16px + var(--ggarry-space-2));
+}
+
+[data-scope='search'][data-part='icon'] {
+  inset-inline-start: var(--ggarry-space-3);
+  inline-size: 16px;
+  block-size: 16px;
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='search'][data-part='root'][data-disabled] > [data-part='icon'] {
+  opacity: 0.55;
+}
+
+/* The native cross, recoloured rather than replaced: a button of our own would
+   need a script, and Escape would stop clearing the field. */
+[data-scope='search'][data-part='root'] > [data-scope='input']::-webkit-search-cancel-button {
+  appearance: none;
+  inline-size: 12px;
+  block-size: 12px;
+  background-color: var(--ggarry-text-muted);
+  mask: var(--gg-icon-close) center / contain no-repeat;
+  cursor: pointer;
+}
+[data-scope='search'][data-part='root'] > [data-scope='input']::-webkit-search-cancel-button:hover {
+  background-color: var(--ggarry-text-default);
+}

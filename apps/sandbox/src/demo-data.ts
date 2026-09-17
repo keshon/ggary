@@ -209,6 +209,18 @@ export const openFiles: TabItem[] = [
 let untitled = 0
 export const newFile = (): TabItem => ({ value: `untitled-${++untitled}`, label: `untitled-${untitled}.css`, closable: true, modified: true })
 
+/** The choice cards, the same on every page. */
+export const runModes = [
+  { value: 'parallel', title: 'In parallel', description: 'Up to 12 agents at once. Faster, but the token spend is higher and the order of the output is not guaranteed.' },
+  { value: 'sequential', title: 'Sequentially', description: 'One agent at a time. Slower, but the log reads top to bottom with no interleaving.' },
+  { value: 'manual', title: 'One step at a time', description: 'Every step waits for you. For a run you do not trust yet.', disabled: true },
+]
+
+export const runExtras = [
+  { value: 'trace', title: 'Collect a trace', description: 'A full log of every step. The run becomes about 15% slower.' },
+  { value: 'notify', title: 'Notify on completion', description: 'An email to the account address when the queue empties.' },
+]
+
 /** The segmented control's options, the same on every page. */
 export const viewModes = [
   { value: 'list', label: 'List' },

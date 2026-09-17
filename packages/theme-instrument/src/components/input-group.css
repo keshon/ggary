@@ -1,0 +1,45 @@
+/* ==========================================================================
+   Instrument — input group
+
+   Ported from instrument/src/forms.css (.inst-input-group, .inst-input-affix).
+   The border lives on the GROUP: otherwise the join gives two lines and focus
+   highlights only half the control.
+
+   THE AFFIX'S RECESS IS RELATIVE and compounds by itself — the affix lies
+   inside a group that already has a recess of its own, so it lands one step
+   under the field wherever the group stands. The source measured an absolute
+   step drifting by a factor of six between a page, a panel and a modal. There
+   is deliberately no divider: the step already draws that boundary.
+   ========================================================================== */
+
+[data-scope='input-group'][data-part='root'] {
+  min-block-size: var(--control-h-md);
+  border: var(--hairline) solid var(--border-control);
+  border-radius: var(--radius-control-md);
+  background: var(--surface-field);
+  transition: border-color var(--dur-1) var(--ease-out);
+
+  &:hover:not([data-disabled]):not([data-invalid]) { border-color: var(--text-muted); }
+  &:focus-within:not([data-invalid]) { border-color: var(--accent-border); }
+  &[data-invalid] { border-color: var(--err-text); }
+  &[data-disabled] { opacity: 0.5; }
+
+  &[data-size='sm'] { min-block-size: var(--control-h-sm); border-radius: var(--radius-control-sm); }
+  &[data-size='lg'] { min-block-size: var(--control-h-lg); border-radius: var(--radius-control-lg); }
+
+  /* A field inside a group hands its border and background outwards. */
+  & > :is([data-scope='input'], [data-scope='select'])[data-part='root'] {
+    min-block-size: auto;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+  }
+  & > [data-scope='button'][data-part='root'] { border-radius: 0; min-block-size: auto; }
+}
+
+:is([data-scope='input-group'][data-part='prefix'], [data-scope='input-group'][data-part='suffix']) {
+  padding-inline: var(--control-pad-sm);
+  background: var(--surface-recessed);
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+}

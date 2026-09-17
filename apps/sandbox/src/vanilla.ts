@@ -3,7 +3,7 @@ import './shared.css'
 import '@ggary/elements'
 import { toast } from '@ggary/elements'
 import type { GgAvatarGroupElement, GgCheckboxElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
-import { agentsText, badgeTones, densities, people, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, densities, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
 
@@ -471,6 +471,62 @@ app.innerHTML = `
     <p class="hint">Drag the axis letter sideways to change the number — Shift is ten times faster, Alt a tenth. The letter is a handle, not a label: each field is named "Position X" in full, because three squares marked X, Y and Z say nothing on their own.</p>
   </section>
 
+  <section id="fields">
+    <h2>Choice cards</h2>
+    <div class="form-column">
+      <gg-choice-cards id="run-mode" label="Run mode" name="mode">
+        ${runModes
+          .map(
+            (mode) =>
+              `<label><input type="radio" value="${mode.value}"${mode.value === 'parallel' ? ' checked' : ''}${mode.disabled ? ' disabled' : ''}>${mode.title}<span slot="description">${mode.description}</span></label>`
+          )
+          .join('')}
+      </gg-choice-cards>
+      <gg-choice-cards id="run-extras" label="Also" type="checkbox" name="extras" orientation="horizontal">
+        ${runExtras
+          .map((item) => `<label><input type="checkbox" value="${item.value}">${item.title}<span slot="description">${item.description}</span></label>`)
+          .join('')}
+      </gg-choice-cards>
+    </div>
+    <pre class="state" id="cards-state">—</pre>
+    <p class="hint">A card is a bigger target for a real radio or checkbox — the box inside is the plain control, drawn by one rule. The heading and the explanation are inside the label, so both are the option’s name; the chosen one carries a border, a bar and its own check, never colour alone.</p>
+
+    <h2 style="margin-top: 32px">Search, and a field with affixes</h2>
+    <div class="form-column">
+      <gg-field label="Search the runs" hint="By name, id or the agent that started it">
+        <gg-search><input type="search" name="q" placeholder="worldgen"></gg-search>
+      </gg-field>
+      <gg-field label="Budget" hint="Per agent, in dollars an hour">
+        <gg-input-group prefix="$" suffix="per hour"><input type="number" name="budget" value="12" step="1" min="0"></gg-input-group>
+      </gg-field>
+      <gg-input-group suffix=".example.com" size="sm"><input name="subdomain" value="worldbox" aria-label="Subdomain"></gg-input-group>
+    </div>
+    <p class="hint">A native search field: the clear cross and Escape are the browser’s, so no script is needed. The magnifier is decoration and hidden from screen readers — the work is named by the label. The border belongs to the group, not to the field inside it: two borders at the join give two lines, and focus would ring half the control. An affix names nothing, so put the unit in the label or the hint too.</p>
+
+    <h2 style="margin-top: 32px">File drop</h2>
+    <div class="form-column">
+      <gg-file-drop label="Drag files in or choose them" hint="Up to 20 MB, the formats .json and .csv">
+        <input type="file" name="import" accept=".json,.csv" multiple>
+      </gg-file-drop>
+    </div>
+    <pre class="state" id="files-state">—</pre>
+    <p class="hint">Drag a file onto the zone, or press it and choose one. The input is clipped to a pixel rather than hidden, so Tab still reaches the zone; a drop writes the files into it, so the form submits them as if they had been chosen.</p>
+
+    <h2 style="margin-top: 32px">Button group</h2>
+    <div class="row">
+      <gg-button-group size="sm" label="Alignment">
+        <gg-button size="sm" emphasis="medium"><button>Left</button></gg-button>
+        <gg-button size="sm" emphasis="medium"><button>Centre</button></gg-button>
+        <gg-button size="sm" emphasis="medium"><button>Right</button></gg-button>
+      </gg-button-group>
+      <gg-button-group>
+        <gg-button emphasis="medium"><button>Run</button></gg-button>
+        <gg-button emphasis="medium"><button>Schedule</button></gg-button>
+      </gg-button-group>
+    </div>
+    <p class="hint">Several different actions standing flush — unlike a segmented control, a group has no chosen one. Tab goes through every button, because each does its own thing.</p>
+  </section>
+
   <section id="display">
     <h2>Badge, Avatar, Spinner and Skeleton</h2>
     <div class="row" style="align-items: center">
@@ -784,3 +840,20 @@ for (const field of document.querySelectorAll('gg-number-field')) {
     numberState.textContent = `x ${position.x}  y ${position.y}  z ${position.z}`
   })
 }
+
+// --- fields ------------------------------------------------------------------------
+const cardsState = document.getElementById('cards-state')!
+const choices: Record<string, string> = { 'run-mode': 'parallel', 'run-extras': '' }
+for (const id of ['run-mode', 'run-extras']) {
+  document.getElementById(id)!.addEventListener('valuechange', (event) => {
+    const { value } = (event as CustomEvent).detail
+    choices[id] = Array.isArray(value) ? value.join(', ') || 'nothing' : value
+    cardsState.textContent = `mode ${choices['run-mode']}  ·  also ${choices['run-extras'] || 'nothing'}`
+  })
+}
+
+const filesState = document.getElementById('files-state')!
+document.querySelector('gg-file-drop')!.addEventListener('fileschange', (event) => {
+  const { files } = (event as CustomEvent).detail as { files: File[] }
+  filesState.textContent = files.map((file) => `${file.name} (${Math.ceil(file.size / 1024)} KB)`).join(', ')
+})

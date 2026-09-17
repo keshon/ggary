@@ -1,0 +1,37 @@
+/* ==========================================================================
+   GGarry — button group
+
+   Several actions standing flush, and that is all: a group has no chosen one
+   (that is the segmented control). Only the ends are rounded, and the seam is
+   one drawn line between neighbours rather than a border on each — outlines
+   in a row add up into a grid.
+
+   The radius comes from the size the group says its buttons are: a constant
+   would give a pill around two small rectangles.
+   ========================================================================== */
+
+[data-scope='button-group'][data-part='root'] {
+  --group-radius: var(--ggarry-radius-md);
+}
+[data-scope='button-group'][data-part='root'][data-size='sm'] { --group-radius: var(--ggarry-radius-sm); }
+[data-scope='button-group'][data-part='root'][data-size='lg'] { --group-radius: var(--ggarry-radius-lg); }
+
+[data-scope='button-group'][data-part='root'] > [data-scope='button'][data-part='root'] {
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-scope='button-group'][data-part='root'] > * + * > [data-scope='button'][data-part='root'],
+[data-scope='button-group'][data-part='root'] > * + [data-scope='button'][data-part='root'] {
+  border-inline-start: 1px solid var(--ggarry-border-default);
+}
+
+[data-scope='button-group'][data-part='root'] > :first-child :is([data-scope='button'][data-part='root']),
+[data-scope='button-group'][data-part='root'] > [data-scope='button'][data-part='root']:first-child {
+  border-start-start-radius: var(--group-radius);
+  border-end-start-radius: var(--group-radius);
+}
+[data-scope='button-group'][data-part='root'] > :last-child :is([data-scope='button'][data-part='root']),
+[data-scope='button-group'][data-part='root'] > [data-scope='button'][data-part='root']:last-child {
+  border-start-end-radius: var(--group-radius);
+  border-end-end-radius: var(--group-radius);
+}

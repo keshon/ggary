@@ -1,0 +1,46 @@
+/* ==========================================================================
+   Instrument — button group
+
+   Ported from instrument/src/actions.css (.inst-btn-group). NO SHADOW on the
+   group: the buttons inside are recessed, and a raised frame around recessed
+   content reads as an assembly error.
+
+   THE SEAM IS DRAWN rather than left over from a neighbour's border: the
+   recessed default has no border of its own, so a row would fuse into one
+   blot — while a group exists precisely so the actions can be told apart. One
+   line between neighbours, not an outline on each: outlines add up into a grid.
+
+   The radius is the radius of ITS buttons: in the source it is read from the
+   children with :has(); here the group is told which size they are, because a
+   button may be wrapped in a <gg-button> that :has() cannot see through.
+   ========================================================================== */
+
+[data-scope='button-group'][data-part='root'] {
+  --group-radius: var(--radius-control-md);
+
+  border-radius: var(--group-radius);
+
+  &[data-size='sm'] { --group-radius: var(--radius-control-sm); }
+  &[data-size='lg'] { --group-radius: var(--radius-control-lg); }
+
+  & [data-scope='button'][data-part='root'] {
+    border-radius: 0;
+    --btn-shadow: none;
+  }
+
+  & > * + * [data-scope='button'][data-part='root'],
+  & > * + [data-scope='button'][data-part='root'] {
+    border-inline-start: var(--hairline) solid var(--border);
+  }
+
+  & > :first-child [data-scope='button'][data-part='root'],
+  & > [data-scope='button'][data-part='root']:first-child {
+    border-start-start-radius: var(--group-radius);
+    border-end-start-radius: var(--group-radius);
+  }
+  & > :last-child [data-scope='button'][data-part='root'],
+  & > [data-scope='button'][data-part='root']:last-child {
+    border-start-end-radius: var(--group-radius);
+    border-end-end-radius: var(--group-radius);
+  }
+}

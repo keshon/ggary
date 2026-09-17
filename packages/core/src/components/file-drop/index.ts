@@ -1,0 +1,5 @@
+export { fileDropAnatomy } from './file-drop.anatomy'
+export type { FileDropPart } from './file-drop.anatomy'
+export { connect } from './file-drop.connect'
+export type { FileDropConnectOptions } from './file-drop.connect'
+export type { FileDropProps } from './file-drop.types'

@@ -130,6 +130,13 @@ const pairs: Pair[] = [
   // 1.3 to 1.4:1. The load-bearing contrast is the arc on its ground.
   { label: 'spinner: arc on the panel', fg: '--accent-mark', bg: ['--surface-raised'], min: large },
   { label: 'spinner: arc on the page', fg: '--accent-mark', bg: ['--surface-page'], min: large },
+  { label: 'choice card: description on its ground', fg: '--text-secondary', bg: ['--surface-raised'], min: text },
+  { label: 'choice card: description on the chosen ground', fg: '--text-secondary', bg: ['--surface-page', '--accent-bg'], min: text },
+  { label: 'choice card: title on the chosen ground', fg: '--text-primary', bg: ['--surface-page', '--accent-bg'], min: text },
+  { label: 'search: the magnifier on the field', fg: '--text-muted', bg: ['--surface-field'], min: large },
+  { label: 'input group: affix on its recess', fg: '--text-muted', bg: ['--surface-page', '--surface-recessed'], min: text },
+  { label: 'file drop: hint on the zone', fg: '--text-muted', bg: ['--surface-field'], min: text },
+  { label: 'file drop: words on the zone under a drag', fg: '--text-secondary', bg: ['--surface-page', '--accent-bg'], min: text },
   { label: 'segmented: resting label on the track', fg: '--text-secondary', bg: ['--surface-page', '--surface-recessed'], min: text },
   { label: 'segmented: chosen label', fg: '--text-primary', bg: ['--surface-page', '--surface-recessed', '--surface-raised'], min: text },
   { label: 'slider: fill on the panel', fg: '--accent-mark', bg: ['--surface-raised'], min: large },

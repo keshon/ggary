@@ -1,5 +1,5 @@
 import '../../../packages/elements/src/index'
-import type { GgAvatarGroupElement, GgNumberFieldElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
+import type { GgAvatarGroupElement, GgChoiceCardsElement, GgNumberFieldElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
 import {
   type Adapter,
   type ButtonProps,
@@ -12,6 +12,11 @@ import {
   type CheckboxProps,
   type SwitchProps,
   type RadioGroupProps,
+  type ButtonGroupProps,
+  type ChoiceCardGroupProps,
+  type FileDropProps,
+  type InputGroupProps,
+  type SearchProps,
   type SegmentedControlProps,
   type SliderProps,
   type NumberFieldProps,
@@ -196,6 +201,76 @@ function applyNumberHost(host: HTMLElement, props: Partial<NumberFieldProps>) {
   }
   if ('readOnly' in props) setAttr(host, 'readonly', props.readOnly)
   if (props.value !== undefined) (host as GgNumberFieldElement).value = props.value
+}
+
+/** <gg-choice-cards> around native radios or checkboxes, as server markup renders them. */
+function choiceCardsHost(props: ChoiceCardGroupProps): HTMLElement {
+  const host = document.createElement('gg-choice-cards')
+  const checked = ([] as string[]).concat((props.defaultValue ?? []) as string | string[])
+  for (const item of props.items) {
+    const label = document.createElement('label')
+    const input = document.createElement('input')
+    input.type = props.type ?? 'radio'
+    input.value = item.value
+    setAttr(input, 'checked', checked.includes(item.value))
+    setAttr(input, 'disabled', item.disabled)
+    label.append(input, item.title)
+    if (item.description) {
+      const description = document.createElement('span')
+      description.slot = 'description'
+      description.textContent = item.description
+      label.append(description)
+    }
+    host.append(label)
+  }
+  return host
+}
+
+function applyChoiceCardsHost(host: HTMLElement, props: Partial<ChoiceCardGroupProps>) {
+  for (const key of ['label', 'name', 'type', 'orientation', 'disabled', 'required', 'invalid'] as const) {
+    if (key in props) setAttr(host, key, props[key])
+  }
+  if (props.value !== undefined) (host as GgChoiceCardsElement).value = props.value
+}
+
+/** <gg-search> around a native search input. */
+function searchHost(props: SearchProps): HTMLElement {
+  const host = document.createElement('gg-search')
+  const input = document.createElement('input')
+  input.type = 'search'
+  setAttr(input, 'name', props.name)
+  setAttr(input, 'placeholder', props.placeholder)
+  if (props.defaultValue !== undefined) input.value = props.defaultValue
+  if (props.value !== undefined) input.value = props.value
+  if (props.onValueChange) input.addEventListener('input', () => props.onValueChange!(input.value))
+  host.append(input)
+  return host
+}
+
+function applySearchHost(host: HTMLElement, props: Partial<SearchProps>) {
+  for (const key of ['label', 'size', 'disabled', 'required', 'invalid'] as const) {
+    if (key in props) setAttr(host, key, props[key])
+  }
+  if ('readOnly' in props) setAttr(host, 'readonly', props.readOnly)
+  if (props.value !== undefined) host.querySelector('input')!.value = props.value
+}
+
+/** <gg-file-drop> around a native file input. */
+function fileDropHost(props: FileDropProps): HTMLElement {
+  const host = document.createElement('gg-file-drop')
+  const input = document.createElement('input')
+  input.type = 'file'
+  setAttr(input, 'name', props.name)
+  setAttr(input, 'accept', props.accept)
+  setAttr(input, 'multiple', props.multiple)
+  host.append(input)
+  return host
+}
+
+function applyFileDropHost(host: HTMLElement, props: Partial<FileDropProps>) {
+  for (const key of ['label', 'hint', 'disabled', 'required', 'invalid'] as const) {
+    if (key in props) setAttr(host, key, props[key])
+  }
 }
 
 function applyRadioHost(host: HTMLElement, props: Partial<RadioGroupProps>) {
@@ -429,6 +504,82 @@ export const elements: Adapter = {
       update: async (patch) => applyNumberHost(host, patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<NumberFieldProps>)
+  },
+
+  async choiceCards(props, target) {
+    const host = choiceCardsHost(props)
+    applyChoiceCardsHost(host, props)
+    if (props.onValueChange) host.addEventListener('valuechange', (e) => props.onValueChange!((e as CustomEvent).detail.value))
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applyChoiceCardsHost(host, patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<ChoiceCardGroupProps>)
+  },
+
+  async search(props, target) {
+    const host = searchHost(props)
+    applySearchHost(host, props)
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applySearchHost(host, patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<SearchProps>)
+  },
+
+  async inputGroup(props, target) {
+    const host = document.createElement('gg-input-group')
+    host.append(nativeInput(props.input ?? {}))
+    const apply = (patch: Partial<InputGroupProps>) => {
+      for (const key of ['prefix', 'suffix', 'size', 'disabled', 'invalid'] as const) {
+        if (key in patch) setAttr(host, key, patch[key])
+      }
+    }
+    apply(props)
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => apply(patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<InputGroupProps>)
+  },
+
+  async fileDrop(props, target) {
+    const host = fileDropHost(props)
+    applyFileDropHost(host, props)
+    if (props.onFilesChange) host.addEventListener('fileschange', (e) => props.onFilesChange!((e as CustomEvent).detail.files))
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applyFileDropHost(host, patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<FileDropProps>)
+  },
+
+  async buttonGroup(props, target) {
+    const host = document.createElement('gg-button-group')
+    for (const label of props.buttons ?? ['One', 'Two', 'Three']) {
+      const wrapper = document.createElement('gg-button')
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.textContent = label
+      if (props.size) wrapper.setAttribute('size', props.size)
+      wrapper.append(button)
+      host.append(wrapper)
+    }
+    const apply = (patch: Partial<ButtonGroupProps>) => {
+      if ('size' in patch) setAttr(host, 'size', patch.size)
+      if ('label' in patch) setAttr(host, 'label', patch.label)
+    }
+    apply(props)
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => apply(patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<ButtonGroupProps>)
   },
 
   async checkboxGroup(props, target) {
@@ -849,6 +1000,14 @@ export const elements: Adapter = {
     if (props.checkbox || props.switch) {
       const tag = props.checkbox ? 'gg-checkbox' : 'gg-switch'
       host.append(choiceHost(tag, (props.checkbox ?? props.switch) as CheckboxProps).host)
+    } else if (props.search) {
+      const wrapper = searchHost(props.search)
+      applySearchHost(wrapper, props.search)
+      host.append(wrapper)
+    } else if (props.fileDrop) {
+      const wrapper = fileDropHost(props.fileDrop)
+      applyFileDropHost(wrapper, props.fileDrop)
+      host.append(wrapper)
     } else if (props.slider) {
       host.append(sliderHost(props.slider))
       applySliderHost(host.lastElementChild as HTMLElement, props.slider)

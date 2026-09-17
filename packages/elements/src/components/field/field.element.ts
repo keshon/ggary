@@ -147,10 +147,11 @@ export class GgFieldElement extends HTMLElement {
       const owner = control.closest('gg-checkbox, gg-switch')
       if (!owner) spread(control, domNormalizer(api.control))
       else if ('applyField' in owner) (owner as unknown as FieldConsumer).applyField(api.control)
-    } else if (control instanceof HTMLInputElement && control.closest('gg-slider, gg-number-field')) {
-      // A slider and a number field are several parts as well: their element
-      // renders them, with the field's props merged in.
-      const owner = control.closest('gg-slider, gg-number-field')!
+    } else if (control instanceof HTMLInputElement && control.closest('gg-slider, gg-number-field, gg-search, gg-file-drop')) {
+      // A slider, a number field, a search field and a file drop are several
+      // parts as well: their element renders them, with the field's props
+      // merged in.
+      const owner = control.closest('gg-slider, gg-number-field, gg-search, gg-file-drop')!
       if ('applyField' in owner) (owner as unknown as FieldConsumer).applyField(api.control)
     } else if (control instanceof HTMLInputElement) {
       // This field owns the control, so it applies the input contract too —

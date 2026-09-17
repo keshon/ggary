@@ -14,8 +14,13 @@ import {
   Input,
   Menu,
   Menubar,
+  ButtonGroup,
+  ChoiceCardGroup,
+  FileDrop,
+  InputGroup,
   NumberField,
   RadioGroup,
+  Search,
   SegmentedControl,
   Select,
   Slider,
@@ -36,7 +41,9 @@ import {
 } from '../../../packages/react/src/index'
 import {
   type Adapter,
+  type ButtonGroupProps,
   type ButtonProps,
+  type InputGroupProps,
   type CheckboxProps,
   type DialogProps,
   type FieldProps,
@@ -113,6 +120,16 @@ export const react: Adapter = {
   segmentedControl: (props, target) => mount(SegmentedControl, props, target),
   slider: (props, target) => mount(Slider, props, target),
   numberField: (props, target) => mount(NumberField, props, target),
+  choiceCards: (props, target) => mount(ChoiceCardGroup, props, target),
+  search: (props, target) => mount(Search, props, target),
+  inputGroup: (props, target) =>
+    mount(InputGroup, props, target, ({ input, ...rest }: InputGroupProps) => [rest, createElement(Input, input ?? {})]),
+  fileDrop: (props, target) => mount(FileDrop, props, target),
+  buttonGroup: (props, target) =>
+    mount(ButtonGroup, props, target, ({ buttons, ...rest }: ButtonGroupProps) => [
+      rest,
+      (buttons ?? ['One', 'Two', 'Three']).map((label) => createElement(Button, { key: label }, label)),
+    ]),
   checkboxGroup: (props, target) => mount(CheckboxGroup, props, target),
   fieldset: (props, target) =>
     mount(Fieldset, props, target, ({ group, items, name, defaultValue, ...fieldset }: FieldsetProps) => [
@@ -182,6 +199,8 @@ export const react: Adapter = {
         const { label, ...rest } = (checkbox ?? switchProps)!
         return [field, createElement((checkbox ? Checkbox : Switch) as ComponentType<any>, rest, label)]
       }
+      if (props.search) return [field, createElement(Search, props.search)]
+      if (props.fileDrop) return [field, createElement(FileDrop, props.fileDrop)]
       if (props.slider) return [field, createElement(Slider, props.slider)]
       if (props.numberField) return [field, createElement(NumberField, props.numberField)]
       return [field, textarea ? createElement(Textarea, textarea) : createElement(Input, input ?? {})]

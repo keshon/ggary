@@ -1,0 +1,72 @@
+/* ==========================================================================
+   Instrument — choice cards
+
+   Ported from instrument/src/forms.css (.inst-choice-card). The box inside is
+   the plain control's, from checkbox.css and radio-group.css: in the source
+   the card holds a bare native input for the same reason.
+
+   Selection is carried by more than colour: the accent border, the accent
+   ground, and the load-bearing marker at the edge — the same mark as on the
+   current navigation item.
+   ========================================================================== */
+
+[data-scope='choice-card-group'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-row);
+}
+
+[data-scope='choice-card-group'][data-part='label'] {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+[data-scope='choice-card-group'][data-part='list'] {
+  gap: var(--gap-row);
+}
+[data-scope='choice-card-group'][data-part='list'][data-orientation='horizontal'] > * {
+  flex: 1 1 14rem;
+}
+
+[data-scope='choice-card'][data-part='root'] {
+  gap: var(--gap-inline);
+  padding: var(--pad-card);
+  border: var(--hairline) solid var(--border-control);
+  border-radius: var(--radius-md);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-ui);
+  transition: border-color var(--dur-1) var(--ease-out), background var(--dur-1) var(--ease-out);
+
+  /* The control centres on the first line of the title: 1lh follows type size
+     and density by itself, as the note glyph does. */
+  & > [data-part='control'] { margin-block-start: calc((1lh - var(--size-check)) / 2); }
+
+  &:hover:not([data-disabled]) { border-color: var(--text-muted); }
+
+  &:has(:checked) {
+    border-color: var(--accent-border);
+    background: var(--accent-bg);
+    box-shadow: inset var(--size-marker) 0 0 0 var(--accent-solid);
+  }
+
+  &:has(:focus-visible) {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  &[data-disabled] { opacity: 0.5; }
+}
+
+[data-scope='choice-card'][data-part='title'] {
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-ui);
+}
+
+[data-scope='choice-card'][data-part='description'] {
+  margin-block-start: var(--space-1);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: var(--leading-ui);
+}
