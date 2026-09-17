@@ -1,0 +1,82 @@
+/* ==========================================================================
+   Instrument — toast
+
+   Ported from instrument/src/overlay.css (.inst-toasts, .inst-toast). A
+   shadow, because a toast floats above and is about to leave. The tone is an
+   icon in --tone-ink (base/tone.css) beside text on the overlay surface; the
+   glyphs are Instrument's own tone masks, now in @ggary/icons.
+
+   Two differences from the source: a close button on every toast (a toast
+   that stays until dismissed needs a way out, and not every toast carries an
+   action), and the announcers are separate live regions rather than roles on
+   the toasts, so a toast created with its text is still spoken.
+   ========================================================================== */
+
+[data-scope='toast'][data-part='region'] {
+  --toast-offset: var(--space-6);
+}
+
+[data-scope='toast'][data-part='list'] {
+  gap: var(--space-3);
+}
+
+[data-scope='toast'][data-part='toast'] {
+  gap: var(--gap-inline);
+  padding: var(--pad-block-y) var(--space-3) var(--pad-block-y) var(--pad-panel);
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-overlay);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  line-height: var(--leading-ui);
+  box-shadow: var(--shadow-popover);
+
+  transition: opacity var(--dur-2) var(--ease-out), translate var(--dur-2) var(--ease-out);
+
+  /* Leaving is an attribute, not a removal: the transition has to play out. */
+  &[data-state='leaving'] { opacity: 0; translate: var(--space-5) 0; }
+}
+
+@starting-style {
+  [data-scope='toast'][data-part='toast'] { opacity: 0; translate: var(--space-5) 0; }
+}
+
+[data-scope='toast'][data-part='icon'] {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+  margin-block-start: calc((1lh - var(--size-icon)) / 2);
+  color: var(--tone-ink, var(--text-secondary));
+}
+
+[data-scope='toast'][data-part='title'] { font-weight: var(--weight-medium); }
+
+[data-scope='toast'][data-part='text'] {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+/* One action, as a small ghost button. */
+[data-scope='toast'][data-part='action'] {
+  align-self: center;
+  min-block-size: var(--control-h-sm);
+  padding-inline: var(--control-pad-sm);
+  border-radius: var(--radius-control-sm);
+  color: var(--text-primary);
+  font-weight: var(--weight-medium);
+
+  &:hover { background: var(--surface-hover); }
+}
+
+[data-scope='toast'][data-part='close'] {
+  inline-size: var(--control-h-xs);
+  block-size: var(--control-h-xs);
+  border-radius: var(--radius-2xs);
+  color: var(--text-muted);
+
+  &:hover { background: var(--surface-active); color: var(--text-primary); }
+}
+
+[data-scope='toast'][data-part='close-icon'] {
+  inline-size: var(--size-chevron);
+  block-size: var(--size-chevron);
+}

@@ -17,6 +17,7 @@ import { radioGroupConformance } from './radio-group.spec'
 import { resetConformance } from './reset.spec'
 import { selectConformance } from './select.spec'
 import { tabsConformance } from './tabs.spec'
+import { toastConformance } from './toast.spec'
 import { textareaConformance } from './textarea.spec'
 
 /**
@@ -50,6 +51,7 @@ export function runConformance() {
       menuConformance(adapter)
       menubarConformance(adapter)
       tabsConformance(adapter)
+      toastConformance(adapter)
     })
   }
 }

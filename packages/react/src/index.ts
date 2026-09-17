@@ -34,3 +34,8 @@ export { Menubar } from './components/menubar'
 export type { MenubarProps } from './components/menubar'
 export { Tabs } from './components/tabs'
 export type { TabsProps } from './components/tabs'
+export { Toaster } from './components/toast'
+export type { ToasterProps } from './components/toast'
+// The queue is framework-free: re-exported so `toast()` comes from the same package as the region.
+export { createToaster, toast, toaster } from '@ggary/core/toast'
+export type { ToastOptions, ToastTone, Toaster as ToasterStore } from '@ggary/core/toast'

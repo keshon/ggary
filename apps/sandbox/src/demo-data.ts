@@ -208,3 +208,10 @@ export const openFiles: TabItem[] = [
 
 let untitled = 0
 export const newFile = (): TabItem => ({ value: `untitled-${++untitled}`, label: `untitled-${untitled}.css`, closable: true, modified: true })
+
+/** The toasts the demo buttons show, the same on every page. */
+export const toastDemos = {
+  queued: { tone: 'ok', title: 'The run is queued', text: 'worldbox-1 · seventh in the queue' },
+  failed: { tone: 'error', title: 'Could not send', text: 'The network is unavailable. Attempt 3 of 5.' },
+  warn: { tone: 'warn', title: 'Disk almost full', text: '92% of 512 GB used' },
+} as const

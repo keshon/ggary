@@ -17,3 +17,7 @@ export { default as Fieldset } from './components/fieldset/Fieldset.svelte'
 export { default as Menu } from './components/menu/Menu.svelte'
 export { default as Menubar } from './components/menubar/Menubar.svelte'
 export { default as Tabs } from './components/tabs/Tabs.svelte'
+export { default as Toaster } from './components/toast/Toaster.svelte'
+// The queue is framework-free: re-exported so `toast()` comes from the same package as the region.
+export { createToaster, toast, toaster } from '@ggary/core/toast'
+export type { ToastOptions, ToastTone, Toaster as ToasterStore } from '@ggary/core/toast'

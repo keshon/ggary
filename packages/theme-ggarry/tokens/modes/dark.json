@@ -18,7 +18,9 @@
     "on-accent": "{color.white}",
     "on-inverted": "{color.slate.900}",
     "accent": "{color.brand.300}",
-    "danger": "{color.danger.400}"
+    "danger": "{color.danger.400}",
+    "success": "{color.success.400}",
+    "warning": "{color.warning.400}"
   },
   "border": {
     "default": "{color.slate.700}",

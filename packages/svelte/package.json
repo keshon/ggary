@@ -55,6 +55,10 @@
       "svelte": "./src/components/tabs/index.ts",
       "default": "./src/components/tabs/index.ts"
     },
+    "./toast": {
+      "svelte": "./src/components/toast/index.ts",
+      "default": "./src/components/toast/index.ts"
+    },
     "./menubar": {
       "svelte": "./src/components/menubar/index.ts",
       "default": "./src/components/menubar/index.ts"

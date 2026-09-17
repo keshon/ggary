@@ -1,8 +1,9 @@
 import './theme'
 import './shared.css'
 import '@ggary/elements'
+import { toast } from '@ggary/elements'
 import type { GgCheckboxElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
-import { newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
 
@@ -367,6 +368,19 @@ app.innerHTML = `
     </p>
   </section>
 
+  <section id="toast">
+    <h2>Toast</h2>
+    <div class="row">
+      <gg-button><button data-toast="queued">Success</button></gg-button>
+      <gg-button><button data-toast="failed">Error that stays</button></gg-button>
+      <gg-button><button data-toast="warn">Warning</button></gg-button>
+      <gg-button emphasis="low"><button id="toast-saving">Saving, then saved</button></gg-button>
+      <gg-button emphasis="minimal"><button id="toast-undo">With an action</button></gg-button>
+    </div>
+    <p class="hint">Toasts stand in the top layer and leave after five seconds; an error stays until dismissed. Rest the pointer on one, or tab to its button, and time stands still. They are announced through live regions that exist before the first toast.</p>
+    <gg-toaster></gg-toaster>
+  </section>
+
   <section id="tabs">
     <h2>Tabs</h2>
     <gg-tabs id="property-tabs" label="Object properties">
@@ -612,4 +626,16 @@ document.getElementById('new-file')!.addEventListener('click', () => {
   panel.toggleAttribute('data-modified', true)
   panel.innerHTML = `<p>Editing ${file.label}</p>`
   fileTabs.append(panel)
+})
+
+// --- toast -------------------------------------------------------------------------
+for (const button of document.querySelectorAll<HTMLButtonElement>('[data-toast]')) {
+  button.addEventListener('click', () => toast({ ...toastDemos[button.dataset.toast as keyof typeof toastDemos] }))
+}
+document.getElementById('toast-saving')!.addEventListener('click', () => {
+  const id = toast({ tone: 'running', title: 'Saving…', duration: 0 })
+  setTimeout(() => toast({ id, tone: 'ok', title: 'Saved' }), 1500)
+})
+document.getElementById('toast-undo')!.addEventListener('click', () => {
+  toast({ title: 'Task deleted', action: { label: 'Undo', onClick: () => toast({ title: 'Task restored' }) } })
 })

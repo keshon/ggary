@@ -18,9 +18,11 @@
     Switch,
     Tabs,
     Textarea,
+    Toaster,
+    toast,
     Tooltip,
   } from '@ggary/svelte'
-  import { newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -516,6 +518,32 @@ invalid  ${taken}`}</pre>
     </Tooltip>
   </div>
   <pre class="state">{overlayLog}</pre>
+</section>
+
+<section id="toast">
+  <h2>Toast</h2>
+  <div class="row">
+    <Button onclick={() => toast({ ...toastDemos.queued })}>Success</Button>
+    <Button onclick={() => toast({ ...toastDemos.failed })}>Error that stays</Button>
+    <Button onclick={() => toast({ ...toastDemos.warn })}>Warning</Button>
+    <Button
+      emphasis="low"
+      onclick={() => {
+        const id = toast({ tone: 'running', title: 'Saving…', duration: 0 })
+        setTimeout(() => toast({ id, tone: 'ok', title: 'Saved' }), 1500)
+      }}
+    >
+      Saving, then saved
+    </Button>
+    <Button
+      emphasis="minimal"
+      onclick={() => toast({ title: 'Task deleted', action: { label: 'Undo', onClick: () => toast({ title: 'Task restored' }) } })}
+    >
+      With an action
+    </Button>
+  </div>
+  <p class="hint">Toasts stand in the top layer and leave after five seconds; an error stays until dismissed. Rest the pointer on one, or tab to its button, and time stands still. They are announced through live regions that exist before the first toast.</p>
+  <Toaster />
 </section>
 
 <section id="tabs">

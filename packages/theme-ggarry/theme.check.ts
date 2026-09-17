@@ -47,6 +47,13 @@ const pairs: Pair[] = [
   { label: 'danger: text on canvas', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-canvas'], min: TEXT },
   // Menu rows. The highlighted row reuses the accent and danger fills above.
   { label: 'menu: shortcut on surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'toast: detail text on the surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'toast: action on the surface', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'toast: action on its hover tint', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface', '--ggarry-bg-accent-subtle'], min: TEXT },
+  { label: 'toast: ok icon', fg: '--ggarry-text-success', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'toast: warn icon', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'toast: error icon', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'toast: running icon', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'tabs: resting label on surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'tabs: bar under the selected tab', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'tabs: resting chip label on the track', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },

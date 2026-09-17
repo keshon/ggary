@@ -37,5 +37,6 @@
 @import './components/select.css' layer(gg.components);
 @import './components/switch.css' layer(gg.components);
 @import './components/tabs.css' layer(gg.components);
+@import './components/toast.css' layer(gg.components);
 @import './components/textarea.css' layer(gg.components);
 @import './components/tooltip.css' layer(gg.components);

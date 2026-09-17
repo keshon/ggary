@@ -22,6 +22,7 @@
   [data-scope='popover'][data-part='content'],
   [data-scope='menu'][data-part='content'],
   [data-scope='tooltip'][data-part='content'],
+  [data-scope='toast'][data-part='toast'],
   [data-scope='chip'][data-part='root'] {
     border: var(--stroke) solid CanvasText;
   }

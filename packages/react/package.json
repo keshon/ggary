@@ -53,6 +53,10 @@
       "types": "./src/components/tabs/index.ts",
       "default": "./src/components/tabs/index.ts"
     },
+    "./toast": {
+      "types": "./src/components/toast/index.ts",
+      "default": "./src/components/toast/index.ts"
+    },
     "./menubar": {
       "types": "./src/components/menubar/index.ts",
       "default": "./src/components/menubar/index.ts"

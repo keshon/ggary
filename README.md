@@ -2,9 +2,9 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Nineteen components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
+Twenty components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
 Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Tabs, Dialog, Sheet,
-Popover, Tooltip, Menu and Menubar — built end to end to prove the architecture holds.
+Popover, Tooltip, Toast, Menu and Menubar — built end to end to prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -38,10 +38,10 @@ packages/
   elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>,
                      <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>, <gg-dialog>, <gg-sheet>,
                      <gg-popover>, <gg-tooltip>, <gg-menu>, <gg-menubar>, <gg-fieldset>,
-                     <gg-checkbox-group>, <gg-tabs>
+                     <gg-checkbox-group>, <gg-tabs>, <gg-toaster>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
                      <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Sheet>, <Popover>, <Tooltip>,
-                     <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>, <Tabs>
+                     <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>, <Tabs>, <Toaster>
   svelte/            the same components as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
@@ -673,6 +673,45 @@ through intent, and in controlled mode moves nothing until the owner answers.
 <gg-tooltip content="Bold (Ctrl+B)"><gg-button><button aria-label="Bold">B</button></gg-button></gg-tooltip>
 ```
 
+### Toast
+
+The result of an action whose result has no place on the screen: "the run is
+queued", "could not send". A toast is called, not written: the queue is a store in
+core that belongs to no framework, so `toast()` works from anywhere, including an
+event handler, a fetch or a store. One region per page renders it.
+
+```tsx
+import { Toaster, toast } from '@ggary/react'   // or '@ggary/svelte', '@ggary/elements'
+<Toaster placement="bottom-end" />
+toast({ tone: 'ok', title: 'Saved' })
+const id = toast({ tone: 'running', title: 'Saving…', duration: 0 })
+toast({ id, tone: 'ok', title: 'Saved' })     // the same id updates it in place
+```
+
+```html
+<gg-toaster placement="bottom-end"></gg-toaster>
+```
+
+- **Tones** are Instrument's `neutral · running · ok · warn · error`. Each tone is
+  an icon in its colour next to text on the surface, never a fill. GGarry gained
+  `--ggarry-text-success` and `--ggarry-text-warning` for it, and both themes check
+  every pair.
+- **Time.** A toast leaves after 5 s. An error stays until dismissed: a message that
+  something *didn't* happen may not leave unseen. While the pointer rests on the
+  region, or focus is inside it, every clock stands still (WCAG 2.2.1), and resuming
+  continues with the time that was left. No more than four show at once: the oldest
+  leaves. A leaving toast plays its exit, then a timer removes it, so reduced motion
+  still removes it. The timers are the store's, not a component's, so nothing
+  re-renders to count down.
+- **One action**, not two, plus a close button on every toast.
+- **The region** is a manual popover opened once and never closed. It sits in the top
+  layer, above everything the app drew, and takes no pointer events: presses go
+  through it to the page. A browser test proves both.
+- **Announcing.** The region holds two live regions that exist before any toast does:
+  polite, and assertive for an error. A new message is added to one of them, because
+  a live region created together with its content is not reliably spoken. The
+  visible toasts carry no live role, so nothing is heard twice.
+
 ### Menu
 
 A menu button (WAI-ARIA APG) on the same layer: a button opens a list of actions,
@@ -1136,9 +1175,8 @@ Real, and deliberately left open:
 - **Platform close requests** (a back gesture) are cancelled through the `cancel`
   event, which browsers may refuse to let a page cancel without recent user
   activation; the dialog then closes natively and reports `native`.
-- **Not ported from Instrument:** everything beyond these nineteen components —
-  prose, the rest of forms (number field, slider, choice cards), tables, the toast
-  overlay,
+- **Not ported from Instrument:** everything beyond these twenty components —
+  prose, the rest of forms (number field, slider, choice cards), tables,
   the agent components (including the composer, a textarea with a toolbar in one
   frame) and print styles.
 - **`onValueChange` fires when the user re-picks the already-selected value.**
@@ -1173,6 +1211,10 @@ Real, and deliberately left open:
   prop that opens one.
 - **Access keys cover the bar only.** Inside an open menu a letter moves to the item it
   starts, as typeahead; it does not activate an item marked with `&`.
+- **A toast is not seen over an open modal dialog.** The top layer orders by entry, and
+  a modal holds above a popover opened later (Instrument measured the same). Report a
+  result inside the dialog, or show the toast after it closes.
+- **One `Toaster` per toaster.** Two regions on one queue render every toast twice.
 - **No context menu yet.** The Menu machine and content are ready for one opened at
   the pointer; the trigger is not built.
 - **No option descriptions.** A radio or checkbox with a second line of help

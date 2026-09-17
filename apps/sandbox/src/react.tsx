@@ -22,9 +22,11 @@ import {
   Switch,
   Tabs,
   Textarea,
+  Toaster,
+  toast,
   Tooltip,
 } from '@ggary/react'
-import { newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -600,6 +602,32 @@ function App() {
           />
         </div>
         <pre className="state">{overlayLog}</pre>
+      </section>
+
+      <section id="toast">
+        <h2>Toast</h2>
+        <div className="row">
+          <Button onClick={() => toast({ ...toastDemos.queued })}>Success</Button>
+          <Button onClick={() => toast({ ...toastDemos.failed })}>Error that stays</Button>
+          <Button onClick={() => toast({ ...toastDemos.warn })}>Warning</Button>
+          <Button
+            emphasis="low"
+            onClick={() => {
+              const id = toast({ tone: 'running', title: 'Saving…', duration: 0 })
+              setTimeout(() => toast({ id, tone: 'ok', title: 'Saved' }), 1500)
+            }}
+          >
+            Saving, then saved
+          </Button>
+          <Button
+            emphasis="minimal"
+            onClick={() => toast({ title: 'Task deleted', action: { label: 'Undo', onClick: () => toast({ title: 'Task restored' }) } })}
+          >
+            With an action
+          </Button>
+        </div>
+        <p className="hint">Toasts stand in the top layer and leave after five seconds; an error stays until dismissed. Rest the pointer on one, or tab to its button, and time stands still. They are announced through live regions that exist before the first toast.</p>
+        <Toaster />
       </section>
 
       <section id="tabs">

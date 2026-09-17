@@ -18,6 +18,7 @@ import {
   Select,
   Switch,
   Tabs,
+  Toaster,
   Textarea,
 } from '../../../packages/react/src/index'
 import {
@@ -81,6 +82,12 @@ export const react: Adapter = {
     await act(async () => interaction())
   },
 
+  async wait(ms) {
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, ms))
+    })
+  },
+
   button: (props, target) =>
     mount(Button, props, target, ({ label, ...rest }: ButtonProps) => [rest, label]),
   select: (props, target) => mount(Select, props, target),
@@ -122,6 +129,7 @@ export const react: Adapter = {
       { ...rest, trigger: (triggerProps: object) => createElement('button', triggerProps, trigger) },
     ]),
   menubar: (props, target) => mount(Menubar, props, target),
+  toaster: (props, target) => mount(Toaster, props, target),
   tabs: (props, target) =>
     mount(Tabs, props, target, ({ panels = true, ...rest }: TabsProps) => [
       panels ? { ...rest, children: (item: { label: string }) => `Panel ${item.label}` } : rest,

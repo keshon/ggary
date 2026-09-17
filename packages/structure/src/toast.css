@@ -1,0 +1,89 @@
+/* The toast region is a manual popover opened once and never closed, pinned to
+   a corner. The browser's popover box is removed, and the region takes no
+   pointer events: presses go through it to the page, and the toasts take them
+   back. Toasts grow from the edge they stand at, the newest nearest it.
+
+   The announcers are live regions that must exist and be displayed, and must
+   not be seen: visually hidden, not display: none. */
+
+[data-scope='toast'][data-part='region'] {
+  --toast-offset: 16px;
+
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+  inline-size: min(24rem, calc(100vw - 2 * var(--toast-offset)));
+  max-block-size: calc(100dvh - 2 * var(--toast-offset));
+  pointer-events: none;
+}
+
+[data-scope='toast'][data-part='region'][data-placement='bottom-end'] { inset-block-end: var(--toast-offset); inset-inline-end: var(--toast-offset); }
+[data-scope='toast'][data-part='region'][data-placement='bottom-start'] { inset-block-end: var(--toast-offset); inset-inline-start: var(--toast-offset); }
+[data-scope='toast'][data-part='region'][data-placement='top-end'] { inset-block-start: var(--toast-offset); inset-inline-end: var(--toast-offset); }
+[data-scope='toast'][data-part='region'][data-placement='top-start'] { inset-block-start: var(--toast-offset); inset-inline-start: var(--toast-offset); }
+
+[data-scope='toast'][data-part='list'] {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+/* At the top edge the newest stands on top, nearest the edge. */
+[data-scope='toast'][data-part='list']:is([data-placement='top-end'], [data-placement='top-start']) {
+  flex-direction: column-reverse;
+}
+
+[data-scope='toast'][data-part='toast'] {
+  display: flex;
+  align-items: flex-start;
+  pointer-events: auto;
+}
+
+[data-scope='toast'][data-part='icon'],
+[data-scope='toast'][data-part='action'],
+[data-scope='toast'][data-part='close'] {
+  flex: none;
+}
+
+[data-scope='toast'][data-part='body'] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+[data-scope='toast'][data-part='title'],
+[data-scope='toast'][data-part='text'] {
+  margin: 0;
+}
+
+[data-scope='toast'][data-part='action'],
+[data-scope='toast'][data-part='close'] {
+  appearance: none;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+[data-scope='toast'][data-part='close'] {
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+}
+
+[data-scope='toast'][data-part='announcer'] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

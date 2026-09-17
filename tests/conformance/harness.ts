@@ -23,6 +23,7 @@ import type { RadioGroupOrientation, RadioItem } from '../../packages/core/src/c
 import type { MenuEntry, MenuItem } from '../../packages/core/src/components/menu'
 import type { MenubarMenu } from '../../packages/core/src/components/menubar'
 import type { TabItem, TabsActivation, TabsOrientation, TabsVariant } from '../../packages/core/src/components/tabs'
+import type { Toaster, ToastPlacement } from '../../packages/core/src/components/toast'
 
 export interface ButtonProps {
   label: string
@@ -223,6 +224,13 @@ export interface TabsProps {
   panels?: boolean
 }
 
+export interface ToasterProps {
+  /** A queue of the test's own, so tests do not share the page's toaster. */
+  toaster: Toaster
+  placement?: ToastPlacement
+  label?: string
+}
+
 export interface TooltipProps {
   content: string
   /** The trigger button's label. */
@@ -282,6 +290,9 @@ export interface Adapter {
   /** Run a user interaction and wait for everything it causes to flush. */
   act(interaction: () => void): Promise<void>
 
+  /** Let time pass — timers fire — and flush what they caused, as inside act. */
+  wait(ms: number): Promise<void>
+
   button(props: ButtonProps, target: HTMLElement): Promise<Mounted<ButtonProps>>
   select(props: SelectProps, target: HTMLElement): Promise<Mounted<SelectProps>>
   chipGroup(props: ChipGroupProps, target: HTMLElement): Promise<Mounted<ChipGroupProps>>
@@ -299,6 +310,7 @@ export interface Adapter {
   menu(props: MenuProps, target: HTMLElement): Promise<Mounted<MenuProps>>
   menubar(props: MenubarProps, target: HTMLElement): Promise<Mounted<MenubarProps>>
   tabs(props: TabsProps, target: HTMLElement): Promise<Mounted<TabsProps>>
+  toaster(props: ToasterProps, target: HTMLElement): Promise<Mounted<ToasterProps>>
   /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
 }

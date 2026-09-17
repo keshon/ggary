@@ -1,5 +1,5 @@
 import '../../../packages/elements/src/index'
-import type { GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement } from '../../../packages/elements/src/index'
+import type { GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
 import {
   type Adapter,
   type ButtonProps,
@@ -20,6 +20,7 @@ import {
   type MenuProps,
   type MenubarProps,
   type TabsProps,
+  type ToasterProps,
   track,
 } from '../harness'
 
@@ -197,6 +198,10 @@ export const elements: Adapter = {
 
   async act(interaction) {
     interaction()
+  },
+
+  async wait(ms) {
+    await new Promise((resolve) => setTimeout(resolve, ms))
   },
 
   async button(props, target) {
@@ -404,6 +409,22 @@ export const elements: Adapter = {
       update: async (patch) => applyPopoverHost(host, patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<PopoverProps>)
+  },
+
+  async toaster(props, target) {
+    const host = document.createElement('gg-toaster') as GgToasterElement
+    host.toaster = props.toaster
+    setAttr(host, 'placement', props.placement)
+    setAttr(host, 'label', props.label)
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => {
+        if ('placement' in patch) setAttr(host, 'placement', patch.placement)
+        if ('label' in patch) setAttr(host, 'label', patch.label)
+      },
+      unmount: async () => host.remove(),
+    } satisfies Mounted<ToasterProps>)
   },
 
   async tabs(props, target) {
