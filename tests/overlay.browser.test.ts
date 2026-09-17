@@ -304,6 +304,75 @@ describe('menu in a real browser', () => {
     expect(box(last).bottom).toBeLessThanOrEqual(box(content).bottom + 1)
   })
 
+  const fileMenu = [
+    { value: 'new', label: 'New' },
+    {
+      type: 'submenu' as const,
+      value: 'recent',
+      label: 'Open Recent',
+      items: [
+        { value: 'a', label: 'a.txt' },
+        { value: 'b', label: 'b.txt' },
+      ],
+    },
+    { value: 'save', label: 'Save' },
+    { value: 'quit', label: 'Quit' },
+  ]
+
+  it('a submenu opens beside its row with its first row level with it, and flips when there is no room', async () => {
+    const host = mount(`
+      <gg-menu id="left" style="position: absolute; top: 40px; left: 40px"><button slot="trigger">File</button></gg-menu>
+      <gg-menu id="right" style="position: absolute; top: 40px; right: 10px"><button slot="trigger">Edit</button></gg-menu>`)
+    for (const id of ['left', 'right']) (host.querySelector(`#${id}`) as GgMenuElement).items = fileMenu
+
+    const left = host.querySelector('#left') as GgMenuElement
+    await userEvent.click(left.querySelector('button')!)
+    await userEvent.hover(item(left, 'Open Recent'))
+    await settle()
+    const row = item(left, 'Open Recent')
+    const submenu = document.getElementById(row.getAttribute('aria-controls')!)!
+    expect(submenu.matches(':popover-open')).toBe(true)
+    expect(document.activeElement).toBe(row)
+    expect(box(submenu).left).toBeGreaterThanOrEqual(box(row).right)
+    expect(Math.abs(box(item(left, 'a.txt')).top - box(row).top)).toBeLessThan(1)
+    await userEvent.keyboard('{Escape}{Escape}')
+
+    const right = host.querySelector('#right') as GgMenuElement
+    await userEvent.click(right.querySelector('button')!)
+    await userEvent.hover(item(right, 'Open Recent'))
+    await settle()
+    const flipped = document.getElementById(item(right, 'Open Recent').getAttribute('aria-controls')!)!
+    expect(box(flipped).right).toBeLessThanOrEqual(box(item(right, 'Open Recent')).left + 1)
+  })
+
+  it('the pointer may cross a sibling row on its way to a submenu, but not wander off', async () => {
+    const host = mount(`<gg-menu style="position: absolute; top: 40px; left: 40px"><button slot="trigger">File</button></gg-menu>`)
+    const menu = host.querySelector('gg-menu') as GgMenuElement
+    // Wide rows, so a diagonal path to the submenu crosses the row below.
+    menu.items = fileMenu
+    menu.style.setProperty('--row-width', '200px')
+    await userEvent.click(menu.querySelector('button')!)
+    for (const row of host.querySelectorAll<HTMLElement>('[data-part="item"]')) row.style.width = '200px'
+    const recent = item(host, 'Open Recent')
+    const save = item(host, 'Save')
+    await userEvent.hover(recent, { position: { x: 190, y: 4 } })
+    await settle()
+    expect(recent.getAttribute('aria-expanded')).toBe('true')
+
+    // Down and to the right, onto Save's right end, heading for the submenu: kept.
+    await userEvent.hover(save, { position: { x: 196, y: 2 } })
+    expect(recent.getAttribute('aria-expanded')).toBe('true')
+    await userEvent.hover(item(host, 'b.txt'))
+    expect(document.activeElement).toBe(item(host, 'b.txt'))
+
+    // Back, and away to the left end of Save: that is choosing Save.
+    await userEvent.hover(recent, { position: { x: 190, y: 4 } })
+    await settle(350)
+    await userEvent.hover(save, { position: { x: 10, y: 10 } })
+    expect(recent.getAttribute('aria-expanded')).toBe('false')
+    expect(document.activeElement).toBe(save)
+  })
+
   it('inside a dialog: Escape closes the menu and leaves the dialog open', async () => {
     const host = mount(`
       <gg-dialog heading="Settings">

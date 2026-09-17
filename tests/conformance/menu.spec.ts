@@ -241,6 +241,163 @@ export function menuConformance(adapter: Adapter) {
       })
     })
 
+    describe('submenus', () => {
+      const tree: MenuEntry[] = [
+        { value: 'new', label: 'New' },
+        {
+          type: 'submenu',
+          value: 'recent',
+          label: 'Open Recent',
+          items: [
+            { value: 'a', label: 'a.txt' },
+            { value: 'b', label: 'b.txt' },
+            { type: 'submenu', value: 'more', label: 'More', items: [{ value: 'c', label: 'c.txt' }] },
+          ],
+        },
+        { type: 'submenu', value: 'export', label: 'Export', disabled: true, items: [{ value: 'pdf', label: 'PDF' }] },
+        { value: 'quit', label: 'Quit' },
+      ]
+      const submenuOf = (row: HTMLElement) => {
+        const id = row.getAttribute('aria-controls')
+        return id ? document.getElementById(id) : null
+      }
+      const shownSubmenus = (root: HTMLElement) =>
+        parts(root, 'menu', 'content').filter((el) => el.hasAttribute('data-level') && shownInTopLayer(el))
+
+      it('a submenu row says it opens a menu, draws a chevron, and renders no submenu while closed', async () => {
+        const { m, row } = await setup({ items: tree })
+        expect(row('Open Recent').getAttribute('role')).toBe('menuitem')
+        expect(row('Open Recent').getAttribute('aria-haspopup')).toBe('menu')
+        expect(row('Open Recent').getAttribute('aria-expanded')).toBe('false')
+        expect(part(row('Open Recent'), 'menu', 'submenu-indicator')!.dataset.icon).toBe('chevron-right')
+        expect(part(row('Open Recent'), 'menu', 'submenu-indicator')!.getAttribute('aria-hidden')).toBe('true')
+        expect(parts(m.root, 'menu', 'content')).toHaveLength(1)
+      })
+
+      it('ArrowRight opens it on its first row, ArrowLeft and Escape close one level at a time', async () => {
+        const { m, content, trigger, row, focused, key } = await setup({ items: tree })
+        await key('Enter', trigger())
+        await key('ArrowDown')
+        expect(focused()).toBe('Open Recent')
+        await key('ArrowRight')
+        expect(focused()).toBe('a.txt')
+        const submenu = submenuOf(row('Open Recent'))!
+        expect(shownInTopLayer(submenu)).toBe(true)
+        expect(submenu.getAttribute('role')).toBe('menu')
+        expect(submenu.getAttribute('aria-labelledby')).toBe(row('Open Recent').id)
+        expect(row('Open Recent').getAttribute('aria-expanded')).toBe('true')
+        // Inside the menu, so a press in it is a press inside the menu.
+        expect(content().contains(submenu)).toBe(true)
+
+        await key('End')
+        await key('ArrowRight')
+        expect(focused()).toBe('c.txt')
+        expect(shownSubmenus(m.root)).toHaveLength(2)
+        await key('ArrowLeft')
+        expect(focused()).toBe('More')
+        expect(shownSubmenus(m.root)).toHaveLength(1)
+        await key('Escape')
+        expect(focused()).toBe('Open Recent')
+        expect(shownSubmenus(m.root)).toHaveLength(0)
+        expect(shownInTopLayer(content())).toBe(true)
+        await key('Escape')
+        expect(shownInTopLayer(content())).toBe(false)
+        expect(document.activeElement).toBe(trigger())
+      })
+
+      it('choosing a row two levels down reports it, closes everything and returns focus to the trigger', async () => {
+        const onSelect = vi.fn()
+        const onOpenChange = vi.fn()
+        const { m, content, trigger, focused, key } = await setup({ items: tree, onSelect, onOpenChange })
+        await key('Enter', trigger())
+        await key('ArrowDown')
+        await key('Enter')
+        expect(focused()).toBe('a.txt')
+        await key('End')
+        await key('Enter')
+        expect(focused()).toBe('c.txt')
+        await key('Enter')
+        expect(onSelect).toHaveBeenCalledTimes(1)
+        expect(onSelect).toHaveBeenCalledWith('c', { item: { value: 'c', label: 'c.txt' } })
+        expect(onOpenChange).toHaveBeenLastCalledWith(false, { reason: 'select' })
+        expect(shownInTopLayer(content())).toBe(false)
+        expect(shownSubmenus(m.root)).toHaveLength(0)
+        expect(openLayerCount()).toBe(0)
+        expect(document.activeElement).toBe(trigger())
+      })
+
+      it('keys pressed faster than a render still land: each is judged on the state it meets', async () => {
+        const { trigger, focused, key } = await setup({ items: tree })
+        await key('Enter', trigger())
+        // One batch, no render in between: the second key must not see the first row.
+        await adapter.act(() => {
+          const menu = document.activeElement!
+          keydown(menu, 'ArrowDown')
+          keydown(menu, 'ArrowRight')
+        })
+        expect(focused()).toBe('a.txt')
+      })
+
+      it('a pointer on a submenu row opens it and focus stays on the row; moving into it moves focus', async () => {
+        const { row, focused, open } = await setup({ items: tree })
+        await open()
+        await adapter.act(() => {
+          row('Open Recent').dispatchEvent(new MouseEvent('pointermove', { bubbles: true }))
+        })
+        expect(focused()).toBe('Open Recent')
+        expect(shownInTopLayer(submenuOf(row('Open Recent'))!)).toBe(true)
+        await adapter.act(() => {
+          row('b.txt').dispatchEvent(new MouseEvent('pointermove', { bubbles: true }))
+        })
+        expect(focused()).toBe('b.txt')
+        expect(row('Open Recent').hasAttribute('data-highlighted')).toBe(true)
+        // Back on another row of the menu: the submenu closes.
+        await adapter.act(() => {
+          row('Quit').dispatchEvent(new MouseEvent('pointermove', { bubbles: true }))
+        })
+        expect(focused()).toBe('Quit')
+        expect(row('Open Recent').getAttribute('aria-expanded')).toBe('false')
+      })
+
+      it('a disabled submenu is reached but never opens', async () => {
+        const { trigger, row, focused, key } = await setup({ items: tree })
+        await key('Enter', trigger())
+        await key('ArrowDown')
+        await key('ArrowDown')
+        expect(focused()).toBe('Export')
+        await key('ArrowRight')
+        await key('Enter')
+        await adapter.act(() => {
+          row('Export').dispatchEvent(new MouseEvent('pointermove', { bubbles: true }))
+        })
+        expect(row('Export').getAttribute('aria-expanded')).toBe('false')
+        expect(focused()).toBe('Export')
+      })
+
+      it('a press inside a submenu keeps the menu; a press outside closes the whole tree', async () => {
+        const { m, content, trigger, row, press, key } = await setup({ items: tree })
+        await key('Enter', trigger())
+        await key('ArrowDown')
+        await key('ArrowRight')
+        await press(row('b.txt'))
+        expect(shownInTopLayer(content())).toBe(true)
+        expect(shownSubmenus(m.root)).toHaveLength(1)
+        await press(document.body)
+        expect(shownInTopLayer(content())).toBe(false)
+        expect(shownSubmenus(m.root)).toHaveLength(0)
+      })
+
+      it('unmounted with a submenu open, it leaves nothing listening', async () => {
+        const { m, trigger, key } = await setup({ items: tree })
+        await key('Enter', trigger())
+        await key('ArrowDown')
+        await key('ArrowRight')
+        expect(openLayerCount()).toBe(1)
+        await m.unmount()
+        expect(openLayerCount()).toBe(0)
+      })
+    })
+
     describe('owner', () => {
       it('follows open pushed by the owner', async () => {
         const { m, content } = await setup({ open: false })

@@ -84,6 +84,15 @@
   color: var(--text-secondary);
 }
 
+/* A submenu carries a chevron at the far edge. Instrument draws it in
+   --text-faint, which on the hover plate is 2.83:1 in dark-soft: under the 3:1 a
+   mark that carries meaning owes. Muted is the quietest colour that holds. */
+[data-scope='menu'][data-part='submenu-indicator'] {
+  inline-size: var(--size-icon);
+  block-size: var(--size-icon);
+  color: var(--text-muted);
+}
+
 [data-scope='menu'][data-part='group-label'] {
   padding: var(--space-2) var(--space-3);
   font-size: var(--text-2xs);

@@ -28,3 +28,19 @@ export function focusMenuItem(content: HTMLElement, itemId: string | null): void
   if (doc.activeElement !== target) target.focus({ preventScroll: true })
   if (item) scrollIntoViewIfNeeded(item, content)
 }
+
+/**
+ * Focus what a menu's state names — a row of the menu or of a submenu, or the
+ * menu itself — and keep it inside its scroll viewport. Silent when the target
+ * is not rendered yet: the adapter calls it again once a submenu is shown.
+ */
+export function focusMenuTarget(doc: Document, target: { contentId: string; itemId: string | null } | null): void {
+  const content = target && doc.getElementById(target.contentId)
+  if (content) focusMenuItem(content, target.itemId)
+}
+
+/** Scroll the target row into view without moving focus. For after placement, which shortens the list. */
+export function revealMenuTarget(doc: Document, target: { contentId: string; itemId: string | null } | null): void {
+  if (!target?.itemId) return
+  scrollIntoViewIfNeeded(doc.getElementById(target.itemId), doc.getElementById(target.contentId))
+}

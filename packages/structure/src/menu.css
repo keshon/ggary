@@ -41,7 +41,8 @@
 }
 
 [data-scope='menu'][data-part='item-shortcut'],
-[data-scope='menu'][data-part='item-indicator'] {
+[data-scope='menu'][data-part='item-indicator'],
+[data-scope='menu'][data-part='submenu-indicator'] {
   flex: none;
 }
 

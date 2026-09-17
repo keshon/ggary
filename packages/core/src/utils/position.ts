@@ -13,6 +13,11 @@ export type { Placement }
 export interface PositionOptions {
   placement?: Placement
   gutter?: number
+  /**
+   * Slide along the reference edge, in px. A submenu passes minus its own top
+   * padding and border, so its first row lines up with the row that opened it.
+   */
+  crossOffset?: number
   /** Match the floating element's min-width to the reference. What a <select> does. */
   sameWidth?: boolean
   /**
@@ -32,14 +37,14 @@ export interface PositionOptions {
 export function attachPositioner(
   reference: HTMLElement,
   floating: HTMLElement,
-  { placement = 'bottom-start', gutter = 4, sameWidth = true, strategy = 'absolute', onPlaced }: PositionOptions = {}
+  { placement = 'bottom-start', gutter = 4, crossOffset = 0, sameWidth = true, strategy = 'absolute', onPlaced }: PositionOptions = {}
 ): () => void {
   return autoUpdate(reference, floating, () => {
     void computePosition(reference, floating, {
       placement,
       strategy,
       middleware: [
-        offset(gutter),
+        offset({ mainAxis: gutter, crossAxis: crossOffset }),
         flip({ padding: 8 }),
         shift({ padding: 8 }),
         size({

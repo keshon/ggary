@@ -123,6 +123,7 @@ const pairs: Pair[] = [
   { label: 'menu: dangerous item highlighted', fg: '--err-text', bg: ['--surface-overlay', '--err-bg'], min: text },
   { label: 'menu: item highlighted', fg: '--text-primary', bg: ['--surface-overlay', '--surface-hover'], min: text },
   { label: 'menu: shortcut on highlighted row', fg: '--text-secondary', bg: ['--surface-overlay', '--surface-hover'], min: text },
+  { label: 'menu: submenu chevron', fg: '--text-muted', bg: ['--surface-overlay', '--surface-hover'], min: large },
   { label: 'menu: marked item', fg: '--accent-text', bg: ['--surface-overlay'], min: text },
   { label: 'tooltip: text', fg: '--text-primary', bg: ['--surface-overlay'], min: text },
   // The select's check mark: a mark with no label over it, on the popover. Not

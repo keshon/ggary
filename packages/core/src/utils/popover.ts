@@ -13,6 +13,11 @@ export interface AttachPopoverOptions extends Omit<PositionOptions, 'strategy'> 
    * stays on its trigger do not.
    */
   manageFocus?: boolean
+  /**
+   * Put the element on the dismiss stack. Default true. A submenu does not: its
+   * menu is the layer, and hears Escape and presses outside for the whole tree.
+   */
+  dismissable?: boolean
   exclude?: (HTMLElement | null)[]
 }
 
@@ -74,6 +79,7 @@ export function attachPopover(reference: HTMLElement, content: HTMLElement, init
     attachPositioner(reference, content, {
       placement: options.placement,
       gutter: options.gutter,
+      crossOffset: options.crossOffset,
       onPlaced: () => options.onPlaced?.(),
       sameWidth: options.sameWidth ?? false,
       strategy: 'fixed',
@@ -93,7 +99,7 @@ export function attachPopover(reference: HTMLElement, content: HTMLElement, init
 
   show()
   let stopPositioning = position()
-  const release = trackDismissable(content, layerOptions)
+  const release = options.dismissable === false ? () => {} : trackDismissable(content, layerOptions)
 
   if (options.manageFocus) {
     firstFocusable(content).focus({ preventScroll: true })
@@ -119,5 +125,28 @@ export function attachPopover(reference: HTMLElement, content: HTMLElement, init
       hide()
       if (options.manageFocus && focusWasInside && reference.isConnected) reference.focus({ preventScroll: true })
     },
+  }
+}
+
+/** An element's padding plus border above its content, and at its inline end, in px. */
+export function contentInsets(element: Element): { top: number; inlineEnd: number } {
+  const style = getComputedStyle(element)
+  const px = (value: string) => parseFloat(value) || 0
+  return {
+    top: px(style.paddingTop) + px(style.borderTopWidth),
+    inlineEnd: px(style.paddingInlineEnd) + px(style.borderInlineEndWidth),
+  }
+}
+
+/**
+ * Where a submenu goes relative to the row that opens it: clear of the parent
+ * panel's padding and border by a hair, and slid up by its own, so its first
+ * row lines up with the row that opened it.
+ */
+export function submenuOffsets(row: Element, submenu: Element): { gutter: number; crossOffset: number } {
+  const panel = row.parentElement?.closest('[role="menu"]')
+  return {
+    gutter: (panel ? contentInsets(panel).inlineEnd : 0) + 2,
+    crossOffset: -contentInsets(submenu).top,
   }
 }

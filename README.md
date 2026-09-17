@@ -14,7 +14,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 1355 tests, 532 of them in headless Chrome
+npm test         # 1422 tests, 558 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -644,6 +644,39 @@ radio item always asks for `true`; the page passes new items back. The custom el
 reuses rows by value, so the focused row keeps focus when the items are replaced
 under it.
 
+**Submenus** are levels of the same machine, not menus of their own. The state
+holds a path, one highlighted index per open level, and the level that has focus.
+One keydown handler on the menu hears every level, because their keys bubble to it.
+Only the menu itself is on the dismiss stack. Each submenu renders right after its
+row, inside the menu, as the APG's menubar example nests them, so a press inside a
+submenu counts as inside the menu. A press outside closes the whole tree; Escape
+closes one level.
+
+```ts
+{ type: 'submenu', value: 'export', label: 'Export as', items: [{ value: 'pdf', label: 'PDF' }] }
+```
+
+- The keyboard: ArrowRight or Enter opens a submenu on its first row and moves focus
+  in. ArrowLeft or Escape closes it and gives focus back to its row.
+- A pointer on the row opens the submenu with focus left on the row, as desktop
+  menus do. It opens beside the row, with its first row level with it, and flips to
+  the other side when there is no room.
+- **The corridor.** A pointer moving diagonally from the row to its submenu crosses
+  the rows below it, which would each take the highlight and close the submenu. For
+  300 ms after the pointer leaves the row, moves inside the triangle from where it
+  left towards the submenu are ignored (`gracePolygon`, pure and unit-tested). The
+  first version drew the triangle from the `pointerleave` event, but that event
+  already carries the pointer's new position, so the very move that left the row
+  always fell inside its own corridor. The real-browser test that jumps away from
+  the submenu caught it. The triangle now starts where the pointer was last seen
+  over the menu.
+- **Keys faster than a render.** The first ArrowRight handler asked the rendered
+  state whether the row had a submenu. Two keys in one frame, End then ArrowRight,
+  met a state from before the End, and nothing opened. Only the sandbox showed it:
+  the tests flush between keys. The reducer now decides, and a conformance test
+  presses both keys in one batch; restoring the render-time check fails it in React
+  and Svelte.
+
 Two things only the browser runs caught:
 
 - **React restores focus after a commit.** The menu's rows stay mounted while it is
@@ -868,17 +901,17 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 129 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection and item roles. |
-| contract | node | `icons.contract.test.ts` | 104 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 142 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor. |
+| contract | node | `icons.contract.test.ts` | 108 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 506 tests. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 530 tests. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 506 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 530 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, and a menu row's shortcut at its edge, measured in pixels, per theme, mode and density. |
-| browser | Chrome | `overlay.browser.test.ts` | 13 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, nested and passive layers. |
+| browser | Chrome | `overlay.browser.test.ts` | 15 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, nested and passive layers. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 | dom | jsdom | `svelte-bind.dom.test.ts` | 3 tests. `bind:value` on Select, ChipGroup, RadioGroup and CheckboxGroup writes back to the owner and follows it. |
 
@@ -1004,8 +1037,10 @@ Real, and deliberately left open:
   side-by-side label layout.
 - **A dialog or popover title's distance to its content is not on the rhythm
   tokens.** It is still each theme's own.
-- **Menu has no submenus,** no leading icons and no second line of description on
-  an item (Instrument's `.inst-menu-item-sub`).
+- **Menu has no leading icons** and no second line of description on an item
+  (Instrument's `.inst-menu-item-sub`).
+- **Submenus are left-to-right only.** They open to the right, and ArrowRight opens
+  them, whatever the document's direction.
 - **A menu item cannot keep the menu open from `onSelect`.** Whether it closes is
   decided up front, by `closeOnSelect` on the menu or the item.
 - **`<gg-menu>` items are data only** — the `items` property or a JSON attribute.

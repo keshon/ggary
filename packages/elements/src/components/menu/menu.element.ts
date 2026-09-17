@@ -1,29 +1,15 @@
 import {
   connect,
   createMenuMachine,
-  hasIndicator,
-  menuHighlightedId,
-  type MenuApi,
   type MenuEntry,
   type MenuEvent,
-  type MenuItem,
   type MenuPlacement,
   type MenuState,
 } from '@ggary/core/menu'
-import { attachPopover, domNormalizer, focusMenuItem, scrollIntoViewIfNeeded, uid, type AttachedPopover, type DomProps, type Machine } from '@ggary/core'
-import { h, spread } from '../../spread'
+import { domNormalizer, uid, type Machine } from '@ggary/core'
+import { spread } from '../../spread'
 import { slottedTrigger } from '../popover/popover.element'
-
-type Api = MenuApi<DomProps>
-
-/** Put exactly these children in this order, touching nothing that is already in place. */
-function syncChildren(parent: Element, children: Element[]): void {
-  const current = parent.children
-  const same = current.length === children.length && children.every((child, index) => current[index] === child)
-  // Only when something moved: removing the focused item, even to put it back,
-  // would drop focus to <body>.
-  if (!same) parent.replaceChildren(...children)
-}
+import { MenuRenderer } from './menu-renderer'
 
 /**
  * A menu button:
@@ -43,14 +29,11 @@ export class GgMenuElement extends HTMLElement {
 
   #machine: Machine<MenuState, MenuEvent> | null = null
   #unsubscribe: (() => void) | null = null
-  #attached: AttachedPopover | null = null
   #reflecting = false
   #items: MenuEntry[] = []
 
   #trigger: HTMLElement | null = null
-  #content: HTMLDivElement | null = null
-  /** Rendered rows and groups by key, so a new items array reuses what it can. */
-  #nodes = new Map<string, HTMLElement>()
+  #renderer: MenuRenderer | null = null
 
   get items(): MenuEntry[] {
     return this.#items
@@ -104,8 +87,7 @@ export class GgMenuElement extends HTMLElement {
   disconnectedCallback(): void {
     this.#unsubscribe?.()
     this.#unsubscribe = null
-    this.#attached?.destroy()
-    this.#attached = null
+    this.#renderer?.destroy()
     // As <gg-select>: a menu that comes back open, with focus gone, is a popup
     // nobody is driving.
     if (this.#machine?.getState().open) this.#machine.send({ type: 'CLOSE', reason: 'api' })
@@ -144,100 +126,20 @@ export class GgMenuElement extends HTMLElement {
 
   #build(): void {
     this.#trigger = slottedTrigger(this).trigger
-    this.#content = h('div')
-    this.append(this.#content)
+    this.#renderer = new MenuRenderer(
+      () => this.#machine!.getState(),
+      () => this.#trigger
+    )
+    this.append(this.#renderer.content)
   }
 
   #render(): void {
     const machine = this.#machine
-    const content = this.#content
-    if (!machine || !content) return
-
-    const state = machine.getState()
-    const api = connect(state, machine.send, domNormalizer, { label: this.getAttribute('label') ?? undefined })
-
+    const renderer = this.#renderer
+    if (!machine || !renderer) return
+    const api = connect(machine.getState(), machine.send, domNormalizer, { label: this.getAttribute('label') ?? undefined })
     if (this.#trigger) spread(this.#trigger, api.triggerProps, 'menu')
-    spread(content, api.contentProps)
-    this.#renderNodes(api)
-
-    if (state.open && !this.#attached && this.#trigger) {
-      this.#attached = attachPopover(this.#trigger, content, {
-        placement: state.placement,
-        gutter: 4,
-        manageFocus: true,
-        onDismiss: (reason) => machine.send({ type: 'CLOSE', reason }),
-        // The size limit arrives after the focus below: scroll again against it.
-        onPlaced: () => scrollIntoViewIfNeeded(document.getElementById(menuHighlightedId(machine.getState()) ?? ''), content),
-      })
-    } else if (!state.open && this.#attached) {
-      this.#attached.destroy()
-      this.#attached = null
-    } else {
-      this.#attached?.update({ placement: state.placement })
-    }
-
-    if (state.open) focusMenuItem(content, api.highlightedId)
-  }
-
-  #renderNodes(api: Api): void {
-    const previous = this.#nodes
-    const next = new Map<string, HTMLElement>()
-    const take = (key: string, tag: 'div' | 'a' | 'span'): HTMLElement => {
-      const existing = previous.get(key)
-      const element = existing && existing.localName === tag ? existing : document.createElement(tag)
-      next.set(key, element)
-      return element
-    }
-
-    const row = (item: MenuItem, index: number): HTMLElement => {
-      const props = api.getItemProps(item, index)
-      const key = `item:${item.value}`
-      const element = take(key, 'href' in props.attrs ? 'a' : 'div')
-      spread(element, props)
-
-      const text = take(`${key}:text`, 'span')
-      spread(text, api.getItemTextProps())
-      if (text.textContent !== item.label) text.textContent = item.label
-      const parts = [text]
-
-      if (item.shortcut) {
-        const shortcut = take(`${key}:shortcut`, 'span')
-        spread(shortcut, api.getItemShortcutProps())
-        if (shortcut.textContent !== item.shortcut) shortcut.textContent = item.shortcut
-        parts.push(shortcut)
-      }
-      if (hasIndicator(item)) {
-        const indicator = take(`${key}:indicator`, 'span')
-        spread(indicator, api.getItemIndicatorProps(item))
-        parts.push(indicator)
-      }
-      syncChildren(element, parts)
-      return element
-    }
-
-    const children = api.nodes.map((node) => {
-      if (node.kind === 'item') return row(node.item, node.index)
-      if (node.kind === 'separator') {
-        const separator = take(node.key, 'div')
-        spread(separator, api.separatorProps)
-        return separator
-      }
-      const group = take(node.key, 'div')
-      spread(group, api.getGroupProps(node))
-      const rows: HTMLElement[] = []
-      if (node.label) {
-        const label = take(`${node.key}:label`, 'div')
-        spread(label, api.getGroupLabelProps(node))
-        if (label.textContent !== node.label) label.textContent = node.label
-        rows.push(label)
-      }
-      for (const { item, index } of node.items) rows.push(row(item, index))
-      syncChildren(group, rows)
-      return group
-    })
-
-    syncChildren(this.#content!, children)
-    this.#nodes = next
+    renderer.render(api)
   }
 }
 

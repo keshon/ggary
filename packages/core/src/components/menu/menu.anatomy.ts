@@ -14,6 +14,7 @@ export const menuAnatomy = createAnatomy('menu', [
   'item-text',
   'item-shortcut',
   'item-indicator',
+  'submenu-indicator',
 ] as const)
 
 export type MenuPart = (typeof menuAnatomy.parts)[number]

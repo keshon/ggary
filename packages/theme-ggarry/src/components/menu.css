@@ -75,6 +75,26 @@
   block-size: 14px;
 }
 
+[data-scope='menu'][data-part='submenu-indicator'] {
+  inline-size: 14px;
+  block-size: 14px;
+  margin-inline-end: calc(var(--ggarry-space-1) * -1);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='menu'][data-part='item'][data-highlighted]:not([data-disabled]) [data-part='submenu-indicator'] {
+  color: inherit;
+}
+
+/* The row whose submenu holds focus stays marked, on a quiet plate: the accent
+   belongs to the row the keyboard is on, one level down. */
+[data-scope='menu'][data-part='item'][data-type='submenu'][data-state='open']:not(:focus) {
+  background: var(--ggarry-bg-muted);
+  color: var(--ggarry-text-default);
+}
+[data-scope='menu'][data-part='item'][data-type='submenu'][data-state='open']:not(:focus) [data-part='submenu-indicator'] {
+  color: var(--ggarry-text-muted);
+}
+
 [data-scope='menu'][data-part='group-label'] {
   padding: var(--ggarry-space-2) var(--ggarry-space-2) var(--ggarry-space-1);
   font-size: var(--ggarry-font-size-sm);

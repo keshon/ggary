@@ -74,6 +74,24 @@ export const initialView: ViewState = { grid: true, rulers: false, density: 'com
 export const documentMenu: MenuEntry[] = [
   { value: 'rename', label: 'Rename', shortcut: 'F2' },
   { value: 'duplicate', label: 'Duplicate', shortcut: 'Ctrl+D' },
+  {
+    type: 'submenu',
+    value: 'export',
+    label: 'Export as',
+    items: [
+      { value: 'export-pdf', label: 'PDF' },
+      { value: 'export-png', label: 'PNG image' },
+      {
+        type: 'submenu',
+        value: 'export-code',
+        label: 'Code',
+        items: [
+          { value: 'export-html', label: 'HTML' },
+          { value: 'export-md', label: 'Markdown' },
+        ],
+      },
+    ],
+  },
   { value: 'archive', label: 'Archive (disabled)', disabled: true },
   { type: 'separator' },
   { value: 'docs', label: 'Open the docs', href: '#menu' },
