@@ -11,3 +11,5 @@ export { default as RadioGroup } from './components/radio-group/RadioGroup.svelt
 export { default as Switch } from './components/switch/Switch.svelte'
 export { default as Popover } from './components/popover/Popover.svelte'
 export { default as Tooltip } from './components/tooltip/Tooltip.svelte'
+export { default as CheckboxGroup } from './components/checkbox-group/CheckboxGroup.svelte'
+export { default as Fieldset } from './components/fieldset/Fieldset.svelte'

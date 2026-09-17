@@ -2,9 +2,9 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Thirteen components — Button, Chip, ChipGroup, Select, Field, Input, Textarea,
-Checkbox, Switch, RadioGroup, Dialog, Popover and Tooltip — built end to end to
-prove the architecture holds.
+Fifteen components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
+Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Dialog, Popover and
+Tooltip — built end to end to prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -14,7 +14,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 1105 tests, 424 of them in headless Chrome
+npm test         # 1204 tests, 468 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -37,9 +37,10 @@ packages/
   checks/            the theme gates: structure and contrast, run on every theme
   elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>,
                      <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>, <gg-dialog>,
-                     <gg-popover>, <gg-tooltip>
+                     <gg-popover>, <gg-tooltip>, <gg-fieldset>, <gg-checkbox-group>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
-                     <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Popover>, <Tooltip>
+                     <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Popover>, <Tooltip>,
+                     <Fieldset>, <CheckboxGroup>
   svelte/            the same ten as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
@@ -382,7 +383,68 @@ error timing and flags reach the native input, and readonly arrives as the
 substitute above rather than as an attribute the browser ignores. Inside
 `<gg-field>` the direction reverses — `<gg-checkbox>` renders several parts, so the
 field pushes its props into it (`applyField`) instead of spreading onto the input.
-RadioGroup has its own label and is not a Field control yet.
+A group of options is not a Field control; it goes in a Fieldset, below.
+
+## Fieldset, CheckboxGroup, and the form's rhythm
+
+A popover with two checkboxes above a radio group showed the checkboxes 16px apart
+and the radios 8px apart, with the group label as far from the last checkbox as the
+checkboxes were from each other. The radios' spacing came from the theme; nobody
+owned the checkboxes' — the page's wrapper supplied a gap meant for fields. Two
+option lists, two rhythms.
+
+**CheckboxGroup** is RadioGroup's shape with a value array: `items`, a shared
+`name`, `value` / `defaultValue` / `onValueChange`, orientation. The two share one
+frame in core (`utils/choice-group.ts`) and one rhythm in every theme, so they cannot
+drift again. Native checkboxes have no "at least one" — `required` on each would
+demand all of them — so `required` is a custom validity on the first checkbox, set
+while the input event is still on the box: a Fieldset above reads the group's
+validity from that same event, and an adapter effect would run too late. The first
+version did run too late, in React and Svelte only, and the fieldset conformance
+test caught it.
+
+**Fieldset** is a native `<fieldset>` and `<legend>` with Field's machine: one name
+for a group, one hint-or-error slot, and the `:user-invalid` timing for the group as
+a whole — no error until focus leaves the group (moving between its own options is
+not leaving it) or a submit attempt fires `invalid`, which it hears by capturing.
+`disabled` is the native attribute, so the browser disables everything inside. An
+option group inside a Fieldset without a label of its own does not name itself
+again: the fieldset is the group, and a second unnamed one would only be announced
+as noise. It takes the fieldset's state instead — required, disabled, and
+`aria-invalid` on its inputs.
+
+```tsx
+<Fieldset legend="Interests" hint="Pick at least one" error="Pick at least one interest" required>
+  <CheckboxGroup name="interests" items={interests} />
+</Fieldset>
+```
+
+```html
+<gg-fieldset legend="Plan" error="Choose a plan" required>
+  <gg-radio-group name="plan">
+    <label><input type="radio" value="free"> Free</label>
+    <label><input type="radio" value="pro"> Pro</label>
+  </gg-radio-group>
+</gg-fieldset>
+```
+
+**The rhythm is two public tokens,** in `contract.json`, so every theme must map
+them and an application can lay out with them:
+
+| Token | Between | GGarry | Instrument |
+|---|---|---|---|
+| `--gg-space-option` | the options of one group; a group label or legend and what follows | 8px | `--gap-row`, 6px at regular density |
+| `--gg-space-group` | groups and fields stacked in a form | 20px | `--pad-panel`, 12px at regular density |
+
+The second is always larger than the first, so a group reads as one thing.
+`tests/rhythm.*.browser.test.ts` measures it in Chrome, per theme and per Instrument
+density: label to first option, option to option, legend to content and group to
+group, in real pixels. Putting the old 16px checkbox gap back fails it.
+
+The same test holds the **listbox corners**: a highlighted option at the top or
+bottom of a listbox is concentric with the panel — the panel's radius less its
+padding and border — rather than a second, tighter token that happened to be close.
+Both themes now derive it; restoring the old radius fails the test by a pixel.
 
 ## The overlay layer, and Dialog
 
@@ -710,15 +772,16 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 106 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice connects; tooltip timing with fake timers. |
-| contract | node | `icons.contract.test.ts` | 86 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 111 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers. |
+| contract | node | `icons.contract.test.ts` | 97 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 408 tests. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 447 tests. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 408 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 447 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
+| browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm and the listbox corners, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 8 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, real hover and Tab for tooltips, nested and passive layers. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 
@@ -823,7 +886,7 @@ Real, and deliberately left open:
 - **Platform close requests** (a back gesture) are cancelled through the `cancel`
   event, which browsers may refuse to let a page cancel without recent user
   activation; the dialog then closes natively and reports `native`.
-- **Not ported from Instrument:** everything beyond these thirteen components —
+- **Not ported from Instrument:** everything beyond these fifteen components —
   prose, the rest of forms (number field, slider, choice cards), tables, the sheet
   and toast overlays,
   the agent components (including the composer, a textarea with a toolbar in one
@@ -840,14 +903,16 @@ Real, and deliberately left open:
   the form (see Field and Input).
 - **Form `reset` does not clear a field's error state.** The machine has a
   `RESET` event; nothing listens for the form's `reset` yet.
-- **Select and RadioGroup do not consume a Field.** Input, Textarea, Checkbox and
-  Switch do. Both groups have their own label, and a group is labelled by
-  `aria-labelledby`, not `<label for>`. A required RadioGroup is validated by the
-  browser on submit but shows no inline error. Wiring groups to Field (or a
-  Fieldset) is its own piece of work; until then, `<gg-field>` should not wrap a
-  radio group — it would treat the first radio as its control.
-- **No CheckboxGroup.** Several Checkboxes sharing a `name` submit correctly; a
-  group with a value array, a label and select-all built in does not exist yet.
+- **Select does not consume a Field or a Fieldset.** It is a listbox with its own
+  label, not a native control. Option groups belong in a Fieldset; `<gg-field>`
+  should not wrap one — it would treat the first option as its control.
+- **CheckboxGroup has no select-all.** A parent checkbox that is indeterminate
+  while some are checked is still built by hand, as the sandbox's Checkbox demo does.
+- **Fieldset has no framed variant** (Instrument's `.inst-fieldset--framed`) and no
+  side-by-side label layout.
+- **The rhythm tokens cover options and groups only.** Field's own label-to-control
+  gap and a dialog or popover title's distance to its content are still each
+  component's.
 - **No option descriptions.** A radio or checkbox with a second line of help
   text (Instrument's choice card) is not built.
 - **After a native form reset, React and Svelte state is stale.** The boxes look

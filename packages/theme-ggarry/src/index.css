@@ -23,10 +23,12 @@
 
 @import './components/button.css' layer(gg.components);
 @import './components/checkbox.css' layer(gg.components);
+@import './components/checkbox-group.css' layer(gg.components);
 @import './components/chip.css' layer(gg.components);
 @import './components/chip-group.css' layer(gg.components);
 @import './components/dialog.css' layer(gg.components);
 @import './components/field.css' layer(gg.components);
+@import './components/fieldset.css' layer(gg.components);
 @import './components/input.css' layer(gg.components);
 @import './components/popover.css' layer(gg.components);
 @import './components/radio-group.css' layer(gg.components);

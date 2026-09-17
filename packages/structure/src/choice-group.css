@@ -1,0 +1,11 @@
+/* RadioGroup and CheckboxGroup: orientation is the layout the group declares;
+   a horizontal group that stacks, or the reverse, is a different component. */
+:is([data-scope='radio-group'], [data-scope='checkbox-group'])[data-part='list'] {
+  display: flex;
+  flex-direction: column;
+}
+
+:is([data-scope='radio-group'], [data-scope='checkbox-group'])[data-part='list'][data-orientation='horizontal'] {
+  flex-direction: row;
+  flex-wrap: wrap;
+}

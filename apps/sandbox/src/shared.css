@@ -66,10 +66,11 @@ form.demo {
 .hint { font-size: 13px; color: var(--gg-text-muted); margin: 8px 0 0; }
 
 .fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px 20px; align-items: start; }
-form.stack { display: grid; gap: 16px; max-width: 420px; padding: 16px; border: 1px dashed var(--gg-border-strong); border-radius: 10px; }
+form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; padding: 16px; border: 1px dashed var(--gg-border-strong); border-radius: 10px; }
 
 .stack { display: grid; gap: 10px; justify-items: start; margin-top: 16px; }
 .nested { display: grid; gap: 10px; justify-items: start; padding-inline-start: 26px; }
 .choices { display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: flex-start; }
 
-.dialog-fields { display: grid; gap: 16px; }
+/* Stacks of fields and groups take the theme's group rhythm, from the public contract. */
+.dialog-fields { display: grid; gap: var(--gg-space-group); }

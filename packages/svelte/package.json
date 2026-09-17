@@ -19,6 +19,10 @@
       "svelte": "./src/components/checkbox/index.ts",
       "default": "./src/components/checkbox/index.ts"
     },
+    "./checkbox-group": {
+      "svelte": "./src/components/checkbox-group/index.ts",
+      "default": "./src/components/checkbox-group/index.ts"
+    },
     "./chip": {
       "svelte": "./src/components/chip/index.ts",
       "default": "./src/components/chip/index.ts"
@@ -34,6 +38,10 @@
     "./field": {
       "svelte": "./src/components/field/index.ts",
       "default": "./src/components/field/index.ts"
+    },
+    "./fieldset": {
+      "svelte": "./src/components/fieldset/index.ts",
+      "default": "./src/components/fieldset/index.ts"
     },
     "./input": {
       "svelte": "./src/components/input/index.ts",

@@ -22,6 +22,7 @@
 @import './chip-group.css';
 @import './textarea.css';
 @import './choice.css';
-@import './radio-group.css';
+@import './choice-group.css';
+@import './fieldset.css';
 @import './dialog.css';
 @import './popover.css';

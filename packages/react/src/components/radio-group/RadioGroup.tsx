@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { connect, type RadioGroupOrientation, type RadioItem } from '@ggary/core/radio-group'
 import { reactNormalizer } from '@ggary/core'
+import { useFieldsetGroup } from '../fieldset/Fieldset'
 
 export interface RadioGroupProps {
   items: RadioItem[]
@@ -31,6 +32,7 @@ export function RadioGroup(props: RadioGroupProps) {
         if (!controlled) setUncontrolled(next)
         onValueChange?.(next)
       },
+      group: useFieldsetGroup() ?? undefined,
     }
   )
 

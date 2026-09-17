@@ -72,10 +72,13 @@
 
 /* Placement, the closed state and scrolling live in @ggary/structure. */
 [data-scope='select'][data-part='content'] {
+  --listbox-radius: var(--ggarry-radius-lg);
+  --listbox-inset: calc(var(--ggarry-space-1) + 1px);
+
   padding: var(--ggarry-space-1);
   background: var(--ggarry-bg-surface);
   border: 1px solid var(--ggarry-border-default);
-  border-radius: var(--ggarry-radius-lg);
+  border-radius: var(--listbox-radius);
   box-shadow: var(--ggarry-shadow-popover);
 }
 
@@ -87,7 +90,10 @@
   padding: var(--ggarry-space-2) var(--ggarry-space-2);
   font-size: var(--ggarry-font-size-md);
   color: var(--ggarry-text-default);
-  border-radius: var(--ggarry-radius-sm);
+  /* Concentric with the panel: the panel's radius less the padding and border
+     between them, so a highlighted first or last option follows the panel's
+     curve instead of cutting a second, tighter one inside it. */
+  border-radius: max(2px, calc(var(--listbox-radius) - var(--listbox-inset)));
   cursor: pointer;
   user-select: none;
 }

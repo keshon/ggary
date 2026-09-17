@@ -1,0 +1,14 @@
+/* The browser's <fieldset> is a bordered, padded box with a minimum width of
+   its content, and its <legend> sits in that border. A kit fieldset is a group
+   of controls, set apart by its legend and by air — the border is the
+   browser's, not the meaning's — and it must shrink in a narrow column. */
+[data-scope='fieldset'][data-part='root'] {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+[data-scope='fieldset'][data-part='legend'] {
+  padding: 0;
+}

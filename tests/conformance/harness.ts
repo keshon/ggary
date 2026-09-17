@@ -119,6 +119,34 @@ export interface RadioGroupProps {
   invalid?: boolean
 }
 
+export interface CheckboxGroupProps {
+  items: RadioItem[]
+  name?: string
+  value?: string[]
+  defaultValue?: string[]
+  onValueChange?: (value: string[]) => void
+  label?: string
+  orientation?: RadioGroupOrientation
+  disabled?: boolean
+  required?: boolean
+  invalid?: boolean
+}
+
+/** A Fieldset around one option group — radios or checkboxes — which is what it exists for. */
+export interface FieldsetProps {
+  legend?: string
+  hint?: string
+  error?: string
+  invalid?: boolean
+  required?: boolean
+  disabled?: boolean
+  group: 'radio' | 'checkbox'
+  items: RadioItem[]
+  name?: string
+  /** Read at mount only. */
+  defaultValue?: string | string[]
+}
+
 export interface DialogProps {
   open?: boolean
   defaultOpen?: boolean
@@ -212,6 +240,9 @@ export interface Adapter {
   checkbox(props: CheckboxProps, target: HTMLElement): Promise<Mounted<CheckboxProps>>
   switch(props: SwitchProps, target: HTMLElement): Promise<Mounted<SwitchProps>>
   radioGroup(props: RadioGroupProps, target: HTMLElement): Promise<Mounted<RadioGroupProps>>
+  checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
+  /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */
+  fieldset(props: FieldsetProps, target: HTMLElement): Promise<Mounted<FieldsetProps>>
   dialog(props: DialogProps, target: HTMLElement): Promise<Mounted<DialogProps>>
   popover(props: PopoverProps, target: HTMLElement): Promise<Mounted<PopoverProps>>
   tooltip(props: TooltipProps, target: HTMLElement): Promise<Mounted<TooltipProps>>

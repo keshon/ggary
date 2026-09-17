@@ -42,6 +42,9 @@ export const reactNormalizer: Normalizer = (props: Dict) => {
     // React names the native `input` event `onChange`, and a controlled input
     // without onChange is read-only in React. Same event, React's word for it.
     else if (key === 'onInput') out.onChange = value
+    // React's onBlur and onFocus already bubble — they are focusout and focusin.
+    else if (key === 'onFocusOut') out.onBlur = value
+    else if (key === 'onFocusIn') out.onFocus = value
     else out[key] = value
   }
   return out

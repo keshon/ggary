@@ -1,0 +1,26 @@
+/* ==========================================================================
+   Instrument — checkbox group
+
+   The rhythm of radio-group.css, from the same --gap-option: two option lists
+   side by side read as one density. The options are checkbox.css's.
+   ========================================================================== */
+
+[data-scope='checkbox-group'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-option);
+  --flow-self: flex-start;
+}
+
+[data-scope='checkbox-group'][data-part='label'] {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--text-primary);
+  line-height: var(--leading-ui);
+}
+
+[data-scope='checkbox-group'][data-part='list'] {
+  gap: var(--gap-option);
+
+  &[data-orientation='horizontal'] { gap: var(--gap-option) var(--gap-inline); }
+}

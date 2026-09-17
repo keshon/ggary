@@ -13,6 +13,8 @@ import {
   type SwitchProps,
   type RadioGroupProps,
   type DialogProps,
+  type CheckboxGroupProps,
+  type FieldsetProps,
   type PopoverProps,
   type TooltipProps,
   track,
@@ -146,6 +148,32 @@ function applyTooltipHost(host: HTMLElement, props: Partial<TooltipProps>) {
   if ('disabled' in props) setAttr(host, 'disabled', props.disabled)
 }
 
+/** <gg-radio-group> or <gg-checkbox-group> around native options, as a server renders them. */
+function optionsHost(
+  tag: 'gg-radio-group' | 'gg-checkbox-group',
+  items: { value: string; label: string; disabled?: boolean }[],
+  checked: string[]
+) {
+  const host = document.createElement(tag)
+  for (const item of items) {
+    const label = document.createElement('label')
+    const input = document.createElement('input')
+    input.type = tag === 'gg-radio-group' ? 'radio' : 'checkbox'
+    input.value = item.value
+    setAttr(input, 'checked', checked.includes(item.value))
+    setAttr(input, 'disabled', item.disabled)
+    label.append(input, ` ${item.label}`)
+    host.append(label)
+  }
+  return host
+}
+
+function applyFieldsetHost(host: HTMLElement, props: Partial<FieldsetProps>) {
+  for (const key of ['legend', 'hint', 'error', 'invalid', 'required', 'disabled'] as const) {
+    if (key in props) setAttr(host, key, props[key])
+  }
+}
+
 function applyButton(host: HTMLElement, props: Partial<ButtonProps>) {
   for (const key of ['emphasis', 'tone', 'size', 'disabled', 'loading'] as const) {
     if (key in props) setAttr(host, key, props[key])
@@ -265,6 +293,33 @@ export const elements: Adapter = {
       update: async (patch) => applyRadioHost(host, patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<RadioGroupProps>)
+  },
+
+  async checkboxGroup(props, target) {
+    const host = optionsHost('gg-checkbox-group', props.items, props.defaultValue ?? [])
+    applyRadioHost(host, props as Partial<RadioGroupProps>)
+    if (props.onValueChange) host.addEventListener('valuechange', (e) => props.onValueChange!((e as CustomEvent).detail.value))
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applyRadioHost(host, patch as Partial<RadioGroupProps>),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<CheckboxGroupProps>)
+  },
+
+  async fieldset(props, target) {
+    const host = document.createElement('gg-fieldset')
+    const checked = props.defaultValue === undefined ? [] : ([] as string[]).concat(props.defaultValue)
+    const group = optionsHost(props.group === 'radio' ? 'gg-radio-group' : 'gg-checkbox-group', props.items, checked)
+    setAttr(group, 'name', props.name)
+    host.append(group)
+    applyFieldsetHost(host, props)
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applyFieldsetHost(host, patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<FieldsetProps>)
   },
 
   async dialog(props, target) {

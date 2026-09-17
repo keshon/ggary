@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { connect as checkbox } from '../packages/core/src/components/checkbox/checkbox.connect'
+import { connect as checkboxGroup } from '../packages/core/src/components/checkbox-group/checkbox-group.connect'
 import { connect as radioGroup } from '../packages/core/src/components/radio-group/radio-group.connect'
 import { connect as switchControl } from '../packages/core/src/components/switch/switch.connect'
 import { domNormalizer, reactNormalizer, svelteNormalizer } from '../packages/core/src/normalize-props'
@@ -109,5 +110,55 @@ describe('radio group connect', () => {
     const onValueChange = vi.fn()
     radioGroup({ id: 'plan', items }, identity, { onValueChange }).getItemProps(items[0], 0).inputProps.onInput(inputEvent(true))
     expect(onValueChange).toHaveBeenCalledWith('free')
+  })
+})
+
+describe('checkbox group connect', () => {
+  const items = [
+    { value: 'open', label: 'Open' },
+    { value: 'mine', label: 'Mine' },
+    { value: 'starred', label: 'Starred', disabled: true },
+  ]
+  const onValueChange = vi.fn()
+  const group = (props: Partial<Parameters<typeof checkboxGroup>[0]> = {}, options = {}) =>
+    checkboxGroup({ id: 'g', items, ...props }, identity, { onValueChange, ...options })
+
+  it('is a named group of checkboxes sharing one name', () => {
+    const api = group({ label: 'Show' })
+    expect(api.rootProps).toMatchObject({ role: 'group', 'aria-labelledby': 'g-label' })
+    expect(api.getItemProps(items[1], 1).inputProps).toMatchObject({ type: 'checkbox', name: 'g', value: 'mine', id: 'g-item-1' })
+  })
+
+  it('reports the checked values in item order, whichever was toggled last', () => {
+    const api = group({ value: ['mine'] })
+    api.getItemProps(items[0], 0).inputProps.onInput({ currentTarget: { checked: true } })
+    expect(onValueChange).toHaveBeenLastCalledWith(['open', 'mine'])
+    api.getItemProps(items[1], 1).inputProps.onInput({ currentTarget: { checked: false } })
+    expect(onValueChange).toHaveBeenLastCalledWith([])
+  })
+
+  it('required means at least one, as a custom validity, not `required` on each box', () => {
+    expect(group({ required: true }).validationMessage).toBe('Select at least one option.')
+    expect(group({ required: true, value: ['open'] }).validationMessage).toBe('')
+    expect(group({ required: true, requiredMessage: 'Pick one' }).validationMessage).toBe('Pick one')
+    expect(group({ required: true }).getItemProps(items[0], 0).inputProps.required).toBeUndefined()
+  })
+})
+
+describe('an option group inside a fieldset', () => {
+  const items = [{ value: 'a', label: 'A' }]
+  const context = { invalid: true, required: true, disabled: false }
+
+  it('without a label of its own, leaves naming to the fieldset and takes its state', () => {
+    const api = radioGroup({ id: 'r', items }, identity, { group: context })
+    expect(api.rootProps.role).toBeUndefined()
+    expect(api.rootProps['aria-invalid']).toBeUndefined()
+    expect(api.getItemProps(items[0], 0).inputProps).toMatchObject({ required: true, 'aria-invalid': 'true' })
+  })
+
+  it('with a label of its own, stays a named group', () => {
+    const api = checkboxGroup({ id: 'c', items, label: 'More' }, identity, { group: context })
+    expect(api.rootProps).toMatchObject({ role: 'group', 'aria-labelledby': 'c-label', 'aria-invalid': 'true' })
+    expect(api.validationMessage).not.toBe('')
   })
 })

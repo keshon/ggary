@@ -27,5 +27,7 @@
   --gg-font-sans: var(--font-sans);
   --gg-font-mono: var(--font-mono);
   --gg-radius: var(--radius-md);
+  --gg-space-option: var(--gap-option);
+  --gg-space-group: var(--gap-group);
   --gg-z-popover: var(--z-popover);
 }

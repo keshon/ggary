@@ -6,10 +6,12 @@ import { createRoot } from 'react-dom/client'
 import {
   Button,
   Checkbox,
+  CheckboxGroup,
   Chip,
   ChipGroup,
   Dialog,
   Field,
+  Fieldset,
   Input,
   Popover,
   RadioGroup,
@@ -320,16 +322,26 @@ function App() {
           <Field label="Password" hint="At least 8 characters" error="Use 8 or more characters" required>
             <Input name="password" type="password" minLength={8} />
           </Field>
-          <RadioGroup
-            label="Plan"
-            name="plan"
-            orientation="horizontal"
-            defaultValue="free"
-            items={[
-              { value: 'free', label: 'Free' },
-              { value: 'pro', label: 'Pro' },
-            ]}
-          />
+          <Fieldset legend="Plan" error="Choose a plan" required>
+            <RadioGroup
+              name="plan"
+              orientation="horizontal"
+              items={[
+                { value: 'free', label: 'Free' },
+                { value: 'pro', label: 'Pro' },
+              ]}
+            />
+          </Fieldset>
+          <Fieldset legend="Interests" hint="Pick at least one" error="Pick at least one interest" required>
+            <CheckboxGroup
+              name="interests"
+              items={[
+                { value: 'design', label: 'Design' },
+                { value: 'code', label: 'Code' },
+                { value: 'research', label: 'Research' },
+              ]}
+            />
+          </Fieldset>
           <Field error="Accept the terms to continue" required>
             <Checkbox name="terms">I accept the terms</Checkbox>
           </Field>
@@ -437,12 +449,53 @@ function App() {
       </section>
 
       <section>
+        <h2>Fieldset and CheckboxGroup</h2>
+        <div className="choices">
+          <Fieldset legend="Notifications" hint="Sent to your work address">
+            <CheckboxGroup
+              name="notify"
+              defaultValue={['mentions', 'replies']}
+              items={[
+                { value: 'mentions', label: 'Mentions' },
+                { value: 'replies', label: 'Replies' },
+                { value: 'digest', label: 'Weekly digest' },
+              ]}
+            />
+            <RadioGroup
+              label="Frequency"
+              name="frequency"
+              defaultValue="instant"
+              items={[
+                { value: 'instant', label: 'As it happens' },
+                { value: 'hourly', label: 'Hourly summary' },
+              ]}
+            />
+          </Fieldset>
+          <Fieldset legend="Billing address" hint="Locked while an invoice is open" disabled>
+            <Field label="Company">
+              <Input defaultValue="Atlas Ltd" />
+            </Field>
+            <Field label="VAT number">
+              <Input defaultValue="GB123456789" />
+            </Field>
+          </Fieldset>
+        </div>
+      </section>
+
+      <section>
         <h2>Popover and Tooltip</h2>
         <div className="row" style={{ alignItems: 'center' }}>
           <Popover title="Filters" onOpenChange={logOverlay('filters')} trigger={(props) => <Button {...props}>Filters</Button>}>
             <div className="dialog-fields">
-              <Checkbox defaultChecked>Only open issues</Checkbox>
-              <Checkbox>Assigned to me</Checkbox>
+              <CheckboxGroup
+                label="Show"
+                name="show"
+                defaultValue={['open']}
+                items={[
+                  { value: 'open', label: 'Only open issues' },
+                  { value: 'mine', label: 'Assigned to me' },
+                ]}
+              />
               <RadioGroup
                 label="Sort"
                 name="sort"

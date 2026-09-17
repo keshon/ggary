@@ -3,11 +3,13 @@ import { createRoot } from 'react-dom/client'
 import {
   Button,
   Checkbox,
+  CheckboxGroup,
   ChipGroup,
   Dialog,
   Popover,
   Tooltip,
   Field,
+  Fieldset,
   Input,
   RadioGroup,
   Select,
@@ -20,6 +22,7 @@ import {
   type CheckboxProps,
   type DialogProps,
   type FieldProps,
+  type FieldsetProps,
   type Mounted,
   type PopoverProps,
   type TooltipProps,
@@ -81,6 +84,14 @@ export const react: Adapter = {
   checkbox: (props, target) => mount(Checkbox, props, target, ({ label, ...rest }: CheckboxProps) => [rest, label]),
   switch: (props, target) => mount(Switch, props, target, ({ label, ...rest }: CheckboxProps) => [rest, label]),
   radioGroup: (props, target) => mount(RadioGroup, props, target),
+  checkboxGroup: (props, target) => mount(CheckboxGroup, props, target),
+  fieldset: (props, target) =>
+    mount(Fieldset, props, target, ({ group, items, name, defaultValue, ...fieldset }: FieldsetProps) => [
+      fieldset,
+      group === 'radio'
+        ? createElement(RadioGroup, { items, name, defaultValue: defaultValue as string | undefined })
+        : createElement(CheckboxGroup, { items, name, defaultValue: defaultValue as string[] | undefined }),
+    ]),
   dialog: (props, target) =>
     mount(Dialog, props, target, ({ trigger, triggerIsButton, body, footer, ...rest }: DialogProps) => [
       {

@@ -1,4 +1,6 @@
-export type RadioGroupOrientation = 'vertical' | 'horizontal'
+import type { ChoiceGroupOrientation } from '../../utils/choice-group'
+
+export type RadioGroupOrientation = ChoiceGroupOrientation
 
 export interface RadioItem {
   value: string

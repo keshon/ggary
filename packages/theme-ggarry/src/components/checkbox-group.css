@@ -1,0 +1,27 @@
+/* ==========================================================================
+   GGarry — checkbox group
+
+   The same rhythm as radio-group.css, from the same tokens: a list of
+   checkboxes and a list of radios next to each other must not read as two
+   different densities. The options themselves are checkbox.css's.
+   ========================================================================== */
+
+[data-scope='checkbox-group'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ggarry-rhythm-option);
+}
+
+[data-scope='checkbox-group'][data-part='label'] {
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='checkbox-group'][data-part='list'] {
+  gap: var(--ggarry-rhythm-option);
+}
+
+[data-scope='checkbox-group'][data-part='list'][data-orientation='horizontal'] {
+  gap: var(--ggarry-rhythm-option) var(--ggarry-space-4);
+}

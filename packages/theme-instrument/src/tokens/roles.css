@@ -234,6 +234,11 @@
   --pad-cell-x:  var(--space-4);
   --row-pad-y:   var(--space-3);
   --gap-row:     var(--space-3);
+  /* A form's rhythm, in two steps and no more: the options of one group sit a
+     row gap apart, and groups a panel's padding apart — so a group reads as
+     one thing, and density moves both together. */
+  --gap-option:  var(--gap-row);
+  --gap-group:   var(--pad-panel);
   /* A SECTION is the fourth step of the rhythm, and it is derived rather than
      appointed. The role tier stopped at 16px: the loudest thing available to
      part two blocks was of the same order as the gap INSIDE a block (6–8).

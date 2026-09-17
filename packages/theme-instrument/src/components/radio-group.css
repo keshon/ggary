@@ -1,13 +1,14 @@
 /* ==========================================================================
    Instrument — radio group
 
-   The box and its states are shared with the checkbox in checkbox.css.
+   The box and its states are shared with the checkbox in checkbox.css; the
+   rhythm with checkbox-group.css, from --gap-option. Here: the circle and dot.
    ========================================================================== */
 
 [data-scope='radio-group'][data-part='root'] {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--gap-option);
   --flow-self: flex-start;
 }
 
@@ -19,9 +20,9 @@
 }
 
 [data-scope='radio-group'][data-part='list'] {
-  gap: var(--space-3);
+  gap: var(--gap-option);
 
-  &[data-orientation='horizontal'] { gap: var(--space-3) var(--gap-inline); }
+  &[data-orientation='horizontal'] { gap: var(--gap-option) var(--gap-inline); }
 }
 
 [data-scope='radio'][data-part='input'] {

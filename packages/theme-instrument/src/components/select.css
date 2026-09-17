@@ -83,9 +83,12 @@
   flex-direction: column;
   gap: var(--space-1);
   min-inline-size: 11rem;
+  --listbox-radius: var(--radius-md);
+  --listbox-inset: calc(var(--space-2) + var(--hairline));
+
   padding: var(--space-2);
   border: var(--hairline) solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--listbox-radius);
   background: var(--surface-overlay);
   color: var(--text-primary);
   /* "Floating above and about to disappear" — exactly what this does. */
@@ -102,7 +105,9 @@
   inline-size: 100%;
   min-block-size: var(--control-h-sm);
   padding-inline: var(--space-3);
-  border-radius: var(--radius-sm);
+  /* Concentric with the panel: its radius less the padding and hairline
+     between them, so a highlighted edge option follows the panel's curve. */
+  border-radius: max(2px, calc(var(--listbox-radius) - var(--listbox-inset)));
   color: var(--text-primary);
   font-size: var(--text-sm);
   white-space: nowrap;

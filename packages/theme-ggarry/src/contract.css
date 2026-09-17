@@ -28,5 +28,7 @@
   --gg-font-sans: var(--ggarry-font-family-sans);
   --gg-font-mono: var(--ggarry-font-family-mono);
   --gg-radius: var(--ggarry-radius-lg);
+  --gg-space-option: var(--ggarry-rhythm-option);
+  --gg-space-group: var(--ggarry-rhythm-group);
   --gg-z-popover: var(--ggarry-z-popover);
 }

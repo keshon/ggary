@@ -17,6 +17,10 @@
       "types": "./src/components/checkbox/index.ts",
       "default": "./src/components/checkbox/index.ts"
     },
+    "./checkbox-group": {
+      "types": "./src/components/checkbox-group/index.ts",
+      "default": "./src/components/checkbox-group/index.ts"
+    },
     "./chip": {
       "types": "./src/components/chip/index.ts",
       "default": "./src/components/chip/index.ts"
@@ -32,6 +36,10 @@
     "./field": {
       "types": "./src/components/field/index.ts",
       "default": "./src/components/field/index.ts"
+    },
+    "./fieldset": {
+      "types": "./src/components/fieldset/index.ts",
+      "default": "./src/components/fieldset/index.ts"
     },
     "./input": {
       "types": "./src/components/input/index.ts",

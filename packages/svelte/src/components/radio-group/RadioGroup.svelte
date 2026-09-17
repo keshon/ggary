@@ -1,7 +1,8 @@
 <script lang="ts">
   import { connect, type RadioGroupOrientation, type RadioItem } from '@ggary/core/radio-group'
   import { svelteNormalizer, uid } from '@ggary/core'
-  import { untrack } from 'svelte'
+  import { getContext, untrack } from 'svelte'
+  import { FIELDSET_CONTEXT, type FieldsetContext } from '../fieldset/context'
 
   type Props = {
     items: RadioItem[]
@@ -36,12 +37,15 @@
     if (value === undefined) value = defaultValue ?? null
   })
 
+  const fieldset = getContext<FieldsetContext | undefined>(FIELDSET_CONTEXT)
+
   const api = $derived(
     connect({ id, items, name, value, label, orientation, disabled, required, invalid }, svelteNormalizer, {
       onValueChange: (next) => {
         value = next
         onValueChange?.(next)
       },
+      group: fieldset?.group,
     })
   )
 </script>

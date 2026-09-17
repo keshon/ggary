@@ -211,10 +211,19 @@ app.innerHTML = `
       <gg-field label="Password" hint="At least 8 characters" error="Use 8 or more characters">
         <input name="password" type="password" minlength="8" required>
       </gg-field>
-      <gg-radio-group label="Plan" name="plan" orientation="horizontal">
-        <label><input type="radio" value="free" checked> Free</label>
-        <label><input type="radio" value="pro"> Pro</label>
-      </gg-radio-group>
+      <gg-fieldset legend="Plan" error="Choose a plan" required>
+        <gg-radio-group name="plan" orientation="horizontal">
+          <label><input type="radio" value="free"> Free</label>
+          <label><input type="radio" value="pro"> Pro</label>
+        </gg-radio-group>
+      </gg-fieldset>
+      <gg-fieldset legend="Interests" hint="Pick at least one" error="Pick at least one interest" required>
+        <gg-checkbox-group name="interests">
+          <label><input type="checkbox" value="design"> Design</label>
+          <label><input type="checkbox" value="code"> Code</label>
+          <label><input type="checkbox" value="research"> Research</label>
+        </gg-checkbox-group>
+      </gg-fieldset>
       <gg-field error="Accept the terms to continue">
         <gg-checkbox><label><input type="checkbox" name="terms" required> I accept the terms</label></gg-checkbox>
       </gg-field>
@@ -279,13 +288,42 @@ app.innerHTML = `
   </section>
 
   <section>
+    <h2>Fieldset and CheckboxGroup</h2>
+    <div class="choices">
+      <gg-fieldset legend="Notifications" hint="Sent to your work address">
+        <gg-checkbox-group name="notify">
+          <label><input type="checkbox" value="mentions" checked> Mentions</label>
+          <label><input type="checkbox" value="replies" checked> Replies</label>
+          <label><input type="checkbox" value="digest"> Weekly digest</label>
+        </gg-checkbox-group>
+        <gg-radio-group label="Frequency" name="frequency">
+          <label><input type="radio" value="instant" checked> As it happens</label>
+          <label><input type="radio" value="hourly"> Hourly summary</label>
+        </gg-radio-group>
+      </gg-fieldset>
+      <gg-fieldset legend="Billing address" hint="Locked while an invoice is open" disabled>
+        <gg-field label="Company"><input value="Atlas Ltd"></gg-field>
+        <gg-field label="VAT number"><input value="GB123456789"></gg-field>
+      </gg-fieldset>
+    </div>
+    <p class="hint">
+      A native &lt;fieldset&gt; and &lt;legend&gt;: one name for a group of controls, one slot for its hint or
+      error, and Field's timing — no error until focus leaves the group or a submit is attempted. A disabled
+      fieldset disables everything inside it. Options sit <code>--gg-space-option</code> apart and groups
+      <code>--gg-space-group</code> apart, in every theme.
+    </p>
+  </section>
+
+  <section>
     <h2>Popover and Tooltip</h2>
     <div class="row" style="align-items: center">
       <gg-popover id="filters-popover" heading="Filters">
         <gg-button slot="trigger"><button>Filters</button></gg-button>
         <div class="dialog-fields">
-          <gg-checkbox><label><input type="checkbox" checked> Only open issues</label></gg-checkbox>
-          <gg-checkbox><label><input type="checkbox"> Assigned to me</label></gg-checkbox>
+          <gg-checkbox-group label="Show" name="show">
+            <label><input type="checkbox" value="open" checked> Only open issues</label>
+            <label><input type="checkbox" value="mine"> Assigned to me</label>
+          </gg-checkbox-group>
           <gg-radio-group label="Sort" name="sort">
             <label><input type="radio" value="newest" checked> Newest first</label>
             <label><input type="radio" value="oldest"> Oldest first</label>

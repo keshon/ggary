@@ -39,11 +39,20 @@ export function spread(element: Element, props: DomProps, owner = 'self'): void 
   previous.attrs = new Set(Object.keys(props.attrs))
 
   // Handlers are recreated on every connect() call, so swap rather than compare.
-  for (const [type, listener] of previous.listeners) element.removeEventListener(type, listener)
+  // A name ending in "capture" (onInvalidCapture -> "invalidcapture") listens in
+  // the capture phase, as React's and Svelte's capture handlers do: `invalid`
+  // does not bubble, and a group hears its controls' only by capturing.
+  const listen = (name: string) =>
+    name.endsWith('capture') ? ([name.slice(0, -'capture'.length), true] as const) : ([name, false] as const)
+  for (const [name, listener] of previous.listeners) {
+    const [type, capture] = listen(name)
+    element.removeEventListener(type, listener, capture)
+  }
   previous.listeners.clear()
-  for (const [type, listener] of Object.entries(props.listeners)) {
-    element.addEventListener(type, listener as EventListener)
-    previous.listeners.set(type, listener as EventListener)
+  for (const [name, listener] of Object.entries(props.listeners)) {
+    const [type, capture] = listen(name)
+    element.addEventListener(type, listener as EventListener, capture)
+    previous.listeners.set(name, listener as EventListener)
   }
 }
 

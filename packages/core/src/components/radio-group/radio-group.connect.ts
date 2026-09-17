@@ -1,5 +1,7 @@
 import type { Dict, Normalizer } from '../../types'
 import { choice } from '../../utils/choice'
+import { choiceGroupFrame } from '../../utils/choice-group'
+import type { GroupContext } from '../../utils/group'
 import { radioAnatomy, radioGroupAnatomy } from './radio-group.anatomy'
 import type { RadioGroupProps, RadioItem } from './radio-group.types'
 
@@ -13,6 +15,8 @@ export interface RadioGroupConnectOptions {
   onValueChange?: (value: string) => void
   /** The native inputs own their checked state (enhanced server markup). */
   nativeChecked?: boolean
+  /** From an enclosing Fieldset; see utils/choice-group. */
+  group?: GroupContext
 }
 
 /**
@@ -22,19 +26,22 @@ export interface RadioGroupConnectOptions {
  * never absent: without one the group falls back to its id.
  */
 export function connect<T = Dict>(props: RadioGroupProps, normalize: Normalizer<T>, options: RadioGroupConnectOptions = {}) {
-  const { id, items, value = null, label, orientation = 'vertical', disabled, required, invalid } = props
+  const { id, items, value = null, label, orientation, disabled, required, invalid } = props
   const name = props.name || id
-  const ids = radioGroupIds(id)
+  const frame = choiceGroupFrame(radioGroupAnatomy, {
+    id, role: 'radiogroup', label, orientation, disabled, required, invalid, group: options.group,
+  })
 
   const getItemProps = (item: RadioItem, index: number) => {
     const parts = choice(radioAnatomy, {
       type: 'radio',
-      id: ids.item(index),
+      id: frame.ids.item(index),
       name,
       value: item.value,
       checked: item.value === value,
-      disabled: disabled || item.disabled,
-      required,
+      disabled: frame.disabled || item.disabled,
+      required: frame.required,
+      invalid: frame.invalid,
       nativeChecked: options.nativeChecked,
       // A radio fires `input` only when it BECOMES checked, never when a
       // sibling takes the check away, so every call here is a selection.
@@ -50,24 +57,13 @@ export function connect<T = Dict>(props: RadioGroupProps, normalize: Normalizer<
   }
 
   return {
-    ids,
+    ids: frame.ids,
     name,
     value,
     items,
     getItemProps,
-    rootProps: normalize({
-      ...radioGroupAnatomy.attrs('root'),
-      id: ids.root,
-      role: 'radiogroup',
-      'aria-labelledby': label ? ids.label : undefined,
-      'aria-required': required ? 'true' : undefined,
-      'aria-invalid': invalid ? 'true' : undefined,
-      'aria-disabled': disabled ? 'true' : undefined,
-      'data-orientation': orientation,
-      'data-disabled': disabled ? '' : undefined,
-      'data-invalid': invalid ? '' : undefined,
-    }),
-    labelProps: normalize({ ...radioGroupAnatomy.attrs('label'), id: ids.label }),
-    listProps: normalize({ ...radioGroupAnatomy.attrs('list'), 'data-orientation': orientation }),
+    rootProps: normalize(frame.rootProps),
+    labelProps: normalize(frame.labelProps),
+    listProps: normalize(frame.listProps),
   }
 }

@@ -7,6 +7,7 @@ import { checkboxConformance, switchConformance } from './checkbox.spec'
 import { chipGroupConformance } from './chip-group.spec'
 import { dialogConformance } from './dialog.spec'
 import { fieldConformance } from './field.spec'
+import { checkboxGroupConformance, fieldsetConformance } from './fieldset.spec'
 import { cleanup } from './harness'
 import { inputConformance } from './input.spec'
 import { popoverConformance, tooltipConformance } from './popover.spec'
@@ -35,6 +36,8 @@ export function runConformance() {
       checkboxConformance(adapter)
       switchConformance(adapter)
       radioGroupConformance(adapter)
+      checkboxGroupConformance(adapter)
+      fieldsetConformance(adapter)
       fieldConformance(adapter)
       dialogConformance(adapter)
       popoverConformance(adapter)

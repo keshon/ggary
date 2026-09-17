@@ -17,6 +17,8 @@
     "--gg-font-sans": "the interface font stack",
     "--gg-font-mono": "the monospace font stack",
     "--gg-radius": "the radius of a surface",
+    "--gg-space-option": "between the options of one group, and from a group's label to its first option",
+    "--gg-space-group": "between groups and fields stacked in a form: more than inside a group, so a group reads as one",
     "--gg-z-popover": "the stacking level of floating content"
   },
   "runtime": {
