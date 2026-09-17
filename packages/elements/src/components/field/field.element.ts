@@ -3,6 +3,7 @@ import { connect as connectInput, type InputSize, type InputType } from '@ggary/
 import { domNormalizer, uid, type Autosize, type Machine } from '@ggary/core'
 import { h, spread } from '../../spread'
 import { applyTextarea, textareaProps } from '../textarea/textarea.element'
+import type { FieldConsumer } from '../checkbox/choice'
 
 /**
  * Light-DOM enhancement around a native control:
@@ -132,7 +133,14 @@ export class GgFieldElement extends HTMLElement {
     spread(this.#error!, api.errorProps)
     this.#error!.textContent = api.errorText
 
-    if (control instanceof HTMLInputElement) {
+    if (control instanceof HTMLInputElement && (control.type === 'checkbox' || control.type === 'radio')) {
+      // A choice control is several parts, so its element renders them and this
+      // field hands it the props to merge. Until that element has upgraded there
+      // is nobody to hand them to; it asks with refresh() once it has.
+      const owner = control.closest('gg-checkbox, gg-switch')
+      if (!owner) spread(control, domNormalizer(api.control))
+      else if ('applyField' in owner) (owner as unknown as FieldConsumer).applyField(api.control)
+    } else if (control instanceof HTMLInputElement) {
       // This field owns the control, so it applies the input contract too —
       // reading size from a <gg-input> wrapper if there is one (that wrapper
       // stands down inside a field).

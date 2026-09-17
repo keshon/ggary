@@ -1,0 +1,84 @@
+/* ==========================================================================
+   GGarry — checkbox, and the box a radio shares
+
+   Every rule on the box styles radios too: one border, one fill, one set of
+   states for both round and square. radio-group.css has the round shape, the
+   dot and the group layout.
+
+   The unchecked box is recognised by its border alone, so the border is
+   border-control (3:1). The checked fill is the accent and must hold 3:1 on
+   the surface; the mark on it is text-on-accent.
+   ========================================================================== */
+
+:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='root'] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ggarry-space-2);
+  font-size: var(--ggarry-font-size-md);
+  color: var(--ggarry-text-default);
+  cursor: pointer;
+  user-select: none;
+}
+
+:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='root'][data-disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='root'][data-readonly] {
+  cursor: default;
+}
+
+/* WCAG 2.2's 24px target without a 24px box: an invisible area on the control.
+   On the control, not the input — an <input> renders no pseudo-elements in
+   every browser, and the control is the element that is always there. */
+:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='control']::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  inline-size: max(100%, 24px);
+  block-size: max(100%, 24px);
+}
+
+:is([data-scope='checkbox'], [data-scope='radio'])[data-part='input'] {
+  inline-size: 16px;
+  block-size: 16px;
+  border: 1px solid var(--ggarry-border-control);
+  border-radius: var(--ggarry-radius-sm);
+  background: var(--ggarry-bg-surface);
+  cursor: inherit;
+  transition: background-color var(--ggarry-duration-fast) ease, border-color var(--ggarry-duration-fast) ease;
+}
+
+:is([data-scope='checkbox'], [data-scope='radio'])[data-part='input']:hover:not(:disabled):not(:checked):not(:indeterminate):not([data-invalid]) {
+  border-color: var(--ggarry-border-accent);
+}
+
+:is([data-scope='checkbox'], [data-scope='radio'])[data-part='input']:is(:checked, [data-state='indeterminate']) {
+  background: var(--ggarry-bg-accent);
+  border-color: var(--ggarry-bg-accent);
+}
+
+:is([data-scope='checkbox'], [data-scope='radio'])[data-part='input'][data-invalid]:not(:checked) {
+  border-color: var(--ggarry-border-danger);
+}
+
+[data-scope='checkbox'][data-part='indicator'] {
+  inline-size: 12px;
+  block-size: 12px;
+  align-self: center;
+  justify-self: center;
+  color: var(--ggarry-text-on-accent);
+}
+
+/* Readonly keeps its colours — the value is still the information — and says
+   "fixed" with a quieter surface, as a readonly input does. */
+[data-scope='checkbox'][data-part='input'][aria-readonly='true']:not(:checked):not([data-state='indeterminate']) {
+  background: var(--ggarry-bg-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is([data-scope='checkbox'], [data-scope='radio'])[data-part='input'] { transition: none; }
+}

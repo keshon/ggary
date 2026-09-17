@@ -20,13 +20,23 @@ const ATTRIBUTE_NAMES: Record<string, string> = {
 const isAbsent = (v: unknown) => v === undefined || v === null || v === false
 
 /**
+ * Props that frameworks set as DOM PROPERTIES, where `false` is a value, not
+ * an absence. A controlled checkbox rendered without `checked` when unchecked is
+ * not controlled at all: React warns and Svelte leaves the old state in place.
+ * The DOM normalizer still drops it — there `checked` is an attribute, and the
+ * attribute is only the default.
+ */
+const KEEP_FALSE = new Set(['checked'])
+const isAbsentProp = (key: string, v: unknown) => isAbsent(v) && !(v === false && KEEP_FALSE.has(key))
+
+/**
  * React: handler keys and camelCase DOM props are already correct; only the
  * historical renames need doing.
  */
 export const reactNormalizer: Normalizer = (props: Dict) => {
   const out: Dict = {}
   for (const [key, value] of Object.entries(props)) {
-    if (isAbsent(value)) continue
+    if (isAbsentProp(key, value)) continue
     if (key === 'class') out.className = value
     else if (key === 'for') out.htmlFor = value
     // React names the native `input` event `onChange`, and a controlled input
@@ -44,7 +54,7 @@ export const reactNormalizer: Normalizer = (props: Dict) => {
 export const svelteNormalizer: Normalizer = (props: Dict) => {
   const out: Dict = {}
   for (const [key, value] of Object.entries(props)) {
-    if (isAbsent(value)) continue
+    if (isAbsentProp(key, value)) continue
     if (isHandler(key)) out[key.toLowerCase()] = value
     else out[ATTRIBUTE_NAMES[key] ?? key] = value
   }

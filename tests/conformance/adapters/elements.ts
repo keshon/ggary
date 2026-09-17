@@ -9,6 +9,9 @@ import {
   type Mounted,
   type SelectProps,
   type TextareaProps,
+  type CheckboxProps,
+  type SwitchProps,
+  type RadioGroupProps,
   track,
 } from '../harness'
 
@@ -59,6 +62,53 @@ function applyTextareaHost(host: HTMLElement, props: Partial<TextareaProps>) {
   if ('resize' in props) setAttr(host, 'resize', props.resize)
   if ('autoResize' in props) setAttr(host, 'autoresize', props.autoResize)
   if ('maxRows' in props) setAttr(host, 'max-rows', props.maxRows)
+}
+
+/**
+ * <gg-checkbox> or <gg-switch> around server markup: a label wrapping a native
+ * checkbox. The native state is the initial one; the host carries what a
+ * checkbox has no attribute for.
+ */
+function choiceHost(tag: 'gg-checkbox' | 'gg-switch', props: CheckboxProps) {
+  const host = document.createElement(tag)
+  const label = document.createElement('label')
+  const input = document.createElement('input')
+  input.type = 'checkbox'
+  setAttr(input, 'name', props.name)
+  setAttr(input, 'value', props.value)
+  setAttr(input, 'checked', props.defaultChecked === true)
+  label.append(input)
+  if (props.label) label.append(` ${props.label}`)
+  host.append(label)
+  if (tag === 'gg-checkbox') setAttr(host, 'indeterminate', props.defaultChecked === 'indeterminate')
+  applyChoiceHost(host, props)
+  if (props.onCheckedChange) host.addEventListener('checkedchange', (e) => props.onCheckedChange!((e as CustomEvent).detail.checked))
+  return { host, input }
+}
+
+function applyChoiceHost(host: HTMLElement, props: Partial<CheckboxProps>) {
+  for (const key of ['invalid', 'disabled', 'required'] as const) {
+    if (key in props) setAttr(host, key, props[key])
+  }
+  if ('readOnly' in props) setAttr(host, 'readonly', props.readOnly)
+}
+
+async function mountChoice(tag: 'gg-checkbox' | 'gg-switch', props: CheckboxProps, target: HTMLElement) {
+  const { host } = choiceHost(tag, props)
+  target.append(host)
+  return track({
+    root: host,
+    async update(patch) {
+      applyChoiceHost(host, patch)
+    },
+    unmount: async () => host.remove(),
+  } satisfies Mounted<CheckboxProps>)
+}
+
+function applyRadioHost(host: HTMLElement, props: Partial<RadioGroupProps>) {
+  for (const key of ['label', 'name', 'orientation', 'disabled', 'required', 'invalid'] as const) {
+    if (key in props) setAttr(host, key, props[key])
+  }
 }
 
 function applyButton(host: HTMLElement, props: Partial<ButtonProps>) {
@@ -157,6 +207,31 @@ export const elements: Adapter = {
     } satisfies Mounted<TextareaProps>)
   },
 
+  checkbox: (props, target) => mountChoice('gg-checkbox', props, target),
+  switch: (props, target) => mountChoice('gg-switch', props as CheckboxProps, target),
+
+  async radioGroup(props, target) {
+    const host = document.createElement('gg-radio-group')
+    for (const item of props.items) {
+      const label = document.createElement('label')
+      const input = document.createElement('input')
+      input.type = 'radio'
+      input.value = item.value
+      setAttr(input, 'checked', item.value === props.defaultValue)
+      setAttr(input, 'disabled', item.disabled)
+      label.append(input, ` ${item.label}`)
+      host.append(label)
+    }
+    applyRadioHost(host, props)
+    if (props.onValueChange) host.addEventListener('valuechange', (e) => props.onValueChange!((e as CustomEvent).detail.value))
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applyRadioHost(host, patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<RadioGroupProps>)
+  },
+
   async field(props, target) {
     const host = document.createElement('gg-field')
     const apply = (patch: Partial<FieldProps>) => {
@@ -165,7 +240,10 @@ export const elements: Adapter = {
       }
       if ('readOnly' in patch) setAttr(host, 'readonly', patch.readOnly)
     }
-    if (props.textarea) {
+    if (props.checkbox || props.switch) {
+      const tag = props.checkbox ? 'gg-checkbox' : 'gg-switch'
+      host.append(choiceHost(tag, (props.checkbox ?? props.switch) as CheckboxProps).host)
+    } else if (props.textarea) {
       // Through a <gg-textarea>, which stands down and hands its attributes to the field.
       const wrapper = document.createElement('gg-textarea')
       applyTextareaHost(wrapper, props.textarea)

@@ -22,6 +22,25 @@
     border: var(--stroke) solid CanvasText;
   }
 
+  /* The boxes and the track: under forced colours the fills reset, so the
+     border is what is left of the control. A checked fill and a switch that is
+     on carry meaning and must survive the reset. */
+  :is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='input'] {
+    border: var(--stroke) solid CanvasText;
+  }
+
+  :is([data-scope='checkbox'], [data-scope='radio'])[data-part='input']:checked,
+  [data-scope='switch'][data-part='input']:checked {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+
+  [data-scope='radio'][data-part='indicator'],
+  [data-scope='switch'][data-part='thumb'] {
+    forced-color-adjust: none;
+    background: HighlightText;
+  }
+
   /* A selection that is only a fill has to survive the reset. */
   [data-scope='select'][data-part='item'][data-highlighted],
   [data-scope='chip-group'] [data-scope='chip'][data-part='root'][data-selected] {

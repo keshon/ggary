@@ -1,7 +1,8 @@
-import { forwardRef, useCallback, useLayoutEffect, useRef, type TextareaHTMLAttributes } from 'react'
+import { forwardRef, useLayoutEffect, useRef, type TextareaHTMLAttributes } from 'react'
 import { connect, type TextareaProps as CoreTextareaProps } from '@ggary/core/textarea'
 import { attachAutosize, mergeProps, reactNormalizer, type Autosize } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
+import { useMergedRef } from '../../utils/use-merged-ref'
 
 export interface TextareaProps
   extends CoreTextareaProps,
@@ -27,14 +28,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   const element = useRef<HTMLTextAreaElement | null>(null)
   const autosize = useRef<Autosize | null>(null)
 
-  const ref = useCallback(
-    (node: HTMLTextAreaElement | null) => {
-      element.current = node
-      if (typeof forwardedRef === 'function') forwardedRef(node)
-      else if (forwardedRef) forwardedRef.current = node
-    },
-    [forwardedRef]
-  )
+  const ref = useMergedRef(element, forwardedRef)
 
   // Layout effects, so the first paint already has the measured height.
   useLayoutEffect(() => {

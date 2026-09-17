@@ -1,0 +1,54 @@
+/* ==========================================================================
+   GGarry — switch
+
+   The input is the track. Off, the track is filled with border-control, so
+   the whole capsule holds 3:1 against the surface as one shape rather than an
+   outline with a pale middle. On, it takes the accent. The thumb is white in
+   both modes and both states: it is the part that moves, and it must read
+   against both tracks.
+   ========================================================================== */
+
+[data-scope='switch'][data-part='input'] {
+  inline-size: 32px;
+  block-size: 18px;
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-border-control);
+  cursor: inherit;
+  transition: background-color var(--ggarry-duration-normal) ease;
+}
+
+[data-scope='switch'][data-part='input']:checked {
+  background: var(--ggarry-bg-accent);
+}
+
+[data-scope='switch'][data-part='input']:hover:not(:disabled):not([aria-readonly='true']):checked {
+  background: var(--ggarry-bg-accent-hover);
+}
+
+[data-scope='switch'][data-part='input'][data-invalid] {
+  outline: 1px solid var(--ggarry-border-danger);
+  outline-offset: 1px;
+}
+
+/* A logical offset, not translate: in right-to-left text the thumb travels
+   the other way, and translate has no logical form. */
+[data-scope='switch'][data-part='thumb'] {
+  align-self: center;
+  justify-self: start;
+  margin-inline-start: 2px;
+  inline-size: 14px;
+  block-size: 14px;
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-color-white);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
+  transition: margin-inline-start var(--ggarry-duration-normal) ease;
+}
+
+[data-scope='switch'][data-part='input']:checked + [data-part='thumb'] {
+  margin-inline-start: 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='switch'][data-part='input'],
+  [data-scope='switch'][data-part='thumb'] { transition: none; }
+}

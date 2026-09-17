@@ -147,6 +147,15 @@ const pairs: Pair[] = [
   { label: 'field: invalid border on panel', fg: '--err-text', bg: ['--surface-raised', '--surface-field'], min: large },
   { label: 'field: hint on panel', fg: '--text-muted', bg: ['--surface-raised'], min: text },
 
+  // Added with Checkbox, Radio and Switch. The source's pairs for the box edge
+  // and the switch track are ported as they were; the thumb is new here, since
+  // it is a part of its own that has to read against both tracks.
+  { label: 'choice: box edge in field on panel', fg: '--border-control', bg: ['--surface-raised', '--surface-field'], min: large },
+  { label: 'choice: checked fill on panel', fg: '--accent-solid', bg: ['--surface-raised'], min: large },
+  { label: 'choice: mark on checked fill', fg: '--accent-on', bg: ['--accent-solid'], min: large },
+  { label: 'switch: thumb on off track', fg: '--surface-raised', bg: ['--surface-raised', '--switch-track'], min: large },
+  { label: 'switch: thumb on on track', fg: '--surface-raised', bg: ['--accent-solid'], min: large },
+
   // Layout and navigation.
   { label: 'text on sidebar', fg: '--text-secondary', bg: ['--surface-sunken'], min: text },
   { label: 'navigation: current item', fg: '--accent-text', bg: ['--surface-sunken', '--surface-selected'], min: text },

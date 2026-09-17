@@ -266,3 +266,96 @@ describe('<gg-field>, <gg-input> and <gg-textarea>', () => {
     expect(control().hasAttribute('aria-invalid')).toBe(false)
   })
 })
+
+describe('<gg-checkbox>, <gg-switch> and <gg-radio-group>', () => {
+  const mount = <T extends Element = HTMLElement>(html: string, selector: string) => {
+    document.body.innerHTML = `<form>${html}</form>`
+    return document.querySelector(selector) as unknown as T
+  }
+  const input = () => document.querySelector('input') as HTMLInputElement
+  const partOf = (scope: string, name: string) => document.querySelector(`[data-scope="${scope}"][data-part="${name}"]`) as HTMLElement
+
+  it('<gg-checkbox> exposes checked as a property and fires a bubbling checkedchange', () => {
+    const host = mount<HTMLElement & { checked: boolean }>('<gg-checkbox><label><input type="checkbox"> Subscribe</label></gg-checkbox>', 'gg-checkbox')
+    const seen: unknown[] = []
+    document.body.addEventListener('checkedchange', (e) => seen.push((e as CustomEvent).detail))
+    host.checked = true
+    expect(partOf('checkbox', 'root').dataset.state).toBe('checked')
+    input().click()
+    expect(host.checked).toBe(false)
+    expect(seen).toEqual([{ checked: false }])
+  })
+
+  it('drops its indeterminate attribute once the user resolves it', () => {
+    const host = mount('<gg-checkbox indeterminate><label><input type="checkbox"> All</label></gg-checkbox>', 'gg-checkbox')
+    expect(input().indeterminate).toBe(true)
+    expect(partOf('checkbox', 'indicator').dataset.icon).toBe('minus')
+    input().click()
+    expect(host.hasAttribute('indeterminate')).toBe(false)
+    expect(input().indeterminate).toBe(false)
+    expect(partOf('checkbox', 'indicator').dataset.icon).toBe('check')
+  })
+
+  it('builds the label itself when the markup has none, and keeps the text as the name', () => {
+    mount('<gg-checkbox><input type="checkbox" name="news"> Send me news</gg-checkbox>', 'gg-checkbox')
+    const root = partOf('checkbox', 'root')
+    expect(root.tagName).toBe('LABEL')
+    expect(partOf('checkbox', 'label').textContent).toBe('Send me news')
+    partOf('checkbox', 'label').click()
+    expect(input().checked).toBe(true)
+  })
+
+  it('a bare box has no label part, so it keeps the aria-label it came with', () => {
+    mount('<gg-checkbox><input type="checkbox" aria-label="Select row"></gg-checkbox>', 'gg-checkbox')
+    expect(partOf('checkbox', 'label')).toBeNull()
+    expect(input().getAttribute('aria-label')).toBe('Select row')
+  })
+
+  it('keeps working after being moved, without building its parts twice', () => {
+    const host = mount('<gg-switch><label><input type="checkbox"> Wi-Fi</label></gg-switch>', 'gg-switch')
+    moveElsewhere(host)
+    expect(document.querySelectorAll('[data-scope="switch"][data-part="control"]')).toHaveLength(1)
+    input().click()
+    expect(partOf('switch', 'root').dataset.state).toBe('checked')
+  })
+
+  it('<gg-field> around a plain checkbox, with no element of its own, still wires it', () => {
+    mount('<gg-field label="Terms" hint="Read them first"><input type="checkbox" required></gg-field>', 'gg-field')
+    expect((document.querySelector('label') as HTMLLabelElement).htmlFor).toBe(input().id)
+    expect(input().getAttribute('aria-describedby')).toBe(partOf('field', 'hint').id)
+    expect(input().hasAttribute('data-size')).toBe(false)
+  })
+
+  const plans = `
+    <label><input type="radio" name="plan" value="free" checked> Free</label>
+    <label><input type="radio" name="plan" value="pro"> Pro</label>`
+
+  it('<gg-radio-group> exposes value as a property and fires a bubbling valuechange', () => {
+    const host = mount<HTMLElement & { value: string | null }>(`<gg-radio-group label="Plan">${plans}</gg-radio-group>`, 'gg-radio-group')
+    const seen: unknown[] = []
+    document.body.addEventListener('valuechange', (e) => seen.push((e as CustomEvent).detail))
+    expect(host.value).toBe('free')
+    host.value = 'pro'
+    expect((document.querySelectorAll('input')[1] as HTMLInputElement).checked).toBe(true)
+    ;(document.querySelectorAll('input')[0] as HTMLInputElement).click()
+    expect(host.value).toBe('free')
+    expect(seen).toEqual([{ value: 'free' }])
+  })
+
+  it('keeps the markup’s name, and a name on the host replaces it on every radio', () => {
+    const host = mount(`<gg-radio-group>${plans}</gg-radio-group>`, 'gg-radio-group')
+    const names = () => [...document.querySelectorAll('input')].map((radio) => radio.name)
+    expect(names()).toEqual(['plan', 'plan'])
+    host.setAttribute('name', 'tier')
+    expect(names()).toEqual(['tier', 'tier'])
+    expect(new FormData(document.querySelector('form')!).get('tier')).toBe('free')
+  })
+
+  it('<gg-radio-group> keeps working after being moved', () => {
+    const host = mount(`<gg-radio-group label="Plan">${plans}</gg-radio-group>`, 'gg-radio-group')
+    moveElsewhere(host)
+    expect(document.querySelectorAll('[data-scope="radio-group"][data-part="list"]')).toHaveLength(1)
+    ;(document.querySelectorAll('input')[1] as HTMLInputElement).click()
+    expect((document.querySelectorAll('[data-scope="radio"][data-part="root"]')[1] as HTMLElement).dataset.state).toBe('checked')
+  })
+})

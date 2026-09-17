@@ -1,7 +1,7 @@
 import './theme'
 import './shared.css'
 import '@ggary/elements'
-import type { GgChipGroupElement, GgSelectElement } from '@ggary/elements'
+import type { GgCheckboxElement, GgChipGroupElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
 import { frameworks, tags } from './demo-data'
 
 const app = document.getElementById('app')!
@@ -135,6 +135,61 @@ app.innerHTML = `
   </section>
 
   <section>
+    <h2>Checkbox</h2>
+    <div class="row">
+      <gg-checkbox><label><input type="checkbox"> Unchecked</label></gg-checkbox>
+      <gg-checkbox><label><input type="checkbox" checked> Checked</label></gg-checkbox>
+      <gg-checkbox indeterminate><label><input type="checkbox"> Indeterminate</label></gg-checkbox>
+      <gg-checkbox><label><input type="checkbox" disabled> Disabled</label></gg-checkbox>
+      <gg-checkbox readonly><label><input type="checkbox" checked> Read only</label></gg-checkbox>
+    </div>
+    <div class="stack" id="select-all">
+      <gg-checkbox id="all"><label><input type="checkbox"> All notifications</label></gg-checkbox>
+      <div class="nested">
+        <gg-checkbox><label><input type="checkbox" checked> Mentions</label></gg-checkbox>
+        <gg-checkbox><label><input type="checkbox"> Replies</label></gg-checkbox>
+        <gg-checkbox><label><input type="checkbox"> Weekly digest</label></gg-checkbox>
+      </div>
+    </div>
+    <p class="hint">"All notifications" is indeterminate while only some are checked; checking it checks them all.</p>
+  </section>
+
+  <section>
+    <h2>Switch</h2>
+    <div class="row">
+      <gg-switch><label><input type="checkbox" checked> Wi-Fi</label></gg-switch>
+      <gg-switch><label><input type="checkbox"> Bluetooth</label></gg-switch>
+      <gg-switch><label><input type="checkbox" disabled> Disabled</label></gg-switch>
+      <gg-switch readonly><label><input type="checkbox" checked> Read only</label></gg-switch>
+    </div>
+    <div class="fields" style="margin-top:16px">
+      <gg-field label="Notifications" hint="Takes effect immediately">
+        <gg-switch><label><input type="checkbox"> Email me</label></gg-switch>
+      </gg-field>
+    </div>
+  </section>
+
+  <section>
+    <h2>Radio group</h2>
+    <div class="choices">
+      <gg-radio-group id="plan-demo" label="Plan" name="plan-demo">
+        <label><input type="radio" value="free" checked> Free</label>
+        <label><input type="radio" value="pro"> Pro</label>
+        <label><input type="radio" value="team" disabled> Team (contact sales)</label>
+      </gg-radio-group>
+      <gg-radio-group label="Billing" orientation="horizontal">
+        <label><input type="radio" name="billing" value="monthly" checked> Monthly</label>
+        <label><input type="radio" name="billing" value="yearly"> Yearly</label>
+      </gg-radio-group>
+    </div>
+    <pre class="state" id="radio-state"></pre>
+    <p class="hint">
+      Native radios: one tab stop, arrow keys move and select, and the value submits with the form.
+      The element only enhances the markup.
+    </p>
+  </section>
+
+  <section>
     <h2>Field — invalid declared by the owner</h2>
     <div class="row">
       <gg-field id="username" label="Username" hint="Letters and digits" error="That username is taken">
@@ -155,6 +210,13 @@ app.innerHTML = `
       <gg-field label="Email" error="Enter a valid email address"><input name="email" type="email" required></gg-field>
       <gg-field label="Password" hint="At least 8 characters" error="Use 8 or more characters">
         <input name="password" type="password" minlength="8" required>
+      </gg-field>
+      <gg-radio-group label="Plan" name="plan" orientation="horizontal">
+        <label><input type="radio" value="free" checked> Free</label>
+        <label><input type="radio" value="pro"> Pro</label>
+      </gg-radio-group>
+      <gg-field error="Accept the terms to continue">
+        <gg-checkbox><label><input type="checkbox" name="terms" required> I accept the terms</label></gg-checkbox>
       </gg-field>
       <gg-field label="About you" hint="Optional, up to 280 characters">
         <gg-textarea autoresize max-rows="6"><textarea name="about" rows="2" maxlength="280"></textarea></gg-textarea>
@@ -276,3 +338,25 @@ signup.addEventListener('submit', (event) => {
   const entries = [...new FormData(signup).entries()]
   signupOutput.textContent = entries.map(([key, value]) => `${key} = ${JSON.stringify(value)}`).join('\n')
 })
+
+// --- choice controls -----------------------------------------------------------
+const all = document.querySelector<GgCheckboxElement>('#all')!
+const notifications = [...document.querySelectorAll<GgCheckboxElement>('#select-all .nested gg-checkbox')]
+const syncAll = () => {
+  const on = notifications.filter((box) => box.checked).length
+  all.indeterminate = on > 0 && on < notifications.length
+  all.checked = on === notifications.length
+}
+notifications.forEach((box) => box.addEventListener('checkedchange', syncAll))
+all.addEventListener('checkedchange', (event) => {
+  const on = (event as CustomEvent).detail.checked
+  notifications.forEach((box) => (box.checked = on))
+  syncAll()
+})
+syncAll()
+
+const planDemo = document.querySelector<GgRadioGroupElement>('#plan-demo')!
+const radioState = document.getElementById('radio-state')!
+const paintPlan = () => (radioState.innerHTML = `value  <b>${JSON.stringify(planDemo.value)}</b>`)
+planDemo.addEventListener('valuechange', paintPlan)
+paintPlan()

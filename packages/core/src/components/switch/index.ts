@@ -1,0 +1,5 @@
+export { switchAnatomy } from './switch.anatomy'
+export type { SwitchPart } from './switch.anatomy'
+export { connect } from './switch.connect'
+export type { SwitchConnectOptions } from './switch.connect'
+export type { SwitchProps } from './switch.types'

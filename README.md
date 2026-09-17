@@ -2,8 +2,9 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Seven components — Button, Chip, ChipGroup, Select, Field, Input and Textarea —
-built end to end to prove the architecture holds.
+Ten components — Button, Chip, ChipGroup, Select, Field, Input, Textarea,
+Checkbox, Switch and RadioGroup — built end to end to prove the architecture
+holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -13,7 +14,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 422 tests
+npm test         # 551 tests
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
 ```
@@ -33,9 +34,11 @@ packages/
   theme-instrument/  Instrument: OKLCH token tiers, component CSS, the --gg-* contract
   icons/             glyph SVGs -> --gg-icon-* tokens; the shared glyph compiler
   checks/            the theme gates: structure and contrast, run on every theme
-  elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>, <gg-textarea>
-  react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>
-  svelte/            <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>
+  elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>,
+                     <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>
+  react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
+                     <Checkbox>, <Switch>, <RadioGroup>
+  svelte/            the same ten as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
 ```
@@ -321,6 +324,64 @@ shared watcher (attributes on `<html>`, stylesheet changes in `<head>`,
 to a subtree is not watched; call `update()` (`measure()` on `<gg-textarea>`)
 after one, and after setting a value from code in the custom element.
 
+## Checkbox, Switch and RadioGroup
+
+All three are native inputs, so keyboard, form submission, label clicks and what
+a screen reader announces come from the browser. None has a machine: the checked
+state is the input's, owned by the adapter the way Input's value is.
+
+```tsx
+<Checkbox checked={all} onCheckedChange={setAll}>All notifications</Checkbox>
+<Switch defaultChecked>Wi-Fi</Switch>
+<RadioGroup label="Plan" name="plan" items={plans} defaultValue="free" />
+```
+
+```html
+<gg-checkbox indeterminate><label><input type="checkbox" name="all"> All</label></gg-checkbox>
+<gg-radio-group label="Plan" name="plan">
+  <label><input type="radio" value="free" checked> Free</label>
+  <label><input type="radio" value="pro"> Pro</label>
+</gg-radio-group>
+```
+
+**One anatomy for all three**, built by `utils/choice.ts` in core: a `<label>`
+root, a `control` that stacks the native `input` with what is drawn over it — the
+check or dash (`indicator`, from the icon tokens), the dot, the switch's `thumb` —
+and the text `label`. The drawing is its own element, not a pseudo-element on the
+input: an `<input>` has no content box and not every browser renders one. The
+stacking and the visibility of the mark are `@ggary/structure`; the mark follows
+`:checked`, not `data-state`, so a form reset that fires no event still draws
+right. RadioGroup's options carry a `radio` scope, as ChipGroup's chips carry
+`chip`, so a theme styles the checkbox box and the radio circle from one rule set.
+
+**What native does not have**, core adds:
+
+- *Indeterminate* is a DOM property with no attribute. Connect reports it; each
+  adapter assigns it to the element. A user's click always resolves it to a
+  boolean, which is all `onCheckedChange` ever reports.
+- *Readonly* does not exist for checkboxes. Core sets `aria-readonly`, blocks the
+  click — the one event every way of toggling goes through — and stays silent in
+  its change handler. React is the exception to the blocked click: it restores a
+  controlled input after every event, and a cancelled click on top of that flips
+  the box, which a jsdom probe showed and the sandbox confirmed. React's adapter
+  passes `restoresChecked` and relies on the restore alone.
+- *A name for the group*: radios that share one are a group — one tab stop, arrow
+  keys that move and select. RadioGroup never lacks one; without `name` it uses
+  its id. The keyboard is not reimplemented.
+
+`checked={false}` survives normalization for React and Svelte, which every other
+`false` does not: there `checked` is a property, and a controlled box rendered
+without it when unchecked is not controlled. For the custom elements it stays
+dropped, because there it would be the `checked` attribute — the default a reset
+restores.
+
+**Field.** Checkbox and Switch consume a Field like Input: the field's label, hint,
+error timing and flags reach the native input, and readonly arrives as the
+substitute above rather than as an attribute the browser ignores. Inside
+`<gg-field>` the direction reverses — `<gg-checkbox>` renders several parts, so the
+field pushes its props into it (`applyField`) instead of spreading onto the input.
+RadioGroup has its own label and is not a Field control yet.
+
 ## Layering inside core
 
 ```
@@ -507,18 +568,24 @@ renderer.
 
 `<gg-select>` **renders** its own light DOM, because a listbox has no meaningful
 no-JS equivalent to enhance. Give it a min-height in CSS if it sits above the
-fold, or you get layout shift on upgrade.
+fold, or you get layout shift on upgrade. `<gg-chip-group>` renders too.
+
+The rule decides new elements: anything with a working native form — field,
+input, textarea, checkbox, switch, radio group — enhances. `<gg-checkbox>` and
+`<gg-radio-group>` take a `<label>` around the input where the markup has one and
+build it where it does not. The native state stays the truth, so they never write
+`checked` back as an attribute.
 
 ## Testing
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 69 tests. Every transition of every machine, pure, milliseconds; `mergeProps`. |
-| contract | node | `icons.contract.test.ts` | 53 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 80 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice connects. |
+| contract | node | `icons.contract.test.ts` | 69 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 237 tests. One contract × three adapters. |
-| dom | jsdom | `elements.dom.test.ts` | 22 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
+| dom | jsdom | `conformance.dom.test.ts` | 330 tests. One contract × three adapters. |
+| dom | jsdom | `elements.dom.test.ts` | 31 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 
 **Machine tests** cover behaviour in depth, once, where it is cheap. They run with
@@ -600,10 +667,10 @@ Real, and deliberately left open:
   lines was out of scope for a first port.
 - **`data-accent` on a subtree is unverified in Instrument.** Its semantics are
   declared on `:root`; the port only exercised the attribute on `<html>`.
-- **Not ported from Instrument:** everything beyond these seven components —
-  prose, the rest of forms (checkbox, radio, switch, number field), tables,
-  overlays, the agent components (including the composer, a textarea with a
-  toolbar in one frame) and print styles.
+- **Not ported from Instrument:** everything beyond these ten components —
+  prose, the rest of forms (number field, slider, choice cards), tables, overlays,
+  the agent components (including the composer, a textarea with a toolbar in one
+  frame) and print styles.
 - **`onValueChange` fires when the user re-picks the already-selected value.**
   Intent semantics, not value-diff semantics. Correct for controlled components,
   mildly surprising otherwise.
@@ -616,9 +683,19 @@ Real, and deliberately left open:
   the form (see Field and Input).
 - **Form `reset` does not clear a field's error state.** The machine has a
   `RESET` event; nothing listens for the form's `reset` yet.
-- **Select does not consume a Field.** Input and Textarea do. Select is a
-  listbox, not a native control, and has its own label; wiring it to Field's
-  label, hint and validation is its own piece of work.
+- **Select and RadioGroup do not consume a Field.** Input, Textarea, Checkbox and
+  Switch do. Both groups have their own label, and a group is labelled by
+  `aria-labelledby`, not `<label for>`. A required RadioGroup is validated by the
+  browser on submit but shows no inline error. Wiring groups to Field (or a
+  Fieldset) is its own piece of work; until then, `<gg-field>` should not wrap a
+  radio group — it would treat the first radio as its control.
+- **No CheckboxGroup.** Several Checkboxes sharing a `name` submit correctly; a
+  group with a value array, a label and select-all built in does not exist yet.
+- **No option descriptions.** A radio or checkbox with a second line of help
+  text (Instrument's choice card) is not built.
+- **After a native form reset, React and Svelte state is stale.** The boxes look
+  right — the theme follows `:checked` — but the adapters' own state, the
+  `data-state` attributes and a controlled owner never hear of it.
 - **No character counter.** `maxLength` is enforced by the browser, silently; a
   "12 / 280" readout (with a polite live region) belongs to Field.
 - **No affixes.** No icon, prefix, suffix or clear button inside an input.

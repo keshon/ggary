@@ -3,9 +3,11 @@ import { elements } from './conformance/adapters/elements'
 import { react } from './conformance/adapters/react'
 import { svelte } from './conformance/adapters/svelte'
 import { buttonConformance } from './conformance/button.spec'
+import { checkboxConformance, switchConformance } from './conformance/checkbox.spec'
 import { chipGroupConformance } from './conformance/chip-group.spec'
 import { fieldConformance } from './conformance/field.spec'
 import { inputConformance } from './conformance/input.spec'
+import { radioGroupConformance } from './conformance/radio-group.spec'
 import { textareaConformance } from './conformance/textarea.spec'
 import { selectConformance } from './conformance/select.spec'
 import { cleanup } from './conformance/harness'
@@ -32,6 +34,9 @@ for (const adapter of [elements, react, svelte]) {
     chipGroupConformance(adapter)
     inputConformance(adapter)
     textareaConformance(adapter)
+    checkboxConformance(adapter)
+    switchConformance(adapter)
+    radioGroupConformance(adapter)
     fieldConformance(adapter)
   })
 }

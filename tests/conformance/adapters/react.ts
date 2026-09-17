@@ -1,7 +1,17 @@
 import { act, createElement, type ComponentType, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Button, ChipGroup, Field, Input, Select, Textarea } from '../../../packages/react/src/index'
-import { type Adapter, type ButtonProps, type FieldProps, type Mounted, track } from '../harness'
+import {
+  Button,
+  Checkbox,
+  ChipGroup,
+  Field,
+  Input,
+  RadioGroup,
+  Select,
+  Switch,
+  Textarea,
+} from '../../../packages/react/src/index'
+import { type Adapter, type ButtonProps, type CheckboxProps, type FieldProps, type Mounted, track } from '../harness'
 
 /**
  * React: every render and every interaction goes through `act`, which flushes
@@ -55,9 +65,15 @@ export const react: Adapter = {
   chipGroup: (props, target) => mount(ChipGroup, props, target),
   input: (props, target) => mount(Input, props, target),
   textarea: (props, target) => mount(Textarea, props, target),
+  checkbox: (props, target) => mount(Checkbox, props, target, ({ label, ...rest }: CheckboxProps) => [rest, label]),
+  switch: (props, target) => mount(Switch, props, target, ({ label, ...rest }: CheckboxProps) => [rest, label]),
+  radioGroup: (props, target) => mount(RadioGroup, props, target),
   field: (props, target) =>
-    mount(Field, props, target, ({ input, textarea, ...field }: FieldProps) => [
-      field,
-      textarea ? createElement(Textarea, textarea) : createElement(Input, input ?? {}),
-    ]),
+    mount(Field, props, target, ({ input, textarea, checkbox, switch: switchProps, ...field }: FieldProps) => {
+      if (checkbox || switchProps) {
+        const { label, ...rest } = (checkbox ?? switchProps)!
+        return [field, createElement((checkbox ? Checkbox : Switch) as ComponentType<any>, rest, label)]
+      }
+      return [field, textarea ? createElement(Textarea, textarea) : createElement(Input, input ?? {})]
+    }),
 }

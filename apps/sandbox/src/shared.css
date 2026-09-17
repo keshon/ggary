@@ -67,3 +67,7 @@ form.demo {
 
 .fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px 20px; align-items: start; }
 form.stack { display: grid; gap: 16px; max-width: 420px; padding: 16px; border: 1px dashed var(--gg-border-strong); border-radius: 10px; }
+
+.stack { display: grid; gap: 10px; justify-items: start; margin-top: 16px; }
+.nested { display: grid; gap: 10px; justify-items: start; padding-inline-start: 26px; }
+.choices { display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: flex-start; }

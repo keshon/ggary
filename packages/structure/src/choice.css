@@ -1,0 +1,31 @@
+/* Checkbox, radio and switch: the native input and what is drawn over it share
+   one grid cell. Without the stack the mark sits BESIDE its box; without
+   pointer-events the mark swallows the click meant for the input. */
+:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='control'] {
+  display: inline-grid;
+  flex: none;
+  position: relative;
+}
+
+:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='control'] > * {
+  grid-area: 1 / 1;
+}
+
+:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='input'] {
+  appearance: none;
+  margin: 0;
+}
+
+:is([data-scope='checkbox'], [data-scope='radio'])[data-part='indicator'],
+[data-scope='switch'][data-part='thumb'] {
+  pointer-events: none;
+}
+
+/* The mark follows the INPUT, not data-state: a form reset changes `checked`
+   without an event, and the pseudo-class is right when the attribute is stale.
+   A radio in a group with nothing checked matches :indeterminate, so radios
+   ask about :checked alone. */
+[data-scope='checkbox'][data-part='input']:not(:checked):not(:indeterminate) + [data-part='indicator'],
+[data-scope='radio'][data-part='input']:not(:checked) + [data-part='indicator'] {
+  visibility: hidden;
+}

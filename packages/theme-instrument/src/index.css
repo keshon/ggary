@@ -41,11 +41,14 @@
 @import './base/tone.css' layer(gg.base);
 
 @import './components/button.css' layer(gg.components);
+@import './components/checkbox.css' layer(gg.components);
 @import './components/chip.css' layer(gg.components);
 @import './components/chip-group.css' layer(gg.components);
 @import './components/field.css' layer(gg.components);
 @import './components/input.css' layer(gg.components);
+@import './components/radio-group.css' layer(gg.components);
 @import './components/select.css' layer(gg.components);
+@import './components/switch.css' layer(gg.components);
 @import './components/textarea.css' layer(gg.components);
 
 @import './a11y/forced.css' layer(gg.forced);

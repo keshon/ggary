@@ -1,0 +1,38 @@
+/* ==========================================================================
+   Instrument — switch
+
+   ONE SHAPE, NOT A SHAPE INSIDE A RING. An off switch has to clear 3:1 against
+   its ground or it cannot be told from an empty patch of panel. An inset
+   --border-control ring over a quiet track met the norm and drew an outlined
+   capsule — two edges and a pale middle. --switch-track carries the same
+   guarantee in the fill, so the control is one solid object.
+   ========================================================================== */
+
+[data-scope='switch'][data-part='input'] {
+  inline-size: var(--size-switch-w);
+  block-size: var(--size-switch-h);
+  border-radius: var(--radius-full);
+  background: var(--switch-track);
+  cursor: inherit;
+  transition: background var(--dur-2) var(--ease-out);
+
+  &:checked { background: var(--accent-solid); }
+  &[data-invalid] { outline: var(--stroke) solid var(--err-text); outline-offset: 1px; }
+}
+
+/* A logical offset rather than translate: in RTL the thumb has to travel the
+   other way, and translate has no logical counterpart. */
+[data-scope='switch'][data-part='thumb'] {
+  align-self: center;
+  justify-self: start;
+  margin-inline-start: 2px;
+  inline-size: calc(var(--size-switch-h) - 4px);
+  block-size: calc(var(--size-switch-h) - 4px);
+  border-radius: var(--radius-full);
+  background: var(--surface-raised);
+  transition: margin-inline-start var(--dur-2) var(--ease-out);
+}
+
+[data-scope='switch'][data-part='input']:checked + [data-part='thumb'] {
+  margin-inline-start: calc(var(--size-switch-w) - var(--size-switch-h) + 2px);
+}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Chip, ChipGroup, Field, Input, Select, Textarea } from '@ggary/svelte'
+  import { Button, Checkbox, Chip, ChipGroup, Field, Input, RadioGroup, Select, Switch, Textarea } from '@ggary/svelte'
   import { frameworks, tags } from './demo-data'
 
   let value = $state<string | null>('svelte')
@@ -7,6 +7,17 @@
   let items = $state(tags)
   let selection = $state<string[]>(['design'])
   let formOutput = $state('submit to see the FormData the hidden input contributes')
+
+  let notify = $state({ mentions: true, replies: false, digest: false })
+  let plan = $state<string | null>('free')
+  const notifyCount = $derived(Object.values(notify).filter(Boolean).length)
+  const allNotify = $derived(notifyCount === 0 ? false : notifyCount === 3 ? true : 'indeterminate')
+
+  const plans = [
+    { value: 'free', label: 'Free' },
+    { value: 'pro', label: 'Pro' },
+    { value: 'team', label: 'Team (contact sales)', disabled: true },
+  ]
 
   let taken = $state(false)
   let username = $state('garry')
@@ -196,6 +207,63 @@ last event  ${lastEvent}`}</pre>
 </section>
 
 <section>
+  <h2>Checkbox</h2>
+  <div class="row">
+    <Checkbox>Unchecked</Checkbox>
+    <Checkbox defaultChecked>Checked</Checkbox>
+    <Checkbox defaultChecked="indeterminate">Indeterminate</Checkbox>
+    <Checkbox disabled>Disabled</Checkbox>
+    <Checkbox readOnly defaultChecked>Read only</Checkbox>
+  </div>
+  <div class="stack">
+    <Checkbox
+      checked={allNotify}
+      onCheckedChange={(on) => (notify = { mentions: on, replies: on, digest: on })}
+    >
+      All notifications
+    </Checkbox>
+    <div class="nested">
+      <Checkbox bind:checked={notify.mentions}>Mentions</Checkbox>
+      <Checkbox bind:checked={notify.replies}>Replies</Checkbox>
+      <Checkbox bind:checked={notify.digest}>Weekly digest</Checkbox>
+    </div>
+  </div>
+  <p class="hint">"All notifications" is indeterminate while only some are checked; checking it checks them all.</p>
+</section>
+
+<section>
+  <h2>Switch</h2>
+  <div class="row">
+    <Switch defaultChecked>Wi-Fi</Switch>
+    <Switch>Bluetooth</Switch>
+    <Switch disabled>Disabled</Switch>
+    <Switch readOnly defaultChecked>Read only</Switch>
+  </div>
+  <div class="fields" style="margin-top:16px">
+    <Field label="Notifications" hint="Takes effect immediately">
+      <Switch>Email me</Switch>
+    </Field>
+  </div>
+</section>
+
+<section>
+  <h2>Radio group</h2>
+  <div class="choices">
+    <RadioGroup label="Plan" name="plan-demo" items={plans} bind:value={plan} />
+    <RadioGroup
+      label="Billing"
+      orientation="horizontal"
+      defaultValue="monthly"
+      items={[
+        { value: 'monthly', label: 'Monthly' },
+        { value: 'yearly', label: 'Yearly' },
+      ]}
+    />
+  </div>
+  <pre class="state">{`value  ${JSON.stringify(plan)}`}</pre>
+</section>
+
+<section>
   <h2>Field — invalid declared by the owner</h2>
   <div class="row">
     <Field label="Username" hint="Letters and digits" error="That username is taken" invalid={taken}>
@@ -218,6 +286,16 @@ invalid  ${taken}`}</pre>
     </Field>
     <Field label="Password" hint="At least 8 characters" error="Use 8 or more characters" required>
       <Input name="password" type="password" minlength={8} />
+    </Field>
+    <RadioGroup
+      label="Plan"
+      name="plan"
+      orientation="horizontal"
+      defaultValue="free"
+      items={plans.slice(0, 2)}
+    />
+    <Field error="Accept the terms to continue" required>
+      <Checkbox name="terms">I accept the terms</Checkbox>
     </Field>
     <Field label="About you" hint="Optional, up to 280 characters">
       <Textarea name="about" rows={2} maxLength={280} autoResize maxRows={6} />

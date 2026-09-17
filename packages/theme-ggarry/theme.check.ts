@@ -68,6 +68,17 @@ const pairs: Pair[] = [
   // Readonly inputs sit on the subtle surface and keep full-colour, readable text.
   { label: 'field: readonly text on subtle', fg: '--ggarry-text-default', bg: ['--ggarry-bg-subtle'], min: TEXT },
 
+  // Choice controls. The checked fill IS the state, so it holds 3:1 on the
+  // surface; the unchecked box is its border-control edge, measured above. The
+  // switch track is filled with border-control when off, and the white thumb
+  // has to read against both tracks — it is the part that says where it is.
+  { label: 'choice: checked fill on surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'choice: checked fill on canvas', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'choice: mark on checked fill', fg: '--ggarry-text-on-accent', bg: ['--ggarry-bg-accent'], min: LARGE },
+  { label: 'switch: off track on surface', fg: '--ggarry-border-control', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'switch: thumb on off track', fg: '--ggarry-color-white', bg: ['--ggarry-border-control'], min: LARGE },
+  { label: 'switch: thumb on on track', fg: '--ggarry-color-white', bg: ['--ggarry-bg-accent'], min: LARGE },
+
   // Focus ring against what it stands on.
   { label: 'focus: ring on surface', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'focus: ring on canvas', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-canvas'], min: LARGE },

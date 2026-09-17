@@ -1,7 +1,7 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Button, ChipGroup, Input, Select, Textarea } from '../../../packages/svelte/src/index'
+import { Button, Checkbox, ChipGroup, Input, RadioGroup, Select, Switch, Textarea } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
-import { type Adapter, type ButtonProps, type Mounted, track } from '../harness'
+import { type Adapter, type ButtonProps, type CheckboxProps, type Mounted, track } from '../harness'
 import { reactiveProps } from './svelte-props.svelte'
 
 /**
@@ -39,6 +39,11 @@ async function mountSvelte<P extends object>(
 const text = (label: string) =>
   createRawSnippet(() => ({ render: () => `<span>${label}</span>` }))
 
+const withLabel = (p: Partial<CheckboxProps>) => {
+  const { label, ...rest } = p
+  return label === undefined ? rest : { ...rest, children: text(label) }
+}
+
 export const svelte: Adapter = {
   name: 'svelte',
   supports: { controlled: true },
@@ -57,6 +62,9 @@ export const svelte: Adapter = {
   chipGroup: (props, target) => mountSvelte(ChipGroup as Component<any>, props, target),
   input: (props, target) => mountSvelte(Input as Component<any>, props, target),
   textarea: (props, target) => mountSvelte(Textarea as Component<any>, props, target),
+  checkbox: (props, target) => mountSvelte(Checkbox as Component<any>, props, target, withLabel),
+  switch: (props, target) => mountSvelte(Switch as Component<any>, props, target, withLabel),
+  radioGroup: (props, target) => mountSvelte(RadioGroup as Component<any>, props, target),
   // A Field's children are a snippet, and a raw snippet cannot render a
   // component, so a two-line wrapper composes the pair as an app would.
   field: (props, target) => mountSvelte(FieldWithControl as Component<any>, props, target),

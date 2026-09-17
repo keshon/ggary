@@ -13,6 +13,10 @@
       "types": "./src/components/button/index.ts",
       "default": "./src/components/button/index.ts"
     },
+    "./checkbox": {
+      "types": "./src/components/checkbox/index.ts",
+      "default": "./src/components/checkbox/index.ts"
+    },
     "./chip": {
       "types": "./src/components/chip/index.ts",
       "default": "./src/components/chip/index.ts"
@@ -29,9 +33,17 @@
       "types": "./src/components/input/index.ts",
       "default": "./src/components/input/index.ts"
     },
+    "./radio-group": {
+      "types": "./src/components/radio-group/index.ts",
+      "default": "./src/components/radio-group/index.ts"
+    },
     "./select": {
       "types": "./src/components/select/index.ts",
       "default": "./src/components/select/index.ts"
+    },
+    "./switch": {
+      "types": "./src/components/switch/index.ts",
+      "default": "./src/components/switch/index.ts"
     },
     "./textarea": {
       "types": "./src/components/textarea/index.ts",

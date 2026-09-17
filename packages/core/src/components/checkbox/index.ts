@@ -1,0 +1,5 @@
+export { checkboxAnatomy } from './checkbox.anatomy'
+export type { CheckboxPart } from './checkbox.anatomy'
+export { connect } from './checkbox.connect'
+export type { CheckboxConnectOptions } from './checkbox.connect'
+export type { CheckboxProps, CheckedState } from './checkbox.types'

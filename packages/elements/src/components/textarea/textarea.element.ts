@@ -75,7 +75,9 @@ export class GgTextareaElement extends HTMLElement {
   attributeChangedCallback(): void {
     // Inside a field the field renders; tell it something changed.
     const field = this.closest('gg-field')
-    if (field) field.refresh()
+    if (field) {
+      if ('refresh' in field) field.refresh()
+    }
     else if (this.#textarea && this.isConnected) this.#render()
   }
 

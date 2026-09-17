@@ -18,6 +18,8 @@ import type { SelectItem } from '../../packages/core/src/components/select'
 import type { ButtonEmphasis, ButtonSize, ButtonTone } from '../../packages/core/src/components/button'
 import type { InputSize, InputType } from '../../packages/core/src/components/input'
 import type { TextareaResize, TextareaSize } from '../../packages/core/src/components/textarea'
+import type { CheckedState } from '../../packages/core/src/components/checkbox'
+import type { RadioGroupOrientation, RadioItem } from '../../packages/core/src/components/radio-group'
 
 export interface ButtonProps {
   label: string
@@ -85,9 +87,41 @@ export interface TextareaProps {
   onValueChange?: (value: string) => void
 }
 
+/** Checkbox and Switch share a shape; `label` is the text beside the box. */
+export interface CheckboxProps {
+  label?: string
+  checked?: CheckedState
+  defaultChecked?: CheckedState
+  onCheckedChange?: (checked: boolean) => void
+  name?: string
+  value?: string
+  disabled?: boolean
+  readOnly?: boolean
+  required?: boolean
+  invalid?: boolean
+}
+
+export interface SwitchProps extends Omit<CheckboxProps, 'checked' | 'defaultChecked'> {
+  checked?: boolean
+  defaultChecked?: boolean
+}
+
+export interface RadioGroupProps {
+  items: RadioItem[]
+  name?: string
+  value?: string | null
+  defaultValue?: string | null
+  onValueChange?: (value: string) => void
+  label?: string
+  orientation?: RadioGroupOrientation
+  disabled?: boolean
+  required?: boolean
+  invalid?: boolean
+}
+
 /**
- * A Field wrapping one control: a Textarea when `textarea` is given, otherwise
- * an Input configured by `input`.
+ * A Field wrapping one control: a Textarea, Checkbox or Switch when that key is
+ * given, otherwise an Input configured by `input`.
  */
 export interface FieldProps {
   label?: string
@@ -99,6 +133,8 @@ export interface FieldProps {
   readOnly?: boolean
   input?: InputProps
   textarea?: TextareaProps
+  checkbox?: CheckboxProps
+  switch?: SwitchProps
 }
 
 export interface Mounted<P> {
@@ -128,7 +164,10 @@ export interface Adapter {
   chipGroup(props: ChipGroupProps, target: HTMLElement): Promise<Mounted<ChipGroupProps>>
   input(props: InputProps, target: HTMLElement): Promise<Mounted<InputProps>>
   textarea(props: TextareaProps, target: HTMLElement): Promise<Mounted<TextareaProps>>
-  /** Updates apply to the Field's own props; `input` and `textarea` are read at mount only. */
+  checkbox(props: CheckboxProps, target: HTMLElement): Promise<Mounted<CheckboxProps>>
+  switch(props: SwitchProps, target: HTMLElement): Promise<Mounted<SwitchProps>>
+  radioGroup(props: RadioGroupProps, target: HTMLElement): Promise<Mounted<RadioGroupProps>>
+  /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
 }
 
@@ -184,8 +223,14 @@ export function typeInto(input: HTMLInputElement | HTMLTextAreaElement, text: st
   input.dispatchEvent(new Event('input', { bubbles: true }))
 }
 
-export const part = (root: ParentNode, scope: string, name: string) =>
-  root.querySelector<HTMLElement>(`[data-scope="${scope}"][data-part="${name}"]`)
+/**
+ * The first element that is this part — the root itself included, since a
+ * custom element that enhances its host (gg-field, gg-radio-group) IS the part.
+ */
+export const part = (root: ParentNode, scope: string, name: string) => {
+  const selector = `[data-scope="${scope}"][data-part="${name}"]`
+  return root instanceof HTMLElement && root.matches(selector) ? root : root.querySelector<HTMLElement>(selector)
+}
 
 export const parts = (root: ParentNode, scope: string, name: string) => [
   ...root.querySelectorAll<HTMLElement>(`[data-scope="${scope}"][data-part="${name}"]`),

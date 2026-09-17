@@ -34,7 +34,9 @@ export class GgInputElement extends HTMLElement {
   attributeChangedCallback(): void {
     // Inside a field the field renders; tell it something changed.
     const field = this.closest('gg-field')
-    if (field) field.refresh()
+    if (field) {
+      if ('refresh' in field) field.refresh()
+    }
     else if (this.#input) this.#render()
   }
 

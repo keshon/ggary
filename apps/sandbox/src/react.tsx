@@ -3,7 +3,7 @@ import './shared.css'
 
 import { StrictMode, useState, type FormEvent } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Button, Chip, ChipGroup, Field, Input, Select, Textarea } from '@ggary/react'
+import { Button, Checkbox, Chip, ChipGroup, Field, Input, RadioGroup, Select, Switch, Textarea } from '@ggary/react'
 import { frameworks, tags } from './demo-data'
 
 function App() {
@@ -12,6 +12,11 @@ function App() {
   const [items, setItems] = useState(tags)
   const [selection, setSelection] = useState<string[]>(['design'])
   const [formOutput, setFormOutput] = useState('submit to see the FormData the hidden input contributes')
+
+  const [notify, setNotify] = useState({ mentions: true, replies: false, digest: false })
+  const [plan, setPlan] = useState<string | null>('free')
+  const notifyCount = Object.values(notify).filter(Boolean).length
+  const allNotify = notifyCount === 0 ? false : notifyCount === 3 ? true : 'indeterminate'
 
   const [taken, setTaken] = useState(false)
   const [username, setUsername] = useState('garry')
@@ -205,6 +210,70 @@ function App() {
       </section>
 
       <section>
+        <h2>Checkbox</h2>
+        <div className="row">
+          <Checkbox>Unchecked</Checkbox>
+          <Checkbox defaultChecked>Checked</Checkbox>
+          <Checkbox defaultChecked="indeterminate">Indeterminate</Checkbox>
+          <Checkbox disabled>Disabled</Checkbox>
+          <Checkbox readOnly defaultChecked>Read only</Checkbox>
+        </div>
+        <div className="stack">
+          <Checkbox checked={allNotify} onCheckedChange={(on) => setNotify({ mentions: on, replies: on, digest: on })}>
+            All notifications
+          </Checkbox>
+          <div className="nested">
+            <Checkbox checked={notify.mentions} onCheckedChange={(on) => setNotify((n) => ({ ...n, mentions: on }))}>Mentions</Checkbox>
+            <Checkbox checked={notify.replies} onCheckedChange={(on) => setNotify((n) => ({ ...n, replies: on }))}>Replies</Checkbox>
+            <Checkbox checked={notify.digest} onCheckedChange={(on) => setNotify((n) => ({ ...n, digest: on }))}>Weekly digest</Checkbox>
+          </div>
+        </div>
+        <p className="hint">"All notifications" is indeterminate while only some are checked; checking it checks them all.</p>
+      </section>
+
+      <section>
+        <h2>Switch</h2>
+        <div className="row">
+          <Switch defaultChecked>Wi-Fi</Switch>
+          <Switch>Bluetooth</Switch>
+          <Switch disabled>Disabled</Switch>
+          <Switch readOnly defaultChecked>Read only</Switch>
+        </div>
+        <div className="fields" style={{ marginTop: 16 }}>
+          <Field label="Notifications" hint="Takes effect immediately">
+            <Switch>Email me</Switch>
+          </Field>
+        </div>
+      </section>
+
+      <section>
+        <h2>Radio group</h2>
+        <div className="choices">
+          <RadioGroup
+            label="Plan"
+            name="plan-demo"
+            value={plan}
+            onValueChange={setPlan}
+            items={[
+              { value: 'free', label: 'Free' },
+              { value: 'pro', label: 'Pro' },
+              { value: 'team', label: 'Team (contact sales)', disabled: true },
+            ]}
+          />
+          <RadioGroup
+            label="Billing"
+            orientation="horizontal"
+            defaultValue="monthly"
+            items={[
+              { value: 'monthly', label: 'Monthly' },
+              { value: 'yearly', label: 'Yearly' },
+            ]}
+          />
+        </div>
+        <pre className="state">{`value  ${JSON.stringify(plan)}`}</pre>
+      </section>
+
+      <section>
         <h2>Field — invalid declared by the owner</h2>
         <div className="row">
           <Field label="Username" hint="Letters and digits" error="That username is taken" invalid={taken}>
@@ -226,6 +295,19 @@ function App() {
           </Field>
           <Field label="Password" hint="At least 8 characters" error="Use 8 or more characters" required>
             <Input name="password" type="password" minLength={8} />
+          </Field>
+          <RadioGroup
+            label="Plan"
+            name="plan"
+            orientation="horizontal"
+            defaultValue="free"
+            items={[
+              { value: 'free', label: 'Free' },
+              { value: 'pro', label: 'Pro' },
+            ]}
+          />
+          <Field error="Accept the terms to continue" required>
+            <Checkbox name="terms">I accept the terms</Checkbox>
           </Field>
           <Field label="About you" hint="Optional, up to 280 characters">
             <Textarea name="about" rows={2} maxLength={280} autoResize maxRows={6} />
