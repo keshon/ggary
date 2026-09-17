@@ -130,6 +130,12 @@ const pairs: Pair[] = [
   // 1.3 to 1.4:1. The load-bearing contrast is the arc on its ground.
   { label: 'spinner: arc on the panel', fg: '--accent-mark', bg: ['--surface-raised'], min: large },
   { label: 'spinner: arc on the page', fg: '--accent-mark', bg: ['--surface-page'], min: large },
+  { label: 'segmented: resting label on the track', fg: '--text-secondary', bg: ['--surface-page', '--surface-recessed'], min: text },
+  { label: 'segmented: chosen label', fg: '--text-primary', bg: ['--surface-page', '--surface-recessed', '--surface-raised'], min: text },
+  { label: 'slider: fill on the panel', fg: '--accent-mark', bg: ['--surface-raised'], min: large },
+  { label: 'slider: thumb on the page', fg: '--accent-mark', bg: ['--surface-page'], min: large },
+  { label: 'slider: value beside the track', fg: '--text-primary', bg: ['--surface-raised'], min: text },
+  { label: 'number field: axis letter', fg: '--text-muted', bg: ['--surface-raised', '--surface-field'], min: text },
   { label: 'region: support title on the recess', fg: '--text-muted', bg: ['--surface-page', '--surface-recessed'], min: text },
   { label: 'banner: detail on a plain ground', fg: '--text-secondary', bg: ['--surface-page', '--surface-sunken'], min: text },
   { label: 'banner: detail on the error ground', fg: '--text-secondary', bg: ['--surface-page', '--err-bg'], min: text },

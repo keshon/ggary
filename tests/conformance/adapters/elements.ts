@@ -1,5 +1,5 @@
 import '../../../packages/elements/src/index'
-import type { GgAvatarGroupElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
+import type { GgAvatarGroupElement, GgNumberFieldElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
 import {
   type Adapter,
   type ButtonProps,
@@ -12,6 +12,9 @@ import {
   type CheckboxProps,
   type SwitchProps,
   type RadioGroupProps,
+  type SegmentedControlProps,
+  type SliderProps,
+  type NumberFieldProps,
   type DialogProps,
   type CheckboxGroupProps,
   type FieldsetProps,
@@ -122,6 +125,77 @@ async function mountChoice(tag: 'gg-checkbox' | 'gg-switch', props: CheckboxProp
     },
     unmount: async () => host.remove(),
   } satisfies Mounted<CheckboxProps>)
+}
+
+/** <gg-segmented-control> around native radios, as server markup renders them. */
+function segmentedHost(props: SegmentedControlProps): HTMLElement {
+  const host = document.createElement('gg-segmented-control')
+  for (const item of props.items) {
+    const label = document.createElement('label')
+    const input = document.createElement('input')
+    input.type = 'radio'
+    input.value = item.value
+    setAttr(input, 'checked', item.value === props.defaultValue)
+    setAttr(input, 'disabled', item.disabled)
+    label.append(input, item.label)
+    host.append(label)
+  }
+  return host
+}
+
+function applySegmentedHost(host: HTMLElement, props: Partial<SegmentedControlProps>) {
+  for (const key of ['label', 'name', 'size', 'disabled', 'required'] as const) {
+    if (key in props) setAttr(host, key, props[key])
+  }
+  if ('fullWidth' in props) setAttr(host, 'full-width', props.fullWidth)
+}
+
+/** <gg-slider> around a native range input. */
+function sliderHost(props: SliderProps): HTMLElement {
+  const host = document.createElement('gg-slider')
+  const input = document.createElement('input')
+  input.type = 'range'
+  setAttr(input, 'min', props.min)
+  setAttr(input, 'max', props.max)
+  setAttr(input, 'step', props.step)
+  setAttr(input, 'name', props.name)
+  const start = props.value ?? props.defaultValue
+  if (start !== undefined) input.value = String(start)
+  host.append(input)
+  return host
+}
+
+function applySliderHost(host: HTMLElement, props: Partial<SliderProps>) {
+  for (const key of ['label', 'size', 'disabled', 'required', 'invalid'] as const) {
+    if (key in props) setAttr(host, key, props[key])
+  }
+  if ('showValue' in props) setAttr(host, 'show-value', props.showValue)
+  if ('valueText' in props) setAttr(host, 'value-text', props.valueText)
+  if (props.value !== undefined) (host as GgSliderElement).value = props.value
+}
+
+/** <gg-number-field> around a native number input. */
+function numberHost(props: NumberFieldProps): HTMLElement {
+  const host = document.createElement('gg-number-field')
+  const input = document.createElement('input')
+  input.type = 'number'
+  setAttr(input, 'min', props.min)
+  setAttr(input, 'max', props.max)
+  setAttr(input, 'step', props.step)
+  setAttr(input, 'name', props.name)
+  setAttr(input, 'placeholder', props.placeholder)
+  const start = props.value === undefined ? props.defaultValue : props.value
+  if (start !== undefined && start !== null) input.value = String(start)
+  host.append(input)
+  return host
+}
+
+function applyNumberHost(host: HTMLElement, props: Partial<NumberFieldProps>) {
+  for (const key of ['axis', 'label', 'size', 'disabled', 'required', 'invalid'] as const) {
+    if (key in props) setAttr(host, key, props[key])
+  }
+  if ('readOnly' in props) setAttr(host, 'readonly', props.readOnly)
+  if (props.value !== undefined) (host as GgNumberFieldElement).value = props.value
 }
 
 function applyRadioHost(host: HTMLElement, props: Partial<RadioGroupProps>) {
@@ -319,6 +393,42 @@ export const elements: Adapter = {
       update: async (patch) => applyRadioHost(host, patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<RadioGroupProps>)
+  },
+
+  async segmentedControl(props, target) {
+    const host = segmentedHost(props)
+    applySegmentedHost(host, props)
+    if (props.onValueChange) host.addEventListener('valuechange', (e) => props.onValueChange!((e as CustomEvent).detail.value))
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applySegmentedHost(host, patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<SegmentedControlProps>)
+  },
+
+  async slider(props, target) {
+    const host = sliderHost(props)
+    applySliderHost(host, props)
+    if (props.onValueChange) host.addEventListener('valuechange', (e) => props.onValueChange!((e as CustomEvent).detail.value))
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applySliderHost(host, patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<SliderProps>)
+  },
+
+  async numberField(props, target) {
+    const host = numberHost(props)
+    applyNumberHost(host, props)
+    if (props.onValueChange) host.addEventListener('valuechange', (e) => props.onValueChange!((e as CustomEvent).detail.value))
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applyNumberHost(host, patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<NumberFieldProps>)
   },
 
   async checkboxGroup(props, target) {
@@ -739,6 +849,12 @@ export const elements: Adapter = {
     if (props.checkbox || props.switch) {
       const tag = props.checkbox ? 'gg-checkbox' : 'gg-switch'
       host.append(choiceHost(tag, (props.checkbox ?? props.switch) as CheckboxProps).host)
+    } else if (props.slider) {
+      host.append(sliderHost(props.slider))
+      applySliderHost(host.lastElementChild as HTMLElement, props.slider)
+    } else if (props.numberField) {
+      host.append(numberHost(props.numberField))
+      applyNumberHost(host.lastElementChild as HTMLElement, props.numberField)
     } else if (props.textarea) {
       // Through a <gg-textarea>, which stands down and hands its attributes to the field.
       const wrapper = document.createElement('gg-textarea')

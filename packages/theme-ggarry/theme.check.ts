@@ -58,6 +58,16 @@ const pairs: Pair[] = [
   // The arc against the surface, not the track: the arc says busy, the track only draws the circle.
   { label: 'spinner: arc on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'skeleton: bar off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'segmented: resting label on the track', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'segmented: label on its hover plate', fg: '--ggarry-text-default', bg: ['--ggarry-bg-muted'], min: TEXT },
+  { label: 'segmented: chosen label', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'segmented: disabled label on the track', fg: '--ggarry-text-subtle', bg: ['--ggarry-bg-subtle'], min: LARGE },
+  // The unfilled track and the thumb's ring are the slider's boundary: 3:1.
+  { label: 'slider: unfilled track on surface', fg: '--ggarry-border-control', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'slider: fill on surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'slider: thumb ring on its white', fg: '--ggarry-bg-accent', bg: ['--ggarry-color-white'], min: LARGE },
+  { label: 'number field: axis letter on surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'number field: readonly value', fg: '--ggarry-text-default', bg: ['--ggarry-bg-subtle'], min: TEXT },
   { label: 'region: support title on its ground', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
   { label: 'banner: detail on a plain ground', fg: '--ggarry-text-default', bg: ['--ggarry-bg-subtle'], min: TEXT },
   { label: 'banner: detail on the running ground', fg: '--ggarry-text-default', bg: ['--ggarry-bg-accent-subtle'], min: TEXT },

@@ -2,11 +2,11 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Thirty components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
-Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Tabs, Dialog, Sheet,
-Popover, Tooltip, Toast, Menu, Menubar, Badge, Avatar, AvatarGroup, Spinner,
-Skeleton, Card, Panel, Banner, Note and EmptyState — built end to end to prove the
-architecture holds.
+Thirty-three components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
+Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, SegmentedControl, Slider,
+NumberField, Tabs, Dialog, Sheet, Popover, Tooltip, Toast, Menu, Menubar, Badge,
+Avatar, AvatarGroup, Spinner, Skeleton, Card, Panel, Banner, Note and EmptyState —
+built end to end to prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -16,7 +16,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 1915 tests, 756 of them in headless Chrome
+npm test         # 2059 tests, 821 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -42,12 +42,14 @@ packages/
                      <gg-popover>, <gg-tooltip>, <gg-menu>, <gg-menubar>, <gg-fieldset>,
                      <gg-checkbox-group>, <gg-tabs>, <gg-toaster>, <gg-badge>, <gg-avatar>,
                      <gg-avatar-group>, <gg-spinner>, <gg-skeleton>, <gg-card>, <gg-panel>,
-                     <gg-banner>, <gg-note>, <gg-empty-state>
+                     <gg-banner>, <gg-note>, <gg-empty-state>, <gg-segmented-control>,
+                     <gg-slider>, <gg-number-field>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
                      <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Sheet>, <Popover>, <Tooltip>,
                      <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>, <Tabs>, <Toaster>,
                      <Badge>, <Avatar>, <AvatarGroup>, <Spinner>, <Skeleton>, <Card>,
-                     <Panel>, <Banner>, <Note>, <EmptyState>
+                     <Panel>, <Banner>, <Note>, <EmptyState>, <SegmentedControl>,
+                     <Slider>, <NumberField>
   svelte/            the same components as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
@@ -951,6 +953,80 @@ Found on the way:
   instead. The banner's 75ch measure moved from its body to its lines, so the body
   still fills the row and the actions sit at its end.
 
+## SegmentedControl, Slider and NumberField
+
+Three controls where the platform already has the behaviour, so the kit's job is
+to stop reimplementing it.
+
+```tsx
+<SegmentedControl label="View mode" items={views} value={view} onValueChange={setView} />
+<Slider label="Parallel agents" min={0} max={16} value={agents} onValueChange={setAgents} showValue
+        formatValue={(n) => `${n} agents`} />
+<NumberField axis="X" label="Position X" value={x} onValueChange={setX} />
+```
+
+```html
+<gg-segmented-control label="View mode" name="view">
+  <label><input type="radio" value="list" checked> List</label>
+  <label><input type="radio" value="grid"> Grid</label>
+</gg-segmented-control>
+
+<gg-slider label="Parallel agents" show-value><input type="range" min="0" max="16" value="6"></gg-slider>
+<gg-number-field axis="X" label="Position X"><input type="number" name="x" value="128"></gg-number-field>
+```
+
+- **SegmentedControl is native radios.** One value among equals is a radio group,
+  so that is what it is: radios sharing a name are one tab stop, the arrow keys
+  move and choose, and the value submits with the form — no roving tabindex, no
+  key handling, nothing in core but the attribute contract. Instrument builds the
+  same control from buttons with `role="radio"` and a script; the radios make the
+  script unnecessary. Each radio covers its whole segment, transparent, so a press
+  anywhere on the segment lands on the input; the segment draws the focus ring
+  through `:has(> input:focus-visible)`. The chosen segment is a surface and a
+  border, never colour alone, and it keeps its weight: Instrument measured a
+  bolder label moving the width of the whole track by half a pixel.
+- **Slider is a native range input.** The keyboard, the step, the `slider` role
+  and the value announcement are the platform's. Two things are not. The track is
+  filled up to the thumb — CSS cannot read an input's value, so `connect` hands
+  the share to the theme as `--slider-fill` on the root, a data channel, as
+  Instrument's `--fill` was. And the number beside the track is an `<output>` tied
+  to the input by `for`, but `aria-hidden`: an output is a live region, and the
+  slider already announces its value at every step. `formatValue` puts the value
+  into words — "6 agents" — for both the output and `aria-valuetext`.
+- **NumberField is a native number input** with the letter of an axis before it.
+  The letter is a drag handle, not a `<label>`: as a label it would become the
+  field's entire accessible name, "X" instead of "Position X". Dragging it
+  sideways moves the value, Shift ×10 and Alt ×0.1 (`utils/scrub`); the spin
+  buttons are removed by styling and the arrow keys are untouched. The wrapper is
+  the visible control, so the focus ring goes round the letter and the digits
+  together.
+
+All three take an enclosing Field's label, ids and description; inside one they
+carry no `aria-label` of their own. `<gg-field>` pushes its control props into
+`<gg-slider>` and `<gg-number-field>` with `applyField()`, the way it already
+does for a checkbox: these are several parts, not one element's attributes.
+
+Two things this wave added to core itself:
+
+- **`style` is a canonical prop**, an object of custom properties. React takes the
+  object as it is, and the Svelte and DOM normalizers turn it into declaration
+  text. It exists for data channels such as the slider's fill — never for a look.
+- **`utils/scrub`.** `scrubValue()` is the arithmetic, tested without a DOM: two
+  pixels to a step, the modifiers, and the float tail cut at the step's precision
+  (0.1 + 0.2 is otherwise 0.30000000000000004). `attachScrub()` is the gesture.
+  It writes the value through `HTMLInputElement.prototype`'s own setter and then
+  dispatches `input`, which is the only way React's controlled input hears a
+  change it did not cause — and Svelte's `bind:value` hears it too.
+
+Found on the way:
+
+- **A number field cannot be a controlled input in React's sense.** Typing "1."
+  holds no new number, and writing the owner's `1` straight back would eat the dot
+  under the caret. The owner's value is written to the element only when it
+  differs from the number the input already holds.
+- **`PageUp` does not step a number input** — that is a range input's behaviour. A
+  browser test claimed it and failed, which is what a browser test is for.
+
 ## Layering inside core
 
 ```
@@ -1155,19 +1231,20 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 185 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers. |
-| contract | node | `icons.contract.test.ts` | 176 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 189 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers. |
+| contract | node | `icons.contract.test.ts` | 191 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 714 tests, 16 of them skipped where an adapter cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 774 tests, 19 of them skipped where an adapter cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 714 tests, 13 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 774 tests, 16 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
 | browser | Chrome | `tabs.browser.test.ts` | 4 tests. One tab stop under the real Tab key, vertical tabs beside their panel, a long strip scrolling to the focused tab, a real click closing a tab without losing focus. |
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
+| browser | Chrome | `controls.browser.test.ts` | 5 tests. One tab stop and the arrow keys on a segmented control, a radio really covering its segment, a range input stepped by the keyboard with the fill following as a computed property, and a real pointer dragging an axis letter under capture. |
 | browser | Chrome | `display.browser.test.ts` | 3 tests. An avatar's picture really loading over the initials, a broken one removed, and a picture not drawn while it loads. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 | dom | jsdom | `svelte-bind.dom.test.ts` | 3 tests. `bind:value` on Select, ChipGroup, RadioGroup and CheckboxGroup writes back to the owner and follows it. |
@@ -1274,6 +1351,11 @@ Real, and deliberately left open:
   prose, the rest of forms (number field, slider, choice cards), tables,
   the agent components (including the composer, a textarea with a toolbar in one
   frame) and print styles.
+- **A segmented control cannot be links.** Instrument's variant carries the state
+  on `aria-current="page"` when the options are addresses. Here the options are
+  radios, so a row of links is a nav, not this component.
+- **The slider is one value.** No second thumb, and no range; a pair of number
+  fields says "from" and "to" better anyway.
 - **Instrument's Tag is Chip.** A static chip is a tag, so there is no separate
   component.
 - **`<gg-card>` cannot be a link card.** A custom element cannot become an `<a>`.

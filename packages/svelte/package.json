@@ -122,6 +122,18 @@
     "./tooltip": {
       "svelte": "./src/components/tooltip/index.ts",
       "default": "./src/components/tooltip/index.ts"
+    },
+    "./number-field": {
+      "svelte": "./src/components/number-field/index.ts",
+      "default": "./src/components/number-field/index.ts"
+    },
+    "./segmented-control": {
+      "svelte": "./src/components/segmented-control/index.ts",
+      "default": "./src/components/segmented-control/index.ts"
+    },
+    "./slider": {
+      "svelte": "./src/components/slider/index.ts",
+      "default": "./src/components/slider/index.ts"
     }
   },
   "peerDependencies": {

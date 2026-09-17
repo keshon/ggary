@@ -2,8 +2,8 @@ import './theme'
 import './shared.css'
 import '@ggary/elements'
 import { toast } from '@ggary/elements'
-import type { GgAvatarGroupElement, GgCheckboxElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
-import { badgeTones, people, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import type { GgAvatarGroupElement, GgCheckboxElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
+import { agentsText, badgeTones, densities, people, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
 
@@ -423,6 +423,54 @@ app.innerHTML = `
     <p class="hint">A menu button: arrows walk every item, disabled ones too, and wrap; a letter jumps to an item; Enter or a click chooses. The view menu stays open while you toggle: the page owns the state and passes new items back.</p>
   </section>
 
+  <section id="controls">
+    <h2>Segmented control</h2>
+    <div class="row" style="align-items: center">
+      <gg-segmented-control id="view-mode" label="View mode" name="view">
+        ${viewModes
+          .map(
+            (mode) =>
+              `<label><input type="radio" value="${mode.value}"${mode.value === 'list' ? ' checked' : ''}${mode.disabled ? ' disabled' : ''}> ${mode.label}</label>`
+          )
+          .join('')}
+      </gg-segmented-control>
+      <gg-segmented-control id="density-control" label="Row density" size="sm">
+        ${densities
+          .map((item) => `<label><input type="radio" value="${item.value}"${item.value === 'regular' ? ' checked' : ''}> ${item.label}</label>`)
+          .join('')}
+      </gg-segmented-control>
+    </div>
+    <pre class="state" id="controls-state">—</pre>
+    <p class="hint">A segmented control is native radios: one Tab stop, the arrow keys move and choose, the value submits with the form. The chosen segment is a surface and a border, never colour alone, and its weight does not change — a bolder label would shift the segments after it.</p>
+
+    <h2 style="margin-top: 32px">Slider</h2>
+    <div class="controls">
+      <gg-slider id="agents-slider" label="Parallel agents" show-value>
+        <input type="range" name="agents" min="0" max="16" step="1" value="6">
+      </gg-slider>
+      <gg-field label="Confidence threshold" hint="Below it the agent asks before acting">
+        <gg-slider show-value>
+          <input type="range" name="confidence" min="0" max="100" step="5" value="80">
+        </gg-slider>
+      </gg-field>
+    </div>
+    <p class="hint">A native range input: the keys, the step and the announcement are the platform’s. The track is filled up to the thumb, which CSS cannot do by itself, so the share is handed to the theme as a custom property. The number beside it is hidden from screen readers, which already hear the value.</p>
+
+    <h2 style="margin-top: 32px">Number field</h2>
+    <div class="vector">
+      <gg-number-field axis="X" label="Position X"><input type="number" name="x" value="128" step="1"></gg-number-field>
+      <gg-number-field axis="Y" label="Position Y"><input type="number" name="y" value="0" step="1"></gg-number-field>
+      <gg-number-field axis="Z" label="Position Z"><input type="number" name="z" value="-64" step="1"></gg-number-field>
+    </div>
+    <div class="controls">
+      <gg-field label="Opacity" hint="Between 0 and 1, in hundredths">
+        <gg-number-field size="sm"><input type="number" name="opacity" value="0.5" step="0.01" min="0" max="1"></gg-number-field>
+      </gg-field>
+    </div>
+    <pre class="state" id="number-state">—</pre>
+    <p class="hint">Drag the axis letter sideways to change the number — Shift is ten times faster, Alt a tenth. The letter is a handle, not a label: each field is named "Position X" in full, because three squares marked X, Y and Z say nothing on their own.</p>
+  </section>
+
   <section id="display">
     <h2>Badge, Avatar, Spinner and Skeleton</h2>
     <div class="row" style="align-items: center">
@@ -714,3 +762,25 @@ document.getElementById('queue-card')!.addEventListener('click', () => {
 // Unprevented, a dismissed banner hides itself; showing it again is the page's.
 const diskBanner = document.getElementById('disk-banner')!
 document.getElementById('banner-restore')!.addEventListener('click', () => diskBanner.removeAttribute('hidden'))
+
+
+// --- controls ----------------------------------------------------------------------
+const controlsState = document.getElementById('controls-state')!
+for (const id of ['view-mode', 'density-control']) {
+  document.getElementById(id)!.addEventListener('valuechange', (event) => {
+    controlsState.textContent = `${id} is ${(event as CustomEvent).detail.value}`
+  })
+}
+// The words beside the thumb are the page's: the kit shows the number.
+;(document.getElementById('agents-slider') as GgSliderElement).formatValue = agentsText
+
+const numberState = document.getElementById('number-state')!
+const position: Record<string, string> = { x: '128', y: '0', z: '-64' }
+for (const field of document.querySelectorAll('gg-number-field')) {
+  field.addEventListener('valuechange', (event) => {
+    const input = field.querySelector('input')!
+    if (!input.name) return
+    position[input.name] = String((event as CustomEvent).detail.value ?? '')
+    numberState.textContent = `x ${position.x}  y ${position.y}  z ${position.z}`
+  })
+}

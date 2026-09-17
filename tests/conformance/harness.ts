@@ -127,6 +127,54 @@ export interface RadioGroupProps {
   invalid?: boolean
 }
 
+export interface SegmentedControlProps {
+  items: RadioItem[]
+  label: string
+  name?: string
+  value?: string | null
+  defaultValue?: string | null
+  onValueChange?: (value: string) => void
+  size?: 'sm' | 'md'
+  disabled?: boolean
+  required?: boolean
+  fullWidth?: boolean
+}
+
+export interface SliderProps {
+  value?: number
+  defaultValue?: number
+  onValueChange?: (value: number) => void
+  min?: number
+  max?: number
+  step?: number
+  name?: string
+  label?: string
+  valueText?: string
+  showValue?: boolean
+  size?: 'sm' | 'md'
+  disabled?: boolean
+  required?: boolean
+  invalid?: boolean
+}
+
+export interface NumberFieldProps {
+  value?: number | null
+  defaultValue?: number | null
+  onValueChange?: (value: number | null) => void
+  min?: number
+  max?: number
+  step?: number
+  name?: string
+  label?: string
+  axis?: string
+  placeholder?: string
+  size?: 'sm' | 'md'
+  disabled?: boolean
+  readOnly?: boolean
+  required?: boolean
+  invalid?: boolean
+}
+
 export interface CheckboxGroupProps {
   items: RadioItem[]
   name?: string
@@ -342,6 +390,8 @@ export interface FieldProps {
   readOnly?: boolean
   input?: InputProps
   textarea?: TextareaProps
+  slider?: SliderProps
+  numberField?: NumberFieldProps
   checkbox?: CheckboxProps
   switch?: SwitchProps
 }
@@ -393,6 +443,9 @@ export interface Adapter {
   checkbox(props: CheckboxProps, target: HTMLElement): Promise<Mounted<CheckboxProps>>
   switch(props: SwitchProps, target: HTMLElement): Promise<Mounted<SwitchProps>>
   radioGroup(props: RadioGroupProps, target: HTMLElement): Promise<Mounted<RadioGroupProps>>
+  segmentedControl(props: SegmentedControlProps, target: HTMLElement): Promise<Mounted<SegmentedControlProps>>
+  slider(props: SliderProps, target: HTMLElement): Promise<Mounted<SliderProps>>
+  numberField(props: NumberFieldProps, target: HTMLElement): Promise<Mounted<NumberFieldProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
   /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */
   fieldset(props: FieldsetProps, target: HTMLElement): Promise<Mounted<FieldsetProps>>

@@ -18,12 +18,15 @@
     Menu,
     Menubar,
     Note,
+    NumberField,
     Panel,
     Popover,
     RadioGroup,
     Select,
+    SegmentedControl,
     Sheet,
     Skeleton,
+    Slider,
     Spinner,
     Switch,
     Tabs,
@@ -32,12 +35,16 @@
     toast,
     Tooltip,
   } from '@ggary/svelte'
-  import { badgeTones, people, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { agentsText, badgeTones, densities, people, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
   let refreshes = $state(0)
   let diskBanner = $state(true)
+  let viewMode = $state('list')
+  let density = $state('regular')
+  let agents = $state(6)
+  let position = $state({ x: 128, y: 0, z: -64 })
   let items = $state(tags)
   let selection = $state<string[]>(['design'])
   let formOutput = $state('submit to see the FormData the hidden input contributes')
@@ -628,6 +635,39 @@ invalid  ${taken}`}</pre>
   </div>
   <pre class="state">{menuLog}</pre>
   <p class="hint">A menu button: arrows walk every item, disabled ones too, and wrap; a letter jumps to an item; Enter or a click chooses. The view menu stays open while you toggle: the page owns the state and passes new items back.</p>
+</section>
+
+<section id="controls">
+  <h2>Segmented control</h2>
+  <div class="row" style="align-items: center">
+    <SegmentedControl items={viewModes} label="View mode" bind:value={viewMode} />
+    <SegmentedControl items={densities} label="Row density" size="sm" bind:value={density} />
+  </div>
+  <pre class="state">view mode is {viewMode}, density is {density}</pre>
+  <p class="hint">A segmented control is native radios: one Tab stop, the arrow keys move and choose, the value submits with the form. The chosen segment is a surface and a border, never colour alone, and its weight does not change — a bolder label would shift the segments after it.</p>
+
+  <h2 style="margin-top: 32px">Slider</h2>
+  <div class="controls">
+    <Slider label="Parallel agents" min={0} max={16} bind:value={agents} showValue formatValue={agentsText} />
+    <Field label="Confidence threshold" hint="Below it the agent asks before acting">
+      <Slider min={0} max={100} step={5} defaultValue={80} showValue />
+    </Field>
+  </div>
+  <p class="hint">A native range input: the keys, the step and the announcement are the platform’s. The track is filled up to the thumb, which CSS cannot do by itself, so the share is handed to the theme as a custom property. The number beside it is hidden from screen readers, which already hear the value.</p>
+
+  <h2 style="margin-top: 32px">Number field</h2>
+  <div class="vector">
+    <NumberField axis="X" label="Position X" bind:value={position.x} />
+    <NumberField axis="Y" label="Position Y" bind:value={position.y} />
+    <NumberField axis="Z" label="Position Z" bind:value={position.z} />
+  </div>
+  <div class="controls">
+    <Field label="Opacity" hint="Between 0 and 1, in hundredths">
+      <NumberField size="sm" step={0.01} min={0} max={1} defaultValue={0.5} />
+    </Field>
+  </div>
+  <pre class="state">x {position.x}  y {position.y}  z {position.z}</pre>
+  <p class="hint">Drag the axis letter sideways to change the number — Shift is ten times faster, Alt a tenth. The letter is a handle, not a label: each field is named "Position X" in full, because three squares marked X, Y and Z say nothing on their own.</p>
 </section>
 
 <section id="display">

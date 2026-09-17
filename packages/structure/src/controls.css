@@ -1,0 +1,124 @@
+/* SegmentedControl, Slider and NumberField: the layout each needs whatever
+   the theme. All three are native inputs underneath; this file only arranges
+   the parts around them. */
+
+/* --- segmented control ------------------------------------------------------ */
+
+[data-scope='segmented-control'][data-part='root'] {
+  display: inline-flex;
+  align-items: stretch;
+  max-inline-size: 100%;
+  vertical-align: middle;
+}
+[data-scope='segmented-control'][data-part='root'][data-full-width] {
+  display: flex;
+}
+[data-scope='segmented-control'][data-part='root'][data-full-width] > [data-part='item'] {
+  flex: 1 1 0;
+}
+
+[data-scope='segmented-control'][data-part='item'] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+[data-scope='segmented-control'][data-part='item'][data-disabled] {
+  cursor: not-allowed;
+}
+
+/* The radio covers its whole segment, transparent: a press anywhere on the
+   segment lands on the input itself, and the segment draws its focus. */
+[data-scope='segmented-control'][data-part='input'] {
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  border-radius: inherit;
+  cursor: inherit;
+}
+
+[data-scope='segmented-control'][data-part='text'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* --- slider -------------------------------------------------------------------- */
+
+[data-scope='slider'][data-part='root'] {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+}
+
+/* The native look is removed so a theme can draw the track and the thumb; the
+   behaviour — keys, step, value, role — stays the browser's. */
+[data-scope='slider'][data-part='input'] {
+  appearance: none;
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+[data-scope='slider'][data-part='input']:disabled {
+  cursor: not-allowed;
+}
+[data-scope='slider'][data-part='input']::-webkit-slider-thumb {
+  appearance: none;
+}
+
+[data-scope='slider'][data-part='output'] {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- number field ---------------------------------------------------------------- */
+
+/* The wrapper is the visible control; the input inside has no box of its own. */
+[data-scope='number-field'][data-part='root'] {
+  display: inline-flex;
+  align-items: stretch;
+  min-inline-size: 0;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+[data-scope='number-field'][data-part='axis'] {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  user-select: none;
+  /* A drag is a drag, not a scroll, on a touch screen. */
+  touch-action: none;
+}
+[data-scope='number-field'][data-part='axis'][data-scrub] {
+  cursor: ew-resize;
+}
+
+[data-scope='number-field'][data-part='input'] {
+  flex: 1 1 auto;
+  inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  /* The spin buttons go; the arrow keys and the step stay. */
+  appearance: textfield;
+}
+[data-scope='number-field'][data-part='input']::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+[data-scope='number-field'][data-part='input']::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}

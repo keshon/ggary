@@ -16,6 +16,17 @@ const ATTRIBUTE_NAMES: Record<string, string> = {
   inputMode: 'inputmode',
 }
 
+/**
+ * `style` is canonical as an object of custom properties — a data channel such
+ * as a slider's fill, never a look. React takes the object; an attribute needs
+ * the declaration text.
+ */
+const styleText = (style: Dict) =>
+  Object.entries(style)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([name, value]) => `${name}: ${value}`)
+    .join('; ')
+
 /** Drop `undefined` (absent) and `false` (absent boolean attribute). */
 const isAbsent = (v: unknown) => v === undefined || v === null || v === false
 
@@ -59,6 +70,7 @@ export const svelteNormalizer: Normalizer = (props: Dict) => {
   for (const [key, value] of Object.entries(props)) {
     if (isAbsentProp(key, value)) continue
     if (isHandler(key)) out[key.toLowerCase()] = value
+    else if (key === 'style' && typeof value === 'object') out.style = styleText(value)
     else out[ATTRIBUTE_NAMES[key] ?? key] = value
   }
   return out
@@ -83,7 +95,7 @@ export const domNormalizer: Normalizer<DomProps> = (props: Dict) => {
       continue
     }
     const name = ATTRIBUTE_NAMES[key] ?? key
-    attrs[name] = value === true ? '' : String(value)
+    attrs[name] = value === true ? '' : key === 'style' && typeof value === 'object' ? styleText(value) : String(value)
   }
   return { attrs, listeners }
 }

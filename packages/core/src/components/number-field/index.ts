@@ -1,0 +1,5 @@
+export { numberFieldAnatomy } from './number-field.anatomy'
+export type { NumberFieldPart } from './number-field.anatomy'
+export { connect, readNumber } from './number-field.connect'
+export type { NumberFieldConnectOptions } from './number-field.connect'
+export type { NumberFieldProps, NumberFieldSize } from './number-field.types'

@@ -1,0 +1,96 @@
+/* ==========================================================================
+   GGarry — slider
+
+   The track is filled up to the thumb: without the fill a slider says only
+   "there is a slider here", and a position on an even bar has to be judged
+   by eye. The fill is two solid zones with a shared edge, not a gradient.
+   The thumb is white with an accent ring, so it reads over both zones.
+   The box is 24px tall for the pointer, whatever the track's height.
+   ========================================================================== */
+
+[data-scope='slider'][data-part='root'] {
+  --slider-track: 4px;
+  --slider-thumb: 16px;
+  --slider-direction: to right;
+
+  gap: var(--ggarry-space-3);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-default);
+}
+[data-scope='slider'][data-part='root']:dir(rtl) {
+  --slider-direction: to left;
+}
+[data-scope='slider'][data-part='root'][data-size='sm'] {
+  --slider-thumb: 12px;
+}
+
+[data-scope='slider'][data-part='input'] {
+  block-size: 24px;
+}
+
+[data-scope='slider'][data-part='input']::-webkit-slider-runnable-track {
+  block-size: var(--slider-track);
+  border-radius: var(--ggarry-radius-full);
+  background: linear-gradient(var(--slider-direction),
+    var(--ggarry-bg-accent) 0 var(--slider-fill, 50%), var(--ggarry-border-control) var(--slider-fill, 50%) 100%);
+}
+[data-scope='slider'][data-part='input']::-moz-range-track {
+  block-size: var(--slider-track);
+  border-radius: var(--ggarry-radius-full);
+  background: linear-gradient(var(--slider-direction),
+    var(--ggarry-bg-accent) 0 var(--slider-fill, 50%), var(--ggarry-border-control) var(--slider-fill, 50%) 100%);
+}
+
+[data-scope='slider'][data-part='input']::-webkit-slider-thumb {
+  inline-size: var(--slider-thumb);
+  block-size: var(--slider-thumb);
+  margin-block-start: calc((var(--slider-track) - var(--slider-thumb)) / 2);
+  border: 2px solid var(--ggarry-bg-accent);
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-color-white);
+  box-shadow: var(--ggarry-shadow-sm);
+  transition: scale var(--ggarry-duration-fast) ease;
+}
+[data-scope='slider'][data-part='input']::-moz-range-thumb {
+  inline-size: var(--slider-thumb);
+  block-size: var(--slider-thumb);
+  box-sizing: border-box;
+  border: 2px solid var(--ggarry-bg-accent);
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-color-white);
+  box-shadow: var(--ggarry-shadow-sm);
+}
+[data-scope='slider'][data-part='input']:active:not(:disabled)::-webkit-slider-thumb {
+  scale: 1.15;
+}
+
+[data-scope='slider'][data-part='input'][data-invalid]::-webkit-slider-thumb {
+  border-color: var(--ggarry-border-danger);
+}
+[data-scope='slider'][data-part='input'][data-invalid]::-moz-range-thumb {
+  border-color: var(--ggarry-border-danger);
+}
+
+[data-scope='slider'][data-part='input']:disabled {
+  opacity: 0.55;
+}
+
+[data-scope='slider'][data-part='output'] {
+  min-inline-size: 3ch;
+  text-align: end;
+}
+
+@media (forced-colors: active) {
+  [data-scope='slider'][data-part='input']::-webkit-slider-runnable-track {
+    background: linear-gradient(var(--slider-direction), Highlight 0 var(--slider-fill, 50%), CanvasText var(--slider-fill, 50%) 100%);
+  }
+  [data-scope='slider'][data-part='input']::-webkit-slider-thumb {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='slider'][data-part='input']::-webkit-slider-thumb { transition: none; }
+}

@@ -1,0 +1,62 @@
+/* ==========================================================================
+   Instrument — segmented control
+
+   Ported from instrument/src/actions.css (.inst-segmented). Instrument's
+   control is buttons with role="radio" and a script; here it is native
+   radios, which is why nothing in this file knows about aria-checked.
+
+   The chosen segment carries TWO marks and neither is colour: a raised
+   surface and a ring of border. Weight carries no state — measured in the
+   source, a medium label moved the width of the whole track by half a pixel
+   depending on which segment was chosen.
+   ========================================================================== */
+
+[data-scope='segmented-control'][data-part='root'] {
+  --segmented-radius: var(--radius-control-md);
+  --segmented-inset: var(--space-1);
+
+  gap: var(--space-1);
+  padding: var(--segmented-inset);
+  background: var(--surface-recessed);
+  border-radius: var(--segmented-radius);
+  font-size: var(--text-sm);
+  line-height: var(--leading-ui);
+}
+
+[data-scope='segmented-control'][data-part='item'] {
+  min-block-size: calc(var(--control-h-md) - var(--space-2));
+  padding-inline: var(--control-pad-md);
+  /* Concentric: the track's radius less its padding, computed, so it holds in every density. */
+  border-radius: calc(var(--segmented-radius) - var(--segmented-inset));
+  color: var(--text-secondary);
+  transition: background var(--dur-1) var(--ease-out), color var(--dur-1) var(--ease-out);
+
+  &:hover:not([data-disabled]) { background: var(--surface-hover); color: var(--text-primary); }
+
+  &[data-state='checked'] {
+    background: var(--surface-raised);
+    color: var(--text-primary);
+    box-shadow: 0 0 0 var(--hairline) var(--border);
+  }
+
+  /* Transparency: the option stays visible, because WHICH one is unavailable matters. */
+  &[data-disabled] { opacity: 0.5; }
+}
+
+[data-scope='segmented-control'][data-part='root'][data-size='sm'] {
+  --segmented-radius: var(--radius-control-sm);
+
+  font-size: var(--text-xs);
+
+  & > [data-part='item'] {
+    min-block-size: calc(var(--control-h-sm) - var(--space-2));
+    padding-inline: var(--control-pad-sm);
+  }
+}
+
+/* The radio is invisible; the ring sits on the segment, inside the track. */
+[data-scope='segmented-control'][data-part='input']:focus-visible { outline: none; }
+[data-scope='segmented-control'][data-part='item']:has(> [data-part='input']:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 0;
+}

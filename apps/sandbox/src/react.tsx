@@ -22,12 +22,15 @@ import {
   Menu,
   Menubar,
   Note,
+  NumberField,
   Panel,
   Popover,
   RadioGroup,
   Select,
+  SegmentedControl,
   Sheet,
   Skeleton,
+  Slider,
   Spinner,
   Switch,
   Tabs,
@@ -36,13 +39,17 @@ import {
   toast,
   Tooltip,
 } from '@ggary/react'
-import { badgeTones, people, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, densities, people, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
   const [lastEvent, setLastEvent] = useState('—')
   const [refreshes, setRefreshes] = useState(0)
   const [diskBanner, setDiskBanner] = useState(true)
+  const [viewMode, setViewMode] = useState('list')
+  const [density, setDensity] = useState('regular')
+  const [agents, setAgents] = useState(6)
+  const [position, setPosition] = useState({ x: 128, y: 0, z: -64 })
   const [items, setItems] = useState(tags)
   const [selection, setSelection] = useState<string[]>(['design'])
   const [formOutput, setFormOutput] = useState('submit to see the FormData the hidden input contributes')
@@ -712,6 +719,45 @@ function App() {
         </div>
         <pre className="state">{menuLog}</pre>
         <p className="hint">A menu button: arrows walk every item, disabled ones too, and wrap; a letter jumps to an item; Enter or a click chooses. The view menu stays open while you toggle: the page owns the state and passes new items back.</p>
+      </section>
+
+      <section id="controls">
+        <h2>Segmented control</h2>
+        <div className="row" style={{ alignItems: 'center' }}>
+          <SegmentedControl items={viewModes} label="View mode" value={viewMode} onValueChange={setViewMode} />
+          <SegmentedControl items={densities} label="Row density" size="sm" value={density} onValueChange={setDensity} />
+        </div>
+        <pre className="state">{`view mode is ${viewMode}, density is ${density}`}</pre>
+        <p className="hint">A segmented control is native radios: one Tab stop, the arrow keys move and choose, the value submits with the form. The chosen segment is a surface and a border, never colour alone, and its weight does not change — a bolder label would shift the segments after it.</p>
+
+        <h2 style={{ marginTop: 32 }}>Slider</h2>
+        <div className="controls">
+          <Slider label="Parallel agents" min={0} max={16} value={agents} onValueChange={setAgents} showValue formatValue={agentsText} />
+          <Field label="Confidence threshold" hint="Below it the agent asks before acting">
+            <Slider min={0} max={100} step={5} defaultValue={80} showValue />
+          </Field>
+        </div>
+        <p className="hint">A native range input: the keys, the step and the announcement are the platform’s. The track is filled up to the thumb, which CSS cannot do by itself, so the share is handed to the theme as a custom property. The number beside it is hidden from screen readers, which already hear the value.</p>
+
+        <h2 style={{ marginTop: 32 }}>Number field</h2>
+        <div className="vector">
+          {(['x', 'y', 'z'] as const).map((axis) => (
+            <NumberField
+              key={axis}
+              axis={axis.toUpperCase()}
+              label={`Position ${axis.toUpperCase()}`}
+              value={position[axis]}
+              onValueChange={(next) => setPosition((current) => ({ ...current, [axis]: next ?? 0 }))}
+            />
+          ))}
+        </div>
+        <div className="controls">
+          <Field label="Opacity" hint="Between 0 and 1, in hundredths">
+            <NumberField size="sm" step={0.01} min={0} max={1} defaultValue={0.5} />
+          </Field>
+        </div>
+        <pre className="state">{`x ${position.x}  y ${position.y}  z ${position.z}`}</pre>
+        <p className="hint">Drag the axis letter sideways to change the number — Shift is ten times faster, Alt a tenth. The letter is a handle, not a label: each field is named "Position X" in full, because three squares marked X, Y and Z say nothing on their own.</p>
       </section>
 
       <section id="display">

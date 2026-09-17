@@ -1,0 +1,72 @@
+/* ==========================================================================
+   Instrument — slider
+
+   Ported from instrument/src/forms.css (.inst-slider). The box is --tap-min
+   tall for a finger; the track is --size-track, centred by the browser.
+
+   THE FILL. --slider-fill is a data channel set by core from the value, as
+   --fill was in the source; it is not styling and not an override point.
+   Two solid zones with a shared edge, not a gradient: the stops coincide.
+
+   The thumb carries a ring the colour of the surface, so it stays legible
+   where it rides over the filled part of its own track.
+   ========================================================================== */
+
+[data-scope='slider'][data-part='root'] {
+  --slider-direction: to right;
+
+  gap: var(--gap-inline);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+
+  &:dir(rtl) { --slider-direction: to left; }
+}
+
+[data-scope='slider'][data-part='input'] {
+  block-size: var(--tap-min);
+
+  &::-webkit-slider-runnable-track {
+    block-size: var(--size-track);
+    border-radius: var(--radius-full);
+    background: linear-gradient(var(--slider-direction),
+      var(--accent-mark) 0 var(--slider-fill, 50%), var(--track) var(--slider-fill, 50%) 100%);
+    box-shadow: inset 0 0 0 var(--hairline) var(--border);
+  }
+  &::-moz-range-track {
+    block-size: var(--size-track);
+    border-radius: var(--radius-full);
+    background: linear-gradient(var(--slider-direction),
+      var(--accent-mark) 0 var(--slider-fill, 50%), var(--track) var(--slider-fill, 50%) 100%);
+    box-shadow: inset 0 0 0 var(--hairline) var(--border);
+  }
+  &::-webkit-slider-thumb {
+    inline-size: var(--size-thumb);
+    block-size: var(--size-thumb);
+    margin-block-start: calc((var(--size-track) - var(--size-thumb)) / 2);
+    border-radius: var(--radius-full);
+    background: var(--accent-mark);
+    box-shadow: 0 0 0 2px var(--surface-raised);
+    transition: scale var(--dur-1) var(--ease-out);
+  }
+  &::-moz-range-thumb {
+    inline-size: var(--size-thumb);
+    block-size: var(--size-thumb);
+    border: none;
+    border-radius: var(--radius-full);
+    background: var(--accent-mark);
+    box-shadow: 0 0 0 2px var(--surface-raised);
+  }
+  /* A press grows the thumb: a response to be felt rather than examined. */
+  &:active:not(:disabled)::-webkit-slider-thumb { scale: 1.15; }
+
+  &[data-invalid]::-webkit-slider-thumb { background: var(--err-text); }
+  &[data-invalid]::-moz-range-thumb { background: var(--err-text); }
+
+  &:disabled { opacity: 0.5; }
+}
+
+[data-scope='slider'][data-part='output'] {
+  min-inline-size: 3ch;
+  text-align: end;
+  color: var(--text-primary);
+}

@@ -209,6 +209,21 @@ export const openFiles: TabItem[] = [
 let untitled = 0
 export const newFile = (): TabItem => ({ value: `untitled-${++untitled}`, label: `untitled-${untitled}.css`, closable: true, modified: true })
 
+/** The segmented control's options, the same on every page. */
+export const viewModes = [
+  { value: 'list', label: 'List' },
+  { value: 'grid', label: 'Grid' },
+  { value: 'table', label: 'Table', disabled: true },
+]
+
+export const densities = [
+  { value: 'compact', label: 'Compact' },
+  { value: 'regular', label: 'Regular' },
+  { value: 'comfortable', label: 'Roomy' },
+]
+
+export const agentsText = (value: number) => `${value} ${value === 1 ? 'agent' : 'agents'}`
+
 /** People for the avatar group, the same on every page. Pictures are left out on purpose: the initials are the demo. */
 export const people = [
   { name: 'Ada Lovelace' },

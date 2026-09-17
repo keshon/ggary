@@ -1,0 +1,5 @@
+export { segmentedControlAnatomy } from './segmented-control.anatomy'
+export type { SegmentedControlPart } from './segmented-control.anatomy'
+export { connect } from './segmented-control.connect'
+export type { SegmentedControlConnectOptions } from './segmented-control.connect'
+export type { SegmentedControlProps, SegmentedControlSize, SegmentedItem } from './segmented-control.types'

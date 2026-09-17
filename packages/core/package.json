@@ -120,6 +120,18 @@
     "./tooltip": {
       "types": "./src/components/tooltip/index.ts",
       "default": "./src/components/tooltip/index.ts"
+    },
+    "./number-field": {
+      "types": "./src/components/number-field/index.ts",
+      "default": "./src/components/number-field/index.ts"
+    },
+    "./segmented-control": {
+      "types": "./src/components/segmented-control/index.ts",
+      "default": "./src/components/segmented-control/index.ts"
+    },
+    "./slider": {
+      "types": "./src/components/slider/index.ts",
+      "default": "./src/components/slider/index.ts"
     }
   },
   "dependencies": {

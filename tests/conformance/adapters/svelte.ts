@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, Button, Checkbox, CheckboxGroup, ChipGroup, Input, Menubar, RadioGroup, Select, Skeleton, Spinner, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, Button, Checkbox, CheckboxGroup, ChipGroup, Input, Menubar, NumberField, RadioGroup, SegmentedControl, Select, Skeleton, Slider, Spinner, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import DialogWithContent from './DialogWithContent.svelte'
 import PopoverWithContent from './PopoverWithContent.svelte'
@@ -77,6 +77,9 @@ export const svelte: Adapter = {
   checkbox: (props, target) => mountSvelte(Checkbox as Component<any>, props, target, withLabel),
   switch: (props, target) => mountSvelte(Switch as Component<any>, props, target, withLabel),
   radioGroup: (props, target) => mountSvelte(RadioGroup as Component<any>, props, target),
+  segmentedControl: (props, target) => mountSvelte(SegmentedControl as Component<any>, props, target),
+  slider: (props, target) => mountSvelte(Slider as Component<any>, props, target),
+  numberField: (props, target) => mountSvelte(NumberField as Component<any>, props, target),
   checkboxGroup: (props, target) => mountSvelte(CheckboxGroup as Component<any>, props, target),
   fieldset: (props, target) => mountSvelte(FieldsetWithGroup as Component<any>, props, target),
   // Snippets for the trigger, body and footer, as an app writes them.

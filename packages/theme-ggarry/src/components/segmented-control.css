@@ -1,0 +1,74 @@
+/* ==========================================================================
+   GGarry — segmented control
+
+   The track and the raised segment of the chip tabs, for one value among
+   equals. The chosen segment is a surface, a border and a shadow — never
+   colour alone — and it keeps its weight: a bolder label would widen the
+   segment and shift the ones after it every time the choice moves.
+   ========================================================================== */
+
+[data-scope='segmented-control'][data-part='root'] {
+  --segmented-radius: var(--ggarry-radius-lg);
+  --segmented-inset: var(--ggarry-space-1);
+
+  gap: var(--ggarry-space-1);
+  padding: var(--segmented-inset);
+  /* subtle, not muted: a resting muted label on muted is 4.34:1 in light mode. */
+  background: var(--ggarry-bg-subtle);
+  border-radius: var(--segmented-radius);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  line-height: 1.25;
+}
+
+[data-scope='segmented-control'][data-part='item'] {
+  min-block-size: var(--ggarry-size-control-sm);
+  padding-inline: var(--ggarry-space-3);
+  border: 1px solid transparent;
+  /* Concentric with the track: its radius less the padding between them. */
+  border-radius: max(2px, calc(var(--segmented-radius) - var(--segmented-inset)));
+  color: var(--ggarry-text-muted);
+  transition: background-color var(--ggarry-duration-fast) ease, color var(--ggarry-duration-fast) ease;
+}
+
+[data-scope='segmented-control'][data-part='root'][data-size='sm'] > [data-part='item'] {
+  min-block-size: calc(var(--ggarry-size-control-sm) - var(--ggarry-space-2));
+  padding-inline: var(--ggarry-space-2);
+  font-size: var(--ggarry-font-size-xs);
+}
+
+[data-scope='segmented-control'][data-part='item']:hover:not([data-disabled]):not([data-state='checked']) {
+  background: var(--ggarry-bg-muted);
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='segmented-control'][data-part='item'][data-state='checked'] {
+  background: var(--ggarry-bg-surface);
+  border-color: var(--ggarry-border-default);
+  box-shadow: var(--ggarry-shadow-sm);
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='segmented-control'][data-part='item'][data-disabled] {
+  color: var(--ggarry-text-subtle);
+}
+
+/* The radio is invisible, so the segment carries its focus. */
+[data-scope='segmented-control'][data-part='input']:focus-visible {
+  outline: none;
+}
+[data-scope='segmented-control'][data-part='item']:has(> [data-part='input']:focus-visible) {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+
+@media (forced-colors: active) {
+  [data-scope='segmented-control'][data-part='item'][data-state='checked'] {
+    border-color: Highlight;
+    color: Highlight;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='segmented-control'][data-part='item'] { transition: none; }
+}

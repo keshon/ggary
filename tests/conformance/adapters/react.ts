@@ -14,8 +14,11 @@ import {
   Input,
   Menu,
   Menubar,
+  NumberField,
   RadioGroup,
+  SegmentedControl,
   Select,
+  Slider,
   Switch,
   Tabs,
   Toaster,
@@ -107,6 +110,9 @@ export const react: Adapter = {
   checkbox: (props, target) => mount(Checkbox, props, target, ({ label, ...rest }: CheckboxProps) => [rest, label]),
   switch: (props, target) => mount(Switch, props, target, ({ label, ...rest }: CheckboxProps) => [rest, label]),
   radioGroup: (props, target) => mount(RadioGroup, props, target),
+  segmentedControl: (props, target) => mount(SegmentedControl, props, target),
+  slider: (props, target) => mount(Slider, props, target),
+  numberField: (props, target) => mount(NumberField, props, target),
   checkboxGroup: (props, target) => mount(CheckboxGroup, props, target),
   fieldset: (props, target) =>
     mount(Fieldset, props, target, ({ group, items, name, defaultValue, ...fieldset }: FieldsetProps) => [
@@ -176,6 +182,8 @@ export const react: Adapter = {
         const { label, ...rest } = (checkbox ?? switchProps)!
         return [field, createElement((checkbox ? Checkbox : Switch) as ComponentType<any>, rest, label)]
       }
+      if (props.slider) return [field, createElement(Slider, props.slider)]
+      if (props.numberField) return [field, createElement(NumberField, props.numberField)]
       return [field, textarea ? createElement(Textarea, textarea) : createElement(Input, input ?? {})]
     }),
 }

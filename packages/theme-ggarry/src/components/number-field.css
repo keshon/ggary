@@ -1,0 +1,83 @@
+/* ==========================================================================
+   GGarry — number field
+
+   The wrapper is the field: the border, the focus, the states. The input
+   inside has no box, so the axis letter and the number are one control to
+   the eye and to the hand, and the ring goes round both. The letter is muted
+   and brightens under the pointer, where it becomes a handle.
+
+   States follow input.css: disabled > invalid > focus > hover.
+   ========================================================================== */
+
+[data-scope='number-field'][data-part='root'] {
+  --number-height: var(--ggarry-size-control-md);
+
+  block-size: var(--number-height);
+  background: var(--ggarry-bg-surface);
+  border: 1px solid var(--ggarry-border-control);
+  border-radius: var(--ggarry-radius-md);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  transition: border-color var(--ggarry-duration-fast) ease, background-color var(--ggarry-duration-fast) ease;
+}
+[data-scope='number-field'][data-part='root'][data-size='sm'] {
+  --number-height: var(--ggarry-size-control-sm);
+  border-radius: var(--ggarry-radius-sm);
+  font-size: var(--ggarry-font-size-sm);
+}
+
+[data-scope='number-field'][data-part='root']:hover:not([data-disabled]):not([data-readonly]):not([data-invalid]) {
+  border-color: var(--ggarry-border-accent);
+}
+[data-scope='number-field'][data-part='root']:focus-within:not([data-invalid]) {
+  border-color: var(--ggarry-border-accent);
+}
+[data-scope='number-field'][data-part='root'][data-invalid] {
+  border-color: var(--ggarry-border-danger);
+}
+[data-scope='number-field'][data-part='root'][data-readonly]:not([data-disabled]) {
+  background: var(--ggarry-bg-subtle);
+  border-color: var(--ggarry-border-default);
+}
+[data-scope='number-field'][data-part='root'][data-disabled] {
+  opacity: 0.55;
+  background: var(--ggarry-bg-subtle);
+}
+
+/* The ring goes round the whole control, not the digits alone. */
+[data-scope='number-field'][data-part='input']:focus-visible {
+  outline: none;
+}
+[data-scope='number-field'][data-part='root']:has(> [data-part='input']:focus-visible) {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+
+[data-scope='number-field'][data-part='axis'] {
+  padding-inline: var(--ggarry-space-3) var(--ggarry-space-1);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+[data-scope='number-field'][data-part='axis'][data-scrub]:hover {
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='number-field'][data-part='input'] {
+  padding-inline: var(--ggarry-space-3);
+}
+[data-scope='number-field'][data-part='axis'] + [data-part='input'] {
+  padding-inline-start: var(--ggarry-space-1);
+}
+[data-scope='number-field'][data-part='input']::placeholder {
+  color: var(--ggarry-text-muted);
+  opacity: 1;
+}
+[data-scope='number-field'][data-part='input']:disabled {
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='number-field'][data-part='root'] { transition: none; }
+}

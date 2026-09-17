@@ -18,6 +18,7 @@ const TOKEN_LISTS = new Set(['aria-describedby', 'aria-labelledby', 'aria-contro
  *
  *   handlers           both run, in order
  *   id lists, class    joined, de-duplicated
+ *   style objects      merged, the later property wins
  *   an absent value    yields to a present one
  *   anything else      the later bag wins
  *
@@ -39,6 +40,8 @@ export function mergeProps(...bags: (Dict | undefined)[]): Dict {
           current(...args)
           value(...args)
         }
+      } else if (key === 'style' && typeof current === 'object' && typeof value === 'object') {
+        out[key] = { ...current, ...value }
       } else if (TOKEN_LISTS.has(key) && typeof current === 'string' && typeof value === 'string') {
         out[key] = [...new Set(`${current} ${value}`.split(/\s+/).filter(Boolean))].join(' ')
       } else {
