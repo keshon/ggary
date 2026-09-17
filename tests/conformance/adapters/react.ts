@@ -4,6 +4,7 @@ import {
   Button,
   Checkbox,
   ChipGroup,
+  Dialog,
   Field,
   Input,
   RadioGroup,
@@ -11,7 +12,7 @@ import {
   Switch,
   Textarea,
 } from '../../../packages/react/src/index'
-import { type Adapter, type ButtonProps, type CheckboxProps, type FieldProps, type Mounted, track } from '../harness'
+import { type Adapter, type ButtonProps, type CheckboxProps, type DialogProps, type FieldProps, type Mounted, track } from '../harness'
 
 /**
  * React: every render and every interaction goes through `act`, which flushes
@@ -68,6 +69,18 @@ export const react: Adapter = {
   checkbox: (props, target) => mount(Checkbox, props, target, ({ label, ...rest }: CheckboxProps) => [rest, label]),
   switch: (props, target) => mount(Switch, props, target, ({ label, ...rest }: CheckboxProps) => [rest, label]),
   radioGroup: (props, target) => mount(RadioGroup, props, target),
+  dialog: (props, target) =>
+    mount(Dialog, props, target, ({ trigger, triggerIsButton, body, footer, ...rest }: DialogProps) => [
+      {
+        ...rest,
+        trigger: trigger
+          ? (triggerProps: object) => createElement(triggerIsButton ? Button : 'button', triggerProps, trigger)
+          : undefined,
+        footer: footer ? createElement('button', { type: 'button' }, footer) : undefined,
+      },
+      createElement('p', null, body ?? 'Body'),
+      createElement('button', { type: 'button' }, 'Body action'),
+    ]),
   field: (props, target) =>
     mount(Field, props, target, ({ input, textarea, checkbox, switch: switchProps, ...field }: FieldProps) => {
       if (checkbox || switchProps) {

@@ -1,0 +1,41 @@
+/* The page stops scrolling under a modal dialog. showModal() makes the page
+   inert to pointers and focus, but a wheel still scrolls it, and the reader
+   comes back to a different place.
+
+   `:modal`, not `[open]`: a non-modal dialog is shown with show() and exists
+   precisely to leave the page usable. And scoped to the kit's dialogs, so an
+   application's own <dialog> keeps whatever it does.
+
+   If the document itself is what scrolls, its scrollbar leaves as the dialog
+   opens and the page shifts by that width; `scrollbar-gutter: stable` on html
+   reserves the room in advance. Not set here: on a page that never scrolls it
+   is an empty strip. */
+:root:has([data-scope='dialog'][data-part='content']:modal) {
+  overflow: hidden;
+}
+
+/* The UA's <dialog> box is a bordered, padded block; the parts lay it out. */
+[data-scope='dialog'][data-part='content'] {
+  padding: 0;
+  border: 0;
+}
+
+/* Only when open: a closed <dialog> is display: none, and a display set here
+   unconditionally would show every closed dialog on the page. */
+[data-scope='dialog'][data-part='content'][open] {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header and footer keep their size; the body scrolls between them when the
+   dialog reaches its maximum height. */
+[data-scope='dialog'][data-part='header'],
+[data-scope='dialog'][data-part='footer'] {
+  flex: none;
+}
+
+[data-scope='dialog'][data-part='body'] {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}

@@ -2,7 +2,7 @@ import './theme'
 import './shared.css'
 import '@ggary/elements'
 import type { GgCheckboxElement, GgChipGroupElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
-import { frameworks, tags } from './demo-data'
+import { frameworks, roles, tags, terms } from './demo-data'
 
 const app = document.getElementById('app')!
 
@@ -233,6 +233,52 @@ app.innerHTML = `
   </section>
 
   <section>
+    <h2>Dialog</h2>
+    <div class="row">
+      <gg-dialog id="edit-dialog" heading="Edit profile" description="Changes show on your public profile.">
+        <gg-button slot="trigger"><button>Edit profile</button></gg-button>
+        <div class="dialog-fields">
+          <gg-field label="Display name"><input value="Garry"></gg-field>
+          <gg-select id="role-select" label="Role" value="editor"></gg-select>
+          <gg-field label="Bio" hint="Optional"><gg-textarea autoresize max-rows="6"><textarea rows="3"></textarea></gg-textarea></gg-field>
+        </div>
+        <footer>
+          <form method="dialog">
+            <gg-button emphasis="minimal"><button value="cancel">Cancel</button></gg-button>
+            <gg-button emphasis="high"><button value="save">Save</button></gg-button>
+          </form>
+        </footer>
+      </gg-dialog>
+
+      <gg-dialog id="delete-dialog" heading="Delete project?" description="This cannot be undone." alert persistent no-close-button size="sm">
+        <gg-button slot="trigger" tone="danger"><button>Delete project…</button></gg-button>
+        <p>Everything in “Atlas” goes, including its run history and settings.</p>
+        <footer>
+          <form method="dialog">
+            <gg-button emphasis="minimal"><button value="cancel">Cancel</button></gg-button>
+            <gg-button emphasis="high" tone="danger"><button value="delete">Delete</button></gg-button>
+          </form>
+        </footer>
+      </gg-dialog>
+
+      <gg-dialog id="terms-dialog" heading="Terms of service" size="lg">
+        <gg-button slot="trigger" emphasis="low"><button>Read the terms</button></gg-button>
+        ${terms.map((clause, i) => `<p>${i + 1}. ${clause}</p>`).join('')}
+        <footer>
+          <form method="dialog"><gg-button emphasis="high"><button value="accept">Accept</button></gg-button></form>
+        </footer>
+      </gg-dialog>
+    </div>
+    <pre class="state" id="dialog-state">open a dialog</pre>
+    <p class="hint">
+      A native &lt;dialog&gt; in the top layer: no portal, the page behind is inert, and it does not scroll.
+      Escape and a click outside close it unless it is <code>persistent</code>; a
+      <code>&lt;form method="dialog"&gt;</code> closes it and reports the button's value. A select inside a
+      dialog takes the first Escape.
+    </p>
+  </section>
+
+  <section>
     <h2>Native form participation</h2>
     <form class="demo" id="demo-form">
       <gg-select id="form-select" name="framework" label="framework" placeholder="Required…"></gg-select>
@@ -360,3 +406,13 @@ const radioState = document.getElementById('radio-state')!
 const paintPlan = () => (radioState.innerHTML = `value  <b>${JSON.stringify(planDemo.value)}</b>`)
 planDemo.addEventListener('valuechange', paintPlan)
 paintPlan()
+
+// --- dialogs -------------------------------------------------------------------
+document.querySelector<GgSelectElement>('#role-select')!.items = roles
+const dialogState = document.getElementById('dialog-state')!
+for (const id of ['edit-dialog', 'delete-dialog', 'terms-dialog']) {
+  document.getElementById(id)!.addEventListener('openchange', (event) => {
+    const { open, reason, returnValue } = (event as CustomEvent).detail
+    dialogState.innerHTML = `${id}  <b>${open ? 'open' : 'closed'}</b>  reason <b>${reason}</b>${returnValue ? `  returnValue <b>${returnValue}</b>` : ''}`
+  })
+}

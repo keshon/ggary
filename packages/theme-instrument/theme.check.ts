@@ -147,6 +147,12 @@ const pairs: Pair[] = [
   { label: 'field: invalid border on panel', fg: '--err-text', bg: ['--surface-raised', '--surface-field'], min: large },
   { label: 'field: hint on panel', fg: '--text-muted', bg: ['--surface-raised'], min: text },
 
+  // Added with Dialog: the sheet is --surface-overlay, and its title,
+  // sub-label and close cross stand on it.
+  { label: 'dialog: title on overlay', fg: '--text-primary', bg: ['--surface-overlay'], min: text },
+  { label: 'dialog: description on overlay', fg: '--text-secondary', bg: ['--surface-overlay'], min: text },
+  { label: 'dialog: close cross on overlay', fg: '--text-muted', bg: ['--surface-overlay'], min: large },
+
   // Added with Checkbox, Radio and Switch. The source's pairs for the box edge
   // and the switch track are ported as they were; the thumb is new here, since
   // it is a part of its own that has to read against both tracks.

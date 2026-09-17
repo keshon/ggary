@@ -9,28 +9,72 @@
  */
 export type DismissReason = 'outside-pointer' | 'escape'
 
-export function trackDismissable(
-  node: HTMLElement,
-  options: { onDismiss: (reason: DismissReason) => void; exclude?: (HTMLElement | null)[] }
-): () => void {
-  const { onDismiss, exclude = [] } = options
-  const doc = node.ownerDocument
+export interface DismissableOptions {
+  onDismiss: (reason: DismissReason) => void
+  /** Elements that count as inside — a trigger, whose own click toggles. */
+  exclude?: (HTMLElement | null)[]
+  /**
+   * Whether a pointer press is outside. The default asks the DOM tree; a modal
+   * <dialog> needs geometry instead, because a press on its ::backdrop is
+   * targeted at the dialog element itself.
+   */
+  isOutside?: (event: PointerEvent) => boolean
+  /** Escape dismisses this layer. Default true. Either way Escape stops here. */
+  closeOnEscape?: boolean
+  /** A press outside dismisses this layer. Default true. */
+  closeOnOutside?: boolean
+}
 
+interface Layer {
+  node: HTMLElement
+  options: DismissableOptions
+}
+
+/*
+ * THE DISMISS STACK. Every open layer — a listbox, a popover, a dialog —
+ * registers here, and only the topmost one hears Escape or an outside press.
+ *
+ * Without it every layer listens to the document on its own: Escape in a
+ * select inside a dialog closes both, and a press on the select's option list
+ * counts as "outside" for the dialog underneath. Nesting order is opening
+ * order, which is what the user sees: what opened last is on top.
+ *
+ * One pair of listeners serves the whole stack, installed while it is not empty.
+ */
+const stack: Layer[] = []
+let teardown: (() => void) | null = null
+
+const top = () => stack[stack.length - 1]
+
+function outside(layer: Layer, event: PointerEvent): boolean {
+  const { node, options } = layer
+  const target = event.target as Node | null
+  if (!target) return false
+  if (options.exclude?.some((el) => el?.contains(target))) return false
+  if (options.isOutside) return options.isOutside(event)
+  return !node.contains(target)
+}
+
+function listen(doc: Document): () => void {
   const onPointerDown = (event: PointerEvent) => {
-    const target = event.target as Node | null
-    if (!target) return
-    if (node.contains(target)) return
-    if (exclude.some((el) => el?.contains(target))) return
-    onDismiss('outside-pointer')
+    const layer = top()
+    if (!layer || layer.options.closeOnOutside === false) return
+    if (outside(layer, event)) layer.options.onDismiss('outside-pointer')
   }
 
   const onKeyDown = (event: KeyboardEvent) => {
-    if (event.key !== 'Escape') return
+    const layer = top()
+    if (!layer || event.key !== 'Escape') return
+    // Stop it for every layer below, and for the browser: a keydown whose
+    // default is prevented makes no close request, so a native modal <dialog>
+    // under a listbox does not close along with it. That holds even when this
+    // layer ignores Escape — a persistent dialog must not be closed natively.
+    event.preventDefault()
     event.stopPropagation()
-    onDismiss('escape')
+    if (layer.options.closeOnEscape !== false) layer.options.onDismiss('escape')
   }
 
-  // Capture phase: dismiss before the page's own handlers see the event.
+  // Capture phase: the stack decides before the page's own handlers see it.
   doc.addEventListener('pointerdown', onPointerDown, true)
   doc.addEventListener('keydown', onKeyDown, true)
   return () => {
@@ -38,6 +82,29 @@ export function trackDismissable(
     doc.removeEventListener('keydown', onKeyDown, true)
   }
 }
+
+/**
+ * Push `node` onto the dismiss stack. Returns the function that removes it —
+ * from wherever it is, not only the top: an owner may close a lower layer
+ * programmatically while one above it is still open.
+ */
+export function trackDismissable(node: HTMLElement, options: DismissableOptions): () => void {
+  const layer: Layer = { node, options }
+  stack.push(layer)
+  if (!teardown) teardown = listen(node.ownerDocument)
+
+  return () => {
+    const index = stack.indexOf(layer)
+    if (index !== -1) stack.splice(index, 1)
+    if (stack.length === 0 && teardown) {
+      teardown()
+      teardown = null
+    }
+  }
+}
+
+/** How many layers are open. For tests and for debugging a stuck overlay. */
+export const openLayerCount = () => stack.length
 
 /** Keep the highlighted option inside the scroll viewport, without smooth-scroll jank. */
 export function scrollIntoViewIfNeeded(item: HTMLElement | null, container: HTMLElement | null): void {

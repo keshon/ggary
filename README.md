@@ -2,9 +2,9 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Ten components — Button, Chip, ChipGroup, Select, Field, Input, Textarea,
-Checkbox, Switch and RadioGroup — built end to end to prove the architecture
-holds.
+Eleven components — Button, Chip, ChipGroup, Select, Field, Input, Textarea,
+Checkbox, Switch, RadioGroup and Dialog — built end to end to prove the
+architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -14,7 +14,7 @@ becoming a monolith again.
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 881 tests, the last 330 in headless Chrome
+npm test         # 987 tests, 374 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -36,9 +36,9 @@ packages/
   icons/             glyph SVGs -> --gg-icon-* tokens; the shared glyph compiler
   checks/            the theme gates: structure and contrast, run on every theme
   elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>,
-                     <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>
+                     <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>, <gg-dialog>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
-                     <Checkbox>, <Switch>, <RadioGroup>
+                     <Checkbox>, <Switch>, <RadioGroup>, <Dialog>
   svelte/            the same ten as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
@@ -383,6 +383,75 @@ substitute above rather than as an attribute the browser ignores. Inside
 field pushes its props into it (`applyField`) instead of spreading onto the input.
 RadioGroup has its own label and is not a Field control yet.
 
+## The overlay layer, and Dialog
+
+Everything before Dialog sat in the page's normal flow. An overlay does not, and
+the usual kit answer — a portal, a z-index scale, a focus-trap library, a scroll
+lock that pads the body — is mostly unnecessary now. The platform does it:
+
+| Need | What provides it |
+|---|---|
+| Above everything, never clipped by an ancestor's `overflow` or `transform` | the **top layer**: `showModal()` puts the `<dialog>` there — no portal, no z-index |
+| Focus kept inside, the page unclickable | a modal dialog makes the rest of the document **inert** |
+| The page does not scroll behind it | `:root:has([data-scope='dialog'][data-part='content']:modal) { overflow: hidden }` in `@ggary/structure` |
+| Which overlay an Escape or an outside press belongs to | **the dismiss stack**, in core |
+
+**The dismiss stack** (`utils/dismissable.ts`). Every open layer — Select's listbox,
+a dialog, and later popovers and menus — registers, and only the topmost hears
+Escape or a press outside. Before it, each layer listened to the document on its
+own: an Escape in a select inside a dialog closed both. The stack also prevents the
+Escape keydown, and a prevented keydown makes no close request, so the native
+dialog underneath does not close by itself either. Removing that one
+`preventDefault` fails exactly two browser tests: the nested select, and a
+controlled dialog that refuses to close.
+
+**Closing goes through state**, never natively (`utils/modal.ts`, `attachDialog`).
+A close request is cancelled and reported. A `<form method="dialog">` submission is
+intercepted — its `submit` is synchronous and carries the submitter — rather than
+left to close the element and fire `close` later: in a page that is not rendering
+that event can wait indefinitely, which the sandbox found in a hidden browser pane,
+with the state saying "open" over a closed element. So every way out reaches
+`onOpenChange(open, { reason, returnValue? })`, and a controlled React owner can
+refuse any of them.
+
+**Focus** moves inside on open (the platform) and back to where it was on close
+(`attachDialog`, since not every browser restores it). When nothing had focus —
+Safari does not focus a clicked button — it goes to the trigger instead of `<body>`.
+
+**The trigger belongs to someone else.** `triggerProps` carry ARIA, an id and a
+handler, and no `data-scope`/`data-part`/`data-state`: spread onto a kit `<Button>`
+they would overwrite the button's own and it would lose its styling. In the
+elements, `spread()` keeps its bookkeeping per owner, so `<gg-button>` and
+`<gg-dialog>` can both apply props to one `<button>` without each removing the
+other's attributes and listeners.
+
+```tsx
+<Dialog title="Delete project?" role="alertdialog" closeOnEscape={false} closeOnOutside={false}
+  trigger={(props) => <Button tone="danger" {...props}>Delete…</Button>}
+  footer={<form method="dialog"><Button type="submit" value="delete">Delete</Button></form>}
+  onOpenChange={(open, { reason, returnValue }) => …}>
+  Everything in "Atlas" goes.
+</Dialog>
+```
+
+```html
+<gg-dialog heading="Delete project?" alert persistent>
+  <gg-button slot="trigger" tone="danger"><button>Delete…</button></gg-button>
+  <p>Everything in "Atlas" goes.</p>
+  <footer><form method="dialog"><button value="delete">Delete</button></form></footer>
+</gg-dialog>
+```
+
+Svelte binds it: `<Dialog bind:open>`, with `trigger`, `footer` and the body as
+snippets.
+
+**Testing overlays.** jsdom has no `showModal()`, no Popover API, no `inert` and no
+`:modal`. `tests/setup/dom-shims.ts` adds stand-ins for the methods so the jsdom run
+exercises the adapters' wiring, and nothing more; the conformance spec runs again in
+Chrome against the real thing, and `tests/dialog.browser.test.ts` covers what only
+a browser has — `:modal`, Tab never leaving, the scroll lock, a real backdrop click,
+real Escape presses through the stack, the form close, and a controlled refusal.
+
 ## Layering inside core
 
 ```
@@ -575,19 +644,27 @@ The rule decides new elements: anything with a working native form — field,
 input, textarea, checkbox, switch, radio group — enhances. `<gg-checkbox>` and
 `<gg-radio-group>` take a `<label>` around the input where the markup has one and
 build it where it does not. The native state stays the truth, so they never write
-`checked` back as an attribute.
+`checked` back as an attribute. For the same reason `<gg-button>` keeps the
+markup's button type: core defaults to `type="button"`, right for a framework
+component, but a bare `<button>` in server markup submits its form, and the first
+version of `<gg-button>` silently stopped every such form from submitting.
+
+`<gg-dialog>` renders its `<dialog>` around the author's children, because opening
+one needs JS anyway; the children themselves stay the author's.
 
 ## Testing
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 80 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice connects. |
-| contract | node | `icons.contract.test.ts` | 69 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 92 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice connects. |
+| contract | node | `icons.contract.test.ts` | 75 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 330 tests. One contract × three adapters. |
-| dom | jsdom | `elements.dom.test.ts` | 31 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 330 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| dom | jsdom | `conformance.dom.test.ts` | 366 tests. One contract × three adapters. |
+| dom | jsdom | `layers.dom.test.ts` | 7 tests. The dismiss stack: which layer hears Escape and an outside press. |
+| dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
+| browser | Chrome | `conformance.browser.test.ts` | 366 tests. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | dom | jsdom | `autosize.dom.test.ts` | 11 tests. Auto-resize against a simulated layout: grow, shrink, cap, and re-measure when the page changes. |
 
 **Machine tests** cover behaviour in depth, once, where it is cheap. They run with
@@ -677,8 +754,23 @@ Real, and deliberately left open:
   lines was out of scope for a first port.
 - **`data-accent` on a subtree is unverified in Instrument.** Its semantics are
   declared on `:root`; the port only exercised the attribute on `<html>`.
-- **Not ported from Instrument:** everything beyond these ten components —
-  prose, the rest of forms (number field, slider, choice cards), tables, overlays,
+- **A Select inside a Dialog is still positioned in the dialog's flow.** Its
+  listbox can be clipped by the dialog body's scroll box. Moving Select's listbox
+  to the top layer is the next step of the overlay plan.
+- **No exit animation.** A dialog's body unmounts as it closes, so there is nothing
+  left to animate out; opening fades in.
+- **Svelte and the custom elements cannot refuse a close.** `bind:open` and the
+  `open` attribute follow the dialog; only a controlled React owner can keep it
+  open against a request.
+- **A dialog inside a `display: none` ancestor never shows,** top layer or not.
+- **A non-modal dialog does not keep focus.** By design — it floats over a page
+  that stays usable — but Tab walks out of it.
+- **Platform close requests** (a back gesture) are cancelled through the `cancel`
+  event, which browsers may refuse to let a page cancel without recent user
+  activation; the dialog then closes natively and reports `native`.
+- **Not ported from Instrument:** everything beyond these eleven components —
+  prose, the rest of forms (number field, slider, choice cards), tables, the sheet
+  and toast overlays,
   the agent components (including the composer, a textarea with a toolbar in one
   frame) and print styles.
 - **`onValueChange` fires when the user re-picks the already-selected value.**

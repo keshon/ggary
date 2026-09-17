@@ -27,6 +27,10 @@
       "svelte": "./src/components/chip-group/index.ts",
       "default": "./src/components/chip-group/index.ts"
     },
+    "./dialog": {
+      "svelte": "./src/components/dialog/index.ts",
+      "default": "./src/components/dialog/index.ts"
+    },
     "./field": {
       "svelte": "./src/components/field/index.ts",
       "default": "./src/components/field/index.ts"

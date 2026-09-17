@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Button, Checkbox, Chip, ChipGroup, Field, Input, RadioGroup, Select, Switch, Textarea } from '@ggary/svelte'
-  import { frameworks, tags } from './demo-data'
+  import { Button, Checkbox, Chip, ChipGroup, Dialog, Field, Input, RadioGroup, Select, Switch, Textarea } from '@ggary/svelte'
+  import { frameworks, roles, tags, terms } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -18,6 +18,12 @@
     { value: 'pro', label: 'Pro' },
     { value: 'team', label: 'Team (contact sales)', disabled: true },
   ]
+
+  let editOpen = $state(false)
+  let deleteOpen = $state(false)
+  let dialogLog = $state('open a dialog')
+  const logDialog = (name: string) => (open: boolean, { reason }: { reason: string }) =>
+    (dialogLog = `${name}  ${open ? 'open' : 'closed'}  reason ${reason}`)
 
   let taken = $state(false)
   let username = $state('garry')
@@ -305,6 +311,65 @@ invalid  ${taken}`}</pre>
     </div>
   </form>
   <pre class="state">{signupOutput}</pre>
+</section>
+
+<section>
+  <h2>Dialog</h2>
+  <div class="row">
+    <Dialog
+      title="Edit profile"
+      description="Changes show on your public profile."
+      bind:open={editOpen}
+      onOpenChange={logDialog('edit')}
+    >
+      {#snippet trigger(props)}
+        <Button {...props}>Edit profile</Button>
+      {/snippet}
+      <div class="dialog-fields">
+        <Field label="Display name"><Input defaultValue="Garry" /></Field>
+        <Select label="Role" items={roles} defaultValue="editor" />
+        <Field label="Bio" hint="Optional"><Textarea rows={3} autoResize maxRows={6} /></Field>
+      </div>
+      {#snippet footer()}
+        <Button emphasis="minimal" onclick={() => ((editOpen = false), (dialogLog = 'edit  closed  by Cancel'))}>Cancel</Button>
+        <Button emphasis="high" onclick={() => ((editOpen = false), (dialogLog = 'edit  closed  by Save'))}>Save</Button>
+      {/snippet}
+    </Dialog>
+
+    <Dialog
+      title="Delete project?"
+      description="This cannot be undone."
+      role="alertdialog"
+      size="sm"
+      closeOnEscape={false}
+      closeOnOutside={false}
+      closeButton={false}
+      bind:open={deleteOpen}
+      onOpenChange={logDialog('delete')}
+    >
+      {#snippet trigger(props)}
+        <Button tone="danger" {...props}>Delete project…</Button>
+      {/snippet}
+      <p>Everything in “Atlas” goes, including its run history and settings.</p>
+      {#snippet footer()}
+        <Button emphasis="minimal" onclick={() => ((deleteOpen = false), (dialogLog = 'delete  closed  by Cancel'))}>Cancel</Button>
+        <Button emphasis="high" tone="danger" onclick={() => ((deleteOpen = false), (dialogLog = 'delete  closed  by Delete'))}>Delete</Button>
+      {/snippet}
+    </Dialog>
+
+    <Dialog title="Terms of service" size="lg" onOpenChange={logDialog('terms')}>
+      {#snippet trigger(props)}
+        <Button emphasis="low" {...props}>Read the terms</Button>
+      {/snippet}
+      {#each terms as clause, i (i)}
+        <p>{i + 1}. {clause}</p>
+      {/each}
+      {#snippet footer()}
+        <form method="dialog"><Button emphasis="high" type="submit" value="accept">Accept</Button></form>
+      {/snippet}
+    </Dialog>
+  </div>
+  <pre class="state">{dialogLog}</pre>
 </section>
 
 <section>

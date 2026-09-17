@@ -18,12 +18,22 @@ export class GgButtonElement extends HTMLElement {
 
   #button: HTMLButtonElement | null = null
   #spinner: HTMLSpanElement | null = null
+  /**
+   * The markup's own type, read before the first render writes one. Core
+   * defaults to type="button", right for a framework component, where a stray
+   * submit is the classic bug. Enhancement is the other way round: the markup
+   * already means something, and a bare <button> in a form submits it.
+   */
+  #markupType: string | null = null
 
   connectedCallback(): void {
-    this.#button = this.querySelector('button')
     if (!this.#button) {
-      console.warn('<gg-button> expects a <button> child to enhance.', this)
-      return
+      this.#button = this.querySelector('button')
+      if (!this.#button) {
+        console.warn('<gg-button> expects a <button> child to enhance.', this)
+        return
+      }
+      this.#markupType = this.#button.getAttribute('type') ?? 'submit'
     }
     this.#render()
   }
@@ -45,7 +55,7 @@ export class GgButtonElement extends HTMLElement {
         disabled: this.hasAttribute('disabled'),
         loading,
         fullWidth: this.hasAttribute('full-width'),
-        type: (this.getAttribute('type') as 'button' | 'submit' | 'reset') ?? undefined,
+        type: (this.getAttribute('type') ?? this.#markupType ?? undefined) as 'button' | 'submit' | 'reset' | undefined,
       },
       domNormalizer
     )

@@ -24,7 +24,15 @@ export default defineConfig({
         // `mount` does not exist.
         plugins: [svelte({ hot: false })],
         resolve: { conditions: ['browser'] },
-        test: { name: 'dom', environment: 'jsdom', include: ['tests/*.dom.test.ts'], globals: true },
+        test: {
+          name: 'dom',
+          environment: 'jsdom',
+          include: ['tests/*.dom.test.ts'],
+          globals: true,
+          // <dialog> methods and the Popover API, which jsdom lacks. Wiring only:
+          // what they do is tested in the browser project.
+          setupFiles: ['tests/setup/dom-shims.ts'],
+        },
       },
       {
         // A real browser, driven by Playwright. It uses the Chrome already

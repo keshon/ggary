@@ -1,0 +1,132 @@
+/* ==========================================================================
+   GGarry — dialog
+
+   One surface: the header, body and footer share one padding and no rules
+   divide them, so a short dialog reads as a card holding a question rather
+   than a window with three panes. The body scrolls between header and footer
+   when the dialog reaches its height (that part is @ggary/structure).
+   ========================================================================== */
+
+[data-scope='dialog'][data-part='content'] {
+  --dialog-pad: var(--ggarry-space-6);
+  --dialog-width: 520px;
+
+  margin: auto;
+  inline-size: min(var(--dialog-width), 100vw - 32px);
+  max-block-size: min(85dvh, 100dvh - 32px);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  box-shadow: var(--ggarry-shadow-modal);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  line-height: 1.5;
+}
+
+[data-scope='dialog'][data-part='content'][data-size='sm'] { --dialog-width: 400px; }
+[data-scope='dialog'][data-part='content'][data-size='lg'] { --dialog-width: 720px; }
+
+/* The backdrop inherits custom properties from its dialog. */
+[data-scope='dialog'][data-part='content']::backdrop {
+  background: var(--ggarry-bg-scrim);
+}
+
+/* A non-modal dialog floats over a live page: no scrim, a lighter lift. */
+[data-scope='dialog'][data-part='content']:not([data-modal]) {
+  box-shadow: var(--ggarry-shadow-popover);
+}
+
+/* Title and description in the first column; the close button pinned to the
+   corner in the second, so a long title wraps instead of pushing it. */
+[data-scope='dialog'][data-part='header'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  column-gap: var(--ggarry-space-4);
+  row-gap: var(--ggarry-space-1);
+  padding: var(--dialog-pad) var(--dialog-pad) var(--ggarry-space-4);
+}
+
+[data-scope='dialog'][data-part='title'] {
+  grid-area: 1 / 1;
+  margin: 0;
+  font-size: var(--ggarry-font-size-lg);
+  font-weight: var(--ggarry-font-weight-semibold);
+  line-height: 1.35;
+}
+
+[data-scope='dialog'][data-part='description'] {
+  grid-area: 2 / 1;
+  margin: 0;
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='dialog'][data-part='close'] {
+  grid-area: 1 / 2;
+  display: inline-grid;
+  place-items: center;
+  inline-size: 28px;
+  block-size: 28px;
+  margin: -4px -6px 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ggarry-radius-md);
+  background: transparent;
+  color: var(--ggarry-text-muted);
+  cursor: pointer;
+}
+
+[data-scope='dialog'][data-part='close']:hover {
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='dialog'][data-part='close-icon'] {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+[data-scope='dialog'][data-part='body'] {
+  padding: 0 var(--dialog-pad);
+}
+
+/* Without a header or a footer, the body takes the edge padding itself. */
+[data-scope='dialog'][data-part='body']:first-child { padding-block-start: var(--dialog-pad); }
+[data-scope='dialog'][data-part='body']:last-child { padding-block-end: var(--dialog-pad); }
+[data-scope='dialog'][data-part='header'][hidden] + [data-part='body'] { padding-block-start: var(--dialog-pad); }
+
+[data-scope='dialog'][data-part='body'] > :first-child { margin-block-start: 0; }
+[data-scope='dialog'][data-part='body'] > :last-child { margin-block-end: 0; }
+
+/* The main action stands last, at the trailing edge. */
+[data-scope='dialog'][data-part='footer'] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-5) var(--dialog-pad) var(--dialog-pad);
+}
+
+/* A <form method="dialog"> in the footer lays its buttons out the same way. */
+[data-scope='dialog'][data-part='footer'] > form {
+  display: contents;
+}
+
+/* Entry: a short fade and rise. Exit is instant — the body unmounts with it. */
+[data-scope='dialog'][data-part='content'][open] {
+  transition: opacity var(--ggarry-duration-normal) ease, translate var(--ggarry-duration-normal) ease;
+}
+
+@starting-style {
+  [data-scope='dialog'][data-part='content'][open] {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='dialog'][data-part='content'][open] { transition: none; }
+}

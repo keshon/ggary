@@ -5,6 +5,7 @@ import { svelte } from './adapters/svelte'
 import { buttonConformance } from './button.spec'
 import { checkboxConformance, switchConformance } from './checkbox.spec'
 import { chipGroupConformance } from './chip-group.spec'
+import { dialogConformance } from './dialog.spec'
 import { fieldConformance } from './field.spec'
 import { cleanup } from './harness'
 import { inputConformance } from './input.spec'
@@ -34,6 +35,7 @@ export function runConformance() {
       switchConformance(adapter)
       radioGroupConformance(adapter)
       fieldConformance(adapter)
+      dialogConformance(adapter)
     })
   }
 }

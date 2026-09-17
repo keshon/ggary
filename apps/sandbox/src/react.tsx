@@ -3,8 +3,8 @@ import './shared.css'
 
 import { StrictMode, useState, type FormEvent } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Button, Checkbox, Chip, ChipGroup, Field, Input, RadioGroup, Select, Switch, Textarea } from '@ggary/react'
-import { frameworks, tags } from './demo-data'
+import { Button, Checkbox, Chip, ChipGroup, Dialog, Field, Input, RadioGroup, Select, Switch, Textarea } from '@ggary/react'
+import { frameworks, roles, tags, terms } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -17,6 +17,12 @@ function App() {
   const [plan, setPlan] = useState<string | null>('free')
   const notifyCount = Object.values(notify).filter(Boolean).length
   const allNotify = notifyCount === 0 ? false : notifyCount === 3 ? true : 'indeterminate'
+
+  const [editOpen, setEditOpen] = useState(false)
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [dialogLog, setDialogLog] = useState('open a dialog')
+  const logDialog = (name: string) => (open: boolean, { reason }: { reason: string }) =>
+    setDialogLog(`${name}  ${open ? 'open' : 'closed'}  reason ${reason}`)
 
   const [taken, setTaken] = useState(false)
   const [username, setUsername] = useState('garry')
@@ -317,6 +323,99 @@ function App() {
           </div>
         </form>
         <pre className="state">{signupOutput}</pre>
+      </section>
+
+      <section>
+        <h2>Dialog</h2>
+        <div className="row">
+          <Dialog
+            title="Edit profile"
+            description="Changes show on your public profile."
+            open={editOpen}
+            onOpenChange={(open, details) => {
+              setEditOpen(open)
+              logDialog('edit')(open, details)
+            }}
+            trigger={(props) => <Button {...props}>Edit profile</Button>}
+            footer={
+              <>
+                <Button emphasis="minimal" onClick={() => (setEditOpen(false), setDialogLog('edit  closed  by Cancel'))}>
+                  Cancel
+                </Button>
+                <Button emphasis="high" onClick={() => (setEditOpen(false), setDialogLog('edit  closed  by Save'))}>
+                  Save
+                </Button>
+              </>
+            }
+          >
+            <div className="dialog-fields">
+              <Field label="Display name">
+                <Input defaultValue="Garry" />
+              </Field>
+              <Select label="Role" items={roles} defaultValue="editor" />
+              <Field label="Bio" hint="Optional">
+                <Textarea rows={3} autoResize maxRows={6} />
+              </Field>
+            </div>
+          </Dialog>
+
+          <Dialog
+            title="Delete project?"
+            description="This cannot be undone."
+            role="alertdialog"
+            size="sm"
+            closeOnEscape={false}
+            closeOnOutside={false}
+            closeButton={false}
+            open={deleteOpen}
+            onOpenChange={(open, details) => {
+              setDeleteOpen(open)
+              logDialog('delete')(open, details)
+            }}
+            trigger={(props) => (
+              <Button tone="danger" {...props}>
+                Delete project…
+              </Button>
+            )}
+            footer={
+              <>
+                <Button emphasis="minimal" onClick={() => (setDeleteOpen(false), setDialogLog('delete  closed  by Cancel'))}>
+                  Cancel
+                </Button>
+                <Button emphasis="high" tone="danger" onClick={() => (setDeleteOpen(false), setDialogLog('delete  closed  by Delete'))}>
+                  Delete
+                </Button>
+              </>
+            }
+          >
+            <p>Everything in “Atlas” goes, including its run history and settings.</p>
+          </Dialog>
+
+          <Dialog
+            title="Terms of service"
+            size="lg"
+            onOpenChange={logDialog('terms')}
+            trigger={(props) => (
+              <Button emphasis="low" {...props}>
+                Read the terms
+              </Button>
+            )}
+            footer={
+              <form method="dialog">
+                <Button emphasis="high" type="submit" value="accept">
+                  Accept
+                </Button>
+              </form>
+            }
+          >
+            {terms.map((clause, i) => (
+              <p key={i}>
+                {i + 1}. {clause}
+              </p>
+            ))}
+          </Dialog>
+        </div>
+        <pre className="state">{dialogLog}</pre>
       </section>
 
       <section>

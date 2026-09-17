@@ -1,0 +1,104 @@
+/* ==========================================================================
+   Instrument — dialog
+
+   Ported from instrument/src/overlay.css (.inst-dialog). A modal is ONE
+   SURFACE, not three storeys: no rules under the header or over the footer,
+   one padding for all three, so a sheet that asks one question reads as a
+   sheet rather than an application window.
+
+   The padding is the dialog's own and does not ride density: density is about
+   how many rows fit into a list, and a sheet shows one question.
+   ========================================================================== */
+
+[data-scope='dialog'][data-part='content'] {
+  --dialog-pad: var(--space-7);
+
+  margin: auto;
+  inline-size: min(34rem, 100vw - var(--space-8));
+  max-block-size: min(80dvh, 100dvh - var(--space-8));
+  border: var(--hairline) solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-overlay);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-modal);
+  overflow: hidden;
+
+  &[data-size='sm'] { inline-size: min(26rem, 100vw - var(--space-8)); }
+  &[data-size='lg'] { inline-size: min(46rem, 100vw - var(--space-8)); }
+
+  &::backdrop { background: var(--scrim); }
+
+  &:not([data-modal]) { box-shadow: var(--shadow-popover); }
+}
+
+/* The close cross is pinned to its corner and does not stretch the header:
+   it has a column of its own, not the end of the title line. */
+[data-scope='dialog'][data-part='header'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-2) var(--gap-inline);
+  padding: var(--dialog-pad) var(--dialog-pad) var(--space-4);
+}
+
+[data-scope='dialog'][data-part='title'] {
+  grid-area: 1 / 1;
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  line-height: var(--leading-ui);
+}
+
+/* The sub-label: quieter and smaller, it serves the question rather than asking it. */
+[data-scope='dialog'][data-part='description'] {
+  grid-area: 2 / 1;
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-ui);
+}
+
+[data-scope='dialog'][data-part='close'] {
+  grid-area: 1 / 2;
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--control-h-sm);
+  block-size: var(--control-h-sm);
+  margin: calc(var(--space-2) * -1) calc(var(--space-2) * -1) 0 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover { background: var(--surface-recessed); color: var(--text-primary); }
+}
+
+[data-scope='dialog'][data-part='close-icon'] {
+  inline-size: 1rem;
+  block-size: 1rem;
+}
+
+[data-scope='dialog'][data-part='body'] {
+  padding: 0 var(--dialog-pad);
+  font-size: var(--text-sm);
+  line-height: var(--leading-ui);
+
+  &:first-child, [data-part='header'][hidden] + & { padding-block-start: var(--dialog-pad); }
+  &:last-child { padding-block-end: var(--dialog-pad); }
+  & > :first-child { margin-block-start: 0; }
+  & > :last-child { margin-block-end: 0; }
+}
+
+/* The footer is pushed to the trailing edge: the main action stands last. */
+[data-scope='dialog'][data-part='footer'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--dialog-pad) var(--dialog-pad);
+
+  & > form { display: contents; }
+}

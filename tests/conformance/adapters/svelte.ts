@@ -1,6 +1,7 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
 import { Button, Checkbox, ChipGroup, Input, RadioGroup, Select, Switch, Textarea } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
+import DialogWithContent from './DialogWithContent.svelte'
 import { type Adapter, type ButtonProps, type CheckboxProps, type Mounted, track } from '../harness'
 import { reactiveProps } from './svelte-props.svelte'
 
@@ -65,6 +66,8 @@ export const svelte: Adapter = {
   checkbox: (props, target) => mountSvelte(Checkbox as Component<any>, props, target, withLabel),
   switch: (props, target) => mountSvelte(Switch as Component<any>, props, target, withLabel),
   radioGroup: (props, target) => mountSvelte(RadioGroup as Component<any>, props, target),
+  // Snippets for the trigger, body and footer, as an app writes them.
+  dialog: (props, target) => mountSvelte(DialogWithContent as Component<any>, props, target),
   // A Field's children are a snippet, and a raw snippet cannot render a
   // component, so a two-line wrapper composes the pair as an app would.
   field: (props, target) => mountSvelte(FieldWithControl as Component<any>, props, target),

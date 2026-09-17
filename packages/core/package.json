@@ -25,6 +25,10 @@
       "types": "./src/components/chip-group/index.ts",
       "default": "./src/components/chip-group/index.ts"
     },
+    "./dialog": {
+      "types": "./src/components/dialog/index.ts",
+      "default": "./src/components/dialog/index.ts"
+    },
     "./field": {
       "types": "./src/components/field/index.ts",
       "default": "./src/components/field/index.ts"

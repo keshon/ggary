@@ -119,6 +119,26 @@ export interface RadioGroupProps {
   invalid?: boolean
 }
 
+export interface DialogProps {
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean, details: { reason: string }) => void
+  title?: string
+  description?: string
+  /** Body text. The body also holds one button, "Body action". */
+  body?: string
+  /** A button in the footer, with this label. */
+  footer?: string
+  /** A trigger button, with this label. */
+  trigger?: string
+  /** Make the trigger the kit's own Button, to test composition. */
+  triggerIsButton?: boolean
+  modal?: boolean
+  role?: 'dialog' | 'alertdialog'
+  closeOnEscape?: boolean
+  closeOnOutside?: boolean
+}
+
 /**
  * A Field wrapping one control: a Textarea, Checkbox or Switch when that key is
  * given, otherwise an Input configured by `input`.
@@ -167,6 +187,7 @@ export interface Adapter {
   checkbox(props: CheckboxProps, target: HTMLElement): Promise<Mounted<CheckboxProps>>
   switch(props: SwitchProps, target: HTMLElement): Promise<Mounted<SwitchProps>>
   radioGroup(props: RadioGroupProps, target: HTMLElement): Promise<Mounted<RadioGroupProps>>
+  dialog(props: DialogProps, target: HTMLElement): Promise<Mounted<DialogProps>>
   /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
 }

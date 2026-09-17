@@ -140,6 +140,18 @@ describe('<gg-chip-group>', () => {
 })
 
 describe('light-DOM enhancement', () => {
+  it('<gg-button> keeps the markup’s button type: a plain <button> in a form still submits it', () => {
+    document.body.innerHTML = `<form>
+      <gg-button><button id="plain">Save</button></gg-button>
+      <gg-button><button id="explicit" type="button">Preview</button></gg-button>
+      <gg-button type="reset"><button id="host" type="submit">Clear</button></gg-button>
+    </form>`
+    const type = (id: string) => (document.getElementById(id) as HTMLButtonElement).type
+    expect(type('plain')).toBe('submit')
+    expect(type('explicit')).toBe('button')
+    expect(type('host')).toBe('reset')
+  })
+
   it('<gg-button> decorates the button it was given rather than replacing it', () => {
     document.body.innerHTML = '<gg-button emphasis="high"><button id="server-rendered">Save</button></gg-button>'
     const button = document.getElementById('server-rendered')!

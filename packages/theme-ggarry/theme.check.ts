@@ -79,6 +79,12 @@ const pairs: Pair[] = [
   { label: 'switch: thumb on off track', fg: '--ggarry-color-white', bg: ['--ggarry-border-control'], min: LARGE },
   { label: 'switch: thumb on on track', fg: '--ggarry-color-white', bg: ['--ggarry-bg-accent'], min: LARGE },
 
+  // Dialog: its text sits on the surface, covered above; the description is
+  // muted text on it. The scrim is decoration, the dialog's border is not the
+  // boundary (its surface and shadow are).
+  { label: 'dialog: description on surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'dialog: close glyph on its hover', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface', '--ggarry-bg-subtle'], min: LARGE },
+
   // Focus ring against what it stands on.
   { label: 'focus: ring on surface', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'focus: ring on canvas', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-canvas'], min: LARGE },

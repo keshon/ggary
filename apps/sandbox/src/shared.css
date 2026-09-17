@@ -71,3 +71,5 @@ form.stack { display: grid; gap: 16px; max-width: 420px; padding: 16px; border: 
 .stack { display: grid; gap: 10px; justify-items: start; margin-top: 16px; }
 .nested { display: grid; gap: 10px; justify-items: start; padding-inline-start: 26px; }
 .choices { display: flex; flex-wrap: wrap; gap: 32px 48px; align-items: flex-start; }
+
+.dialog-fields { display: grid; gap: 16px; }

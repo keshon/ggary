@@ -5,7 +5,7 @@ interface Applied {
   listeners: Map<string, EventListener>
 }
 
-const applied = new WeakMap<Element, Applied>()
+const applied = new WeakMap<Element, Map<string, Applied>>()
 
 /**
  * The vanilla equivalent of JSX spread: apply a normalized prop bag to a real
@@ -14,11 +14,20 @@ const applied = new WeakMap<Element, Applied>()
  *
  * This is the whole "renderer" for the elements package.
  */
-export function spread(element: Element, props: DomProps): void {
-  let previous = applied.get(element)
+export function spread(element: Element, props: DomProps, owner = 'self'): void {
+  // Bookkeeping is per owner. One element can take props from two elements —
+  // a <button> that <gg-button> styles and <gg-dialog> uses as its trigger —
+  // and each may only remove what it applied itself, or they would strip each
+  // other's attributes and listeners on every render.
+  let owners = applied.get(element)
+  if (!owners) {
+    owners = new Map()
+    applied.set(element, owners)
+  }
+  let previous = owners.get(owner)
   if (!previous) {
     previous = { attrs: new Set(), listeners: new Map() }
-    applied.set(element, previous)
+    owners.set(owner, previous)
   }
 
   for (const name of previous.attrs) {

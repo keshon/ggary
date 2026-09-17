@@ -12,6 +12,7 @@ import {
   type CheckboxProps,
   type SwitchProps,
   type RadioGroupProps,
+  type DialogProps,
   track,
 } from '../harness'
 
@@ -108,6 +109,21 @@ async function mountChoice(tag: 'gg-checkbox' | 'gg-switch', props: CheckboxProp
 function applyRadioHost(host: HTMLElement, props: Partial<RadioGroupProps>) {
   for (const key of ['label', 'name', 'orientation', 'disabled', 'required', 'invalid'] as const) {
     if (key in props) setAttr(host, key, props[key])
+  }
+}
+
+/**
+ * <gg-dialog> takes one `persistent` flag where the frameworks take two, so
+ * the harness maps "neither closes" to it; specs only switch both off at once.
+ */
+function applyDialogHost(host: HTMLElement, props: Partial<DialogProps>) {
+  if ('open' in props) setAttr(host, 'open', props.open)
+  if ('title' in props) setAttr(host, 'heading', props.title)
+  if ('description' in props) setAttr(host, 'description', props.description)
+  if ('modal' in props) setAttr(host, 'non-modal', props.modal === false)
+  if ('role' in props) setAttr(host, 'alert', props.role === 'alertdialog')
+  if ('closeOnEscape' in props || 'closeOnOutside' in props) {
+    setAttr(host, 'persistent', props.closeOnEscape === false && props.closeOnOutside === false)
   }
 }
 
@@ -230,6 +246,51 @@ export const elements: Adapter = {
       update: async (patch) => applyRadioHost(host, patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<RadioGroupProps>)
+  },
+
+  async dialog(props, target) {
+    const host = document.createElement('gg-dialog')
+    if (props.trigger) {
+      const trigger = document.createElement('button')
+      trigger.textContent = props.trigger
+      if (props.triggerIsButton) {
+        const wrapper = document.createElement('gg-button')
+        wrapper.slot = 'trigger'
+        wrapper.append(trigger)
+        host.append(wrapper)
+      } else {
+        trigger.slot = 'trigger'
+        host.append(trigger)
+      }
+    }
+    const text = document.createElement('p')
+    text.textContent = props.body ?? 'Body'
+    const action = document.createElement('button')
+    action.type = 'button'
+    action.textContent = 'Body action'
+    host.append(text, action)
+    if (props.footer) {
+      const footer = document.createElement('footer')
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.textContent = props.footer
+      footer.append(button)
+      host.append(footer)
+    }
+    setAttr(host, 'open', props.defaultOpen)
+    applyDialogHost(host, props)
+    if (props.onOpenChange) {
+      host.addEventListener('openchange', (e) => {
+        const { open, reason } = (e as CustomEvent).detail
+        props.onOpenChange!(open, { reason })
+      })
+    }
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => applyDialogHost(host, patch),
+      unmount: async () => host.remove(),
+    } satisfies Mounted<DialogProps>)
   },
 
   async field(props, target) {
