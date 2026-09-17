@@ -1,0 +1,7 @@
+export { tabsAnatomy } from './tabs.anatomy'
+export type { TabsPart } from './tabs.anatomy'
+export { connect, tabsIds } from './tabs.connect'
+export type { TabsApi, TabsConnectOptions } from './tabs.connect'
+export { createTabsMachine, initialState, reducer } from './tabs.machine'
+export type { TabsMachineConfig } from './tabs.machine'
+export type { TabItem, TabsActivation, TabsEvent, TabsOptions, TabsOrientation, TabsState, TabsVariant } from './tabs.types'

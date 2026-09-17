@@ -16,3 +16,4 @@ export { default as CheckboxGroup } from './components/checkbox-group/CheckboxGr
 export { default as Fieldset } from './components/fieldset/Fieldset.svelte'
 export { default as Menu } from './components/menu/Menu.svelte'
 export { default as Menubar } from './components/menubar/Menubar.svelte'
+export { default as Tabs } from './components/tabs/Tabs.svelte'

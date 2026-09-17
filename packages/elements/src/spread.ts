@@ -67,3 +67,19 @@ export function h<K extends keyof HTMLElementTagNameMap>(
   if (children) element.append(...children)
   return element
 }
+
+/**
+ * Make `parent`'s children exactly `children`, in order, moving only what is out
+ * of place. Nodes that stay are never detached: detaching the focused element,
+ * even to put it straight back, drops focus to <body> — which is what a tab
+ * list rebuilt with replaceChildren did when a tab next to the focused one closed.
+ */
+export function reconcileChildren(parent: Element, children: Element[]): void {
+  // Leavers first, so a removal in the middle does not make the nodes after it look out of place.
+  const keep = new Set(children)
+  for (const child of [...parent.children]) if (!keep.has(child)) child.remove()
+  children.forEach((child, index) => {
+    const current = parent.children[index]
+    if (current !== child) parent.insertBefore(child, current ?? null)
+  })
+}

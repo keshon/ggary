@@ -1,6 +1,7 @@
 import type { ChipItem } from '@ggary/core/chip-group'
 import type { MenuEntry } from '@ggary/core/menu'
 import type { MenubarMenu } from '@ggary/core/menubar'
+import type { TabItem } from '@ggary/core/tabs'
 import type { SelectItem } from '@ggary/core/select'
 
 export const frameworks: SelectItem[] = [
@@ -183,3 +184,27 @@ export function appMenus(view: ViewState): MenubarMenu[] {
     },
   ]
 }
+
+export const propertyTabs: TabItem[] = [
+  { value: 'geometry', label: 'Geometry' },
+  { value: 'material', label: 'Material' },
+  { value: 'physics', label: 'Physics (disabled)', disabled: true },
+  { value: 'scripts', label: 'Scripts' },
+]
+
+export const propertyPanels: Record<string, string> = {
+  geometry: '12 480 vertices, 6 240 polygons.',
+  material: 'Standard PBR, two textures.',
+  physics: 'A convex hull, a mass of 4.2 kg.',
+  scripts: 'Two behaviours attached.',
+}
+
+export const openFiles: TabItem[] = [
+  { value: 'tokens.css', label: 'tokens.css', closable: true },
+  { value: 'layout.css', label: 'layout.css', closable: true, modified: true },
+  { value: 'components.css', label: 'components.css', closable: true },
+  { value: 'README.md', label: 'README.md', closable: true },
+]
+
+let untitled = 0
+export const newFile = (): TabItem => ({ value: `untitled-${++untitled}`, label: `untitled-${untitled}.css`, closable: true, modified: true })

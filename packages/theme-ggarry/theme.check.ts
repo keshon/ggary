@@ -47,6 +47,12 @@ const pairs: Pair[] = [
   { label: 'danger: text on canvas', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-canvas'], min: TEXT },
   // Menu rows. The highlighted row reuses the accent and danger fills above.
   { label: 'menu: shortcut on surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'tabs: resting label on surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'tabs: bar under the selected tab', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'tabs: resting chip label on the track', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'tabs: chip label on its hover plate', fg: '--ggarry-text-default', bg: ['--ggarry-bg-muted'], min: TEXT },
+  { label: 'tabs: unsaved dot on the selected chip', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'tabs: unsaved dot on the track', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-subtle'], min: LARGE },
   { label: 'menubar: item on its hover and open plate', fg: '--ggarry-text-default', bg: ['--ggarry-bg-muted'], min: TEXT },
   { label: 'menu: submenu chevron on the open row plate', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-muted'], min: LARGE },
   // Disabled text is exempt from 1.4.3; it is held to the decor tier, as the

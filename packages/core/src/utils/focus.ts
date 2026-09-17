@@ -44,3 +44,19 @@ export function revealMenuTarget(doc: Document, target: { contentId: string; ite
   if (!target?.itemId) return
   scrollIntoViewIfNeeded(doc.getElementById(target.itemId), doc.getElementById(target.contentId))
 }
+
+/**
+ * Move focus to a tab and keep it inside its tab list's scroll strip. A long
+ * row of open documents scrolls; focusing without scrolling would leave the
+ * focused tab out of sight, and letting focus scroll would move the page.
+ */
+export function focusTab(document: Document, id: string): void {
+  rovingFocus(document, id)
+  const tab = document.getElementById(id)
+  const list = tab?.parentElement
+  if (!tab || !list) return
+  const start = tab.offsetLeft - list.offsetLeft
+  const end = start + tab.offsetWidth
+  if (start < list.scrollLeft) list.scrollLeft = start
+  else if (end > list.scrollLeft + list.clientWidth) list.scrollLeft = end - list.clientWidth
+}

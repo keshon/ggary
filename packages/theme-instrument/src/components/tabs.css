@@ -1,0 +1,152 @@
+/* ==========================================================================
+   Instrument — tabs
+
+   Ported from instrument/src/layout.css (.inst-tabs, .inst-tab,
+   .inst-tabs--chips, .inst-tab-close).
+
+     line   sections: a bar of --size-marker in --accent-solid. The weight does
+            not change on selection, so the tabs after it do not shift.
+     chips  open documents: a raised chip on a recessed track, with weight.
+
+   One deviation: Instrument lays the close cross over the end of the label on
+   a gradient and reserves room only on the selected and unsaved chips. Here
+   room is kept on every closable chip and the cross shows in place, so the
+   label is never covered and nothing needs to know the chip's background.
+   ========================================================================== */
+
+[data-scope='tabs'][data-part='root'] {
+  font-size: var(--text-sm);
+  line-height: var(--leading-ui);
+  color: var(--text-primary);
+}
+
+/* --- line ---------------------------------------------------------------- */
+
+[data-scope='tabs'][data-part='list'][data-variant='line'] {
+  gap: var(--space-6);
+  border-block-end: var(--hairline) solid var(--border);
+}
+
+[data-scope='tabs'][data-part='list'][data-variant='line'] > [data-part='tab'] {
+  gap: var(--space-3);
+  padding-block: var(--space-4);
+  /* Covers the list's hairline by a negative margin rather than half a pixel. */
+  margin-block-end: calc(var(--hairline) * -1);
+  border-block-end: var(--size-marker) solid transparent;
+  color: var(--text-secondary);
+
+  /* Hover lights the bar in a neutral: it shows in advance what selecting does. */
+  &:hover:not([data-disabled]) { color: var(--text-primary); border-block-end-color: var(--border-strong); }
+  &[data-state='active'] { color: var(--text-primary); border-block-end-color: var(--accent-solid); }
+}
+
+[data-scope='tabs'][data-part='list'][data-variant='line'][data-orientation='vertical'] {
+  gap: 0;
+  border-block-end: 0;
+  border-inline-end: var(--hairline) solid var(--border);
+
+  & > [data-part='tab'] {
+    padding: var(--space-3) var(--space-5) var(--space-3) 0;
+    margin-block-end: 0;
+    margin-inline-end: calc(var(--hairline) * -1);
+    border-block-end: 0;
+    border-inline-end: var(--size-marker) solid transparent;
+
+    &:hover:not([data-disabled]) { border-inline-end-color: var(--border-strong); }
+    &[data-state='active'] { border-inline-end-color: var(--accent-solid); }
+  }
+}
+
+/* --- chips --------------------------------------------------------------- */
+
+/* The row is a track: recessed under, raised on top, two steps apart. */
+[data-scope='tabs'][data-part='list'][data-variant='chips'] {
+  gap: var(--space-1);
+  padding: var(--space-2);
+  background: var(--surface-recessed);
+  border-radius: var(--radius-md);
+
+  & > [data-part='tab'] {
+    gap: var(--space-2);
+    min-block-size: var(--control-h-sm);
+    padding-inline: var(--control-pad-sm);
+    border-radius: var(--radius-control-md);
+    color: var(--text-secondary);
+
+    &[data-closable] { padding-inline-end: var(--space-2); }
+    &:hover:not([data-disabled]):not([data-state='active']) { background: var(--surface-hover); color: var(--text-primary); }
+
+    /* Two carriers, neither of them colour: the raised surface and the weight. */
+    &[data-state='active'] {
+      background: var(--surface-raised);
+      color: var(--text-primary);
+      font-weight: var(--weight-medium);
+    }
+  }
+}
+
+[data-scope='tabs'][data-part='tab'][data-disabled] {
+  opacity: 0.5;
+}
+
+/* --- close, and unsaved -------------------------------------------------- */
+
+/* A square with a field around the glyph, and a tap area grown to --tap-min
+   by an invisible ::before — the shape stays small. */
+[data-scope='tabs'][data-part='close'] {
+  position: relative;
+  inline-size: var(--control-h-xs);
+  block-size: var(--control-h-xs);
+  border-radius: var(--radius-2xs);
+  color: var(--text-muted);
+  visibility: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 50% auto auto 50%;
+    translate: -50% -50%;
+    inline-size: var(--tap-min);
+    block-size: var(--tap-min);
+  }
+
+  &:hover { background: var(--surface-active); color: var(--text-primary); }
+}
+
+/* Shown under the cursor and from the keyboard alike (an invisible button Tab
+   reached would be a trap), on the selected tab, and on an unsaved one. */
+[data-scope='tabs'][data-part='tab']:is(:hover, :focus-within, [data-state='active'], [data-modified]) > [data-part='close'] {
+  visibility: visible;
+}
+
+[data-scope='tabs'][data-part='close-icon'] {
+  inline-size: var(--size-chevron);
+  block-size: var(--size-chevron);
+}
+
+/* Unsaved: a dot in place of the cross, until the cross is hovered. */
+[data-scope='tabs'][data-part='tab'][data-modified] > [data-part='close'] {
+  color: var(--accent-mark);
+
+  &:not(:hover) > [data-part='close-icon'] { visibility: hidden; }
+  &:not(:hover)::after {
+    content: '';
+    position: absolute;
+    inset: 50% auto auto 50%;
+    translate: -50% -50%;
+    inline-size: var(--size-dot);
+    block-size: var(--size-dot);
+    border-radius: var(--radius-full);
+    background: currentColor;
+  }
+}
+
+/* --- panel --------------------------------------------------------------- */
+
+[data-scope='tabs'][data-part='panel'] {
+  padding-block-start: var(--gap-group);
+}
+[data-scope='tabs'][data-part='root'][data-orientation='vertical'] > [data-part='panel'] {
+  padding-block-start: 0;
+  padding-inline-start: var(--gap-group);
+}

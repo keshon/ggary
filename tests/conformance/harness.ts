@@ -22,6 +22,7 @@ import type { CheckedState } from '../../packages/core/src/components/checkbox'
 import type { RadioGroupOrientation, RadioItem } from '../../packages/core/src/components/radio-group'
 import type { MenuEntry, MenuItem } from '../../packages/core/src/components/menu'
 import type { MenubarMenu } from '../../packages/core/src/components/menubar'
+import type { TabItem, TabsActivation, TabsOrientation, TabsVariant } from '../../packages/core/src/components/tabs'
 
 export interface ButtonProps {
   label: string
@@ -208,6 +209,20 @@ export interface MenubarProps {
   closeOnSelect?: boolean
 }
 
+export interface TabsProps {
+  items: TabItem[]
+  value?: string | null
+  defaultValue?: string | null
+  onValueChange?: (value: string) => void
+  onClose?: (value: string) => void
+  label?: string
+  orientation?: TabsOrientation
+  activation?: TabsActivation
+  variant?: TabsVariant
+  /** Render a panel per tab reading "Panel <label>". Default true; false for tabs without panels. */
+  panels?: boolean
+}
+
 export interface TooltipProps {
   content: string
   /** The trigger button's label. */
@@ -283,6 +298,7 @@ export interface Adapter {
   tooltip(props: TooltipProps, target: HTMLElement): Promise<Mounted<TooltipProps>>
   menu(props: MenuProps, target: HTMLElement): Promise<Mounted<MenuProps>>
   menubar(props: MenubarProps, target: HTMLElement): Promise<Mounted<MenubarProps>>
+  tabs(props: TabsProps, target: HTMLElement): Promise<Mounted<TabsProps>>
   /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
 }

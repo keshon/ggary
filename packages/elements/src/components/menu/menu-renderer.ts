@@ -7,18 +7,9 @@ import {
   type AttachedPopover,
   type DomProps,
 } from '@ggary/core'
-import { h, spread } from '../../spread'
+import { h, reconcileChildren, spread } from '../../spread'
 
 type Api = MenuApi<DomProps>
-
-/** Put exactly these children in this order, touching nothing that is already in place. */
-function syncChildren(parent: Element, children: Element[]): void {
-  const current = parent.children
-  const same = current.length === children.length && children.every((child, index) => current[index] === child)
-  // Only when something moved: removing the focused item, even to put it back,
-  // would drop focus to <body>.
-  if (!same) parent.replaceChildren(...children)
-}
 
 /**
  * The menu panel and every submenu under it, for <gg-menu> and <gg-menubar>,
@@ -149,7 +140,7 @@ export class MenuRenderer {
         spread(chevron, api.submenuIndicatorProps)
         parts.push(chevron)
       }
-      syncChildren(element, parts)
+      reconcileChildren(element, parts)
 
       if (item.type !== 'submenu' || !api.isSubmenuOpen(path)) return [element]
       // Right after its row, inside the menu: a press inside it is inside the menu.
@@ -176,11 +167,11 @@ export class MenuRenderer {
         rows.push(label)
       }
       for (const { item, index } of node.items) rows.push(...row(item, index))
-      syncChildren(group, rows)
+      reconcileChildren(group, rows)
       return [group]
     })
 
-    syncChildren(parent, children)
+    reconcileChildren(parent, children)
     if (at.length === 0) this.#nodes = next
   }
 }

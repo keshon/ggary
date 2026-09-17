@@ -1,0 +1,59 @@
+/* A tab list is a row that scrolls when it runs out of room, with the scrollbar
+   hidden: the wheel, a touchpad and the keyboard (which keeps the focused tab
+   in view) still scroll it. Vertical tabs stand in a column beside the panel.
+
+   A tab is a <div role="tab">, so it can hold its close button; the button's
+   own browser box is removed here. */
+
+[data-scope='tabs'][data-part='root'][data-orientation='vertical'] {
+  display: flex;
+  align-items: flex-start;
+}
+
+[data-scope='tabs'][data-part='list'] {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+[data-scope='tabs'][data-part='list']::-webkit-scrollbar {
+  inline-size: 0;
+  block-size: 0;
+}
+
+[data-scope='tabs'][data-part='list'][data-orientation='vertical'] {
+  flex: none;
+  flex-direction: column;
+  overflow-x: visible;
+  overflow-y: auto;
+}
+
+[data-scope='tabs'][data-part='tab'] {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+}
+[data-scope='tabs'][data-part='tab'][data-disabled] {
+  cursor: not-allowed;
+}
+
+[data-scope='tabs'][data-part='close'] {
+  appearance: none;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+[data-scope='tabs'][data-part='root'][data-orientation='vertical'] > [data-part='panel'] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}

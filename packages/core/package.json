@@ -49,6 +49,10 @@
       "types": "./src/components/menu/index.ts",
       "default": "./src/components/menu/index.ts"
     },
+    "./tabs": {
+      "types": "./src/components/tabs/index.ts",
+      "default": "./src/components/tabs/index.ts"
+    },
     "./menubar": {
       "types": "./src/components/menubar/index.ts",
       "default": "./src/components/menubar/index.ts"

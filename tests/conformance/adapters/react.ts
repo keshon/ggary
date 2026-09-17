@@ -17,6 +17,7 @@ import {
   RadioGroup,
   Select,
   Switch,
+  Tabs,
   Textarea,
 } from '../../../packages/react/src/index'
 import {
@@ -30,6 +31,7 @@ import {
   type Mounted,
   type PopoverProps,
   type TooltipProps,
+  type TabsProps,
   track,
 } from '../harness'
 
@@ -120,6 +122,10 @@ export const react: Adapter = {
       { ...rest, trigger: (triggerProps: object) => createElement('button', triggerProps, trigger) },
     ]),
   menubar: (props, target) => mount(Menubar, props, target),
+  tabs: (props, target) =>
+    mount(Tabs, props, target, ({ panels = true, ...rest }: TabsProps) => [
+      panels ? { ...rest, children: (item: { label: string }) => `Panel ${item.label}` } : rest,
+    ]),
   menu: (props, target) =>
     mount(Menu, props, target, ({ trigger, ...rest }: MenuProps) => [
       { ...rest, trigger: (triggerProps: object) => createElement('button', triggerProps, trigger) },

@@ -16,10 +16,11 @@
     Select,
     Sheet,
     Switch,
+    Tabs,
     Textarea,
     Tooltip,
   } from '@ggary/svelte'
-  import { appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -54,6 +55,8 @@
   ]
 
   let view = $state(initialView)
+  let files = $state(openFiles)
+  let tabsLog = $state('pick a tab')
   let menuLog = $state('choose something')
 
   let taken = $state(false)
@@ -513,6 +516,36 @@ invalid  ${taken}`}</pre>
     </Tooltip>
   </div>
   <pre class="state">{overlayLog}</pre>
+</section>
+
+<section id="tabs">
+  <h2>Tabs</h2>
+  <Tabs items={propertyTabs} label="Object properties" onValueChange={(value) => (tabsLog = `selected ${value}`)}>
+    {#snippet panel(item)}
+      <p>{propertyPanels[item.value]}</p>
+    {/snippet}
+  </Tabs>
+  <div class="row" style="align-items: center; margin-block-start: 16px">
+    <div style="flex: 1; min-width: 0">
+      <Tabs
+        items={files}
+        variant="chips"
+        label="Open files"
+        onValueChange={(value) => (tabsLog = `selected ${value}`)}
+        onClose={(value) => {
+          files = files.filter((file) => file.value !== value)
+          tabsLog = `closed ${value}`
+        }}
+      >
+        {#snippet panel(item)}
+          <p>Editing {item.label}</p>
+        {/snippet}
+      </Tabs>
+    </div>
+    <Button emphasis="low" onclick={() => (files = [...files, newFile()])}>New file</Button>
+  </div>
+  <pre class="state">{tabsLog}</pre>
+  <p class="hint">Tab reaches the tab list once; the arrows move and select. Open files close with their button, Delete or a middle click, and the neighbour takes over; a dot marks unsaved changes.</p>
 </section>
 
 <section id="menubar">

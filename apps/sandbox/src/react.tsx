@@ -20,10 +20,11 @@ import {
   Select,
   Sheet,
   Switch,
+  Tabs,
   Textarea,
   Tooltip,
 } from '@ggary/react'
-import { appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -48,6 +49,8 @@ function App() {
     setOverlayLog(`${name}  ${open ? 'open' : 'closed'}  reason ${reason}`)
 
   const [view, setView] = useState(initialView)
+  const [files, setFiles] = useState(openFiles)
+  const [tabsLog, setTabsLog] = useState('pick a tab')
   const [menuLog, setMenuLog] = useState('choose something')
 
   const [taken, setTaken] = useState(false)
@@ -597,6 +600,34 @@ function App() {
           />
         </div>
         <pre className="state">{overlayLog}</pre>
+      </section>
+
+      <section id="tabs">
+        <h2>Tabs</h2>
+        <Tabs items={propertyTabs} label="Object properties" onValueChange={(value) => setTabsLog(`selected ${value}`)}>
+          {(item) => <p>{propertyPanels[item.value]}</p>}
+        </Tabs>
+        <div className="row" style={{ alignItems: 'center', marginBlockStart: 16 }}>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <Tabs
+              items={files}
+              variant="chips"
+              label="Open files"
+              onValueChange={(value) => setTabsLog(`selected ${value}`)}
+              onClose={(value) => {
+                setFiles((current) => current.filter((file) => file.value !== value))
+                setTabsLog(`closed ${value}`)
+              }}
+            >
+              {(item) => <p>Editing {item.label}</p>}
+            </Tabs>
+          </div>
+          <Button emphasis="low" onClick={() => setFiles((current) => [...current, newFile()])}>
+            New file
+          </Button>
+        </div>
+        <pre className="state">{tabsLog}</pre>
+        <p className="hint">Tab reaches the tab list once; the arrows move and select. Open files close with their button, Delete or a middle click, and the neighbour takes over; a dot marks unsaved changes.</p>
       </section>
 
       <section id="menubar">

@@ -2,9 +2,9 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two complete design languages on top of it.
-Eighteen components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
-Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Dialog, Sheet, Popover,
-Tooltip, Menu and Menubar — built end to end to prove the architecture holds.
+Nineteen components — Button, Chip, ChipGroup, Select, Field, Fieldset, Input,
+Textarea, Checkbox, CheckboxGroup, Switch, RadioGroup, Tabs, Dialog, Sheet,
+Popover, Tooltip, Menu and Menubar — built end to end to prove the architecture holds.
 
 The two themes are **GGarry**, the kit's own neutral language, and
 **Instrument**, ported from [keshon/instrument](https://github.com/keshon/instrument)
@@ -38,11 +38,11 @@ packages/
   elements/          <gg-button>, <gg-chip>, <gg-chip-group>, <gg-select>, <gg-field>, <gg-input>,
                      <gg-textarea>, <gg-checkbox>, <gg-switch>, <gg-radio-group>, <gg-dialog>, <gg-sheet>,
                      <gg-popover>, <gg-tooltip>, <gg-menu>, <gg-menubar>, <gg-fieldset>,
-                     <gg-checkbox-group>
+                     <gg-checkbox-group>, <gg-tabs>
   react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
                      <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Sheet>, <Popover>, <Tooltip>,
-                     <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>
-  svelte/            the same ten as React
+                     <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>, <Tabs>
+  svelte/            the same components as React
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
 ```
@@ -478,6 +478,57 @@ the default-checked test alone.
 
 A controlled React owner is not told: its value is the value, and the component
 renders it again over the reset.
+
+## Tabs
+
+Tabs follow the WAI-ARIA APG pattern: a tab list with one tab stop, where the arrows
+move along it and each tab controls a panel. There are two jobs and two looks, as in
+Instrument:
+
+| Variant | For | Marked by |
+|---|---|---|
+| `line` | sections of one screen: few, fixed, never closed | a bar under the selected tab; its weight does not change, so the tabs after it do not shift |
+| `chips` | open documents: any number, opened and closed as work goes on | a raised chip on a recessed track, and weight |
+
+```tsx
+<Tabs items={files} variant="chips" label="Open files" onClose={(value) => setFiles(files.filter((f) => f.value !== value))}>
+  {(item) => <Editor file={item.value} />}
+</Tabs>
+```
+
+```html
+<gg-tabs label="Object properties">
+  <section data-tab="geometry" data-label="Geometry">…</section>
+  <section data-tab="material" data-label="Material" data-closable data-modified>…</section>
+</gg-tabs>
+```
+
+- **Activation.** `automatic`, the default: the arrows select as they move. `manual`:
+  the arrows move focus, and Enter or Space selects, for panels that are expensive to
+  show. `orientation="vertical"` walks with ArrowUp and ArrowDown and stands the
+  list beside the panel.
+- **Panels.** React renders the selected panel from `children(item)` and Svelte from a
+  `panel` snippet; `keepMounted` renders all of them, hidden, to keep their state.
+  `<gg-tabs>` enhances the author's own panels: each child with `data-tab` is a panel,
+  and its tab is built from its `data-*`. Adding or removing a panel adds or removes
+  its tab. Without panels, the tabs are a switch for something rendered elsewhere, and
+  they don't point `aria-controls` at nothing.
+- **Closing is a request.** A closable tab carries a close button with an
+  `aria-label`, kept out of the tab order. Delete and a middle click close it too;
+  `onClose` (or `tabclose`) asks, and the owner removes the item. When the selected
+  tab goes, its neighbour is selected and reported, as in an editor. Focus on the
+  closing tab is aimed at that neighbour. A dot marks `modified` in place of the
+  cross, until the pointer reaches it.
+- A tab is a `div role="tab"`, not a button, so it can hold its close button: a
+  button inside a button is invalid HTML.
+
+Found on the way, in `<gg-tabs>`: closing the tab next to the focused one lost focus.
+The list was rebuilt with `replaceChildren`, which detaches the focused tab to put it
+back. The first fix still moved it: with the closed tab in the middle, every tab after
+it looked out of place. `reconcileChildren` now removes leavers first and moves only
+what is out of order, and the menu renderer uses it too. A long strip of documents
+scrolls, with its scrollbar hidden, and the keyboard keeps the focused tab in sight; a
+browser test proves it, and fails without the scroll.
 
 ## The overlay layer, and Dialog
 
@@ -1085,7 +1136,7 @@ Real, and deliberately left open:
 - **Platform close requests** (a back gesture) are cancelled through the `cancel`
   event, which browsers may refuse to let a page cancel without recent user
   activation; the dialog then closes natively and reports `native`.
-- **Not ported from Instrument:** everything beyond these eighteen components —
+- **Not ported from Instrument:** everything beyond these nineteen components —
   prose, the rest of forms (number field, slider, choice cards), tables, the toast
   overlay,
   the agent components (including the composer, a textarea with a toolbar in one

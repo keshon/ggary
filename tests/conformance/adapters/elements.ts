@@ -1,5 +1,5 @@
 import '../../../packages/elements/src/index'
-import type { GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement } from '../../../packages/elements/src/index'
+import type { GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement } from '../../../packages/elements/src/index'
 import {
   type Adapter,
   type ButtonProps,
@@ -19,6 +19,7 @@ import {
   type TooltipProps,
   type MenuProps,
   type MenubarProps,
+  type TabsProps,
   track,
 } from '../harness'
 
@@ -403,6 +404,51 @@ export const elements: Adapter = {
       update: async (patch) => applyPopoverHost(host, patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<PopoverProps>)
+  },
+
+  async tabs(props, target) {
+    const host = document.createElement('gg-tabs') as GgTabsElement
+    let current = props
+    const panels = props.panels ?? true
+    // Panels as an author writes them: a child per tab, which the element reads.
+    const writePanels = (items: TabsProps['items']) => {
+      const existing = new Map([...host.querySelectorAll<HTMLElement>(':scope > [data-tab]')].map((el) => [el.dataset.tab!, el]))
+      for (const [value, el] of existing) if (!items.some((item) => item.value === value)) el.remove()
+      for (const item of items) {
+        const el = existing.get(item.value) ?? document.createElement('section')
+        el.dataset.tab = item.value
+        el.dataset.label = item.label
+        for (const flag of ['disabled', 'closable', 'modified'] as const) el.toggleAttribute(`data-${flag}`, !!item[flag])
+        el.textContent = `Panel ${item.label}`
+        host.append(el)
+      }
+    }
+    if (panels) writePanels(props.items)
+    else host.items = props.items
+    setAttr(host, 'value', props.value ?? props.defaultValue)
+    setAttr(host, 'label', props.label)
+    setAttr(host, 'orientation', props.orientation)
+    setAttr(host, 'activation', props.activation)
+    setAttr(host, 'variant', props.variant)
+    host.addEventListener('valuechange', (e) => current.onValueChange?.((e as CustomEvent).detail.value))
+    host.addEventListener('tabclose', (e) => current.onClose?.((e as CustomEvent).detail.value))
+    target.append(host)
+    return track({
+      root: host,
+      update: async (patch) => {
+        current = { ...current, ...patch }
+        if ('items' in patch) {
+          if (panels) writePanels(patch.items!)
+          else host.items = patch.items!
+        }
+        if ('value' in patch) setAttr(host, 'value', patch.value)
+        if ('orientation' in patch) setAttr(host, 'orientation', patch.orientation)
+        if ('activation' in patch) setAttr(host, 'activation', patch.activation)
+        // The element hears its panels through a MutationObserver, a microtask later.
+        await Promise.resolve()
+      },
+      unmount: async () => host.remove(),
+    } satisfies Mounted<TabsProps>)
   },
 
   async menubar(props, target) {

@@ -16,6 +16,7 @@ import { popoverConformance, tooltipConformance } from './popover.spec'
 import { radioGroupConformance } from './radio-group.spec'
 import { resetConformance } from './reset.spec'
 import { selectConformance } from './select.spec'
+import { tabsConformance } from './tabs.spec'
 import { textareaConformance } from './textarea.spec'
 
 /**
@@ -48,6 +49,7 @@ export function runConformance() {
       tooltipConformance(adapter)
       menuConformance(adapter)
       menubarConformance(adapter)
+      tabsConformance(adapter)
     })
   }
 }

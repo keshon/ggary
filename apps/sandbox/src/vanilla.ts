@@ -2,7 +2,7 @@ import './theme'
 import './shared.css'
 import '@ggary/elements'
 import type { GgCheckboxElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
-import { appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
 
@@ -367,6 +367,27 @@ app.innerHTML = `
     </p>
   </section>
 
+  <section id="tabs">
+    <h2>Tabs</h2>
+    <gg-tabs id="property-tabs" label="Object properties">
+      ${propertyTabs
+        .map((tab) => `<section data-tab="${tab.value}" data-label="${tab.label}"${tab.disabled ? ' data-disabled' : ''}><p>${propertyPanels[tab.value]}</p></section>`)
+        .join('')}
+    </gg-tabs>
+    <div class="row" style="align-items: center; margin-block-start: 16px">
+      <div style="flex: 1; min-width: 0">
+        <gg-tabs id="file-tabs" variant="chips" label="Open files">
+          ${openFiles
+            .map((file) => `<section data-tab="${file.value}" data-label="${file.label}" data-closable${file.modified ? ' data-modified' : ''}><p>Editing ${file.label}</p></section>`)
+            .join('')}
+        </gg-tabs>
+      </div>
+      <gg-button emphasis="low"><button id="new-file">New file</button></gg-button>
+    </div>
+    <pre class="state" id="tabs-state">pick a tab</pre>
+    <p class="hint">Tab reaches the tab list once; the arrows move and select. Open files close with their button, Delete or a middle click, and the neighbour takes over; a dot marks unsaved changes.</p>
+  </section>
+
   <section id="menubar">
     <h2>Menubar</h2>
     <gg-menubar id="app-menubar" label="Application" mnemonics></gg-menubar>
@@ -567,4 +588,28 @@ menubar.addEventListener('itemselect', (event) => {
   view = next
   menubar.menus = appMenus(view)
   viewMenuEl.items = viewMenu(view)
+})
+
+// --- tabs ------------------------------------------------------------------------
+const tabsState = document.getElementById('tabs-state')!
+const fileTabs = document.getElementById('file-tabs')!
+for (const id of ['property-tabs', 'file-tabs']) {
+  document.getElementById(id)!.addEventListener('valuechange', (event) => {
+    tabsState.textContent = `selected ${(event as CustomEvent).detail.value}`
+  })
+}
+// Closing is the page's: remove the panel, and the tab goes with it.
+fileTabs.addEventListener('tabclose', (event) => {
+  const { value } = (event as CustomEvent).detail
+  fileTabs.querySelector(`[data-tab="${CSS.escape(value)}"]`)?.remove()
+  tabsState.textContent = `closed ${value}`
+})
+document.getElementById('new-file')!.addEventListener('click', () => {
+  const file = newFile()
+  const panel = document.createElement('section')
+  Object.assign(panel.dataset, { tab: file.value, label: file.label })
+  panel.toggleAttribute('data-closable', true)
+  panel.toggleAttribute('data-modified', true)
+  panel.innerHTML = `<p>Editing ${file.label}</p>`
+  fileTabs.append(panel)
 })
