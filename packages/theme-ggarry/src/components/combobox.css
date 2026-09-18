@@ -1,0 +1,187 @@
+/* ==========================================================================
+   GGarry — combobox
+
+   A field first: the box is an input's — its border, its height, its focus —
+   and the chips inside it are small quiet plates, not the loud chips of a
+   filter row. The list is Select's list, so the two read as one family; an
+   option with a second line keeps it in the muted ink, and the list that is
+   being refreshed dims rather than blanking.
+   ========================================================================== */
+
+[data-scope='combobox'][data-part='root'] {
+  gap: var(--ggarry-space-1);
+  min-inline-size: 240px;
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='combobox'][data-part='label'] {
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='combobox'][data-part='label'][data-disabled] {
+  opacity: 0.55;
+}
+
+[data-scope='combobox'][data-part='control'] {
+  gap: var(--ggarry-space-1);
+  min-block-size: var(--ggarry-size-control-md);
+  padding: 3px var(--ggarry-space-1) 3px var(--ggarry-space-3);
+  border: 1px solid var(--ggarry-border-control);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-md);
+  transition: border-color var(--ggarry-duration-fast) ease;
+}
+[data-scope='combobox'][data-part='root'][data-multiple] [data-part='control'] {
+  padding-inline-start: var(--ggarry-space-1);
+}
+[data-scope='combobox'][data-part='control']:hover:not([data-disabled]),
+[data-scope='combobox'][data-part='control'][data-state='open'] {
+  border-color: var(--ggarry-border-accent);
+}
+/* The ring goes round the box, not the bare input inside it. */
+[data-scope='combobox'][data-part='control']:has([data-part='input']:focus-visible) {
+  border-color: var(--ggarry-border-accent);
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+[data-scope='combobox'][data-part='control'][data-disabled] {
+  opacity: 0.55;
+  background: var(--ggarry-bg-subtle);
+  cursor: not-allowed;
+}
+
+[data-scope='combobox'][data-part='input'] {
+  min-block-size: calc(var(--ggarry-size-control-md) - 8px);
+}
+/* One ring, the box's: the input inside it draws none of its own. */
+[data-scope='combobox'][data-part='input']:focus-visible {
+  outline: none;
+}
+[data-scope='combobox'][data-part='root'][data-multiple] [data-part='input'] {
+  padding-inline-start: var(--ggarry-space-1);
+}
+[data-scope='combobox'][data-part='input']::placeholder {
+  color: var(--ggarry-text-muted);
+  opacity: 1;
+}
+
+[data-scope='combobox'][data-part='chip'] {
+  gap: 2px;
+  block-size: 24px;
+  padding-inline: var(--ggarry-space-2) 2px;
+  border-radius: var(--ggarry-radius-sm);
+  background: var(--ggarry-bg-muted);
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-sm);
+}
+[data-scope='combobox'][data-part='chip-remove'] {
+  inline-size: 18px;
+  block-size: 18px;
+  border-radius: var(--ggarry-radius-sm);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='combobox'][data-part='chip-remove']:hover {
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='combobox']:is([data-part='clear'], [data-part='trigger']) {
+  inline-size: 26px;
+  block-size: 26px;
+  border-radius: var(--ggarry-radius-sm);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='combobox']:is([data-part='clear'], [data-part='trigger']):hover {
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-default);
+}
+:is([data-scope='combobox'][data-part='chip-remove-icon'], [data-scope='combobox'][data-part='clear-icon']) {
+  inline-size: 12px;
+  block-size: 12px;
+}
+[data-scope='combobox'][data-part='trigger-icon'] {
+  inline-size: 14px;
+  block-size: 14px;
+  transition: rotate var(--ggarry-duration-fast) ease;
+}
+[data-scope='combobox'][data-part='trigger'][data-state='open'] > [data-part='trigger-icon'] {
+  rotate: 180deg;
+}
+
+/* --- the list: Select's ----------------------------------------------------- */
+
+[data-scope='combobox'][data-part='content'] {
+  --listbox-radius: var(--ggarry-radius-lg);
+  --listbox-inset: calc(var(--ggarry-space-1) + 1px);
+  padding: var(--ggarry-space-1);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--listbox-radius);
+  background: var(--ggarry-bg-surface);
+  box-shadow: var(--ggarry-shadow-popover);
+  font-family: var(--ggarry-font-family-sans);
+  transition: opacity var(--ggarry-duration-fast) ease;
+}
+/* The last answer, while the next is on its way: still there, plainly not current. */
+[data-scope='combobox'][data-part='content'][data-stale] {
+  opacity: 0.6;
+}
+
+[data-scope='combobox'][data-part='item'] {
+  column-gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-2);
+  border-radius: max(2px, calc(var(--listbox-radius) - var(--listbox-inset)));
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-md);
+  cursor: pointer;
+  user-select: none;
+}
+[data-scope='combobox'][data-part='item'][data-highlighted] {
+  background: var(--ggarry-bg-accent);
+  color: var(--ggarry-text-on-accent);
+}
+[data-scope='combobox'][data-part='item'][data-selected] {
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+[data-scope='combobox'][data-part='item'][data-disabled] {
+  color: var(--ggarry-text-subtle);
+  cursor: not-allowed;
+}
+[data-scope='combobox'][data-part='item-description'] {
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-normal);
+}
+[data-scope='combobox'][data-part='item'][data-highlighted] > [data-part='item-description'] {
+  color: inherit;
+}
+[data-scope='combobox'][data-part='item-indicator'] {
+  inline-size: 14px;
+  block-size: 14px;
+  opacity: 0;
+}
+[data-scope='combobox'][data-part='item'][data-selected] > [data-part='item-indicator'] {
+  opacity: 1;
+}
+
+[data-scope='combobox']:is([data-part='empty'], [data-part='more']) {
+  padding: var(--ggarry-space-2) var(--ggarry-space-3);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-sm);
+}
+[data-scope='combobox'][data-part='empty'] {
+  text-align: center;
+}
+[data-scope='combobox'][data-part='empty'][data-status='error'] {
+  color: var(--ggarry-text-danger);
+}
+[data-scope='combobox'][data-part='more'] {
+  border-block-start: 1px solid var(--ggarry-border-default);
+  margin-block-start: var(--ggarry-space-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='combobox']:is([data-part='control'], [data-part='content'], [data-part='trigger-icon']) { transition: none; }
+}

@@ -29,6 +29,7 @@
     Menu,
     Menubar,
     Nav,
+    Combobox,
     Grid,
     PageHeader,
     Section,
@@ -77,6 +78,10 @@
     managerItems,
     runLeadMenu,
     saveLead,
+    searchCompanies,
+    managerOptions,
+    tagOptions,
+    HINT_COMBOBOX,
     statusItems,
     statusTone,
     HINT_ROWS,
@@ -99,6 +104,7 @@
   let page = $state(8)
   let leadGrid = $state<DataGridController<Lead>>()
   let leadLog = $state('—')
+  let comboLog = $state('—')
   const searchLeads = debounce((text: string) => leadGrid?.send({ type: 'SET_SEARCH', search: text }))
   $effect(() => {
     if (!leadGrid) return
@@ -928,6 +934,23 @@ invalid  ${taken}`}</pre>
     </Section>
   </div>
   <p class="hint">{HINT_FLOW}</p>
+</section>
+
+<section id="combobox">
+  <h2>Combobox</h2>
+  <div class="fields">
+    <Combobox label="Manager" items={managerOptions} placeholder="Anyone" onValueChange={(value) => (comboLog = `manager: ${value.join(', ') || '—'}`)} />
+    <Combobox label="Tags" items={tagOptions} multiple defaultValue={['renewal', 'partner']} placeholder="Add a tag" name="tags" />
+    <Combobox
+      label="Company"
+      load={searchCompanies}
+      placeholder="Search 700,000 leads"
+      words={{ locale: 'en-US', more: (shown, total) => `${shown} of ${total.toLocaleString('en-US')} — type to narrow` }}
+      onValueChange={(value, chosen) => (comboLog = `company: ${chosen[0]?.label ?? '—'}`)}
+    />
+  </div>
+  <pre class="state">{comboLog}</pre>
+  <p class="hint">{HINT_COMBOBOX}</p>
 </section>
 
 <section id="fields">

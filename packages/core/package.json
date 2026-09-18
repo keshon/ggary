@@ -204,6 +204,10 @@
     "./flow": {
       "types": "./src/components/flow/index.ts",
       "default": "./src/components/flow/index.ts"
+    },
+    "./combobox": {
+      "types": "./src/components/combobox/index.ts",
+      "default": "./src/components/combobox/index.ts"
     }
   },
   "dependencies": {

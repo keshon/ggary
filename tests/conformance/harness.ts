@@ -372,6 +372,19 @@ export interface SectionProps {
   body: string
 }
 
+export interface ComboboxProps {
+  label: string
+  items?: import('../../packages/core/src/components/combobox').ComboboxItem[]
+  load?: import('../../packages/core/src/components/combobox').ComboboxLoad
+  debounce?: number
+  multiple?: boolean
+  defaultValue?: string | string[] | null
+  onValueChange?: (value: string[]) => void
+  placeholder?: string
+  limit?: number
+  name?: string
+}
+
 export interface CheckboxGroupProps {
   items: RadioItem[]
   name?: string
@@ -666,6 +679,8 @@ export interface Adapter {
   flow(props: FlowProps, target: HTMLElement): Promise<Mounted<FlowProps>>
   pageHeader(props: PageHeaderProps, target: HTMLElement): Promise<Mounted<PageHeaderProps>>
   section(props: SectionProps, target: HTMLElement): Promise<Mounted<SectionProps>>
+  /** Optional: an adapter without it skips the combobox spec (the custom elements, while vanilla is undecided). */
+  combobox?(props: ComboboxProps, target: HTMLElement): Promise<Mounted<ComboboxProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
   /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */

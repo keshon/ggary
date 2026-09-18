@@ -1,0 +1,99 @@
+/* The combobox: a box that looks like a field and holds the chips, the input,
+   the clear button and the chevron; and a list in the top layer, placed as
+   Select's is. Geometry only. */
+
+[data-scope='combobox'][data-part='root'] {
+  display: inline-flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+[data-scope='combobox'][data-part='control'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-inline-size: 0;
+  cursor: text;
+}
+/* The input takes what the chips leave on their line, and a line of its own
+   once they leave too little to type in. */
+[data-scope='combobox'][data-part='input'] {
+  flex: 1 1 6ch;
+  min-inline-size: 6ch;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+[data-scope='combobox'][data-part='chip'] {
+  display: inline-flex;
+  align-items: center;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+[data-scope='combobox'][data-part='chip-text'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-scope='combobox']:is([data-part='chip-remove'], [data-part='clear'], [data-part='trigger']) {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* The list: in the top layer, placed by Floating UI, as Select's. */
+[data-scope='combobox'][data-part='positioner'] {
+  position: fixed;
+  inset: 0 auto auto 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+}
+[data-scope='combobox'][data-part='positioner'][data-state='closed'] {
+  display: none;
+}
+[data-scope='combobox'][data-part='content'] {
+  max-height: var(--gg-available-height, 320px);
+  overflow-y: auto;
+  margin: 0;
+  list-style: none;
+}
+[data-scope='combobox'][data-part='content']:focus-visible {
+  outline: none;
+}
+[data-scope='combobox'][data-part='item'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+[data-scope='combobox'][data-part='item-description'] {
+  grid-column: 1;
+}
+[data-scope='combobox'][data-part='item-indicator'] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* Spoken, not shown. */
+[data-scope='combobox'][data-part='status'] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

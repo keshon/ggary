@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two design languages on top of it.
-Fifty-four components — DataGrid, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Fifty-five components — DataGrid, Combobox, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 2717 tests, 1082 of them in headless Chrome
+npm test         # 2797 tests, 1113 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1554,6 +1554,53 @@ Found on the way:
   merges identical interface declarations, so nothing complained. Thirty-two
   duplicates are gone.
 
+## Combobox
+
+A text field with a list under it: type to narrow the list, choose with the
+arrows and Enter or a press. For the choices a Select is too long for — a
+manager out of forty, a company out of 700,000.
+
+```tsx
+<Combobox label="Manager" items={managers} onValueChange={([id]) => assign(id)} />
+<Combobox label="Tags" items={tags} multiple defaultValue={['renewal']} name="tags" />
+<Combobox label="Company" load={(query, signal) => api.companies(query, signal)} />
+```
+
+**The field keeps the focus.** It is the editable combobox of the ARIA
+practices, with list autocomplete: `aria-activedescendant` names the
+highlighted option, and a press on the list is cancelled so the field never
+loses the focus to it. Home and End stay the field's, for the caret. Escape
+closes an open list and, on a closed one, empties the field; leaving without
+choosing puts the field back to the chosen value's label, because an unfinished
+search is not a value. A live status says how many matched, that it is
+searching, or that the search failed.
+
+**A list in the page is filtered as you type,** case, accents and "ё" not
+counting, and ranked: a label that starts with the query first, then one with a
+word that does, then one that contains it — its description included. Only
+`limit` options (50) are drawn; the rest are reached by typing more, and the
+list says how many there are, so a list of thousands costs a list of fifty.
+
+**A server list** is `load(query, signal)`. It is asked when the list is open and
+the typing pauses (`debounce`, 200 ms); a new question aborts the one in flight,
+and an answer to a question no longer asked is dropped, not drawn. While it
+waits, the last answer stays on screen, dimmed. A failure says why and is asked
+again when the list opens next — not on a timer. A chosen value keeps its label
+when the next answer no longer holds it.
+
+**Several values** (`multiple`) stand as chips in the field. The list stays open
+between picks, choosing a chosen one takes it back, each chip's remove button is
+named and is not a tab stop — the field is the one stop — and Backspace in an
+empty field removes the last. With a `name`, each value submits as its own field.
+
+Found on the way:
+
+- **The field drew a ring inside the box's ring.** The box shows the focus for
+  the input inside it, and the theme's own focus rule, in a later layer than the
+  structure's, gave the bare input a second one.
+- **`spellCheck` reached Svelte as a camel-cased attribute.** It joins the
+  normalizers' table of DOM names beside `autoComplete` and `inputMode`.
+
 ## PageHeader, Section, Container, Stack, Cluster and Grid
 
 What goes inside the work area: the top of a screen, the stretches under it,
@@ -1828,14 +1875,14 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 265 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target. |
+| machine | node | `*.machine.test.ts` | 279 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target. |
 | contract | node | `icons.contract.test.ts` | 258 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 996 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1023 tests, 35 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 34 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 996 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1023 tests, 26 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
@@ -1843,6 +1890,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
+| browser | Chrome | `combobox.browser.test.ts` | 4 tests. Real typing; the list under the field, lined up with it, over an ancestor that clips; Enter choosing and Tab moving on with the list gone; a press outside putting the field back; chips wrapping in the box with room left to type. |
 | browser | Chrome | `layout.browser.test.ts` | 16 tests. The column beside the work on a wide screen with only the work scrolling, the drawer out of the tab order until opened and then over an inert page, the window growing past the breakpoint closing it, a bar lying down under the header, a separator dragged by a pointer with its line under it and stopping for the other pane, the keyboard moving it, a status strip staying one line with air around a button in it, a button group of custom elements standing flush; a stack stretching a field and not a button, a grid falling to fewer columns, a container centred under its ceiling, a page header's actions falling under its title, a section's line under its heading, and sections farther apart than their rows. |
 | browser | Chrome | `data-grid-rows.browser.test.ts` | 6 tests. A double click and a click elsewhere saving, Tab walking the editable cells, an edit surviving its row scrolled out of view (elements, and React under StrictMode), the row menu standing at the pointer and handing the focus back, a press on another row while the sheet is open. |
 | dom | jsdom | `react-strict.dom.test.ts` | 1 test. The grid under React StrictMode, which unmounts and remounts once, still loads. |
@@ -1970,6 +2018,10 @@ Real, and deliberately left open:
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that is Instrument's position, and it stays available.
+- **Combobox has no custom element.** Whether the vanilla adapter keeps growing
+  is being decided; its conformance spec skips an adapter without `combobox`.
+- **A combobox cannot create an option.** Typing a value the list does not hold
+  and pressing Enter does nothing; a "Create …" option is not built.
 - **The flow channel knows eight components.** Button, badge, chip, button group,
   avatar, avatar group, spinner and segmented control read `--gg-flow-self`; a
   component of your own sized by its content should read it too, or a stack will

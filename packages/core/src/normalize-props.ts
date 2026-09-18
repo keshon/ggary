@@ -14,6 +14,7 @@ const ATTRIBUTE_NAMES: Record<string, string> = {
   minLength: 'minlength',
   autoComplete: 'autocomplete',
   inputMode: 'inputmode',
+  spellCheck: 'spellcheck',
 }
 
 /**

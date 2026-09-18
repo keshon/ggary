@@ -287,3 +287,42 @@ export function leadFacts(lead: Lead): { label: string; text: string }[] {
 
 export const HINT_ROWS =
   'Company, contact, email, status, manager and paid are editable: F2, Enter, a double click or just typing opens the editor; Enter saves, Escape undoes, Tab goes on to the next editable cell. The save takes 400 ms and shows at once — type a sum on a Lost lead and the server refuses it, the old sum comes back and the grid says why. Right-click a row (or Shift+F10) for its menu; on a row inside a selection the menu acts on all of it. Enter on a non-editable cell, or Open, shows the lead in a sheet that walks to the next and previous lead and follows the grid.'
+
+/** The managers, as options with where they sit. */
+export const managerOptions = MANAGERS.map((name, i) => ({ value: name, label: name, description: ['Moscow', 'Kazan', 'Samara', 'Perm', 'Moscow'][i] }))
+
+let companyIndex: string[] | null = null
+
+/**
+ * The registry's companies as a server would search them: after a delay, the
+ * first 20 whose name starts with the query, and how many there are in all.
+ * The index is only the lower-cased names — built once, in one pass over the
+ * 700,000 leads — and the rest of an option is written for the 20 it returns.
+ */
+export async function searchCompanies(query: string, signal: AbortSignal) {
+  await new Promise((resolve, reject) => {
+    const timer = setTimeout(resolve, 250)
+    signal.addEventListener('abort', () => {
+      clearTimeout(timer)
+      reject(new DOMException('Aborted', 'AbortError'))
+    })
+  })
+  companyIndex ??= leads.map((lead) => lead.company.toLowerCase())
+  const needle = query.trim().toLowerCase()
+  const found: number[] = []
+  let total = 0
+  for (let i = 0; i < companyIndex.length; i += 1) {
+    if (needle && !companyIndex[i].startsWith(needle)) continue
+    total += 1
+    if (found.length < 20) found.push(i)
+  }
+  const items = found.map((i) => ({ value: String(leads[i].id), label: leads[i].company, description: `${leads[i].contact} · lead ${leads[i].id}` }))
+  return { items, total }
+}
+
+export const tagOptions = ['Enterprise', 'Renewal', 'Partner', 'Trial', 'Education', 'Government', 'Nonprofit', 'Startup', 'Churn risk', 'Upsell'].map(
+  (tag) => ({ value: tag.toLowerCase().replace(/\s+/g, '-'), label: tag })
+)
+
+export const HINT_COMBOBOX =
+  'Type to narrow the list: a label that starts with what you typed comes first, and case, accents and ё do not count. Arrows walk it, Enter chooses, Escape closes it and on a closed field empties it; leaving without choosing puts the field back. The field keeps the focus the whole time. Several values stand as chips: Backspace in an empty field takes the last. The company search asks a server — 700,000 leads, answered after 250 ms — once the typing pauses, drops an answer that arrives late for an older question, and keeps the last answer shown while it waits.'

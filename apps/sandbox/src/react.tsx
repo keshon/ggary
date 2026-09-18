@@ -15,6 +15,10 @@ import {
   managerItems,
   runLeadMenu,
   saveLead,
+  searchCompanies,
+  managerOptions,
+  tagOptions,
+  HINT_COMBOBOX,
   statusItems,
   HINT_ROWS,
   statusTone,
@@ -36,6 +40,7 @@ import {
   GridDetail,
   GridFilters,
   GridRowMenu,
+  Combobox,
   Grid,
   PageHeader,
   Section,
@@ -104,6 +109,7 @@ function App() {
   const [page, setPage] = useState(8)
   const [leadGrid, setLeadGrid] = useState<DataGridController<Lead>>()
   const [leadLog, setLeadLog] = useState('—')
+  const [comboLog, setComboLog] = useState('—')
   const searchLeads = useMemo(() => debounce((text: string) => leadGrid?.send({ type: 'SET_SEARCH', search: text })), [leadGrid])
   useEffect(() => {
     if (!leadGrid) return
@@ -1045,6 +1051,23 @@ function App() {
           </Section>
         </div>
         <p className="hint">{HINT_FLOW}</p>
+      </section>
+
+      <section id="combobox">
+        <h2>Combobox</h2>
+        <div className="fields">
+          <Combobox label="Manager" items={managerOptions} placeholder="Anyone" onValueChange={(value) => setComboLog(`manager: ${value.join(', ') || '—'}`)} />
+          <Combobox label="Tags" items={tagOptions} multiple defaultValue={['renewal', 'partner']} placeholder="Add a tag" name="tags" />
+          <Combobox
+            label="Company"
+            load={searchCompanies}
+            placeholder="Search 700,000 leads"
+            words={{ locale: 'en-US', more: (shown, total) => `${shown} of ${total.toLocaleString('en-US')} — type to narrow` }}
+            onValueChange={(value, chosen) => setComboLog(`company: ${chosen[0]?.label ?? '—'}`)}
+          />
+        </div>
+        <pre className="state">{comboLog}</pre>
+        <p className="hint">{HINT_COMBOBOX}</p>
       </section>
 
       <section id="fields">

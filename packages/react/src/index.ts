@@ -90,3 +90,5 @@ export { Rail, Shell, Split, StatusBar, StatusBarItem, StatusBarSpacer } from '.
 export type { RailProps, ShellProps, SplitProps, StatusBarItemProps, StatusBarProps } from './components/layout'
 export { Cluster, ClusterSpacer, Container, Grid, PageHeader, Section, Stack } from './components/layout'
 export type { PageHeaderProps, SectionProps } from './components/layout'
+export { Combobox } from './components/combobox'
+export type { ComboboxProps } from './components/combobox'
