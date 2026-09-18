@@ -37,6 +37,7 @@
     Tree,
     Progress,
     Kanban,
+    CommandPalette,
     Grid,
     PageHeader,
     Section,
@@ -97,7 +98,8 @@
   } from './leads'
   import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import type { PaletteCommand } from '@ggary/core/command-palette'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -118,6 +120,14 @@
   let placeLog = $state('—')
   let boardLog = $state('—')
   let deals = $state.raw(initialDeals)
+  let paletteCommands = $state.raw<PaletteCommand[]>([])
+  let paletteLog = $state('—')
+  // The sections are read from the page once it is drawn.
+  $effect(() => {
+    paletteCommands = sandboxCommands((text) => toast({ tone: 'neutral', title: text }))
+  })
+  const searchLeadCommands = async (query: string, signal: AbortSignal): Promise<PaletteCommand[]> =>
+    (await searchCompanies(query, signal)).items.map((item) => ({ id: `lead:${item.value}`, label: item.label, description: item.description }))
   let dealLog = $state('—')
   const moveDeal = async (move: KanbanMove<Deal>) => {
     await saveDealMove(move.card, move.to.column)
@@ -1068,6 +1078,17 @@ invalid  ${taken}`}</pre>
   </div>
   <pre class="state">{dealLog}</pre>
   <p class="hint">{HINT_KANBAN}</p>
+</section>
+
+<section id="palette">
+  <h2>Command palette</h2>
+  <CommandPalette commands={paletteCommands} load={searchLeadCommands} onRun={(command) => (paletteLog = `ran: ${command.label}`)}>
+    {#snippet trigger(props)}
+      <Button {...props} emphasis="medium">Search or run a command… <kbd class="kbd">Ctrl K</kbd></Button>
+    {/snippet}
+  </CommandPalette>
+  <pre class="state">{paletteLog}</pre>
+  <p class="hint">{HINT_PALETTE}</p>
 </section>
 
 <section id="fields">

@@ -73,6 +73,9 @@
 
   let snapshot = $state(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))
+  // Effects that attach on open read this, not the snapshot: a new snapshot on every
+  // change would detach and attach them again on each key.
+  const isOpen = $derived(snapshot.open)
 
   const api = $derived(
     connect(snapshot, machine.send, svelteNormalizer, {
@@ -94,7 +97,7 @@
   let attached: AttachedDialog | null = null
 
   $effect(() => {
-    if (!snapshot.open) return
+    if (!isOpen) return
     const instance = untrack(() => {
       const { modal, closeOnEscape, closeOnOutside } = machine.getState()
       return attachDialog(content, {

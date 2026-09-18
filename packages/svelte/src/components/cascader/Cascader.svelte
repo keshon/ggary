@@ -39,6 +39,9 @@
   )
   let snapshot = $state.raw(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))
+  // Effects that attach on open read this, not the snapshot: a new snapshot on every
+  // change would detach and attach them again on each key.
+  const isOpen = $derived(snapshot.open)
   const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label, placeholder, rootLabel, name }))
 
   $effect(() => machine.send({ type: 'SYNC_ITEMS', items }))
@@ -60,7 +63,7 @@
 
   $effect(() => {
     const positioner = positionerEl
-    if (!snapshot.open || !triggerEl || !positioner) return
+    if (!isOpen || !triggerEl || !positioner) return
     return untrack(() => {
       const popover = attachPopover(triggerEl!, positioner, { placement: 'bottom-start', gutter: 4, sameWidth: false, onDismiss: () => machine.send({ type: 'CLOSE' }) })
       // The columns are drawn in this same update: focus the highlighted item once they are.

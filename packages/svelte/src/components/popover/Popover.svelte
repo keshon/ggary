@@ -53,6 +53,9 @@
 
   let snapshot = $state(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))
+  // Effects that attach on open read this, not the snapshot: a new snapshot on every
+  // change would detach and attach them again on each key.
+  const isOpen = $derived(snapshot.open)
 
   const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { title: title != null, closeLabel }))
 
@@ -65,7 +68,7 @@
   let attached: AttachedPopover | null = null
 
   $effect(() => {
-    if (!snapshot.open) return
+    if (!isOpen) return
     const instance = untrack(() => {
       const reference = document.getElementById(api.ids.trigger)
       if (!reference) return null

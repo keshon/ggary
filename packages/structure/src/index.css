@@ -33,6 +33,7 @@
 @import './tabs.css';
 @import './disclosure.css';
 @import './kanban.css';
+@import './command-palette.css';
 @import './toast.css';
 @import './display.css';
 @import './regions.css';

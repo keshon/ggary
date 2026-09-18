@@ -1,0 +1,85 @@
+/* The command palette: a modal <dialog> near the top of the viewport, a field
+   over a list that is always shown. Geometry only. */
+
+:root:has([data-scope='command-palette'][data-part='content']:modal) {
+  overflow: hidden;
+}
+[data-scope='command-palette'][data-part='content'] {
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+}
+/* Only when open: a closed <dialog> is display: none. */
+[data-scope='command-palette'][data-part='content'][open] {
+  display: flex;
+  flex-direction: column;
+}
+[data-scope='command-palette'][data-part='control'] {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+[data-scope='command-palette']:is([data-part='search-icon'], [data-part='page']) {
+  flex: none;
+}
+[data-scope='command-palette'][data-part='input'] {
+  flex: 1;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+[data-scope='command-palette'][data-part='list'] {
+  position: relative;
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+[data-scope='command-palette'][data-part='item'] {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+[data-scope='command-palette'][data-part='item'][data-disabled] {
+  cursor: default;
+}
+[data-scope='command-palette'][data-part='item-text'] {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='command-palette']:is([data-part='item-shortcut'], [data-part='item-branch']) {
+  flex: none;
+}
+[data-scope='command-palette'][data-part='item-branch']:dir(rtl) {
+  scale: -1 1;
+}
+[data-scope='command-palette'][data-part='empty'] {
+  margin: 0;
+}
+[data-scope='command-palette'][data-part='footer'] {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+}
+[data-scope='command-palette'][data-part='hint'] {
+  display: inline-flex;
+  align-items: center;
+}
+/* Spoken, not shown: how many match. */
+[data-scope='command-palette'][data-part='status'] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

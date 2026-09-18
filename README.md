@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two design languages on top of it.
-Sixty-two components — DataGrid, Kanban, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Sixty-three components — DataGrid, Kanban, CommandPalette, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 3161 tests, 1258 of them in headless Chrome
+npm test         # 3221 tests, 1283 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1963,6 +1963,71 @@ Found on the way:
   into one core helper, `focusKanbanCard`, which both adapters call and which
   checks before it scrolls.
 
+## CommandPalette
+
+Ctrl+K (⌘K on a Mac) from anywhere on the page: a field that finds what to
+do — an action, a place, a record — and Enter does it.
+
+```tsx
+<CommandPalette
+  commands={[
+    { id: 'new', label: 'New deal', group: 'Actions', shortcut: 'N', run: openNewDeal },
+    { id: 'mode', label: 'Colour mode', group: 'Actions', children: modes },
+    { id: 'go:reports', label: 'Reports', group: 'Go to', keywords: ['analytics'], run: () => navigate('/reports') },
+  ]}
+  load={(query, signal) => api.searchLeads(query, signal)}
+  trigger={(props) => <Button {...props}>Search…</Button>}
+/>
+```
+
+**A modal dialog holding the APG's editable combobox, its list always
+shown.** The focus stays in the field; the arrows move a highlight that
+`aria-activedescendant` names, and loop; PageUp and PageDown go to the ends;
+Enter runs it, and so does a press, which never takes the focus from the
+field. The dialog sits high in the viewport, where the eye already is, over
+the page's scrim, with the page behind it inert.
+
+**What it finds** is matched on the label, its words, `keywords` and the
+description, case and accents not counting: a label that starts with the
+query first, then a word of it, then a keyword — "settings" finds
+Preferences — then anywhere. The commands stand under their `group`
+headings, and a heading stands where its best match falls, so the best
+match of all is first. A live status says how many there are.
+
+**A command with `children` opens a level of its own** — Colour mode ›
+Dark, Move card › a column — shown as a chip before the field, with its own
+placeholder. Backspace in the empty field or Escape goes back up, onto the
+command that opened it; Escape at the top closes.
+
+**Records from a server**, with `load(query, signal)`: asked on the top level
+when the typing pauses (150 ms) and two letters are typed; a new question
+aborts the one in flight, and an answer to a question no longer asked is
+dropped. They stand under their own heading, "Results".
+
+**A command runs after the palette has closed** and given the focus back —
+so a command that opens a dialog of its own gets the focus, rather than
+losing it to the element the palette returns to. `run` on the command, or
+`onRun` for all of them.
+
+Found on the way:
+
+- **Svelte detached and attached every popover on every key.** An effect
+  that attaches on open read `snapshot.open`, and the snapshot is a new
+  object on every change, so the effect ran again for any change at all:
+  the palette closed on its first level, and the cascader sent the focus to
+  its button and back on each arrow — twice in a three-key walk, which a
+  test now counts. Eight components read `open` through a `$derived` now,
+  which only tells its readers when the value itself changes.
+- **Escape never reaches the field.** The dismiss stack takes Escape on the
+  document before any element sees it, so the field cannot decide "back up a
+  level" itself. The dialog's dismiss hands the palette an ESCAPE, and the
+  palette decides: up a level, or closed.
+- **The field drew a ring inside its header.** The theme's own focus rule,
+  in a later layer, outlined the bare input, as it once did the combobox's.
+- **The grid's search had a NUL byte in its source.** A separator written as
+  the character itself made tools read the file as binary; it is `\u0000`,
+  the same string.
+
 ## PageHeader, Section, Container, Stack, Cluster and Grid
 
 What goes inside the work area: the top of a screen, the stretches under it,
@@ -2237,14 +2302,14 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 340 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says. |
-| contract | node | `icons.contract.test.ts` | 332 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 348 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped. |
+| contract | node | `icons.contract.test.ts` | 338 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1143 tests, 75 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1164 tests, 82 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 34 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 1143 tests, 66 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1164 tests, 73 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
@@ -2253,6 +2318,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
 | browser | Chrome | `date-picker.browser.test.ts` | 4 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. |
+| browser | Chrome | `command-palette.browser.test.ts` | 4 tests. The real Ctrl+K opening it modal, high in the viewport, and closing it back to the element before; the list scrolling to keep the highlight in view; a server's records under their heading after the typing pauses; a command that opens a dialog of its own keeping the focus. |
 | browser | Chrome | `kanban.browser.test.ts` | 13 tests. The column's thin themed bar following a dark island; a board given a height holding its columns and a column scrolling to the focus; a drag at a column's edge scrolling it; a real right click opening the card's menu at the pointer and Move to › Done moving it; a card typed with real keys standing faded and giving way to the owner's card with no double. Also A real mouse dragging a card into an empty column, the owner hearing it and the card not opening; a short press still a press; mid-drag, the slot where the card would land and a copy under the pointer, and Escape putting it back; the board scrolling at its edge; a finger that moves scrolling and one held still picking the card up; real keys carrying a card across a board narrower than its columns, the board scrolling to keep it in sight and the card drawn held; Tab out with a card up putting it back and the focus going on; a press on a control inside a card left to the control. |
 | browser | Chrome | `disclosure.browser.test.ts` | 6 tests. A closed section hidden until found, taking no room, and opened by the page's search; a real Space and Enter, the chevron turned; a tree given a height scrolling to the focus under the real keyboard, each level stepped in by 16 pixels with a leaf lined up; a bar's fill measured to the pixel from the start edge in both directions; a ring's sweep and turn. |
 | browser | Chrome | `cascader.browser.test.ts` | 2 tests. The columns side by side under the button over an ancestor that clips, the card keeping to a phone's screen with the focused item scrolled into view; the real keyboard walking down and across, Enter choosing and the focus back on the button. |
@@ -2384,11 +2450,14 @@ Real, and deliberately left open:
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that is Instrument's position, and it stays available.
-- **No custom elements for Kanban, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree or Progress.** The vanilla
+- **No custom elements for Kanban, CommandPalette, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree or Progress.** The vanilla
   adapter is frozen (see its section); their specs skip it.
 - **The date picker has no time.** A day or a range of days; a time of day, and
   the time zone that comes with it, are not built. Nor are presets ("last 7
   days") for a range, or two months side by side.
+- **The palette keeps no history.** Recent commands, frecency and a
+  "did you mean" are yours to put in `commands`; nothing is remembered
+  between openings. A level's children are given up front, not loaded.
 - **The board does not window its columns, or move them.** A column of a few
   hundred cards renders them all; a column is not dragged to another place;
   several cards are not moved at once; there are no swimlanes.

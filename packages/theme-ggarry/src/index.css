@@ -53,6 +53,7 @@
 @import './components/radio-group.css' layer(gg.components);
 @import './components/select.css' layer(gg.components);
 @import './components/combobox.css' layer(gg.components);
+@import './components/command-palette.css' layer(gg.components);
 @import './components/cascader.css' layer(gg.components);
 @import './components/accordion.css' layer(gg.components);
 @import './components/tree.css' layer(gg.components);

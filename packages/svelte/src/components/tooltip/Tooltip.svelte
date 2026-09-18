@@ -48,6 +48,9 @@
 
   let snapshot = $state(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))
+  // Effects that attach on open read this, not the snapshot: a new snapshot on every
+  // change would detach and attach them again on each key.
+  const isOpen = $derived(snapshot.open)
 
   const api = $derived(connect(snapshot, machine.send, svelteNormalizer))
 
@@ -61,7 +64,7 @@
   let content: HTMLDivElement
 
   $effect(() => {
-    if (!snapshot.open) return
+    if (!isOpen) return
     const placement = snapshot.placement
     const instance = untrack(() => {
       const reference = document.querySelector<HTMLElement>(`[aria-describedby~="${api.ids.content}"]`)

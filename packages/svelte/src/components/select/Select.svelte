@@ -49,6 +49,9 @@
 
   let snapshot = $state(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))
+  // Effects that attach on open read this, not the snapshot: a new snapshot on every
+  // change would detach and attach them again on each key.
+  const isOpen = $derived(snapshot.open)
 
   // Identical to the React adapter's `connect()` call — different normalizer.
   const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { placeholder, name }))
@@ -73,7 +76,7 @@
   let contentEl = $state<HTMLUListElement | null>(null)
 
   $effect(() => {
-    if (!snapshot.open || !triggerEl || !positionerEl) return
+    if (!isOpen || !triggerEl || !positionerEl) return
     // Focus stays on the trigger (aria-activedescendant), so no focus management.
     const popover = attachPopover(triggerEl, positionerEl, {
       sameWidth: true,
@@ -92,7 +95,7 @@
   })
 
   $effect(() => {
-    if (!snapshot.open || snapshot.highlightedIndex < 0) return
+    if (!isOpen || snapshot.highlightedIndex < 0) return
     scrollIntoViewIfNeeded(document.getElementById(api.ids.item(snapshot.highlightedIndex)), contentEl)
   })
 </script>

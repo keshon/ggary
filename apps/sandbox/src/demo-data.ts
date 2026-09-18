@@ -1,5 +1,7 @@
 import type { ChipItem } from '@ggary/core/chip-group'
 import { todayISO } from '@ggary/core'
+import type { PaletteCommand } from '@ggary/core/command-palette'
+import { setAxis } from './theme'
 import type { MenuEntry } from '@ggary/core/menu'
 import type { MenubarMenu } from '@ggary/core/menubar'
 import type { TabItem } from '@ggary/core/tabs'
@@ -494,3 +496,33 @@ export const formatAmount = (amount?: number) => (amount === undefined ? 'No amo
 
 export const HINT_KANBAN =
   'Tab to the board: one stop, on a card. The arrows walk the cards; Space picks the focused one up, and then the arrows carry it — up and down, across the columns, Home and End — while a screen reader hears where it is; Space or Enter drops it, Escape puts it back, and Tab away does too. Enter on a card opens it. A move stands at once and fades until the pretend server answers, half a second later; move a deal with no amount into Won and it is refused — the card goes back and the reason is read out. In talks has a limit of 3: past it, the count turns red. The board is held to a height here: each column scrolls its own cards, and a card dragged to a column\u2019s top or bottom scrolls it. Right-click a card, press Shift+F10 on it, or use its ⋯ button for its menu: Move to another column, to the top or the bottom, or the demo\u2019s own Copy link and Archive. Add a card at a column\u2019s foot: Enter adds it and leaves the field open for the next; a title in capitals is refused and comes back to the field. Or drag a card: past a few pixels it comes up, a copy follows the pointer and the card’s slot moves where it would land; near the board’s edge the board scrolls; Escape puts it back. On a touch screen, hold a card still for a moment to pick it up — a quick swipe still scrolls.'
+
+/**
+ * The sandbox's commands: its sections to go to, and a few things to do. Read
+ * from the page once it is drawn, so every section has its own title.
+ */
+export function sandboxCommands(notify: (text: string) => void): PaletteCommand[] {
+  const sections = [...document.querySelectorAll<HTMLElement>('section[id]')].map((section) => ({ id: section.id, title: section.querySelector('h2')?.textContent ?? section.id }))
+  return [
+    {
+      id: 'mode',
+      label: 'Colour mode',
+      group: 'Actions',
+      keywords: ['dark', 'light', 'theme', 'appearance'],
+      placeholder: 'Which mode?',
+      children: ['system', 'light', 'dark'].map((mode) => ({ id: `mode:${mode}`, label: mode[0].toUpperCase() + mode.slice(1), run: () => setAxis('data-mode', mode) })),
+    },
+    { id: 'notify', label: 'Show a notification', group: 'Actions', keywords: ['toast'], run: () => notify('Sent from the command palette') },
+    { id: 'top', label: 'Back to the top', group: 'Actions', shortcut: 'Home', run: () => window.scrollTo({ top: 0 }) },
+    { id: 'export', label: 'Export the grid to CSV', group: 'Actions', description: 'Not in this palette: use the grid’s own button', disabled: true },
+    ...sections.map((section) => ({
+      id: `go:${section.id}`,
+      label: section.title,
+      group: 'Go to',
+      run: () => document.getElementById(section.id)?.scrollIntoView({ block: 'start' }),
+    })),
+  ]
+}
+
+export const HINT_PALETTE =
+  'Press Ctrl+K (⌘K on a Mac) anywhere on the page, or the button. Type to find a section to go to or a thing to do; the arrows move, Enter runs, a press does too. Colour mode opens a level of its own: Backspace in the empty field or Escape goes back up, Escape at the top closes. Type two letters of a company — "ke", "or" — and the leads that match come from the pretend server under Results.'

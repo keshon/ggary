@@ -236,6 +236,10 @@
     "./kanban": {
       "types": "./src/components/kanban/index.ts",
       "default": "./src/components/kanban/index.ts"
+    },
+    "./command-palette": {
+      "types": "./src/components/command-palette/index.ts",
+      "default": "./src/components/command-palette/index.ts"
     }
   },
   "dependencies": {

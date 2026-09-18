@@ -431,6 +431,12 @@ export interface ProgressProps {
   showValue?: boolean
 }
 
+export interface CommandPaletteProps {
+  commands: import('../../packages/core/src/components/command-palette').PaletteCommand[]
+  defaultOpen?: boolean
+  onRun?: (command: import('../../packages/core/src/components/command-palette').PaletteCommand) => void
+}
+
 export interface KanbanProps {
   columns: import('../../packages/core/src/components/kanban').KanbanColumn[]
   cards: import('../../packages/core/src/components/kanban').KanbanCard[]
@@ -752,6 +758,7 @@ export interface Adapter {
   tree?(props: TreeProps, target: HTMLElement): Promise<Mounted<TreeProps>>
   progress?(props: ProgressProps, target: HTMLElement): Promise<Mounted<ProgressProps>>
   kanban?(props: KanbanProps, target: HTMLElement): Promise<Mounted<KanbanProps>>
+  commandPalette?(props: CommandPaletteProps, target: HTMLElement): Promise<Mounted<CommandPaletteProps>>
   datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>

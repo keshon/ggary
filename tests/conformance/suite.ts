@@ -19,6 +19,7 @@ import { comboboxConformance } from './combobox.spec'
 import { cascaderConformance } from './cascader.spec'
 import { disclosureConformance } from './disclosure.spec'
 import { kanbanConformance } from './kanban.spec'
+import { commandPaletteConformance } from './command-palette.spec'
 import { calendarConformance, datePickerConformance } from './date-picker.spec'
 import { breadcrumbsConformance, navConformance, paginationConformance, stepsConformance, toolbarConformance } from './navigation.spec'
 import { menubarConformance } from './menubar.spec'
@@ -74,6 +75,7 @@ export function runConformance() {
       cascaderConformance(adapter)
       disclosureConformance(adapter)
       kanbanConformance(adapter)
+      commandPaletteConformance(adapter)
       calendarConformance(adapter)
       datePickerConformance(adapter)
       checkboxGroupConformance(adapter)

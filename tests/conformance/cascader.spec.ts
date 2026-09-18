@@ -57,6 +57,19 @@ export function cascaderConformance(adapter: Adapter) {
       expect(columns()).toHaveLength(3)
     })
 
+    it('walking the columns never sends the focus back to the button on the way', async () => {
+      const { trigger, press } = await setup()
+      await adapter.act(() => click(trigger()))
+      await adapter.wait(0)
+      let visits = 0
+      trigger().addEventListener('focus', () => visits++)
+      await press('ArrowDown')
+      await press('ArrowRight')
+      await press('ArrowDown')
+      await adapter.wait(0)
+      expect(visits).toBe(0)
+    })
+
     it('Enter on a leaf chooses the path, closes, and gives the focus back to the button', async () => {
       const { m, trigger, press, changes } = await setup({ name: 'place' })
       await adapter.act(() => click(trigger()))

@@ -154,6 +154,12 @@ function commit(): void {
   renderControls()
 }
 
+/** Set one of the current theme's axes — the command palette's "Colour mode" does. */
+export function setAxis(attr: string, value: string): void {
+  settings = { ...settings, axes: { ...settings.axes, [`${settings.theme}:${attr}`]: value } }
+  commit()
+}
+
 apply()
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderControls)
 else renderControls()

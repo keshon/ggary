@@ -1,0 +1,153 @@
+/* ==========================================================================
+   GGarry — command palette
+
+   A dialog's card set high in the viewport, where the eye already is, under
+   the dialog's scrim. The field is the header: a large line with the search
+   glyph, parted from the list by a hairline, the level opened standing before
+   it as a quiet chip. The list is the combobox's — the highlighted command in
+   the accent's fill — with headings in small capitals, and keys drawn as
+   keycaps: at a command's end for its shortcut, and in the footer's hints.
+   ========================================================================== */
+
+[data-scope='command-palette'][data-part='content'] {
+  margin: 12dvh auto auto;
+  inline-size: min(640px, 100vw - 32px);
+  max-block-size: min(480px, 76dvh);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  box-shadow: var(--ggarry-shadow-modal);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+}
+[data-scope='command-palette'][data-part='content']::backdrop {
+  background: var(--ggarry-bg-scrim);
+}
+
+[data-scope='command-palette'][data-part='control'] {
+  gap: var(--ggarry-space-2);
+  min-block-size: 52px;
+  padding-inline: var(--ggarry-space-4);
+  border-block-end: 1px solid var(--ggarry-border-default);
+}
+[data-scope='command-palette'][data-part='search-icon'] {
+  inline-size: 16px;
+  block-size: 16px;
+  color: var(--ggarry-text-muted);
+}
+[data-scope='command-palette'][data-part='page'] {
+  padding: 2px var(--ggarry-space-2);
+  border-radius: var(--ggarry-radius-sm);
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+  white-space: nowrap;
+}
+[data-scope='command-palette'][data-part='input'] {
+  font-size: var(--ggarry-font-size-lg);
+  line-height: 1.4;
+}
+/* The field is the header, and the only thing that ever has the focus here:
+   no ring around it (the theme's own focus rule would draw one). */
+[data-scope='command-palette'][data-part='input']:focus-visible {
+  outline: none;
+}
+[data-scope='command-palette'][data-part='input']::placeholder {
+  color: var(--ggarry-text-subtle);
+  opacity: 1;
+}
+
+[data-scope='command-palette'][data-part='list'] {
+  padding: var(--ggarry-space-2);
+}
+[data-scope='command-palette'][data-part='group'] + [data-part='group'] {
+  margin-block-start: var(--ggarry-space-2);
+}
+[data-scope='command-palette'][data-part='group-label'] {
+  padding: var(--ggarry-space-2) var(--ggarry-space-2) var(--ggarry-space-1);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+[data-scope='command-palette'][data-part='item'] {
+  gap: var(--ggarry-space-3);
+  min-block-size: 36px;
+  padding: var(--ggarry-space-2);
+  border-radius: var(--ggarry-radius-md);
+}
+[data-scope='command-palette'][data-part='item'][data-highlighted] {
+  background: var(--ggarry-bg-accent);
+  color: var(--ggarry-text-on-accent);
+}
+[data-scope='command-palette'][data-part='item'][data-disabled] {
+  color: var(--ggarry-text-subtle);
+}
+[data-scope='command-palette'][data-part='item-description'] {
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-sm);
+}
+[data-scope='command-palette'][data-part='item'][data-highlighted] [data-part='item-description'] {
+  color: inherit;
+}
+[data-scope='command-palette'][data-part='item-branch'] {
+  inline-size: 14px;
+  block-size: 14px;
+  color: var(--ggarry-text-muted);
+}
+[data-scope='command-palette'][data-part='item'][data-highlighted] [data-part='item-branch'] {
+  color: inherit;
+}
+
+/* A key, drawn as a keycap: a command's shortcut, and the footer's hints. */
+[data-scope='command-palette']:is([data-part='item-shortcut'], [data-part='key']) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 20px;
+  block-size: 20px;
+  padding-inline: 5px;
+  border: 1px solid var(--ggarry-border-default);
+  border-block-end-width: 2px;
+  border-radius: var(--ggarry-radius-sm);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-muted);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+}
+[data-scope='command-palette'][data-part='item'][data-highlighted] [data-part='item-shortcut'] {
+  border-color: color-mix(in srgb, currentColor 40%, transparent);
+  background: transparent;
+  color: inherit;
+}
+
+[data-scope='command-palette'][data-part='empty'] {
+  padding: var(--ggarry-space-6) var(--ggarry-space-4);
+  color: var(--ggarry-text-muted);
+  text-align: center;
+}
+[data-scope='command-palette'][data-part='footer'] {
+  gap: var(--ggarry-space-4);
+  padding: var(--ggarry-space-2) var(--ggarry-space-4);
+  border-block-start: 1px solid var(--ggarry-border-default);
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+}
+[data-scope='command-palette'][data-part='hint'] {
+  gap: var(--ggarry-space-1);
+}
+
+@media (forced-colors: active) {
+  [data-scope='command-palette'][data-part='item'][data-highlighted] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+}
