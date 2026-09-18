@@ -12,10 +12,14 @@ import type { GgSelectElement } from '@ggary/elements/components/select/select.e
 import '@ggary/elements/components/select/select.element'
 import { onThemeChange, setAxis, setTheme, themeChoices } from './theme'
 
-/** The mark: two G's, one inside the other, sharing a crossbar. */
-export const LOGO = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-  <path d="M24.49 7.51 A12 12 0 1 0 28 16 H16" />
-  <path d="M20.24 11.76 A6 6 0 1 0 22 16" />
+/**
+ * The mark: two G's, one inside the other, sharing a crossbar. Their openings
+ * are wide and their ends cut square, so the pair reads as letters and not as
+ * an "@".
+ */
+export const LOGO = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="butt" stroke-linejoin="miter" aria-hidden="true">
+  <path d="M19.11 4.41 A12 12 0 1 0 28 16 H16" />
+  <path d="M17.55 10.20 A6 6 0 1 0 22 16" />
 </svg>`
 
 const PAGES = [
@@ -30,7 +34,7 @@ const capital = (text: string) => text[0].toUpperCase() + text.slice(1)
 
 function buildBar(bar: HTMLElement) {
   bar.innerHTML = `
-    <a class="brand" href="#" aria-label="GGary UI, to the top">${LOGO}<span class="wordmark">GGary<span>UI</span></span></a>
+    <a class="brand" href="#" aria-label="GGary UI, to the top">${LOGO}<span class="wordmark">GGary</span></a>
     <gg-segmented-control class="frameworks" label="Framework" size="sm">
       ${PAGES.map((page) => `<label><input type="radio" name="framework" value="${page.value}"${page === here ? ' checked' : ''}> ${page.label}</label>`).join('')}
     </gg-segmented-control>

@@ -44,7 +44,6 @@ header.bar .brand {
 }
 header.bar .brand svg { inline-size: 26px; block-size: 26px; color: var(--gg-accent); flex: none; }
 header.bar .wordmark { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
-header.bar .wordmark span { margin-inline-start: 5px; font-weight: 500; color: var(--gg-text-faint); }
 
 .theme-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-left: auto; }
 /* A select's label beside it, small, rather than over it: the bar is one line. */

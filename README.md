@@ -191,8 +191,9 @@ way on all three pages from four custom elements — a SegmentedControl for the
 framework, a Select per theme axis, a Nav for the sections and a Button to
 open it — imported one by one (`@ggary/elements/components/…`), so the React
 and Svelte pages carry those four and no others: about 5 KB gzipped, in the
-chunk the pages share. The bar sticks to the top with the mark, two G's
-sharing a crossbar; the sections are numbered and parted by a dashed line the
+chunk the pages share. The bar sticks to the top with the mark — two G's
+sharing a crossbar, wide open and cut square so they do not read as an "@" —
+and the name; the sections are numbered and parted by a dashed line the
 page's width; the navigator lists them with the one being read marked — a
 column at the page's left edge, under the bar, where there is room, and
 behind a button at the corner where there is not. The bar stands under the
