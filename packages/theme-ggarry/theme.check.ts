@@ -58,6 +58,11 @@ const pairs: Pair[] = [
   // The arc against the surface, not the track: the arc says busy, the track only draws the circle.
   { label: 'spinner: arc on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'skeleton: bar off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'grid: a header on its band', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'grid: a cell on a hovered row', fg: '--ggarry-text-default', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'grid: a cell on a selected row', fg: '--ggarry-text-default', bg: ['--ggarry-bg-accent-subtle'], min: TEXT },
+  { label: 'grid: the error over the body', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'grid: the line between rows', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
   { label: 'breadcrumbs: the path on the page', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-canvas'], min: TEXT },
   { label: 'breadcrumbs: the chevron between crumbs', fg: '--ggarry-text-subtle', bg: ['--ggarry-bg-canvas'], min: LARGE },
   { label: 'nav: a resting item on the column', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },

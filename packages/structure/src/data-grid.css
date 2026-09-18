@@ -1,0 +1,137 @@
+/* The data grid's layout, whatever the theme. The grid is a scrolling box with
+   a sticky header row and a body as tall as the (possibly scaled) list; rows
+   are absolutely placed at the top the controller computes, so only the rows
+   in view exist. */
+
+/* A virtual list needs a bounded height, or it would grow to hold every row.
+   28rem unless the page gives the frame a height of its own. */
+[data-scope='data-grid'][data-part='frame'] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  block-size: 28rem;
+  min-block-size: 10rem;
+  min-inline-size: 0;
+}
+
+[data-scope='data-grid'][data-part='root'] {
+  position: relative;
+  flex: 1 1 auto;
+  min-block-size: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+[data-scope='data-grid'][data-part='header'] {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  display: flex;
+  min-inline-size: 100%;
+}
+
+[data-scope='data-grid'][data-part='header-cell'] {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: none;
+  min-inline-size: 0;
+  user-select: none;
+}
+[data-scope='data-grid'][data-part='header-cell'][data-align='end'] {
+  justify-content: flex-end;
+}
+[data-scope='data-grid'][data-part='header-cell'][data-select] {
+  justify-content: center;
+}
+[data-scope='data-grid'][data-part='header-label'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-scope='data-grid'][data-part='sort'] {
+  flex: none;
+}
+[data-scope='data-grid'][data-part='resize'] {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  inline-size: 8px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+[data-scope='data-grid'][data-part='body'] {
+  position: relative;
+  min-inline-size: 100%;
+}
+
+[data-scope='data-grid'][data-part='row'] {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  display: flex;
+  min-inline-size: 100%;
+}
+
+/* Block, not flex: text-overflow only works on a block of text, and a cell's
+   text is one line cut with an ellipsis rather than a row that grows. */
+[data-scope='data-grid'][data-part='cell'] {
+  display: block;
+  flex: none;
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: var(--gg-grid-row-height, 32px);
+}
+[data-scope='data-grid'][data-part='cell'][data-align='end'] {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+[data-scope='data-grid'][data-part='cell'][data-select] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Pinned cells stay where they are while the rest scroll under them. */
+[data-scope='data-grid']:is([data-part='cell'], [data-part='header-cell'])[data-pinned] {
+  position: sticky;
+  z-index: 1;
+}
+[data-scope='data-grid'][data-part='header-cell'][data-pinned] {
+  z-index: 3;
+}
+
+[data-scope='data-grid'][data-part='checkbox'] {
+  margin: 0;
+}
+
+[data-scope='data-grid'][data-part='placeholder'] {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* The empty or error message stands over the body, under the header. */
+[data-scope='data-grid'][data-part='overlay'] {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  inset-block-start: var(--gg-grid-header-height, 36px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Spoken, not shown: the live count and the loading state. */
+[data-scope='data-grid'][data-part='status'] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

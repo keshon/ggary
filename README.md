@@ -1,8 +1,8 @@
 # ggary-ui
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
-custom elements, React, Svelte 5), and two complete design languages on top of it.
-Forty-three components — Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+custom elements, React, Svelte 5), and two design languages on top of it.
+Forty-four components — DataGrid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -14,10 +14,17 @@ The two themes are **GGarry**, the kit's own neutral language, and
 to test whether a strict, opinionated language can live on this spine without
 becoming a monolith again.
 
+**Instrument is frozen.** It styles the forty-three components it has, and the
+gates keep checking every one of them; components added after the freeze — the
+data grid onward — are GGarry's only. It stays because a second theme is what
+proves structure and look are really apart: it found bugs in the shared layer
+that GGarry alone never would have (an auto margin that loses to a theme's
+reset, a `display` rule that showed a closed menu).
+
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 2349 tests, 940 of them in headless Chrome
+npm test         # 2434 tests, 967 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1170,6 +1177,118 @@ Found on the way:
   The margin moved into both themes, and a browser test now measures the tail
   against the strip's own inset.
 
+## DataGrid
+
+A list people spend their day in, at any size. It was designed against a real
+one: a sales team's leads registry of about 700,000 rows, where sorting quietly
+reordered only the loaded page, "select all" and CSV export stopped at the page,
+a selection survived filter changes invisibly, 36 columns scrolled the company
+name out of view, headers were internal keys, and every reload swapped the table
+for a spinner and lost the scroll position. Each of those is a thing this grid is
+built not to do.
+
+```tsx
+<DataGrid
+  columns={[
+    { id: 'company', header: 'Company', pinned: 'start' },
+    { id: 'sum', header: 'Paid', type: 'money', currency: 'RUB' },
+    { id: 'status', header: 'Status', type: 'enum', options },
+  ]}
+  source={leadsApi}            // or rows={array}: the grid sorts and filters it itself
+  rowKey={(lead) => lead.id}
+  label="Leads"
+  selectable
+  onRowActivate={openLead}
+  renderCell={(lead, column, text) => (column.id === 'status' ? <Badge tone={tone[lead.status]}>{text}</Badge> : text)}
+/>
+```
+
+```ts
+// A source answers a query; the grid never holds the dataset.
+const leadsApi: GridSource<Lead> = {
+  load: ({ sort, filters, search, range }, signal) =>
+    fetch('/api/leads', { method: 'POST', body: JSON.stringify({ sort, filters, search, range }), signal })
+      .then((response) => response.json()), // { rows, total }
+}
+```
+
+**The grid holds a query, not the data.** Sort (several keys), typed filters
+(text, set, number range, date range), free-text search and the range of rows on
+screen go to a source; the source answers with those rows and the total. An array
+in the page is one kind of source (`createArraySource`, which sorts once per
+query, not once per scroll); a server is another. `applyQuery` is the reference
+for what a query means, so the two cannot disagree about a filter.
+
+**Only a screenful exists.** Rows load in blocks of 100 as they come into view;
+neighbouring blocks travel in one request; a new query aborts the old requests,
+and an answer that arrives late for an old query is dropped rather than drawn;
+dragging the scrollbar across the list aborts the requests for rows scrolled
+past; while a new query loads, the old rows stay on screen, dimmed, instead of a
+spinner; memory is bounded by forgetting the blocks farthest from view.
+
+**The scrollbar covers the whole list.** 700,000 rows of 36px is 25 million
+pixels — past Firefox's height cap of about 17.9 million, where a scrollbar lies
+and the last rows cannot be reached. Above 8 million pixels the scroll range is
+scaled: a pixel of scroll stands for more than a pixel of rows, and rows are
+still drawn at their real height. Rows have one fixed height (a theme sets it as
+`--gg-grid-row-height`); variable heights would need every row measured to know
+where row 500,000 is, which is where most virtual tables break.
+
+**Selection is honest about what it covers.** It is either keys, or "everything
+matching this query, except these" — so "select all 12,400" is one object, and a
+bulk action receives the query and the exceptions (`selectionPayload`) and does
+one request. A new query drops the selection: it was made on rows no longer shown.
+
+**One tab stop.** The grid element keeps the focus and names the active cell
+with `aria-activedescendant`, so recycling rows during a scroll cannot drop the
+focus. Arrows move between cells; Home and End go along a row, Ctrl+Home and
+Ctrl+End to the first and the last of 700,000; Page keys move by a screen;
+Enter or Space on a header sorts (Shift adds a key); Space selects a row,
+Shift+arrows extend, Ctrl+A selects everything matching, Escape clears; Enter on
+a row opens it; Alt+Left and Alt+Right resize the column under a header. It is a
+`role="grid"` with the true `aria-rowcount`, one sorted header marked with
+`aria-sort`, and a live status that says how many rows match and how many are
+selected. The status and the empty or error message live in a frame beside the
+grid, because a grid may own only rows.
+
+**Columns are for working in.** Pinned to the start or the end, resized by
+dragging an edge or by keyboard, hidden and reordered through the state
+(`SET_HIDDEN`, `MOVE`); widths clamp to each column's bounds and the last visible
+column cannot be hidden. Numbers stand at the end of their cell with equal-width
+digits; a cell with no value reads as a dash; money, percentages, dates and
+enums are written by their type in the page's locale.
+
+**A view is an address.** `queryToParams` and `queryFromParams` put a query in
+the URL readably — `?sort=date:desc,name&f.status=in:new|won&f.sum=100..500` — and
+a link naming a column since removed loses that part instead of showing an empty
+grid. Column layout is personal and stays out of links: `columnLayout` and
+`applyColumnLayout` store it and lay it over today's columns, new ones joining
+and removed ones dropping.
+
+In the sandbox, each page carries the registry: 700,000 generated leads, answered
+after 120ms as a server would, with a search field, status badges in cells and
+Enter to open a lead.
+
+Found on the way:
+
+- **React StrictMode killed the grid in the sandbox while every test passed.**
+  StrictMode unmounts and remounts each component once in development, and the
+  grid destroyed its loader on the first unmount, so it sat on "Loading…" forever.
+  The conformance harness renders without StrictMode, which is why nothing
+  caught it. A grid now aborts its requests when it detaches and asks again when
+  it comes back, and `react-strict.dom.test.ts` renders it under StrictMode — it
+  fails with the old code put back.
+- **A checkbox click that was cancelled undid the grid's own drawing.** The
+  browser reverts a cancelled checkbox click after every handler has run, which
+  is after the elements and React adapters had already drawn the new state. The
+  click is no longer cancelled; the box is set to what the grid decided.
+- **Sorting depends on the language.** The first tests assumed Latin before
+  Cyrillic; the machine's locale was Russian, where it is the other way round.
+  The locale is now an option everywhere a sort or a format happens.
+- **A plain click on a tie-breaker column** used to flip its direction as a
+  tie-breaker; it now starts it afresh as the only key, which is what "sort by
+  this" means.
+
 ## Layering inside core
 
 ```
@@ -1374,19 +1493,21 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 195 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers. |
-| contract | node | `icons.contract.test.ts` | 245 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 227 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers. |
+| contract | node | `icons.contract.test.ts` | 251 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 885 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 903 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 885 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 903 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
 | browser | Chrome | `tabs.browser.test.ts` | 4 tests. One tab stop under the real Tab key, vertical tabs beside their panel, a long strip scrolling to the focused tab, a real click closing a tab without losing focus. |
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
+| browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
+| dom | jsdom | `react-strict.dom.test.ts` | 1 test. The grid under React StrictMode, which unmounts and remounts once, still loads. |
 | browser | Chrome | `navigation.browser.test.ts` | 8 tests. A toolbar under the real Tab and arrow keys — wrapping, skipping what is disabled, returning to the tool last used — a field inside it keeping its own arrows, the spacer measured against the strip's inset, the drawn chevron that is in no text, and a step's bar spanning its item. |
 | browser | Chrome | `controls.browser.test.ts` | 5 tests. One tab stop and the arrow keys on a segmented control, a radio really covering its segment, a range input stepped by the keyboard with the fill following as a computed property, and a real pointer dragging an axis letter under capture. |
 | browser | Chrome | `display.browser.test.ts` | 3 tests. An avatar's picture really loading over the initials, a broken one removed, and a picture not drawn while it loads. |
@@ -1495,6 +1616,15 @@ Real, and deliberately left open:
   prose, the rest of forms (number field, slider, choice cards), tables,
   the agent components (including the composer, a textarea with a toolbar in one
   frame) and print styles.
+- **The grid's second half is still to come.** Built: the engine, the grid,
+  virtual scrolling, sorting, selection with "all matching", pinning, resizing,
+  keyboard, URL views. Not yet: a filter bar with removable chips and per-column
+  filter menus, a column picker, a bulk-action bar, export by query, inline
+  editing with rollback, a detail sheet and a context menu. The state for all of
+  them is in core already; what is missing is their UI.
+- **Instrument does not style the data grid.** It is frozen; with Instrument
+  selected, the sandbox's grid shows the structure layer only.
+- **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that is Instrument's position, and it stays available.
 - **No Shell.** The side column, the drawer and the responsive strip Instrument's

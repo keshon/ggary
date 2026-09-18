@@ -1,0 +1,166 @@
+/* ==========================================================================
+   GGarry — data grid
+
+   A working surface for a list people spend their day in. Rows are one line
+   and one height, parted by a hairline rather than zebra stripes; numbers
+   stand at the end of their column with their digits lined up; the header is
+   quieter than the data it names. A selected row is a tint, and its checkbox
+   says the same thing without colour.
+
+   Pinned cells take the row's own ground, so the columns scrolling under them
+   are covered rather than showing through.
+   ========================================================================== */
+
+[data-scope='data-grid'][data-part='frame'] {
+  --gg-grid-row-height: 36px;
+
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  overflow: hidden;
+}
+
+/* The ring goes round the whole grid; the active cell is marked inside it. */
+[data-scope='data-grid'][data-part='root']:focus-visible {
+  outline: none;
+}
+[data-scope='data-grid'][data-part='frame']:has(> [data-part='root']:focus-visible) {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+[data-scope='data-grid'][data-part='root']:focus-visible :is([data-part='cell'], [data-part='header-cell'])[data-focused] {
+  outline: 2px solid var(--ggarry-focus-ring);
+  outline-offset: -2px;
+}
+
+/* --- header -------------------------------------------------------------- */
+
+[data-scope='data-grid'][data-part='header'] {
+  block-size: var(--gg-grid-row-height);
+  background: var(--ggarry-bg-subtle);
+  box-shadow: inset 0 -1px 0 var(--ggarry-border-default);
+}
+
+[data-scope='data-grid'][data-part='header-cell'] {
+  gap: var(--ggarry-space-1);
+  padding-inline: var(--ggarry-space-3);
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+[data-scope='data-grid'][data-part='header-cell'][data-sortable] {
+  cursor: pointer;
+}
+[data-scope='data-grid'][data-part='header-cell'][data-sortable]:hover,
+[data-scope='data-grid'][data-part='header-cell'][data-sorted] {
+  color: var(--ggarry-text-default);
+}
+
+/* The chevron only shows for a sorted column, pointing the way it runs. */
+[data-scope='data-grid'][data-part='sort'] {
+  inline-size: 12px;
+  block-size: 12px;
+  visibility: hidden;
+}
+[data-scope='data-grid'][data-part='header-cell'][data-sorted] > [data-part='sort'] {
+  visibility: visible;
+}
+[data-scope='data-grid'][data-part='sort'][data-direction='asc'] {
+  rotate: 180deg;
+}
+/* The place of a column in a sort by several: 1, 2, 3. */
+[data-scope='data-grid'][data-part='header-cell'][data-sort-order]::after {
+  content: attr(data-sort-order);
+  font-size: 10px;
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='data-grid'][data-part='resize']::after {
+  content: '';
+  position: absolute;
+  inset-block: 25%;
+  inset-inline-end: 3px;
+  inline-size: 1px;
+  background: var(--ggarry-border-default);
+}
+[data-scope='data-grid'][data-part='resize']:hover::after {
+  inset-block: 0;
+  inline-size: 2px;
+  background: var(--ggarry-border-accent);
+}
+
+/* --- rows ---------------------------------------------------------------- */
+
+[data-scope='data-grid'][data-part='row'] {
+  background: var(--ggarry-bg-surface);
+  box-shadow: inset 0 -1px 0 var(--ggarry-border-default);
+}
+[data-scope='data-grid'][data-part='row']:hover {
+  background: var(--ggarry-bg-subtle);
+}
+[data-scope='data-grid'][data-part='row'][data-selected] {
+  background: var(--ggarry-bg-accent-subtle);
+}
+
+[data-scope='data-grid'][data-part='cell'] {
+  padding-inline: var(--ggarry-space-3);
+  line-height: calc(var(--gg-grid-row-height) - 1px);
+}
+[data-scope='data-grid']:is([data-part='cell'], [data-part='header-cell'])[data-pinned] {
+  background: inherit;
+}
+/* The last pinned column draws the edge the rest scroll under. */
+[data-scope='data-grid']:is([data-part='cell'], [data-part='header-cell'])[data-pinned='start'][data-pin-edge] {
+  box-shadow: inset -1px 0 0 var(--ggarry-border-default);
+}
+[data-scope='data-grid']:is([data-part='cell'], [data-part='header-cell'])[data-pinned='end'][data-pin-edge] {
+  box-shadow: inset 1px 0 0 var(--ggarry-border-default);
+}
+
+[data-scope='data-grid'][data-part='checkbox'] {
+  inline-size: 16px;
+  block-size: 16px;
+  accent-color: var(--ggarry-bg-accent);
+  cursor: pointer;
+}
+
+/* A row still on its way: a bar where the text will be. */
+[data-scope='data-grid'][data-part='placeholder'] {
+  inline-size: 60%;
+  block-size: 8px;
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-bg-muted);
+}
+
+/* The previous answer, while the new one loads: still there, plainly not current. */
+[data-scope='data-grid'][data-part='frame'][data-stale] [data-part='body'] {
+  opacity: 0.55;
+  transition: opacity var(--ggarry-duration-normal) ease;
+}
+
+[data-scope='data-grid'][data-part='overlay'] {
+  gap: var(--ggarry-space-3);
+  padding: var(--ggarry-space-6);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='data-grid'][data-part='overlay'] > p {
+  margin: 0;
+}
+[data-scope='data-grid'][data-part='overlay'][data-kind='error'] {
+  color: var(--ggarry-text-danger);
+}
+
+@media (forced-colors: active) {
+  [data-scope='data-grid'][data-part='row'][data-selected] {
+    outline: 1px solid Highlight;
+    outline-offset: -1px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='data-grid'][data-part='frame'][data-stale] [data-part='body'] { transition: none; }
+}

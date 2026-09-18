@@ -7,6 +7,7 @@
     Button,
     Breadcrumbs,
     ButtonGroup,
+    DataGrid,
     Card,
     Checkbox,
     CheckboxGroup,
@@ -48,6 +49,8 @@
     ToolbarSpacer,
     Tooltip,
   } from '@ggary/svelte'
+  import type { DataGridController } from '@ggary/core/data-grid'
+  import { debounce, leadColumns, leadSource, statusTone, type Lead } from './leads'
   import { agentsText, badgeTones, crumbs, densities, importSteps, navGroups, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
@@ -62,6 +65,9 @@
   let extras = $state<string[]>([])
   let chosenFiles = $state<File[]>([])
   let page = $state(8)
+  let leadGrid = $state<DataGridController<Lead>>()
+  let leadLog = $state('—')
+  const searchLeads = debounce((text: string) => leadGrid?.send({ type: 'SET_SEARCH', search: text }))
   let items = $state(tags)
   let selection = $state<string[]>(['design'])
   let formOutput = $state('submit to see the FormData the hidden input contributes')
@@ -685,6 +691,34 @@ invalid  ${taken}`}</pre>
   </div>
   <pre class="state">x {position.x}  y {position.y}  z {position.z}</pre>
   <p class="hint">Drag the axis letter sideways to change the number — Shift is ten times faster, Alt a tenth. The letter is a handle, not a label: each field is named "Position X" in full, because three squares marked X, Y and Z say nothing on their own.</p>
+</section>
+
+<section id="grid">
+  <h2>Data grid</h2>
+  <div class="row" style="align-items: center; margin-bottom: 12px">
+    <div style="flex: 1 1 18rem">
+      <Search label="Search the leads" placeholder="Company, contact or email" onValueChange={searchLeads} />
+    </div>
+  </div>
+  <DataGrid
+    columns={leadColumns}
+    source={leadSource}
+    rowKey={(lead: Lead) => lead.id}
+    label="Leads"
+    selectable
+    locale="en-US"
+    bind:controller={leadGrid}
+    style="block-size: 520px"
+    onRowActivate={(lead: Lead) => (leadLog = `opened ${lead.company} — ${lead.contact}`)}
+    onSelectionChange={(selection) =>
+      (leadLog = selection.mode === 'matching' ? 'selected: every lead matching' : `selected: ${selection.keys.size}`)}
+  >
+    {#snippet cell(lead: Lead, column, text: string)}
+      {#if column.id === 'status'}<Badge tone={statusTone[lead.status]}>{text}</Badge>{:else}{text}{/if}
+    {/snippet}
+  </DataGrid>
+  <pre class="state">{leadLog}</pre>
+  <p class="hint">700,000 leads, answered after a 120 ms delay as a server would. Only a screenful of rows exists at a time; the scrollbar covers the whole list, and the last row is reachable. Sort by a header (Shift adds a second key), drag a header edge to resize, scroll sideways and the company stays pinned. The grid is one Tab stop: arrows move the active cell, Space selects, Shift+arrows extend, Ctrl+A selects all matching, Enter opens a lead.</p>
 </section>
 
 <section id="navigation">

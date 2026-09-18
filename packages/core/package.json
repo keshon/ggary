@@ -172,6 +172,10 @@
     "./toolbar": {
       "types": "./src/components/toolbar/index.ts",
       "default": "./src/components/toolbar/index.ts"
+    },
+    "./data-grid": {
+      "types": "./src/components/data-grid/index.ts",
+      "default": "./src/components/data-grid/index.ts"
     }
   },
   "dependencies": {

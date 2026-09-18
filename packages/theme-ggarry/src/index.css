@@ -29,6 +29,7 @@
 @import './components/button-group.css' layer(gg.components);
 @import './components/card.css' layer(gg.components);
 @import './components/checkbox.css' layer(gg.components);
+@import './components/data-grid.css' layer(gg.components);
 @import './components/checkbox-group.css' layer(gg.components);
 @import './components/chip.css' layer(gg.components);
 @import './components/choice-card.css' layer(gg.components);

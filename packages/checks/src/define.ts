@@ -66,6 +66,13 @@ export interface ThemeCheck {
   contexts: Context[]
   pairs: Pair[]
   waivers?: Waiver[]
+  /**
+   * The components this theme answers for. Left out, it is every component core
+   * ships, and a new one fails parity until the theme styles it. A FROZEN theme
+   * lists what it covers: what it has keeps being checked, and new components
+   * are not owed to it.
+   */
+  components?: string[]
 }
 
 export const defineThemeCheck = (check: ThemeCheck): ThemeCheck => check

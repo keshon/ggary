@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, Button, Checkbox, CheckboxGroup, ChipGroup, Breadcrumbs, ChoiceCardGroup, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, Button, Checkbox, CheckboxGroup, ChipGroup, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
@@ -88,6 +88,8 @@ export const svelte: Adapter = {
   fileDrop: (props, target) => mountSvelte(FileDrop as Component<any>, props, target),
   buttonGroup: (props, target) => mountSvelte(GroupWithControl as Component<any>, props, target, (p) => ({ ...p, group: 'buttons' })),
   breadcrumbs: (props, target) => mountSvelte(Breadcrumbs as Component<any>, props, target),
+  dataGrid: (props, target) =>
+    mountSvelte(DataGrid as Component<any>, props, target, (p) => ({ rowKey: (row: { id: unknown }) => row.id, ...p })),
   nav: (props, target) => mountSvelte(Nav as Component<any>, props, target),
   pagination: (props, target) => mountSvelte(Pagination as Component<any>, props, target),
   steps: (props, target) => mountSvelte(Steps as Component<any>, props, target),

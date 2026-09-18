@@ -73,9 +73,14 @@ export function checkStructure(check: ThemeCheck, workspaceRoot: string): Findin
 
   // 4. Parity: every component core ships has a stylesheet in every theme.
   //    "Done" for a component means done in all themes; this makes that a rule
-  //    rather than a habit.
+  //    rather than a habit. A frozen theme names the components it answers for,
+  //    and those are held to the same rule; a name core does not ship is a typo.
   const componentsDir = join(workspaceRoot, 'packages', 'core', 'src', 'components')
-  for (const component of readdirSync(componentsDir)) {
+  const shipped = readdirSync(componentsDir)
+  for (const name of check.components ?? []) {
+    if (!shipped.includes(name)) add({ check: 'parity', message: `answers for "${name}", which core does not ship` })
+  }
+  for (const component of check.components ?? shipped) {
     const expected = resolve(join(srcDir, 'components', `${component}.css`))
     if (!existsSync(expected)) {
       add({ check: 'parity', message: `core ships "${component}" but the theme has no components/${component}.css` })

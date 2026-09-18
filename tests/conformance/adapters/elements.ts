@@ -1,5 +1,5 @@
 import '../../../packages/elements/src/index'
-import type { GgAvatarGroupElement, GgChoiceCardsElement, GgNumberFieldElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
+import type { GgAvatarGroupElement, GgChoiceCardsElement, GgDataGridElement, GgNumberFieldElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
 import {
   type Adapter,
   type ButtonProps,
@@ -13,6 +13,7 @@ import {
   type SwitchProps,
   type RadioGroupProps,
   type BreadcrumbsProps,
+  type DataGridProps,
   type ButtonGroupProps,
   type ChoiceCardGroupProps,
   type NavProps,
@@ -585,6 +586,26 @@ export const elements: Adapter = {
       update: async (patch) => apply(patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<ButtonGroupProps>)
+  },
+
+  async dataGrid(props, target) {
+    const host = document.createElement('gg-data-grid') as GgDataGridElement
+    setAttr(host, 'label', props.label)
+    setAttr(host, 'selectable', props.selectable)
+    setAttr(host, 'locale', props.locale)
+    if (props.onRowActivate) host.addEventListener('rowactivate', (e) => props.onRowActivate!((e as CustomEvent).detail.row, (e as CustomEvent).detail.index))
+    if (props.onSelectionChange) host.addEventListener('selectionchange', (e) => props.onSelectionChange!((e as CustomEvent).detail.selection))
+    if (props.onQueryChange) host.addEventListener('querychange', (e) => props.onQueryChange!((e as CustomEvent).detail.query))
+    target.append(host)
+    host.rowKey = (row: { id: string | number }) => row.id
+    host.columns = props.columns
+    if (props.source) host.source = props.source
+    else host.rows = props.rows
+    return track({
+      root: host,
+      update: async () => {},
+      unmount: async () => host.remove(),
+    } satisfies Mounted<DataGridProps>)
   },
 
   async breadcrumbs(props, target) {

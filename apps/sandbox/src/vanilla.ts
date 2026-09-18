@@ -2,7 +2,8 @@ import './theme'
 import './shared.css'
 import '@ggary/elements'
 import { toast } from '@ggary/elements'
-import type { GgAvatarGroupElement, GgCheckboxElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
+import { debounce, leadColumns, leadSource, statusTone, type Lead } from './leads'
+import type { GgDataGridElement, GgAvatarGroupElement, GgCheckboxElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
 import { agentsText, badgeTones, crumbs, densities, importSteps, navGroups, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
@@ -471,6 +472,17 @@ app.innerHTML = `
     <p class="hint">Drag the axis letter sideways to change the number — Shift is ten times faster, Alt a tenth. The letter is a handle, not a label: each field is named "Position X" in full, because three squares marked X, Y and Z say nothing on their own.</p>
   </section>
 
+  <section id="grid">
+    <h2>Data grid</h2>
+    <div class="row" style="align-items: center; margin-bottom: 12px">
+      <gg-search label="Search the leads" style="flex: 1 1 18rem"><input type="search" id="lead-search" placeholder="Company, contact or email"></gg-search>
+      <span class="hint" id="lead-count" style="margin: 0">Loading…</span>
+    </div>
+    <gg-data-grid id="leads" label="Leads" selectable locale="en-US" style="block-size: 520px"></gg-data-grid>
+    <pre class="state" id="lead-state">—</pre>
+    <p class="hint">700,000 leads, answered after a 120 ms delay as a server would. Only a screenful of rows exists at a time; the scrollbar covers the whole list, and the last row is reachable. Sort by a header (Shift adds a second key), drag a header edge to resize, scroll sideways and the company stays pinned. The grid is one Tab stop: arrows move the active cell, Space selects, Shift+arrows extend, Ctrl+A selects all matching, Enter opens a lead.</p>
+  </section>
+
   <section id="navigation">
     <h2>Breadcrumbs</h2>
     <gg-breadcrumbs label="Breadcrumbs">
@@ -926,3 +938,36 @@ document.getElementById('pages')!.addEventListener('pagechange', (event) => {
   press.preventDefault()
   pagesState.textContent = `page ${page}`
 })
+
+// --- data grid -----------------------------------------------------------------------
+const leadGrid = document.getElementById('leads') as GgDataGridElement<Lead>
+leadGrid.rowKey = (lead) => lead.id
+leadGrid.columns = leadColumns
+leadGrid.renderCell = (lead, column, text) => {
+  if (column.id !== 'status') return text
+  const badge = document.createElement('gg-badge')
+  badge.setAttribute('tone', statusTone[lead.status])
+  badge.textContent = text
+  return badge
+}
+leadGrid.source = leadSource
+const leadState = document.getElementById('lead-state')!
+const leadCount = document.getElementById('lead-count')!
+const showCount = () => {
+  const snapshot = leadGrid.controller?.getSnapshot()
+  const total = snapshot?.data.total
+  leadCount.textContent = total === undefined ? 'Loading…' : `${total.toLocaleString('en-US')} leads`
+}
+leadGrid.controller?.subscribe(showCount)
+leadGrid.addEventListener('rowactivate', (event) => {
+  const { row } = (event as CustomEvent).detail as { row: Lead }
+  leadState.textContent = `opened ${row.company} — ${row.contact}`
+})
+leadGrid.addEventListener('selectionchange', (event) => {
+  const { selection } = (event as CustomEvent).detail
+  leadState.textContent = selection.mode === 'matching' ? 'selected: every lead matching' : `selected: ${selection.keys.size}`
+})
+document.getElementById('lead-search')!.addEventListener(
+  'input',
+  debounce((event: Event) => leadGrid.controller?.send({ type: 'SET_SEARCH', search: (event.target as HTMLInputElement).value }))
+)

@@ -17,15 +17,26 @@ const ATTRIBUTE_NAMES: Record<string, string> = {
 }
 
 /**
- * `style` is canonical as an object of custom properties — a data channel such
- * as a slider's fill, never a look. React takes the object; an attribute needs
- * the declaration text.
+ * `style` is canonical as an object keyed by CSS property names — custom
+ * properties such as a slider's fill, or the geometry of a virtual row: data,
+ * never a look. React takes the object in camelCase; an attribute needs the
+ * declaration text.
  */
 const styleText = (style: Dict) =>
   Object.entries(style)
     .filter(([, value]) => value !== undefined && value !== null)
     .map(([name, value]) => `${name}: ${value}`)
     .join('; ')
+
+/** React names style properties in camelCase; a custom property keeps its name. */
+const reactStyle = (style: Dict) => {
+  const out: Dict = {}
+  for (const [name, value] of Object.entries(style)) {
+    if (value === undefined || value === null) continue
+    out[name.startsWith('--') ? name : name.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase())] = value
+  }
+  return out
+}
 
 /** Drop `undefined` (absent) and `false` (absent boolean attribute). */
 const isAbsent = (v: unknown) => v === undefined || v === null || v === false
@@ -49,6 +60,7 @@ export const reactNormalizer: Normalizer = (props: Dict) => {
   for (const [key, value] of Object.entries(props)) {
     if (isAbsentProp(key, value)) continue
     if (key === 'class') out.className = value
+    else if (key === 'style' && typeof value === 'object') out.style = reactStyle(value)
     else if (key === 'for') out.htmlFor = value
     // React names the native `input` event `onChange`, and a controlled input
     // without onChange is read-only in React. Same event, React's word for it.

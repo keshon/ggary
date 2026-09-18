@@ -104,6 +104,16 @@ describe('structural checks', () => {
     expect(kinds(root)).toEqual(['orphans'])
   })
 
+  it('a frozen theme answers only for what it lists — and a listed name must exist', () => {
+    const root = workspace({ components: ['button'] })
+    mkdirSync(join(root, 'packages/core/src/components/dialog'), { recursive: true })
+    // dialog arrived after the freeze: not owed.
+    expect(kinds(root, theme({ components: ['button'] }))).toEqual([])
+    // a listed component the theme lost is still caught, and so is a typo.
+    expect(kinds(root, theme({ components: ['button', 'dialog'] }))).toEqual(['parity'])
+    expect(kinds(root, theme({ components: ['button', 'buton'] }))).toEqual(['parity', 'parity'])
+  })
+
   it('reports a component core ships but the theme does not style', () => {
     const root = workspace({ components: ['button'] })
     // core grows a component the theme never heard of

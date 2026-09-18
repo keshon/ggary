@@ -1,7 +1,9 @@
 import './theme'
 import './shared.css'
 
-import { StrictMode, useState, type FormEvent } from 'react'
+import { StrictMode, useMemo, useState, type FormEvent } from 'react'
+import type { DataGridController } from '@ggary/core/data-grid'
+import { debounce, leadColumns, leadSource, statusTone, type Lead } from './leads'
 import { createRoot } from 'react-dom/client'
 import {
   Avatar,
@@ -11,6 +13,7 @@ import {
   Button,
   Breadcrumbs,
   ButtonGroup,
+  DataGrid,
   Card,
   Checkbox,
   CheckboxGroup,
@@ -67,6 +70,9 @@ function App() {
   const [extras, setExtras] = useState<string[]>([])
   const [chosenFiles, setChosenFiles] = useState<File[]>([])
   const [page, setPage] = useState(8)
+  const [leadGrid, setLeadGrid] = useState<DataGridController<Lead>>()
+  const [leadLog, setLeadLog] = useState('—')
+  const searchLeads = useMemo(() => debounce((text: string) => leadGrid?.send({ type: 'SET_SEARCH', search: text })), [leadGrid])
   const [items, setItems] = useState(tags)
   const [selection, setSelection] = useState<string[]>(['design'])
   const [formOutput, setFormOutput] = useState('submit to see the FormData the hidden input contributes')
@@ -775,6 +781,34 @@ function App() {
         </div>
         <pre className="state">{`x ${position.x}  y ${position.y}  z ${position.z}`}</pre>
         <p className="hint">Drag the axis letter sideways to change the number — Shift is ten times faster, Alt a tenth. The letter is a handle, not a label: each field is named "Position X" in full, because three squares marked X, Y and Z say nothing on their own.</p>
+      </section>
+
+      <section id="grid">
+        <h2>Data grid</h2>
+        <div className="row" style={{ alignItems: 'center', marginBottom: 12 }}>
+          <div style={{ flex: '1 1 18rem' }}>
+            <Search label="Search the leads" placeholder="Company, contact or email" onValueChange={searchLeads} />
+          </div>
+        </div>
+        <DataGrid
+          columns={leadColumns}
+          source={leadSource}
+          rowKey={(lead) => lead.id}
+          label="Leads"
+          selectable
+          locale="en-US"
+          controllerRef={setLeadGrid}
+          style={{ blockSize: 520 }}
+          renderCell={(lead, column, text) =>
+            column.id === 'status' ? <Badge tone={statusTone[lead.status]}>{text}</Badge> : text
+          }
+          onRowActivate={(lead) => setLeadLog(`opened ${lead.company} — ${lead.contact}`)}
+          onSelectionChange={(selection) =>
+            setLeadLog(selection.mode === 'matching' ? 'selected: every lead matching' : `selected: ${selection.keys.size}`)
+          }
+        />
+        <pre className="state">{leadLog}</pre>
+        <p className="hint">700,000 leads, answered after a 120 ms delay as a server would. Only a screenful of rows exists at a time; the scrollbar covers the whole list, and the last row is reachable. Sort by a header (Shift adds a second key), drag a header edge to resize, scroll sideways and the company stays pinned. The grid is one Tab stop: arrows move the active cell, Space selects, Shift+arrows extend, Ctrl+A selects all matching, Enter opens a lead.</p>
       </section>
 
       <section id="navigation">

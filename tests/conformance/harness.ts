@@ -507,6 +507,18 @@ export interface ToolbarProps {
   tools?: string[]
 }
 
+export interface DataGridProps {
+  columns: import('../../packages/core/src/components/data-grid').ColumnDef<any>[]
+  rows?: any[]
+  source?: import('../../packages/core/src/components/data-grid').GridSource<any>
+  label: string
+  selectable?: boolean
+  locale?: string
+  onRowActivate?: (row: any, index: number) => void
+  onSelectionChange?: (selection: import('../../packages/core/src/components/data-grid').Selection) => void
+  onQueryChange?: (query: import('../../packages/core/src/components/data-grid').GridQuery) => void
+}
+
 export interface CheckboxGroupProps {
   items: RadioItem[]
   name?: string
@@ -790,26 +802,8 @@ export interface Adapter {
   pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
   steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
   toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
-  breadcrumbs(props: BreadcrumbsProps, target: HTMLElement): Promise<Mounted<BreadcrumbsProps>>
-  nav(props: NavProps, target: HTMLElement): Promise<Mounted<NavProps>>
-  pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
-  steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
-  toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
-  breadcrumbs(props: BreadcrumbsProps, target: HTMLElement): Promise<Mounted<BreadcrumbsProps>>
-  nav(props: NavProps, target: HTMLElement): Promise<Mounted<NavProps>>
-  pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
-  steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
-  toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
-  breadcrumbs(props: BreadcrumbsProps, target: HTMLElement): Promise<Mounted<BreadcrumbsProps>>
-  nav(props: NavProps, target: HTMLElement): Promise<Mounted<NavProps>>
-  pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
-  steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
-  toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
-  breadcrumbs(props: BreadcrumbsProps, target: HTMLElement): Promise<Mounted<BreadcrumbsProps>>
-  nav(props: NavProps, target: HTMLElement): Promise<Mounted<NavProps>>
-  pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
-  steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
-  toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
+  /** Updates are not supported: a grid's props are read at mount. */
+  dataGrid(props: DataGridProps, target: HTMLElement): Promise<Mounted<DataGridProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
   /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */
   fieldset(props: FieldsetProps, target: HTMLElement): Promise<Mounted<FieldsetProps>>
