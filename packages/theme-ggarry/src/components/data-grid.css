@@ -121,11 +121,12 @@
   box-shadow: inset 1px 0 0 var(--ggarry-border-default);
 }
 
+/* The selection boxes are drawn by checkbox.css, as the Checkbox's are. */
 [data-scope='data-grid'][data-part='checkbox'] {
-  inline-size: 16px;
-  block-size: 16px;
-  accent-color: var(--ggarry-bg-accent);
   cursor: pointer;
+}
+[data-scope='data-grid'][data-part='checkbox']:disabled {
+  cursor: default;
 }
 
 /* A row still on its way: a bar where the text will be. */

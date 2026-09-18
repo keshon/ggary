@@ -96,7 +96,7 @@
       {#each api.headerCells as header (header.key)}
         <div {...header.props}>
           {#if header.isSelect}
-            <input {...header.checkboxProps} indeterminate={header.indeterminate} />
+            <span {...api.checkboxControlProps}><input {...header.checkboxProps} indeterminate={header.indeterminate} /><span {...header.checkboxIndicatorProps}></span></span>
           {:else}
             <span {...header.labelProps}>{header.label}</span>
             {#if header.sortable}<span {...header.sortProps}></span>{/if}
@@ -111,7 +111,7 @@
           {#each line.cells as item (item.key)}
             <div {...item.props}>
               {#if item.isSelect}
-                <input {...item.checkboxProps} />
+                <span {...api.checkboxControlProps}><input {...item.checkboxProps} /><span {...api.checkboxIndicatorProps}></span></span>
               {:else if line.row === undefined}
                 <span {...api.placeholderProps}></span>
               {:else if item.editor}

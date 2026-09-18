@@ -66,3 +66,8 @@
   justify-self: center;
   color: var(--accent-on);
 }
+
+/* The DataGrid's boxes stay the browser's here: its drawn mark is GGarry's. */
+[data-scope='data-grid'][data-part='checkbox-indicator'] {
+  display: none;
+}

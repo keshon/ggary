@@ -8,6 +8,10 @@
    The unchecked box is recognised by its border alone, so the border is
    border-control (3:1). The checked fill is the accent and must hold 3:1 on
    the surface; the mark on it is text-on-accent.
+
+   The DataGrid's selection boxes wear the same box, in the grid's own parts
+   — checkbox-control, checkbox, checkbox-indicator — so a table's boxes are
+   the form's boxes, in both modes.
    ========================================================================== */
 
 :is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='root'] {
@@ -32,7 +36,8 @@
 /* WCAG 2.2's 24px target without a 24px box: an invisible area on the control.
    On the control, not the input — an <input> renders no pseudo-elements in
    every browser, and the control is the element that is always there. */
-:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='control']::before {
+:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='control']::before,
+[data-scope='data-grid'][data-part='checkbox-control']::before {
   content: '';
   position: absolute;
   inset-block-start: 50%;
@@ -42,7 +47,10 @@
   block-size: max(100%, 24px);
 }
 
-:is([data-scope='checkbox'], [data-scope='radio'])[data-part='input'] {
+:is([data-scope='checkbox'], [data-scope='radio'])[data-part='input'],
+[data-scope='data-grid'][data-part='checkbox'] {
+  appearance: none;
+  margin: 0;
   inline-size: 16px;
   block-size: 16px;
   border: 1px solid var(--ggarry-border-control);
@@ -52,11 +60,13 @@
   transition: background-color var(--ggarry-duration-fast) ease, border-color var(--ggarry-duration-fast) ease;
 }
 
-:is([data-scope='checkbox'], [data-scope='radio'])[data-part='input']:hover:not(:disabled):not(:checked):not(:indeterminate):not([data-invalid]) {
+:is([data-scope='checkbox'], [data-scope='radio'])[data-part='input']:hover:not(:disabled):not(:checked):not(:indeterminate):not([data-invalid]),
+[data-scope='data-grid'][data-part='checkbox']:hover:not(:disabled):not(:checked):not(:indeterminate) {
   border-color: var(--ggarry-border-accent);
 }
 
-:is([data-scope='checkbox'], [data-scope='radio'])[data-part='input']:is(:checked, [data-state='indeterminate']) {
+:is([data-scope='checkbox'], [data-scope='radio'])[data-part='input']:is(:checked, [data-state='indeterminate']),
+[data-scope='data-grid'][data-part='checkbox']:is(:checked, :indeterminate) {
   background: var(--ggarry-bg-accent);
   border-color: var(--ggarry-bg-accent);
 }
@@ -65,7 +75,8 @@
   border-color: var(--ggarry-border-danger);
 }
 
-[data-scope='checkbox'][data-part='indicator'] {
+[data-scope='checkbox'][data-part='indicator'],
+[data-scope='data-grid'][data-part='checkbox-indicator'] {
   inline-size: 12px;
   block-size: 12px;
   align-self: center;
@@ -80,5 +91,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :is([data-scope='checkbox'], [data-scope='radio'])[data-part='input'] { transition: none; }
+  :is([data-scope='checkbox'], [data-scope='radio'])[data-part='input'],
+  [data-scope='data-grid'][data-part='checkbox'] { transition: none; }
 }

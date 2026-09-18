@@ -75,8 +75,10 @@
 }
 [data-scope='command-palette'][data-part='item'] {
   gap: var(--ggarry-space-3);
-  min-block-size: 36px;
-  padding: var(--ggarry-space-2);
+  /* 32 pixels a row, as the select's options. */
+  min-block-size: 32px;
+  padding: 6px var(--ggarry-space-2);
+  line-height: 20px;
   border-radius: var(--ggarry-radius-md);
 }
 [data-scope='command-palette'][data-part='item'][data-highlighted] {

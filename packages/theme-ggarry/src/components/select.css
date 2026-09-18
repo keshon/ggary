@@ -73,7 +73,6 @@
 /* Placement, the closed state and scrolling live in @ggary/structure. */
 [data-scope='select'][data-part='content'] {
   --listbox-radius: var(--ggarry-radius-lg);
-  --listbox-inset: calc(var(--ggarry-space-1) + 1px);
 
   padding: var(--ggarry-space-1);
   background: var(--ggarry-bg-surface);
@@ -87,13 +86,16 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--ggarry-space-2);
-  padding: var(--ggarry-space-2) var(--ggarry-space-2);
+  /* 32 pixels an option: a line of 20 and 6 either side. As tall as the field
+     that opens it, a highlighted option read as a second field, and a heavy one. */
+  padding: 6px var(--ggarry-space-2);
   font-size: var(--ggarry-font-size-md);
+  line-height: 20px;
   color: var(--ggarry-text-default);
-  /* Concentric with the panel: the panel's radius less the padding and border
-     between them, so a highlighted first or last option follows the panel's
-     curve instead of cutting a second, tighter one inside it. */
-  border-radius: max(2px, calc(var(--listbox-radius) - var(--listbox-inset)));
+  /* The field's own corner. The panel's less its inset would be concentric,
+     but a pixel tighter than the field it opens from, and the eye holds the
+     option against the field. */
+  border-radius: var(--ggarry-radius-md);
   cursor: pointer;
   user-select: none;
 }

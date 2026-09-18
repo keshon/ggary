@@ -115,7 +115,6 @@
 
 [data-scope='combobox'][data-part='content'] {
   --listbox-radius: var(--ggarry-radius-lg);
-  --listbox-inset: calc(var(--ggarry-space-1) + 1px);
   padding: var(--ggarry-space-1);
   border: 1px solid var(--ggarry-border-default);
   border-radius: var(--listbox-radius);
@@ -131,8 +130,10 @@
 
 [data-scope='combobox'][data-part='item'] {
   column-gap: var(--ggarry-space-2);
-  padding: var(--ggarry-space-2);
-  border-radius: max(2px, calc(var(--listbox-radius) - var(--listbox-inset)));
+  /* 32 pixels a row, with the field's corner, as the select's options. */
+  padding: 6px var(--ggarry-space-2);
+  line-height: 20px;
+  border-radius: var(--ggarry-radius-md);
   color: var(--ggarry-text-default);
   font-size: var(--ggarry-font-size-md);
   cursor: pointer;

@@ -183,6 +183,8 @@ export function connect<Row, T = Dict>(
       }),
       /** The in-between state is a property, not an attribute: adapters set it. */
       indeterminate: !all && count > 0,
+      /** The box's mark: a check, or a dash while some rows but not all are chosen. */
+      checkboxIndicatorProps: normalize({ ...dataGridAnatomy.attrs('checkbox-indicator'), 'aria-hidden': 'true', 'data-icon': !all && count > 0 ? 'minus' : 'check' }),
     }
   })
 
@@ -417,6 +419,13 @@ export function connect<Row, T = Dict>(
       style: { width: `${layout.width}px`, height: `${scrollHeight}px` },
     }),
     placeholderProps: normalize({ ...dataGridAnatomy.attrs('placeholder'), 'aria-hidden': 'true' }),
+    /**
+     * A box drawn as the Checkbox draws its own: the control holds the input
+     * and, over it, the mark — an input draws no mark of its own. Around a
+     * header's or a row's `checkboxProps`, with the row's mark in it.
+     */
+    checkboxControlProps: normalize({ ...dataGridAnatomy.attrs('checkbox-control') }),
+    checkboxIndicatorProps: normalize({ ...dataGridAnatomy.attrs('checkbox-indicator'), 'aria-hidden': 'true', 'data-icon': 'check' }),
     statusProps: normalize({ ...dataGridAnatomy.attrs('status'), role: 'status', 'aria-live': 'polite' }),
     overlayProps: normalize({
       ...dataGridAnatomy.attrs('overlay'),

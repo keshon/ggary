@@ -9,7 +9,6 @@
 
 [data-scope='menu'][data-part='content'] {
   --listbox-radius: var(--ggarry-radius-lg);
-  --listbox-inset: calc(var(--ggarry-space-1) + 1px);
 
   min-inline-size: 180px;
   padding: var(--ggarry-space-1);
@@ -25,9 +24,10 @@
 
 [data-scope='menu'][data-part='item'] {
   gap: var(--ggarry-space-2);
-  padding: var(--ggarry-space-2);
-  /* Concentric with the panel, as the select's options are. */
-  border-radius: max(2px, calc(var(--listbox-radius) - var(--listbox-inset)));
+  /* 32 pixels a row, with the field's corner, as the select's options. */
+  padding: 6px var(--ggarry-space-2);
+  line-height: 20px;
+  border-radius: var(--ggarry-radius-md);
   cursor: pointer;
 }
 

@@ -101,12 +101,15 @@ export function DataGrid<Row>(props: DataGridProps<Row>) {
           {api.headerCells.map((header) => (
             <div key={header.key} {...header.props}>
               {header.isSelect ? (
-                <input
-                  {...header.checkboxProps}
-                  ref={(box) => {
-                    if (box) box.indeterminate = header.indeterminate
-                  }}
-                />
+                <span {...api.checkboxControlProps}>
+                  <input
+                    {...header.checkboxProps}
+                    ref={(box) => {
+                      if (box) box.indeterminate = header.indeterminate
+                    }}
+                  />
+                  <span {...header.checkboxIndicatorProps} />
+                </span>
               ) : (
                 <>
                   <span {...header.labelProps}>{header.label}</span>
@@ -123,7 +126,10 @@ export function DataGrid<Row>(props: DataGridProps<Row>) {
               {line.cells.map((cell) => (
                 <div key={cell.key} {...cell.props}>
                   {cell.isSelect ? (
-                    <input {...cell.checkboxProps} />
+                    <span {...api.checkboxControlProps}>
+                      <input {...cell.checkboxProps} />
+                      <span {...api.checkboxIndicatorProps} />
+                    </span>
                   ) : line.row === undefined ? (
                     <span {...api.placeholderProps} />
                   ) : cell.editor ? (

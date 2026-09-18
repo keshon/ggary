@@ -1,13 +1,17 @@
 /* Checkbox, radio and switch: the native input and what is drawn over it share
    one grid cell. Without the stack the mark sits BESIDE its box; without
-   pointer-events the mark swallows the click meant for the input. */
-:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='control'] {
+   pointer-events the mark swallows the click meant for the input. The
+   DataGrid's selection boxes are checkboxes too, in the grid's own parts;
+   a theme that draws them takes their native look away itself. */
+:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='control'],
+[data-scope='data-grid'][data-part='checkbox-control'] {
   display: inline-grid;
   flex: none;
   position: relative;
 }
 
-:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='control'] > * {
+:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='control'] > *,
+[data-scope='data-grid'][data-part='checkbox-control'] > * {
   grid-area: 1 / 1;
 }
 
@@ -17,6 +21,7 @@
 }
 
 :is([data-scope='checkbox'], [data-scope='radio'])[data-part='indicator'],
+[data-scope='data-grid'][data-part='checkbox-indicator'],
 [data-scope='switch'][data-part='thumb'] {
   pointer-events: none;
 }
@@ -26,6 +31,7 @@
    A radio in a group with nothing checked matches :indeterminate, so radios
    ask about :checked alone. */
 [data-scope='checkbox'][data-part='input']:not(:checked):not(:indeterminate) + [data-part='indicator'],
+[data-scope='data-grid'][data-part='checkbox']:not(:checked):not(:indeterminate) + [data-part='checkbox-indicator'],
 [data-scope='radio'][data-part='input']:not(:checked) + [data-part='indicator'] {
   visibility: hidden;
 }

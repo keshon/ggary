@@ -78,13 +78,31 @@ export async function expectRhythm() {
   near(gap(control, field.querySelector('[data-part="hint"]')!), option)
 }
 
+/**
+ * How a theme rounds a list's rows: concentric with the panel — its radius
+ * less its padding and border — or with the field's own corner, the one the
+ * eye holds a highlighted option against (GGarry's, with its rows 32 pixels).
+ */
+export interface RowCorners {
+  corner: 'concentric' | 'field'
+  rowHeight?: number
+}
+let rowCorners: RowCorners = { corner: 'concentric' }
+export const useRowCorners = (rule: RowCorners) => void (rowCorners = rule)
+
+function expectRowCorner(panel: CSSStyleDeclaration, row: Element) {
+  const item = getComputedStyle(row)
+  const field = document.querySelector('gg-select [data-part="trigger"]')!
+  const expected = rowCorners.corner === 'field' ? px(getComputedStyle(field).borderTopLeftRadius) : Math.max(2, px(panel.borderTopLeftRadius) - px(panel.paddingTop) - px(panel.borderTopWidth))
+  near(px(item.borderTopLeftRadius), expected)
+  if (rowCorners.rowHeight !== undefined) near(box(row).height, rowCorners.rowHeight)
+}
+
 export async function expectConcentricListbox() {
   const select = document.querySelector('gg-select') as GgSelectElement
   await userEvent.click(select.querySelector('[data-part="trigger"]')!)
   const panel = getComputedStyle(select.querySelector('[data-part="content"]')!)
-  const item = getComputedStyle(select.querySelector('[data-part="item"]')!)
-  const expected = Math.max(2, px(panel.borderTopLeftRadius) - px(panel.paddingTop) - px(panel.borderTopWidth))
-  near(px(item.borderTopLeftRadius), expected)
+  expectRowCorner(panel, select.querySelector('[data-part="item"]')!)
   await userEvent.keyboard('{Escape}')
 }
 
@@ -97,8 +115,7 @@ export async function expectConcentricMenu() {
   const panel = getComputedStyle(menu.querySelector('[data-part="content"]')!)
   const row = menu.querySelector('[data-part="item"]')!
   const item = getComputedStyle(row)
-  const expected = Math.max(2, px(panel.borderTopLeftRadius) - px(panel.paddingTop) - px(panel.borderTopWidth))
-  near(px(item.borderTopLeftRadius), expected)
+  expectRowCorner(panel, row)
   near(box(row.querySelector('[data-part="item-shortcut"]')!).right, box(row).right - px(item.paddingRight))
   await userEvent.keyboard('{Escape}')
 }

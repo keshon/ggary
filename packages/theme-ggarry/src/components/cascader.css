@@ -88,7 +88,9 @@
 
 [data-scope='cascader'][data-part='item'] {
   gap: var(--ggarry-space-2);
-  padding: var(--ggarry-space-2);
+  /* 32 pixels a row, as the select's options. */
+  padding: 6px var(--ggarry-space-2);
+  line-height: 20px;
   border-radius: var(--ggarry-radius-md);
   color: var(--ggarry-text-default);
   font-size: var(--ggarry-font-size-md);

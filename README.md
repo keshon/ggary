@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 3384 tests, 1350 of them in headless Chrome
+npm test         # 3385 tests, 1350 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -502,10 +502,14 @@ The second is always larger than the first, so a group reads as one thing.
 density: label to first option, option to option, legend to content and group to
 group, in real pixels. Putting the old 16px checkbox gap back fails it.
 
-The same test holds the **listbox corners**: a highlighted option at the top or
-bottom of a listbox is concentric with the panel — the panel's radius less its
-padding and border — rather than a second, tighter token that happened to be close.
-Both themes now derive it; restoring the old radius fails the test by a pixel.
+The same test holds the **listbox corners**: in Instrument a highlighted option
+at the top or bottom of a listbox is concentric with the panel — the panel's
+radius less its padding and border — rather than a second, tighter token that
+happened to be close. GGarry rounds its rows with the field's own corner
+instead, 6 pixels, and makes them 32 pixels tall: an option as tall as the field
+that opens it, filled in the accent, read as a second field, and a heavy one,
+and the eye holds its corner against the field's, not the panel's. The test
+measures each theme's rule.
 
 A Field's label and its control, and the control and its hint, are the same
 distance: `--gg-space-option`. "A label and what it labels" is one rule whether the
@@ -1444,6 +1448,12 @@ Found on the way:
   browser reverts a cancelled checkbox click after every handler has run, which
   is after the elements and React adapters had already drawn the new state. The
   click is no longer cancelled; the box is set to what the grid decided.
+- **The grid's boxes were the browser's.** A row's and the header's
+  checkboxes were native inputs tinted with `accent-color`: another shape,
+  another mark, and a white box in the dark. They are drawn as the Checkbox
+  draws its own now — a control, the input, a mark over it (a dash while some
+  rows but not all are chosen) — in the grid's own parts, and GGarry's
+  checkbox rules take them in. Instrument, frozen, keeps the native box.
 - **Sorting depends on the language.** The first tests assumed Latin before
   Cyrillic; the machine's locale was Russian, where it is the other way round.
   The locale is now an option everywhere a sort or a format happens.
@@ -2532,7 +2542,7 @@ one needs JS anyway; the children themselves stay the author's.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 379 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row. |
-| contract | node | `icons.contract.test.ts` | 338 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `icons.contract.test.ts` | 350 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
 | dom | jsdom | `conformance.dom.test.ts` | 1218 tests, 100 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
