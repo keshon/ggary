@@ -9,7 +9,7 @@ import {
   type CalendarWords,
   type DateRange,
 } from '@ggary/core/calendar'
-import { connect, createDatePickerMachine, type DatePickerWords } from '@ggary/core/date-picker'
+import { connect, createDatePickerMachine, type DatePickerWords, type DatePreset } from '@ggary/core/date-picker'
 import { attachPopover, reactNormalizer, type Dict, type ISODate } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 
@@ -105,12 +105,14 @@ export interface DatePickerProps extends CalendarOptionsProps {
   /** Submits `YYYY-MM-DD`, or `YYYY-MM-DD/YYYY-MM-DD` for a range. */
   name?: string
   placeholder?: string
+  /** Choices made in one press beside the calendar. `rangePresets()` gives the usual ones for a range. */
+  presets?: DatePreset[]
   words?: DatePickerWords
 }
 
 /** A field for a day or a range of days, typed or chosen from a calendar. */
 export function DatePicker(props: DatePickerProps) {
-  const { label, value, defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, locale, name, placeholder, words } = props
+  const { label, value, defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, locale, name, placeholder, presets, words } = props
   const id = `gg-date-${useId().replace(/:/g, '')}`
   const callbacks = useRef({ onValueChange })
   callbacks.current = { onValueChange }
@@ -121,7 +123,7 @@ export function DatePicker(props: DatePickerProps) {
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder })
+  const api = connect(state, machine.send, reactNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, presets })
 
   useEffect(
     () => machine.send({ type: 'SYNC_OPTIONS', locale, mode, min, max, weekStart, isDateDisabled }),
@@ -172,7 +174,22 @@ export function DatePicker(props: DatePickerProps) {
       </div>
       {api.invalid && <span {...api.errorProps}>{api.errorText}</span>}
       <div ref={positionerRef} {...api.positionerProps}>
-        <div {...api.contentProps}>{state.open && <CalendarView api={api.calendar} gridRef={gridRef} />}</div>
+        <div {...api.contentProps}>
+          {state.open && (
+            <>
+              <CalendarView api={api.calendar} gridRef={gridRef} />
+              {api.presets.length > 0 && (
+                <div {...api.presetsProps}>
+                  {api.presets.map(({ preset }) => (
+                    <button key={preset.label} {...api.getPresetProps(preset)}>
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
       {name && <input {...api.hiddenInputProps} />}
     </div>

@@ -102,6 +102,31 @@ export function datePickerConformance(adapter: Adapter) {
       return { m, input, trigger, content, type, values }
     }
 
+    it('presets stand beside the calendar as buttons; one press chooses its range, closes, and the field says it', async () => {
+      const presets = [
+        { label: 'First week', value: { start: '2026-09-01', end: '2026-09-07' } },
+        { label: 'Too early', value: { start: '2026-01-01', end: '2026-01-02' } },
+      ]
+      const { m, input, trigger, content, values } = await setup({ mode: 'range', min: '2026-06-01', presets, locale: 'en-GB' })
+      await adapter.act(() => click(trigger()))
+      await adapter.wait(0)
+      const group = part(content(), 'date-picker', 'presets')!
+      expect(group.getAttribute('role')).toBe('group')
+      const buttons = parts(group, 'date-picker', 'preset') as HTMLButtonElement[]
+      expect(buttons.map((button) => [button.textContent, button.disabled, button.getAttribute('aria-pressed')])).toEqual([
+        ['First week', false, 'false'],
+        ['Too early', true, 'false'],
+      ])
+      await adapter.act(() => click(buttons[0]))
+      await adapter.wait(0)
+      expect(values).toEqual([{ start: '2026-09-01', end: '2026-09-07' }])
+      expect(trigger().getAttribute('aria-expanded')).toBe('false')
+      expect(input().value).toBe('1 Sept 2026 – 7 Sept 2026')
+      await adapter.act(() => click(trigger()))
+      await adapter.wait(0)
+      expect(part(m.root, 'date-picker', 'preset')!.getAttribute('aria-pressed')).toBe('true')
+    })
+
     it('is a labelled field and a button that says it opens a dialog', async () => {
       const { m, input, trigger, content } = await setup()
       expect((part(m.root, 'date-picker', 'label') as HTMLLabelElement).htmlFor).toBe(input().id)

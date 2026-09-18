@@ -27,6 +27,7 @@ import {
 } from './leads'
 import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
 import { applyMove, type KanbanMove } from '@ggary/core/kanban'
+import { rangePresets } from '@ggary/core/date-picker'
 import type { PaletteCommand } from '@ggary/core/command-palette'
 import { createRoot } from 'react-dom/client'
 import {
@@ -127,6 +128,7 @@ function App() {
   const [deals, setDeals] = useState(initialDeals)
   const [paletteCommands, setPaletteCommands] = useState<PaletteCommand[]>([])
   const [paletteLog, setPaletteLog] = useState('—')
+  const [tagList, setTagList] = useState(tagOptions)
   // The sections are read from the page once it is drawn.
   useEffect(() => setPaletteCommands(sandboxCommands((text) => toast({ tone: 'neutral', title: text }))), [])
   const searchLeadCommands = async (query: string, signal: AbortSignal): Promise<PaletteCommand[]> =>
@@ -1099,7 +1101,19 @@ function App() {
         <h2>Combobox</h2>
         <div className="fields">
           <Combobox label="Manager" items={managerOptions} placeholder="Anyone" onValueChange={(value) => setComboLog(`manager: ${value.join(', ') || '—'}`)} />
-          <Combobox label="Tags" items={tagOptions} multiple defaultValue={['renewal', 'partner']} placeholder="Add a tag" name="tags" />
+          <Combobox
+            label="Tags"
+            items={tagList}
+            multiple
+            defaultValue={['renewal', 'partner']}
+            placeholder="Add a tag"
+            name="tags"
+            onCreate={(text) => {
+              const tag = { value: text.toLowerCase().replace(/\s+/g, '-'), label: text }
+              setTagList((current) => [...current, tag])
+              return tag
+            }}
+          />
           <Combobox
             label="Company"
             load={searchCompanies}
@@ -1116,7 +1130,7 @@ function App() {
         <h2>Date picker and calendar</h2>
         <div className="fields">
           <DatePicker label="Follow up on" locale="en-GB" min={todayISO()} onValueChange={(value) => setDateLog(`follow up: ${value.start ?? '—'}`)} name="follow" />
-          <DatePicker label="Registered between" mode="range" locale="en-GB" onValueChange={(value) => setDateLog(`registered: ${value.start ?? '…'} – ${value.end ?? '…'}`)} />
+          <DatePicker label="Registered between" mode="range" locale="en-GB" presets={rangePresets()} onValueChange={(value) => setDateLog(`registered: ${value.start ?? '…'} – ${value.end ?? '…'}`)} />
         </div>
         <div style={{ marginTop: 16 }}>
           <Calendar locale="en-GB" isDateDisabled={isWeekend} onValueChange={(value) => setDateLog(`call on: ${value.start}`)} />

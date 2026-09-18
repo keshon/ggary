@@ -24,6 +24,8 @@
     defaultValue?: string | string[] | null
     selectedItems?: ComboboxItem[]
     onValueChange?: (value: string[], items: ComboboxItem[]) => void
+    /** Typed text that matches no option can be created: "Create …" ends the list. Return the new option and it is chosen. */
+    onCreate?: (text: string) => ComboboxItem | void | Promise<ComboboxItem | void>
     placeholder?: string
     disabled?: boolean
     limit?: number
@@ -32,7 +34,7 @@
   }
 
   let {
-    label, items, load, debounce, minLength, multiple = false, value = $bindable(), defaultValue, selectedItems, onValueChange,
+    label, items, load, debounce, minLength, multiple = false, value = $bindable(), defaultValue, selectedItems, onValueChange, onCreate,
     placeholder, disabled = false, limit, name, words,
   }: Props = $props()
 
@@ -47,6 +49,8 @@
       multiple,
       disabled,
       limit,
+      creatable: onCreate !== undefined,
+      onCreate: (text) => onCreate?.(text),
       onValueChange: (next, chosen) => {
         value = multiple ? next : (next[0] ?? null)
         onValueChange?.(next, chosen)
@@ -64,7 +68,7 @@
   $effect(() => {
     if (!load && items) machine.send({ type: 'SYNC_SOURCE', items })
   })
-  $effect(() => machine.send({ type: 'SYNC_OPTIONS', multiple, disabled, limit }))
+  $effect(() => machine.send({ type: 'SYNC_OPTIONS', multiple, disabled, limit, creatable: onCreate !== undefined }))
   $effect(() => {
     if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value, items: untrack(() => selectedItems) })
   })
@@ -120,7 +124,7 @@
       {#if api.items.length === 0}<li {...api.emptyProps}>{api.emptyText}</li>{/if}
       {#each api.items as item, index (item.value)}
         <li {...api.getItemProps(item, index)}>
-          <span {...api.itemTextProps}>{item.label}</span>
+          <span {...api.itemTextProps}>{api.labelOf(item)}</span>
           {#if item.description}<span {...api.itemDescriptionProps}>{item.description}</span>{/if}
           <span {...api.itemIndicatorProps}></span>
         </li>

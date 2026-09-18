@@ -65,6 +65,22 @@ export function comboboxConformance(adapter: Adapter) {
       expect(document.activeElement).toBe(input())
     })
 
+    it('text that matches nothing can be created: "Create …" ends the list, and Enter chooses what the owner makes', async () => {
+      const { m, input, options, texts, type, press, changes } = await setup({ onCreate: (text) => ({ value: `new:${text}`, label: text }) })
+      input().focus()
+      await type('dar')
+      expect(texts()).toEqual(['Daria Morozova', 'Create “dar”'])
+      expect(options()[1].hasAttribute('data-create')).toBe(true)
+      await type('Zinaida P.')
+      expect(texts()).toEqual(['Create “Zinaida P.”'])
+      expect(part(m.root, 'combobox', 'status')!.textContent).toBe('Nothing matches. Enter creates “Zinaida P.”.')
+      await press('Enter')
+      await adapter.wait(10)
+      expect(changes).toEqual([['new:Zinaida P.']])
+      expect(input().value).toBe('Zinaida P.')
+      expect(input().getAttribute('aria-expanded')).toBe('false')
+    })
+
     it('arrows open the list and walk it, skipping what is disabled; Escape closes it', async () => {
       const { input, press, options } = await setup()
       input().focus()

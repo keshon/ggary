@@ -1,6 +1,6 @@
 <script lang="ts">
   import { focusCalendarDay, toRange, type CalendarMode, type DateRange } from '@ggary/core/calendar'
-  import { connect, createDatePickerMachine, type DatePickerWords } from '@ggary/core/date-picker'
+  import { connect, createDatePickerMachine, type DatePickerWords, type DatePreset } from '@ggary/core/date-picker'
   import { attachPopover, onFormReset, svelteNormalizer, uid, type ISODate } from '@ggary/core'
   import { untrack } from 'svelte'
   import CalendarView from './CalendarView.svelte'
@@ -20,12 +20,14 @@
     /** Submits `YYYY-MM-DD`, or `YYYY-MM-DD/YYYY-MM-DD` for a range. */
     name?: string
     placeholder?: string
+    /** Choices made in one press beside the calendar. `rangePresets()` gives the usual ones for a range. */
+    presets?: DatePreset[]
     words?: DatePickerWords
   }
 
   /** A field for a day or a range of days, typed or chosen from a calendar. */
   let {
-    label, value = $bindable(), defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, locale, name, placeholder, words,
+    label, value = $bindable(), defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, locale, name, placeholder, presets, words,
   }: Props = $props()
 
   const initial = untrack(() => (value !== undefined ? value : (defaultValue ?? null)))
@@ -45,7 +47,7 @@
   // Effects that attach on open read this, not the snapshot: a new snapshot on every
   // change would detach and attach them again on each key.
   const isOpen = $derived(snapshot.open)
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder }))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, presets }))
 
   $effect(() => machine.send({ type: 'SYNC_OPTIONS', locale, mode, min, max, weekStart, isDateDisabled }))
   $effect(() => {
@@ -100,7 +102,14 @@
   {#if api.invalid}<span {...api.errorProps}>{api.errorText}</span>{/if}
   <div bind:this={positionerEl} {...api.positionerProps}>
     <div {...api.contentProps}>
-      {#if snapshot.open}<CalendarView api={api.calendar} bind:grid />{/if}
+      {#if snapshot.open}
+        <CalendarView api={api.calendar} bind:grid />
+        {#if api.presets.length > 0}
+          <div {...api.presetsProps}>
+            {#each api.presets as { preset } (preset.label)}<button {...api.getPresetProps(preset)}>{preset.label}</button>{/each}
+          </div>
+        {/if}
+      {/if}
     </div>
   </div>
   {#if name}<input {...api.hiddenInputProps} />{/if}

@@ -28,6 +28,12 @@ export interface ComboboxProps {
   /** The chosen items' labels, when `load` knows them and `items` does not. */
   selectedItems?: ComboboxItem[]
   onValueChange?: (value: string[], items: ComboboxItem[]) => void
+  /**
+   * Typed text that matches no option can be created: "Create …" ends the
+   * list. Return the new option (or a promise of it) and it is chosen; add it
+   * to `items` to keep it. A rejection says why.
+   */
+  onCreate?: (text: string) => ComboboxItem | void | Promise<ComboboxItem | void>
   placeholder?: string
   disabled?: boolean
   /** How many options are drawn at once. Default 50. */
@@ -39,12 +45,12 @@ export interface ComboboxProps {
 /** A text field with a list of options: type to narrow it, arrows and Enter to choose. */
 export function Combobox(props: ComboboxProps) {
   const {
-    label, items, load, debounce, minLength, multiple = false, value, defaultValue, selectedItems, onValueChange,
+    label, items, load, debounce, minLength, multiple = false, value, defaultValue, selectedItems, onValueChange, onCreate,
     placeholder, disabled = false, limit, name, words,
   } = props
   const id = `gg-combobox-${useId().replace(/:/g, '')}`
-  const callbacks = useRef({ onValueChange, load })
-  callbacks.current = { onValueChange, load }
+  const callbacks = useRef({ onValueChange, load, onCreate })
+  callbacks.current = { onValueChange, load, onCreate }
 
   const [machine] = useState(() =>
     createComboboxMachine({
@@ -56,7 +62,9 @@ export function Combobox(props: ComboboxProps) {
       multiple,
       disabled,
       limit,
+      creatable: onCreate !== undefined,
       onValueChange: (next, chosen) => callbacks.current.onValueChange?.(next, chosen),
+      onCreate: (text) => callbacks.current.onCreate?.(text),
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
@@ -65,7 +73,8 @@ export function Combobox(props: ComboboxProps) {
   useEffect(() => {
     if (!load && items) machine.send({ type: 'SYNC_SOURCE', items })
   }, [machine, items, load])
-  useEffect(() => machine.send({ type: 'SYNC_OPTIONS', multiple, disabled, limit }), [machine, multiple, disabled, limit])
+  const creatable = onCreate !== undefined
+  useEffect(() => machine.send({ type: 'SYNC_OPTIONS', multiple, disabled, limit, creatable }), [machine, multiple, disabled, limit, creatable])
   useEffect(() => {
     if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value, items: selectedItems })
   }, [machine, value, selectedItems])
@@ -128,7 +137,7 @@ export function Combobox(props: ComboboxProps) {
           {api.items.length === 0 && <li {...api.emptyProps}>{api.emptyText}</li>}
           {api.items.map((item, index) => (
             <li key={item.value} {...api.getItemProps(item, index)}>
-              <span {...api.itemTextProps}>{item.label}</span>
+              <span {...api.itemTextProps}>{api.labelOf(item)}</span>
               {item.description && <span {...api.itemDescriptionProps}>{item.description}</span>}
               <span {...api.itemIndicatorProps} />
             </li>

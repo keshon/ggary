@@ -97,3 +97,27 @@
 [data-scope='date-picker'][data-part='positioner'][data-state='closed'] {
   display: none;
 }
+
+/* Presets stand beside the calendar, a column of buttons, after it in the
+   reading order. */
+[data-scope='date-picker'][data-part='content']:has([data-part='presets']) {
+  display: flex;
+  align-items: stretch;
+}
+[data-scope='date-picker'][data-part='presets'] {
+  display: flex;
+  flex-direction: column;
+}
+[data-scope='date-picker'][data-part='preset'] {
+  margin: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  white-space: nowrap;
+  cursor: pointer;
+}
+[data-scope='date-picker'][data-part='preset']:disabled {
+  cursor: default;
+}

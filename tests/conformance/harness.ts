@@ -380,6 +380,7 @@ export interface ComboboxProps {
   multiple?: boolean
   defaultValue?: string | string[] | null
   onValueChange?: (value: string[]) => void
+  onCreate?: (text: string) => import('../../packages/core/src/components/combobox').ComboboxItem | void | Promise<import('../../packages/core/src/components/combobox').ComboboxItem | void>
   placeholder?: string
   limit?: number
   name?: string
@@ -397,6 +398,7 @@ export interface CalendarProps {
 export interface DatePickerProps extends CalendarProps {
   label: string
   name?: string
+  presets?: import('../../packages/core/src/components/date-picker').DatePreset[]
 }
 
 export interface AccordionProps {

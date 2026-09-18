@@ -4,7 +4,7 @@ import { syncOptions } from '../../utils/open-intent'
 import { fold } from '../data-grid/data-grid.query'
 import type { ComboboxEvent, ComboboxItem, ComboboxOptions, ComboboxState } from './combobox.types'
 
-export const DEFAULTS: ComboboxOptions = { multiple: false, disabled: false, limit: 50 }
+export const DEFAULTS: ComboboxOptions = { multiple: false, disabled: false, limit: 50, creatable: false }
 
 const collection = { isDisabled: (item: ComboboxItem) => Boolean(item.disabled), loop: false }
 const first = (items: ComboboxItem[]) => edgeEnabled(items, 'first', collection)
@@ -32,11 +32,30 @@ export function filterItems(items: readonly ComboboxItem[], query: string, limit
   return { items: ranked.slice(0, limit).map((entry) => entry.item), total: ranked.length }
 }
 
+/** The value of the "Create …" option: no option of anyone's has it. */
+export const CREATE_VALUE = '\u0000create'
+
+/**
+ * The "Create …" option, at the end of the list, when what is typed matches
+ * no option's label exactly — case and accents not counting. Highlighted
+ * when it is all there is, so Enter creates.
+ */
+function withCreate(state: ComboboxState): ComboboxState {
+  const items = state.items.filter((item) => !item.create)
+  const text = state.query.trim()
+  const offer = state.creatable && state.typing && text !== '' && !items.some((item) => fold(item.label) === fold(text))
+  const next = offer ? [...items, { value: CREATE_VALUE, label: text, create: true as const }] : items
+  if (next.length === state.items.length && next.every((item, i) => item === state.items[i])) return state
+  // A highlight on the list stays; with nothing else to choose, the option to create is highlighted.
+  const highlighted = state.highlightedIndex >= 0 && state.highlightedIndex < next.length ? state.highlightedIndex : offer && items.length === 0 ? 0 : -1
+  return { ...state, items: next, highlightedIndex: highlighted }
+}
+
 /** The options for the current query, when the list is in the page. */
 function refilter(state: ComboboxState, query: string): ComboboxState {
   if (!state.source) return state
   const { items, total } = filterItems(state.source, query, state.limit)
-  return { ...state, items, total, answered: query, highlightedIndex: query.trim() ? first(items) : -1 }
+  return withCreate({ ...state, items, total, answered: query, highlightedIndex: query.trim() ? first(items) : -1 })
 }
 
 const known = (state: ComboboxState, value: string): ComboboxItem =>
@@ -75,7 +94,7 @@ export function reducer(state: ComboboxState, event: ComboboxEvent): ComboboxSta
       if (state.disabled) return state
       const next = { ...state, query: event.text, typing: true, open: true }
       // A server list keeps showing its last answer until the next one lands.
-      return state.source ? refilter(next, event.text) : { ...next, highlightedIndex: -1 }
+      return state.source ? refilter({ ...next, createError: null }, event.text) : withCreate({ ...next, createError: null, highlightedIndex: -1 })
     }
 
     case 'HIGHLIGHT': {
@@ -101,6 +120,11 @@ export function reducer(state: ComboboxState, event: ComboboxEvent): ComboboxSta
       const index = event.index ?? state.highlightedIndex
       const item = state.items[index]
       if (!item || item.disabled) return state
+      // "Create …": the owner is asked; the list stays open, saying so, until it answers.
+      if (item.create) {
+        if (state.creating !== null) return state
+        return { ...state, creating: item.label, createError: null, createIntent: { value: item.label, nonce: state.createIntent.nonce + 1 } }
+      }
       if (!state.multiple) {
         return closed({ ...commit(state, [item.value], [item]), highlightedIndex: index })
       }
@@ -134,12 +158,26 @@ export function reducer(state: ComboboxState, event: ComboboxEvent): ComboboxSta
       return state.source ? refilter(next, '') : next
     }
 
+    case 'CREATED': {
+      if (state.creating === null) return state
+      const item = { ...event.item, create: undefined }
+      const done = { ...state, creating: null, selected: [...state.selected.filter((entry) => entry.value !== item.value), item] }
+      if (!state.multiple) return closed(commit(done, [item.value], [item]))
+      const value = done.value.includes(item.value) ? done.value : [...done.value, item.value]
+      const selected = done.selected.filter((entry) => value.includes(entry.value))
+      const next = { ...commit(done, value, selected), query: '', typing: false }
+      return state.source ? refilter(next, '') : withCreate(next)
+    }
+
+    case 'CREATE_FAILED':
+      return state.creating === null ? state : { ...state, creating: null, createError: event.message }
+
     case 'LOADING':
       return { ...state, status: 'loading', request: event.request, error: null }
 
     case 'RESULTS': {
       if (event.request !== state.request) return state
-      return {
+      return withCreate({
         ...state,
         items: event.items,
         total: event.total ?? event.items.length,
@@ -147,7 +185,7 @@ export function reducer(state: ComboboxState, event: ComboboxEvent): ComboboxSta
         status: 'idle',
         error: null,
         highlightedIndex: state.open && event.query.trim() ? first(event.items) : -1,
-      }
+      })
     }
 
     case 'FAILED':
@@ -171,7 +209,7 @@ export function reducer(state: ComboboxState, event: ComboboxEvent): ComboboxSta
       const next = syncOptions(state, DEFAULTS, options)
       if (next === state) return state
       const trimmed = !next.multiple && next.value.length > 1 ? { ...next, value: next.value.slice(0, 1), selected: next.selected.slice(0, 1) } : next
-      return trimmed.disabled ? closed(trimmed) : trimmed.source ? refilter(trimmed, trimmed.query) : trimmed
+      return trimmed.disabled ? closed(trimmed) : trimmed.source ? refilter(trimmed, trimmed.query) : withCreate(trimmed)
     }
   }
 }
@@ -187,6 +225,13 @@ export interface ComboboxConfig extends Partial<ComboboxOptions> {
   selectedItems?: ComboboxItem[]
   onValueChange?: (value: string[], items: ComboboxItem[]) => void
   onOpenChange?: (open: boolean) => void
+  /**
+   * Create an option for typed text that matches none: offered as "Create …"
+   * at the end of the list. Return the option — or a promise of it — and it
+   * is chosen; return nothing and the text is its own value. A rejection says
+   * why, and chooses nothing. Add the option to `items` to keep it.
+   */
+  onCreate?: (text: string) => ComboboxItem | void | Promise<ComboboxItem | void>
 }
 
 const asList = (value: string | string[] | null | undefined) => (value == null ? [] : Array.isArray(value) ? value : [value])
@@ -196,6 +241,7 @@ export function initialState(config: ComboboxConfig): ComboboxState {
     multiple: config.multiple ?? DEFAULTS.multiple,
     disabled: config.disabled ?? DEFAULTS.disabled,
     limit: config.limit ?? DEFAULTS.limit,
+    creatable: config.creatable ?? config.onCreate !== undefined,
   }
   const controlled = config.value !== undefined
   const value = asList(controlled ? config.value : config.defaultValue)
@@ -217,6 +263,9 @@ export function initialState(config: ComboboxConfig): ComboboxState {
     selected: config.selectedItems ?? [],
     controlled,
     intent: { value, nonce: 0 },
+    creating: null,
+    createError: null,
+    createIntent: { value: null, nonce: 0 },
   }
   const filtered = base.source ? refilter(base, '') : base
   return { ...filtered, selected: value.map((entry) => known(filtered, entry)) }
@@ -224,11 +273,22 @@ export function initialState(config: ComboboxConfig): ComboboxState {
 
 export function createComboboxMachine(config: ComboboxConfig): Machine<ComboboxState, ComboboxEvent> {
   const machine = createMachine(initialState(config), reducer)
-  return withEffects(machine, (previous, next) => {
+  // Answers are sent to the machine with its effects, so what they change is heard too.
+  const wrapped: Machine<ComboboxState, ComboboxEvent> = withEffects(machine, (previous, next) => {
     if (previous.open !== next.open) config.onOpenChange?.(next.open)
+    if (previous.createIntent.nonce !== next.createIntent.nonce && next.createIntent.value !== null) {
+      const text = next.createIntent.value
+      Promise.resolve()
+        .then(() => config.onCreate?.(text))
+        .then(
+          (item) => wrapped.send({ type: 'CREATED', item: item ?? { value: text, label: text } }),
+          (error) => wrapped.send({ type: 'CREATE_FAILED', message: error instanceof Error ? error.message : String(error) })
+        )
+    }
     if (previous.intent.nonce !== next.intent.nonce) {
       const items = next.intent.value.map((value) => known(next, value))
       config.onValueChange?.(next.intent.value, items)
     }
   })
+  return wrapped
 }

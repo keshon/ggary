@@ -99,7 +99,7 @@
           {#each column as node (node.value)}
             <li {...api.getItemProps(node, level)}>
               <span {...api.itemTextProps}>{node.label}</span>
-              {#if api.hasChildren(node)}<span {...api.itemBranchProps}></span>{:else}<span {...api.itemIndicatorProps}></span>{/if}
+              {#if api.hasChildren(node)}<span {...api.getItemBranchProps(node, level)}></span>{:else}<span {...api.itemIndicatorProps}></span>{/if}
             </li>
           {/each}
         </ul>

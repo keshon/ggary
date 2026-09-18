@@ -122,8 +122,16 @@
   block-size: 12px;
   flex: none;
 }
+/* The chevron is a press target of its own: drawn at 12px, pressed at 28. */
 [data-scope='cascader'][data-part='item-branch'] {
+  box-sizing: content-box;
+  margin: -8px;
+  padding: 8px;
+  border-radius: var(--ggarry-radius-sm);
   color: var(--ggarry-text-muted);
+}
+[data-scope='cascader'][data-part='item-branch']:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
 }
 [data-scope='cascader'][data-part='item'][data-highlighted] > [data-part='item-branch'] {
   color: inherit;

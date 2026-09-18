@@ -1,7 +1,7 @@
 import type { IconName } from '@ggary/icons'
 import { createMachine, withEffects, type Machine } from '../../machine'
 import { createAnatomy, type Dict, type Normalizer } from '../../types'
-import { clampDate, dateOrder, formatDate, parseTypedDate, todayISO, type ISODate } from '../../utils/calendar'
+import { addDays, addMonths, clampDate, dateOrder, formatDate, parseTypedDate, startOfMonth, todayISO, type ISODate } from '../../utils/calendar'
 import { connect as connectCalendar, type CalendarWords } from '../calendar/calendar.connect'
 import { initialState as initialCalendar, isUnavailable, reducer as calendarReducer, EMPTY_RANGE, type CalendarConfig } from '../calendar/calendar.machine'
 import type { CalendarEvent, CalendarOptions, CalendarState, DateRange } from '../calendar/calendar.types'
@@ -27,6 +27,8 @@ export const datePickerAnatomy = createAnatomy('date-picker', [
   'trigger-icon',
   'positioner',
   'content',
+  'presets',
+  'preset',
   'error',
 ] as const)
 export type DatePickerPart = (typeof datePickerAnatomy.parts)[number]
@@ -52,6 +54,37 @@ export type DatePickerEvent =
   | { type: 'CALENDAR'; event: CalendarEvent }
   | { type: 'SYNC_VALUE'; value: DateRange }
   | ({ type: 'SYNC_OPTIONS'; locale?: string } & Partial<CalendarOptions>)
+
+/** A choice made in one press beside the calendar: "Last 7 days". Its value may depend on today. */
+export interface DatePreset {
+  label: string
+  value: DateRange | ((today: ISODate) => DateRange)
+}
+
+export interface RangePresetWords {
+  today?: string
+  yesterday?: string
+  last7?: string
+  last30?: string
+  thisMonth?: string
+  lastMonth?: string
+}
+
+/**
+ * The ranges a report asks for most: today, yesterday, the last 7 and 30
+ * days (today included), this month so far, and the whole of last month.
+ */
+export function rangePresets(words: RangePresetWords = {}): DatePreset[] {
+  const endOfMonth = (iso: ISODate) => addDays(startOfMonth(addMonths(startOfMonth(iso), 1)), -1)
+  return [
+    { label: words.today ?? 'Today', value: (today) => ({ start: today, end: today }) },
+    { label: words.yesterday ?? 'Yesterday', value: (today) => ({ start: addDays(today, -1), end: addDays(today, -1) }) },
+    { label: words.last7 ?? 'Last 7 days', value: (today) => ({ start: addDays(today, -6), end: today }) },
+    { label: words.last30 ?? 'Last 30 days', value: (today) => ({ start: addDays(today, -29), end: today }) },
+    { label: words.thisMonth ?? 'This month', value: (today) => ({ start: startOfMonth(today), end: today }) },
+    { label: words.lastMonth ?? 'Last month', value: (today) => ({ start: startOfMonth(addMonths(startOfMonth(today), -1)), end: endOfMonth(addMonths(startOfMonth(today), -1)) }) },
+  ]
+}
 
 /** What stands in the field when nobody is typing: the chosen day, or range, in the locale's words. */
 export function displayValue(value: DateRange, mode: CalendarState['mode'], locale?: string): string {
@@ -158,6 +191,10 @@ export interface DatePickerWords extends CalendarWords {
 }
 
 export interface DatePickerConnectOptions extends DatePickerWords {
+  /** Choices made in one press beside the calendar. `rangePresets()` gives the usual ones. */
+  presets?: DatePreset[]
+  /** The presets' name. Default "Presets". */
+  presetsLabel?: string
   /** Submits the day as `YYYY-MM-DD`, a range as `YYYY-MM-DD/YYYY-MM-DD` — an ISO 8601 interval. */
   name?: string
   form?: string
@@ -250,6 +287,26 @@ export function connect<T = Dict>(state: DatePickerState, send: (event: DatePick
       'aria-labelledby': calendar.ids.title,
       'data-state': state.open ? 'open' : 'closed',
     }),
+    /** The presets, each with the range it stands for today. */
+    presets: (options.presets ?? []).map((preset) => ({ preset, range: typeof preset.value === 'function' ? preset.value(state.calendar.today) : preset.value })),
+    presetsProps: normalize({ ...anatomy.attrs('presets'), role: 'group', 'aria-label': options.presetsLabel ?? 'Presets' }),
+    getPresetProps: (preset: DatePreset) => {
+      const chosen = typeof preset.value === 'function' ? preset.value(state.calendar.today) : preset.value
+      const refused = !chosen.start || [chosen.start, chosen.end].some((date) => date !== null && isUnavailable(state.calendar, date))
+      const current = chosen.start === value.start && (chosen.end ?? null) === (value.end ?? null)
+      return normalize({
+        ...anatomy.attrs('preset'),
+        type: 'button',
+        'aria-pressed': current ? 'true' : 'false',
+        disabled: refused || undefined,
+        'data-current': current ? '' : undefined,
+        onClick: () => {
+          send({ type: 'CALENDAR', event: { type: 'SET', value: range ? chosen : { start: chosen.start, end: null } } })
+          // The same range again is no change, and still the end of the visit.
+          send({ type: 'CLOSE' })
+        },
+      })
+    },
     errorProps: normalize({ ...anatomy.attrs('error'), id: ids.error }),
     hiddenInputProps: normalize({ type: 'hidden', name: options.name, form: options.form, value: submitted }),
     close: () => send({ type: 'CLOSE' }),

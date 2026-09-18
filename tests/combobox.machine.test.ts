@@ -211,3 +211,81 @@ describe('a server list', () => {
     expect(connect(machine.getState(), machine.send, same).selectedItems.map((item) => item.label)).toEqual(['Daria Morozova'])
   })
 })
+
+describe('creating an option', () => {
+  const tick = () => new Promise((resolve) => setTimeout(resolve, 0))
+  const combobox = (config: Partial<Parameters<typeof createComboboxMachine>[0]> = {}) => {
+    const changes: string[][] = []
+    const created: string[] = []
+    const machine = createComboboxMachine({
+      id: 'c',
+      items: managers,
+      onValueChange: (value) => changes.push(value),
+      onCreate: (text) => {
+        created.push(text)
+        return { value: `new:${text}`, label: text }
+      },
+      ...config,
+    })
+    const labels = () => connect(machine.getState(), machine.send, same).items.map((item) => connect(machine.getState(), machine.send, same).labelOf(item))
+    return { machine, send: machine.send, changes, created, labels, state: () => machine.getState() }
+  }
+
+  it('offers "Create …" at the end when what is typed matches no label exactly, highlighted when alone', () => {
+    const { send, labels, state } = combobox()
+    send({ type: 'INPUT', text: 'dar' })
+    expect(labels()).toEqual(['Daria Morozova', 'Create “dar”'])
+    expect(state().highlightedIndex).toBe(0)
+    send({ type: 'INPUT', text: 'daria morozova' })
+    expect(labels()).toEqual(['Daria Morozova'])
+    send({ type: 'INPUT', text: 'Zinaida P.' })
+    expect(labels()).toEqual(['Create “Zinaida P.”'])
+    expect(state().highlightedIndex).toBe(0)
+    send({ type: 'INPUT', text: '   ' })
+    expect(labels().some((label) => label.startsWith('Create'))).toBe(false)
+  })
+
+  it('Enter on it asks the owner, and the option it answers with is chosen', async () => {
+    const { send, changes, created, state } = combobox()
+    send({ type: 'INPUT', text: 'Zinaida P.' })
+    send({ type: 'SELECT' })
+    expect(state().creating).toBe('Zinaida P.')
+    await tick()
+    await tick()
+    expect(created).toEqual(['Zinaida P.'])
+    expect(changes).toEqual([['new:Zinaida P.']])
+    expect(state()).toMatchObject({ open: false, creating: null, selected: [{ value: 'new:Zinaida P.', label: 'Zinaida P.' }] })
+  })
+
+  it('several values: the new one joins the chips and the field empties for the next', async () => {
+    const { send, changes, state } = combobox({ multiple: true, defaultValue: ['roman'] })
+    send({ type: 'INPUT', text: 'Zinaida P.' })
+    send({ type: 'SELECT' })
+    await tick()
+    await tick()
+    expect(changes).toEqual([['roman', 'new:Zinaida P.']])
+    expect(state()).toMatchObject({ query: '', open: true })
+  })
+
+  it('a refusal chooses nothing and says why; nothing returned makes the text its own value', async () => {
+    const refused = combobox({ onCreate: () => Promise.reject(new Error('names are unique')) })
+    refused.send({ type: 'INPUT', text: 'Zinaida P.' })
+    refused.send({ type: 'SELECT' })
+    await tick()
+    await tick()
+    expect(refused.changes).toEqual([])
+    expect(connect(refused.state(), refused.send, same).statusText).toBe('Could not create: names are unique')
+    const plain = combobox({ onCreate: () => undefined })
+    plain.send({ type: 'INPUT', text: 'Zinaida P.' })
+    plain.send({ type: 'SELECT' })
+    await tick()
+    await tick()
+    expect(plain.changes).toEqual([['Zinaida P.']])
+  })
+
+  it('without onCreate there is no such option', () => {
+    const machine = createComboboxMachine({ id: 'c', items: managers })
+    machine.send({ type: 'INPUT', text: 'Zinaida' })
+    expect(machine.getState().items).toEqual([])
+  })
+})

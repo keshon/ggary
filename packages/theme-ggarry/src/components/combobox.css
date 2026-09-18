@@ -142,6 +142,13 @@
   background: var(--ggarry-bg-accent);
   color: var(--ggarry-text-on-accent);
 }
+/* "Create …": an action at the list's end, in the accent's ink until it is highlighted. */
+[data-scope='combobox'][data-part='item'][data-create]:not([data-highlighted]) {
+  color: var(--ggarry-text-accent);
+}
+[data-scope='combobox'][data-part='item'][aria-busy='true'] {
+  opacity: 0.7;
+}
 [data-scope='combobox'][data-part='item'][data-selected] {
   font-weight: var(--ggarry-font-weight-semibold);
 }

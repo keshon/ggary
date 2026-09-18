@@ -98,6 +98,7 @@
   } from './leads'
   import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
+  import { rangePresets } from '@ggary/core/date-picker'
   import type { PaletteCommand } from '@ggary/core/command-palette'
   import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
@@ -122,6 +123,7 @@
   let deals = $state.raw(initialDeals)
   let paletteCommands = $state.raw<PaletteCommand[]>([])
   let paletteLog = $state('—')
+  let tagList = $state.raw(tagOptions)
   // The sections are read from the page once it is drawn.
   $effect(() => {
     paletteCommands = sandboxCommands((text) => toast({ tone: 'neutral', title: text }))
@@ -984,7 +986,19 @@ invalid  ${taken}`}</pre>
   <h2>Combobox</h2>
   <div class="fields">
     <Combobox label="Manager" items={managerOptions} placeholder="Anyone" onValueChange={(value) => (comboLog = `manager: ${value.join(', ') || '—'}`)} />
-    <Combobox label="Tags" items={tagOptions} multiple defaultValue={['renewal', 'partner']} placeholder="Add a tag" name="tags" />
+    <Combobox
+      label="Tags"
+      items={tagList}
+      multiple
+      defaultValue={['renewal', 'partner']}
+      placeholder="Add a tag"
+      name="tags"
+      onCreate={(text) => {
+        const tag = { value: text.toLowerCase().replace(/\s+/g, '-'), label: text }
+        tagList = [...tagList, tag]
+        return tag
+      }}
+    />
     <Combobox
       label="Company"
       load={searchCompanies}
@@ -1001,7 +1015,7 @@ invalid  ${taken}`}</pre>
   <h2>Date picker and calendar</h2>
   <div class="fields">
     <DatePicker label="Follow up on" locale="en-GB" min={todayISO()} onValueChange={(value) => (dateLog = `follow up: ${value.start ?? '—'}`)} name="follow" />
-    <DatePicker label="Registered between" mode="range" locale="en-GB" onValueChange={(value) => (dateLog = `registered: ${value.start ?? '…'} – ${value.end ?? '…'}`)} />
+    <DatePicker label="Registered between" mode="range" locale="en-GB" presets={rangePresets()} onValueChange={(value) => (dateLog = `registered: ${value.start ?? '…'} – ${value.end ?? '…'}`)} />
   </div>
   <div style="margin-top: 16px">
     <Calendar locale="en-GB" isDateDisabled={isWeekend} onValueChange={(value) => (dateLog = `call on: ${value.start}`)} />

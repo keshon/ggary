@@ -4,6 +4,8 @@ export interface ComboboxItem {
   /** A second, quieter line: an email under a name, a city under a company. */
   description?: string
   disabled?: boolean
+  /** Set by the combobox on its own "Create …" option; never on yours. */
+  create?: true
 }
 
 /** What a list of options is doing: showing, waiting for a server, or failed. */
@@ -15,6 +17,8 @@ export interface ComboboxOptions {
   disabled: boolean
   /** How many options are drawn at once; the rest are reached by typing more. */
   limit: number
+  /** Typed text that matches no option can be created: a "Create …" option ends the list. */
+  creatable: boolean
 }
 
 export interface ComboboxState extends ComboboxOptions {
@@ -46,6 +50,10 @@ export interface ComboboxState extends ComboboxOptions {
   selected: ComboboxItem[]
   controlled: boolean
   intent: { value: string[]; nonce: number }
+  /** The text being created, while the owner answers. */
+  creating: string | null
+  createError: string | null
+  createIntent: { value: string | null; nonce: number }
 }
 
 export type ComboboxEvent =
@@ -65,4 +73,7 @@ export type ComboboxEvent =
   | { type: 'FAILED'; request: number; message: string }
   | { type: 'SYNC_VALUE'; value: string | string[] | null; items?: ComboboxItem[] }
   | { type: 'SYNC_SOURCE'; items: ComboboxItem[] }
+  /** The owner created an option for the typed text: it is chosen. */
+  | { type: 'CREATED'; item: ComboboxItem }
+  | { type: 'CREATE_FAILED'; message: string }
   | ({ type: 'SYNC_OPTIONS' } & Partial<ComboboxOptions>)

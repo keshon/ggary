@@ -27,6 +27,14 @@ export interface ComboboxWords {
   clear?: string
   /** "Remove Daria M."; receives the label. */
   remove?: (label: string) => string
+  /** The "Create …" option: receives what was typed. */
+  create?: (text: string) => string
+  /** While the owner creates it. */
+  creating?: (text: string) => string
+  /** "Could not create: …"; receives the reason. */
+  createFailed?: (message: string) => string
+  /** The live status when nothing matches but it can be created. */
+  createHint?: (text: string) => string
 }
 
 export interface ComboboxConnectOptions extends ComboboxWords {
@@ -58,8 +66,15 @@ export function connect<T = Dict>(state: ComboboxState, send: (event: ComboboxEv
   const shown = state.items.length
   const loading = state.status === 'loading'
 
+  const createOffered = state.items.some((item) => item.create)
   const statusText =
-    state.status === 'error'
+    state.creating !== null
+      ? (options.creating ?? ((text: string) => `Creating “${text}”…`))(state.creating)
+      : state.createError !== null
+        ? (options.createFailed ?? ((message: string) => `Could not create: ${message}`))(state.createError)
+        : createOffered && state.total === 0 && state.status !== 'loading'
+          ? (options.createHint ?? ((text: string) => `Nothing matches. Enter creates “${text}”.`))(state.query.trim())
+          : state.status === 'error'
       ? (options.failed ?? ((message: string) => `Could not search: ${message}`))(state.error ?? '')
       : !state.open
         ? ''
@@ -185,7 +200,7 @@ export function connect<T = Dict>(state: ComboboxState, send: (event: ComboboxEv
       'aria-controls': ids.content,
       'aria-activedescendant': state.open && highlighted >= 0 ? ids.item(highlighted) : undefined,
       'aria-describedby': ids.status,
-      'aria-busy': loading ? 'true' : undefined,
+      'aria-busy': loading || state.creating !== null ? 'true' : undefined,
       placeholder: state.multiple && state.value.length > 0 ? undefined : options.placeholder,
       value: inputValue,
       disabled: state.disabled || undefined,
@@ -253,6 +268,8 @@ export function connect<T = Dict>(state: ComboboxState, send: (event: ComboboxEv
         'data-highlighted': index === highlighted ? '' : undefined,
         'data-selected': selected ? '' : undefined,
         'data-disabled': item.disabled ? '' : undefined,
+        'data-create': item.create ? '' : undefined,
+        'aria-busy': item.create && state.creating === item.label ? 'true' : undefined,
         onClick: () => {
           if (!item.disabled) send({ type: 'SELECT', index })
         },
@@ -261,6 +278,13 @@ export function connect<T = Dict>(state: ComboboxState, send: (event: ComboboxEv
         },
       })
     },
+    /** What an option says: its label, or "Create “…”" for the combobox's own. */
+    labelOf: (item: ComboboxItem) =>
+      !item.create
+        ? item.label
+        : state.creating === item.label
+          ? (options.creating ?? ((text: string) => `Creating “${text}”…`))(item.label)
+          : (options.create ?? ((text: string) => `Create “${text}”`))(item.label),
     itemTextProps: normalize({ ...anatomy.attrs('item-text') }),
     itemDescriptionProps: normalize({ ...anatomy.attrs('item-description') }),
     itemIndicatorProps: normalize({ ...anatomy.attrs('item-indicator'), 'aria-hidden': 'true', 'data-icon': 'check' satisfies IconName }),

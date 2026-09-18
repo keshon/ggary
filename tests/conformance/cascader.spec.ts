@@ -95,6 +95,18 @@ export function cascaderConformance(adapter: Adapter) {
       expect(changes).toEqual([['ru', 'tat', 'chelny']])
     })
 
+    it('when a branch may be chosen, a press on its chevron only opens it — the way on a touch screen', async () => {
+      const { m, trigger, columns, changes } = await setup({ selectParents: true })
+      await adapter.act(() => click(trigger()))
+      await adapter.wait(0)
+      const row = (text: string) => parts(m.root, 'cascader', 'item').find((item) => part(item, 'cascader', 'item-text')!.textContent === text)!
+      await adapter.act(() => click(part(row('Kazakhstan'), 'cascader', 'item-branch')!))
+      expect(changes).toEqual([])
+      expect(columns()[1].getAttribute('aria-label')).toBe('Kazakhstan')
+      await adapter.act(() => click(row('Kazakhstan')))
+      expect(changes).toEqual([['kz']])
+    })
+
     it('Escape closes without choosing, and the focus goes back to the button', async () => {
       const { trigger, changes } = await setup()
       await adapter.act(() => click(trigger()))

@@ -472,7 +472,8 @@ const messageOf = (error: unknown) => (error instanceof Error ? error.message : 
 
 export function createKanbanMachine<T extends KanbanCard>(config: KanbanMachineConfig<T>): Machine<KanbanState<T>, KanbanEvent> {
   const machine = createMachine(initialState(config), reducer as (state: KanbanState<T>, event: KanbanEvent) => KanbanState<T>)
-  return withEffects(machine, (previous, next) => {
+  // Answers are sent to the machine with its effects, so what they change is heard too.
+  const wrapped: Machine<KanbanState<T>, KanbanEvent> = withEffects(machine, (previous, next) => {
     if (next.openIntent.nonce !== previous.openIntent.nonce && next.openIntent.value) {
       const card = next.cards.find((candidate) => candidate.id === next.openIntent.value)
       if (card) config.onOpen?.(card)
@@ -482,8 +483,8 @@ export function createKanbanMachine<T extends KanbanCard>(config: KanbanMachineC
       Promise.resolve()
         .then(() => config.onAdd?.(add.column, add.title))
         .then(
-          () => machine.send({ type: 'ADD_SETTLE', add: add.id, ok: true }),
-          (error) => machine.send({ type: 'ADD_SETTLE', add: add.id, ok: false, message: messageOf(error) })
+          () => wrapped.send({ type: 'ADD_SETTLE', add: add.id, ok: true }),
+          (error) => wrapped.send({ type: 'ADD_SETTLE', add: add.id, ok: false, message: messageOf(error) })
         )
     }
     if (next.moveIntent.nonce !== previous.moveIntent.nonce && next.moveIntent.value) {
@@ -493,11 +494,12 @@ export function createKanbanMachine<T extends KanbanCard>(config: KanbanMachineC
       Promise.resolve()
         .then(() => config.onMove?.({ card, from: move.from, to: move.to }))
         .then(
-          () => machine.send({ type: 'SETTLE', move: move.id, ok: true }),
-          (error) => machine.send({ type: 'SETTLE', move: move.id, ok: false, message: messageOf(error) })
+          () => wrapped.send({ type: 'SETTLE', move: move.id, ok: true }),
+          (error) => wrapped.send({ type: 'SETTLE', move: move.id, ok: false, message: messageOf(error) })
         )
     }
   })
+  return wrapped
 }
 
 export interface KanbanWords {

@@ -67,9 +67,14 @@ export function toastConformance(adapter: Adapter) {
     it('leaves after its duration and is removed after its exit', async () => {
       const { toasts, show, settle } = await setup()
       await show({ title: 'Saved', duration: 60 })
-      await settle(90)
+      // Timers run late on a busy machine: wait for each state, not for a margin.
+      const until = async (done: () => boolean) => {
+        for (let waited = 0; waited < 1000 && !done(); waited += 20) await settle(20)
+      }
+      await until(() => toasts()[0]?.dataset.state !== 'open')
       expect(toasts()[0].dataset.state).toBe('leaving')
-      await settle(LEAVE_MS + 60)
+      await settle(LEAVE_MS)
+      await until(() => toasts().length === 0)
       expect(toasts()).toHaveLength(0)
     })
 

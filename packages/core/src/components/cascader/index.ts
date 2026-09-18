@@ -370,7 +370,21 @@ export function connect<T = Dict>(state: CascaderState, send: (event: CascaderEv
       })
     },
     itemTextProps: normalize({ ...anatomy.attrs('item-text') }),
-    itemBranchProps: normalize({ ...anatomy.attrs('item-branch'), 'aria-hidden': 'true', 'data-icon': 'chevron-right' satisfies IconName }),
+    /**
+     * A branch's chevron: a press target of its own that opens the branch's
+     * column without choosing it — the way on a touch screen, where nothing
+     * hovers, to a branch that may be chosen itself (`selectParents`).
+     */
+    getItemBranchProps: (node: CascaderNode, level: number) =>
+      normalize({
+        ...anatomy.attrs('item-branch'),
+        'aria-hidden': 'true',
+        'data-icon': 'chevron-right' satisfies IconName,
+        onClick: (event: MouseEvent) => {
+          event.stopPropagation()
+          send({ type: 'HIGHLIGHT', level, value: node.value })
+        },
+      }),
     itemIndicatorProps: normalize({ ...anatomy.attrs('item-indicator'), 'aria-hidden': 'true', 'data-icon': 'check' satisfies IconName }),
     hasChildren,
     hiddenInputProps: normalize({ type: 'hidden', name: options.name, form: options.form, value: state.value[state.value.length - 1] ?? '' }),

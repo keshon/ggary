@@ -219,3 +219,19 @@ describe('the date picker', () => {
     expect(values).toEqual([{ start: null, end: null }])
   })
 })
+
+describe('range presets', () => {
+  it('stand for the ranges a report asks for, counted from today', async () => {
+    const { rangePresets } = await import('../packages/core/src/components/date-picker')
+    const ranges = Object.fromEntries(rangePresets().map((preset) => [preset.label, typeof preset.value === 'function' ? preset.value('2026-03-18') : preset.value]))
+    expect(ranges).toEqual({
+      Today: { start: '2026-03-18', end: '2026-03-18' },
+      Yesterday: { start: '2026-03-17', end: '2026-03-17' },
+      'Last 7 days': { start: '2026-03-12', end: '2026-03-18' },
+      'Last 30 days': { start: '2026-02-17', end: '2026-03-18' },
+      'This month': { start: '2026-03-01', end: '2026-03-18' },
+      'Last month': { start: '2026-02-01', end: '2026-02-28' },
+    })
+    expect(rangePresets({ today: 'Сегодня' })[0].label).toBe('Сегодня')
+  })
+})

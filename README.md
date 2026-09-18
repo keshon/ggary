@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 3221 tests, 1283 of them in headless Chrome
+npm test         # 3245 tests, 1292 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1655,6 +1655,15 @@ Found on the way:
 - **`isISODate` narrowed a string to nothing.** A type guard `text is ISODate`,
   where `ISODate` is `string`, made TypeScript read the text after it as `never`.
 
+**Presets** stand beside the month, with `presets`: a column of buttons, after
+the calendar in the reading order, each a range — or a function of today
+returning one. `rangePresets()` gives the ones a report asks for: today,
+yesterday, the last 7 and 30 days (today included), this month so far, and
+the whole of last month, with `words` for another language. One press
+chooses and closes; the preset the value stands on is `aria-pressed`, and
+one that would reach outside `min` and `max` or onto a disabled day is
+disabled.
+
 **The grid's date filter is this picker now.** A date column's chip opens two
 of them, From and To, each bounding the other: To cannot go before From. They
 take the grid's locale, so a filter is typed and read the way the rest of the
@@ -1686,6 +1695,12 @@ right-to-left), Enter or Space chooses — on a branch, it opens it — and typi
 jumps to a label. A press on a branch opens it; on a leaf, it chooses. Escape and
 a press outside close without choosing, and the focus goes back to the button.
 A disabled item is passed over and cannot be chosen.
+
+**A branch's chevron is a press target of its own**: it opens the branch's
+column without choosing it. That matters with `selectParents`, where a press
+on the branch chooses it: a pointer can hover to open a branch, a finger
+cannot, and the chevron — drawn at 12 pixels, pressed at 28 — is the way to
+a chosen-able branch's children on a touch screen.
 
 **The focus moves, not a highlight.** Each column is its own listbox, and
 `aria-activedescendant` cannot point across them, so the item itself takes the
@@ -1740,6 +1755,15 @@ waits, the last answer stays on screen, dimmed. A failure says why and is asked
 again when the list opens next — not on a timer. A chosen value keeps its label
 when the next answer no longer holds it.
 
+**An option can be created** with `onCreate`: typed text that matches no
+option's label exactly — case and accents not counting — is offered as
+"Create “…”" at the end of the list, in the accent's ink, highlighted when it
+is all there is, so Enter creates. The owner makes the option (a promise of
+it, if a server must) and it is chosen; with several values it joins the
+chips and the field empties for the next. While it waits the option says
+"Creating “…”" and the field is busy; a refusal chooses nothing and the live
+status reads out why. Nothing returned makes the text its own value.
+
 **Several values** (`multiple`) stand as chips in the field. The list stays open
 between picks, choosing a chosen one takes it back, each chip's remove button is
 named and is not a tab stop — the field is the one stop — and Backspace in an
@@ -1788,7 +1812,7 @@ closes, Home and End, `*` opens every sibling, typing jumps to a name. One tab
 stop. A press anywhere on a branch's row opens or closes it, as a file tree's
 does, and chooses it; Enter does the same. The chevron is a target of its own
 that only opens and closes, so a branch can be opened without being chosen —
-on a touch screen too, which the cascader cannot do yet. In a multiple tree a
+on a touch screen too, as the cascader's chevron does. In a multiple tree a
 press on a row only adds or takes it back: opening the branch on each press
 would fight the choice, so there the chevron opens it.
 `selectionMode` is `single`, `multiple` (each row then says whether it is
@@ -2018,6 +2042,11 @@ Found on the way:
   its button and back on each arrow — twice in a three-key walk, which a
   test now counts. Eight components read `open` through a `$derived` now,
   which only tells its readers when the value itself changes.
+- **An owner's answer was heard by nobody.** The combobox sent the created
+  option back to its machine from inside its own effect — to the machine
+  underneath the effects, not the one wrapped by them — so the choice was made
+  and `onValueChange` never heard it. The board's answers went the same way,
+  harmlessly so far. Both send to the wrapped machine now.
 - **Escape never reaches the field.** The dismiss stack takes Escape on the
   document before any element sees it, so the field cannot decide "back up a
   level" itself. The dialog's dismiss hands the palette an ESCAPE, and the
@@ -2302,14 +2331,14 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 348 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped. |
+| machine | node | `*.machine.test.ts` | 354 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped. |
 | contract | node | `icons.contract.test.ts` | 338 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1164 tests, 82 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1173 tests, 85 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 34 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 1164 tests, 73 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1173 tests, 76 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
@@ -2453,8 +2482,8 @@ Real, and deliberately left open:
 - **No custom elements for Kanban, CommandPalette, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree or Progress.** The vanilla
   adapter is frozen (see its section); their specs skip it.
 - **The date picker has no time.** A day or a range of days; a time of day, and
-  the time zone that comes with it, are not built. Nor are presets ("last 7
-  days") for a range, or two months side by side.
+  the time zone that comes with it, are not built. Nor are two months side by
+  side.
 - **The palette keeps no history.** Recent commands, frecency and a
   "did you mean" are yours to put in `commands`; nothing is remembered
   between openings. A level's children are given up front, not loaded.
@@ -2475,13 +2504,6 @@ Real, and deliberately left open:
 - **A cascader does not search.** Typing jumps within a column; a search across
   every level, answering with whole paths, is not built. Nor are children loaded
   on demand: the whole tree is given up front.
-- **A branch that may be chosen needs a pointer that hovers.** With
-  `selectParents`, the pointer moving over a branch opens its column and a press
-  chooses it; a finger does not hover, so on a touch screen a tap chooses the
-  branch and its children are reached only by the keyboard. A separate "open"
-  target on each branch would fix it.
-- **A combobox cannot create an option.** Typing a value the list does not hold
-  and pressing Enter does nothing; a "Create …" option is not built.
 - **The flow channel knows eight components.** Button, badge, chip, button group,
   avatar, avatar group, spinner and segmented control read `--gg-flow-self`; a
   component of your own sized by its content should read it too, or a stack will

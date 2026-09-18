@@ -89,7 +89,7 @@ export function Cascader(props: CascaderProps) {
               {column.map((node) => (
                 <li key={node.value} {...api.getItemProps(node, level)}>
                   <span {...api.itemTextProps}>{node.label}</span>
-                  {api.hasChildren(node) ? <span {...api.itemBranchProps} /> : <span {...api.itemIndicatorProps} />}
+                  {api.hasChildren(node) ? <span {...api.getItemBranchProps(node, level)} /> : <span {...api.itemIndicatorProps} />}
                 </li>
               ))}
             </ul>
