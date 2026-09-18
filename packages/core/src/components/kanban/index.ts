@@ -1,5 +1,8 @@
 import { createMachine, withEffects, type Machine } from '../../machine'
 import { createAnatomy, type Dict, type Normalizer } from '../../types'
+import { flipKanban } from './drag'
+
+export { attachKanbanDrag, flipKanban, type KanbanDragOptions } from './drag'
 
 /**
  * A kanban board: columns of cards, a card moved from one place to another.
@@ -64,8 +67,8 @@ export interface KanbanState<T extends KanbanCard = KanbanCard> {
   order: Record<string, string[]>
   /** The roving tab stop; `nonce` moves real focus there — after an arrow, and after a move re-renders the card elsewhere. */
   focus: { card: string | null; nonce: number }
-  /** The card picked up by the keyboard, and where it was. */
-  lifted: { card: string; origin: KanbanPlace } | null
+  /** The card picked up — by the keyboard, or dragged by a pointer — and where it was. */
+  lifted: { card: string; origin: KanbanPlace; by: 'keyboard' | 'pointer' } | null
   pending: Pending[]
   announcement: { value: KanbanAnnouncement | null; nonce: number }
   moveIntent: { value: Pending | null; nonce: number }
@@ -77,7 +80,10 @@ export type KanbanEvent =
   /** The focus left the board: a picked-up card goes back, and the focus is not pulled in again. */
   | { type: 'BLUR' }
   | { type: 'WALK'; direction: Direction }
-  | { type: 'LIFT' }
+  /** Pick up the focused card, or `card` — a pointer's drag names the card it started on. */
+  | { type: 'LIFT'; card?: string; by?: 'keyboard' | 'pointer' }
+  /** A dragged card is over this place: it is shown there. */
+  | { type: 'PLACE'; to: KanbanPlace }
   | { type: 'SHIFT'; direction: Direction }
   | { type: 'DROP' }
   | { type: 'CANCEL' }
@@ -208,7 +214,8 @@ export function reducer<T extends KanbanCard>(state: KanbanState<T>, event: Kanb
     }
 
     case 'BLUR':
-      return state.lifted ? putBack(state, false) : state
+      // A drag re-renders the card it carries, and the focus goes for a moment: that is not leaving.
+      return state.lifted && state.lifted.by === 'keyboard' ? putBack(state, false) : state
 
     case 'WALK': {
       const from = tabStop(state)
@@ -218,10 +225,21 @@ export function reducer<T extends KanbanCard>(state: KanbanState<T>, event: Kanb
     }
 
     case 'LIFT': {
-      const card = tabStop(state)
+      const card = event.card ?? tabStop(state)
       const place = card && placeOf(state.order, card)
       if (!card || !place || state.lifted) return state
-      return where({ ...state, lifted: { card, origin: place } }, 'lifted', card)
+      const by = event.by ?? 'keyboard'
+      return where({ ...state, lifted: { card, origin: place, by }, focus: { card, nonce: state.focus.nonce } }, 'lifted', card)
+    }
+
+    case 'PLACE': {
+      if (!state.lifted) return state
+      const { card } = state.lifted
+      const place = placeOf(state.order, card)
+      if (!place || !state.order[event.to.column]) return state
+      const order = moveInOrder(state.order, card, event.to)
+      const to = placeOf(order, card)!
+      return samePlace(place, to) ? state : { ...state, order }
     }
 
     case 'SHIFT': {
@@ -237,7 +255,9 @@ export function reducer<T extends KanbanCard>(state: KanbanState<T>, event: Kanb
       if (!state.lifted) return state
       const { card, origin } = state.lifted
       const place = placeOf(state.order, card)!
-      const dropped = where({ ...state, lifted: null }, 'dropped', card)
+      // After a drag the card's element may have been re-rendered: the focus is put back on it.
+      const settled = state.lifted.by === 'pointer' ? refocus(state, card) : state
+      const dropped = where({ ...settled, lifted: null }, 'dropped', card)
       return samePlace(place, origin) ? dropped : startMove(dropped, card, origin, place)
     }
 
@@ -411,6 +431,14 @@ export const kanbanIds = (id: string) => ({
   cardBody: (card: string) => `${id}-card-${idPart(card)}-body`,
 })
 
+/** Run a keyboard move with the cards animating to their new places. */
+function withFlip(event: KeyboardEvent, change: () => void, prevent?: KeyboardEvent) {
+  prevent?.preventDefault()
+  const root = (event.currentTarget as Element | null)?.closest?.('[data-scope="kanban"][data-part="root"]')
+  if (root instanceof HTMLElement) flipKanban(root, change)
+  else change()
+}
+
 /** A press on these inside a card is theirs, not the card's. */
 const INTERACTIVE = 'a[href], button, input, select, textarea, summary, [role="button"], [role="checkbox"], [role="link"], [role="menuitem"]'
 
@@ -452,10 +480,15 @@ export function connect<T extends KanbanCard, P = Dict>(state: KanbanState<T>, s
       event.preventDefault()
       send(sent)
     }
+    if (state.lifted?.by === 'pointer') {
+      // The pointer carries it; only Escape is the keyboard's.
+      if (event.key === 'Escape') handled({ type: 'CANCEL' })
+      return
+    }
     if (state.lifted) {
-      if (direction) return handled({ type: 'SHIFT', direction })
+      if (direction) return withFlip(event, () => send({ type: 'SHIFT', direction }), event)
+      if (event.key === 'Escape') return withFlip(event, () => send({ type: 'CANCEL' }), event)
       if (event.key === ' ' || event.key === 'Enter') return handled({ type: 'DROP' })
-      if (event.key === 'Escape') return handled({ type: 'CANCEL' })
       // Tab carries the focus out; BLUR puts the card back.
       return
     }
@@ -484,6 +517,7 @@ export function connect<T extends KanbanCard, P = Dict>(state: KanbanState<T>, s
       role: 'group',
       'aria-label': w.label,
       'data-lifting': state.lifted ? '' : undefined,
+      'data-dragging': state.lifted?.by === 'pointer' ? '' : undefined,
       // Leaving the board with a card up puts it back. A move re-renders the card
       // elsewhere and blurs it for a moment, so wait for the focus to land.
       onFocusOut: (event: FocusEvent) => {
@@ -536,6 +570,8 @@ export function connect<T extends KanbanCard, P = Dict>(state: KanbanState<T>, s
         tabIndex: card.id === stop ? 0 : -1,
         'data-card': card.id,
         'data-lifted': lifted ? '' : undefined,
+        // Dragged, the card in the list is the place it would land; a copy follows the pointer.
+        'data-dragging': lifted && state.lifted?.by === 'pointer' ? '' : undefined,
         'data-pending': pendingCards.has(card.id) ? '' : undefined,
         onKeyDown: onCardKeyDown,
         onFocusIn: (event: FocusEvent) => {

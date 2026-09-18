@@ -1,5 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
-import { connect, createKanbanMachine, focusKanbanCard, type KanbanCard, type KanbanColumn, type KanbanMove, type KanbanWords } from '@ggary/core/kanban'
+import { attachKanbanDrag, connect, createKanbanMachine, focusKanbanCard, type KanbanCard, type KanbanColumn, type KanbanMove, type KanbanWords } from '@ggary/core/kanban'
 import { reactNormalizer } from '@ggary/core'
 
 export interface KanbanProps<T extends KanbanCard> {
@@ -14,6 +14,8 @@ export interface KanbanProps<T extends KanbanCard> {
   onMove?: (move: KanbanMove<T>) => Promise<unknown> | unknown
   /** Enter on a card, or a press on it. */
   onOpen?: (card: T) => void
+  /** Whether a card may be dragged by a pointer. Default: all of them. The keyboard can still move it. */
+  canDrag?: (card: T) => boolean
   /** What a card shows under its title. */
   children?: (card: T) => ReactNode
   /** The heading level of each column's title. Default 3. */
@@ -24,10 +26,10 @@ export interface KanbanProps<T extends KanbanCard> {
 
 /** Columns of cards, a card moved by the keyboard from one place to another. */
 export function Kanban<T extends KanbanCard>(props: KanbanProps<T>) {
-  const { columns, cards, onMove, onOpen, children, headingLevel, words } = props
+  const { columns, cards, onMove, onOpen, canDrag, children, headingLevel, words } = props
   const id = `gg-kanban-${useId().replace(/:/g, '')}`
-  const callbacks = useRef({ onMove, onOpen })
-  callbacks.current = { onMove, onOpen }
+  const callbacks = useRef({ onMove, onOpen, canDrag })
+  callbacks.current = { onMove, onOpen, canDrag }
   const [machine] = useState(() =>
     createKanbanMachine<T>({
       id,
@@ -43,6 +45,18 @@ export function Kanban<T extends KanbanCard>(props: KanbanProps<T>) {
   useEffect(() => machine.send({ type: 'SYNC_COLUMNS', columns }), [machine, columns])
   useEffect(() => machine.send({ type: 'SYNC_CARDS', cards }), [machine, cards])
 
+  const rootRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root) return
+    return attachKanbanDrag(root, machine.send, {
+      canDrag: (key) => {
+        const card = machine.getState().cards.find((candidate) => candidate.id === key)
+        return !!card && (callbacks.current.canDrag?.(card) ?? true)
+      },
+    })
+  }, [machine])
+
   // A move re-renders the card in its new place: the focus goes with it.
   const lastFocusNonce = useRef(0)
   useLayoutEffect(() => {
@@ -52,7 +66,7 @@ export function Kanban<T extends KanbanCard>(props: KanbanProps<T>) {
   })
 
   return (
-    <div {...api.rootProps}>
+    <div ref={rootRef} {...api.rootProps}>
       {api.columns.map(({ column, cards: inColumn }) => (
         <section key={column.id} {...api.getColumnProps(column)}>
           <header {...api.columnHeaderProps}>

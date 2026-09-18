@@ -30,13 +30,22 @@
   flex: none;
   font-variant-numeric: tabular-nums;
 }
+/* Positioned, so a card's offsetTop is its place in the list: a drag reads it. */
 [data-scope='kanban'][data-part='list'] {
+  position: relative;
   display: flex;
   flex-direction: column;
 }
 [data-scope='kanban'][data-part='card'] {
   position: relative;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+[data-scope='kanban'][data-part='root'][data-dragging],
+[data-scope='kanban'][data-part='root'][data-dragging] * {
+  cursor: grabbing;
 }
 [data-scope='kanban'][data-part='card-body']:empty {
   display: none;

@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends KanbanCard">
-  import { connect, createKanbanMachine, focusKanbanCard, type KanbanCard, type KanbanColumn, type KanbanMove, type KanbanWords } from '@ggary/core/kanban'
+  import { attachKanbanDrag, connect, createKanbanMachine, focusKanbanCard, type KanbanCard, type KanbanColumn, type KanbanMove, type KanbanWords } from '@ggary/core/kanban'
   import { svelteNormalizer, uid } from '@ggary/core'
   import { untrack, type Snippet } from 'svelte'
 
@@ -15,6 +15,8 @@
     onMove?: (move: KanbanMove<T>) => Promise<unknown> | unknown
     /** Enter on a card, or a press on it. */
     onOpen?: (card: T) => void
+    /** Whether a card may be dragged by a pointer. Default: all of them. The keyboard can still move it. */
+    canDrag?: (card: T) => boolean
     /** What a card shows under its title. */
     card?: Snippet<[T]>
     /** The heading level of each column's title. Default 3. */
@@ -24,7 +26,7 @@
   }
 
   /** Columns of cards, a card moved by the keyboard from one place to another. */
-  let { columns, cards, onMove, onOpen, card: body, headingLevel, words }: Props = $props()
+  let { columns, cards, onMove, onOpen, canDrag, card: body, headingLevel, words }: Props = $props()
 
   const machine = untrack(() =>
     createKanbanMachine<T>({
@@ -42,6 +44,20 @@
   $effect(() => machine.send({ type: 'SYNC_COLUMNS', columns }))
   $effect(() => machine.send({ type: 'SYNC_CARDS', cards }))
 
+  let rootEl = $state<HTMLDivElement | null>(null)
+  $effect(() => {
+    if (!rootEl) return
+    const root = rootEl
+    return untrack(() =>
+      attachKanbanDrag(root, machine.send, {
+        canDrag: (key) => {
+          const card = machine.getState().cards.find((candidate) => candidate.id === key)
+          return !!card && (canDrag?.(card) ?? true)
+        },
+      })
+    )
+  })
+
   // A move re-renders the card in its new place: the focus goes with it.
   let lastFocusNonce = 0
   $effect(() => {
@@ -52,7 +68,7 @@
   })
 </script>
 
-<div {...api.rootProps}>
+<div bind:this={rootEl} {...api.rootProps}>
   {#each api.columns as { column, cards: inColumn } (column.id)}
     <section {...api.getColumnProps(column)}>
       <header {...api.columnHeaderProps}>

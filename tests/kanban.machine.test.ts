@@ -141,6 +141,34 @@ describe('kanban', () => {
     expect(machine.getState().focus.nonce).toBe(nonce)
   })
 
+  it('a pointer drag: the card is shown where it is over, a blur is no leaving, the drop hands the move over', async () => {
+    const { machine, send, order, moves } = board()
+    send({ type: 'LIFT', card: 'b', by: 'pointer' })
+    expect(machine.getState().lifted).toMatchObject({ card: 'b', by: 'pointer', origin: { column: 'todo', index: 1 } })
+    send({ type: 'PLACE', to: { column: 'review', index: 0 } })
+    expect(order().review).toEqual(['b'])
+    // The card's element is re-rendered in its new place, and the focus goes for a moment.
+    send({ type: 'BLUR' })
+    expect(machine.getState().lifted).not.toBeNull()
+    send({ type: 'PLACE', to: { column: 'review', index: 5 } })
+    expect(order().review).toEqual(['b'])
+    const nonce = machine.getState().focus.nonce
+    send({ type: 'DROP' })
+    expect(machine.getState().focus).toEqual({ card: 'b', nonce: nonce + 1 })
+    await tick()
+    expect(moves.map(({ card, to }) => [card.id, to])).toEqual([['b', { column: 'review', index: 0 }]])
+  })
+
+  it('a drag cancelled puts the card back; PLACE without a card up does nothing', () => {
+    const { send, order } = board()
+    send({ type: 'PLACE', to: { column: 'done', index: 0 } })
+    expect(order().done).toEqual(['f'])
+    send({ type: 'LIFT', card: 'd', by: 'pointer' })
+    send({ type: 'PLACE', to: { column: 'done', index: 1 } })
+    send({ type: 'CANCEL' })
+    expect(order()).toEqual({ todo: ['a', 'b', 'c'], doing: ['d', 'e'], review: [], done: ['f'] })
+  })
+
   it('Enter opens a card; it does not while one is carried', () => {
     const { send, opened } = board()
     send({ type: 'OPEN' })

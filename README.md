@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 3123 tests, 1239 of them in headless Chrome
+npm test         # 3130 tests, 1244 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1816,9 +1816,8 @@ Found on the way:
 
 ## Kanban
 
-Columns of cards, and a card moved from one to another. This is its first
-step: the board, and every move by the keyboard. Dragging with a pointer is
-the next.
+Columns of cards, and a card moved from one to another — by the keyboard,
+or dragged by a pointer.
 
 ```tsx
 <Kanban
@@ -1859,6 +1858,26 @@ flight. When a move holds, apply it to your cards — `applyMove` places the
 card in the array so that its column's order puts it where it was dropped.
 The DataGrid's cell saves work the same way.
 
+**Dragged by a pointer**, a card comes up once the press has moved four
+pixels, so a press that does not move still opens it. A copy of it follows
+the pointer, tilted a degree, in the top layer above everything; the card
+itself stays in the list as a dashed slot, standing where it would land, and
+the cards around it slide aside. Where it would land is read from layout
+positions, not drawn ones, so a card in the middle of sliding does not make
+the slot flicker. Near the board's left or right edge the board scrolls,
+near the window's top or bottom the page does, faster the nearer. Escape, or
+a pointer the browser takes back, puts the card back; on release the copy
+flies to where the card landed, and the press that ended the drag does not
+open it. On a touch screen a card is held still for 300 ms before it comes
+up: a finger that moves first is scrolling, and scrolls. `canDrag` keeps a
+card from being dragged; the keyboard can still move it. A keyboard move
+slides the cards too, and under reduced motion nothing slides.
+
+The drag is one DOM helper in the core, `attachKanbanDrag(root, send)`, which
+both adapters attach: it reads where the pointer is, and the machine holds
+where the card is — a drag is the keyboard's pick-up, carry and drop, with a
+pointer choosing the places.
+
 **A limit is soft.** A column with `limit` shows its count against it, "4 / 3",
 and turns the count red past it; a move past it is not refused, since a
 kanban's limit is a signal to the team, not a lock. A move the server refuses
@@ -1874,6 +1893,18 @@ Found on the way:
 - **A held card did not look held in dark mode.** The popover's shadow is lost
   on a dark page, and a one-pixel accent edge is easy to miss. A held card
   now has a doubled accent edge and rises two pixels.
+- **The slides restarted on every pointer move.** Each move re-measured the
+  cards and started their slide over, so while the pointer moved the cards
+  crawled and never settled. A slide now starts only when the slot's place
+  changes.
+- **A dropped card's copy could stay on the page.** It flies home on the next
+  animation frame, and a frame never comes in a hidden tab or a frame the
+  browser throttles; the copy stood over the board. A timer now takes it
+  away if the frame does not come.
+- **A drag lost its card on a blur.** The card's element is re-rendered in its
+  new place, which drops the focus for a moment, and the board took that for
+  leaving and put the card back. A blur now puts back only a card the keyboard
+  holds.
 - **jsdom has no `scrollIntoView`.** The focus-and-reveal after a move went
   into one core helper, `focusKanbanCard`, which both adapters call and which
   checks before it scrolls.
@@ -2152,7 +2183,7 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 332 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back, moves shown at once and taken back per card, what the live region says. |
+| machine | node | `*.machine.test.ts` | 334 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, moves shown at once and taken back per card, what the live region says. |
 | contract | node | `icons.contract.test.ts` | 330 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
@@ -2168,7 +2199,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
 | browser | Chrome | `date-picker.browser.test.ts` | 4 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. |
-| browser | Chrome | `kanban.browser.test.ts` | 3 tests. Real keys carrying a card across a board narrower than its columns, the board scrolling to keep it in sight and the card drawn held; Tab out with a card up putting it back and the focus going on; a press on a control inside a card left to the control. |
+| browser | Chrome | `kanban.browser.test.ts` | 8 tests. A real mouse dragging a card into an empty column, the owner hearing it and the card not opening; a short press still a press; mid-drag, the slot where the card would land and a copy under the pointer, and Escape putting it back; the board scrolling at its edge; a finger that moves scrolling and one held still picking the card up. Also, real keys carrying a card across a board narrower than its columns, the board scrolling to keep it in sight and the card drawn held; Tab out with a card up putting it back and the focus going on; a press on a control inside a card left to the control. |
 | browser | Chrome | `disclosure.browser.test.ts` | 6 tests. A closed section hidden until found, taking no room, and opened by the page's search; a real Space and Enter, the chevron turned; a tree given a height scrolling to the focus under the real keyboard, each level stepped in by 16 pixels with a leaf lined up; a bar's fill measured to the pixel from the start edge in both directions; a ring's sweep and turn. |
 | browser | Chrome | `cascader.browser.test.ts` | 2 tests. The columns side by side under the button over an ancestor that clips, the card keeping to a phone's screen with the focused item scrolled into view; the real keyboard walking down and across, Enter choosing and the focus back on the button. |
 | browser | Chrome | `combobox.browser.test.ts` | 4 tests. Real typing; the list under the field, lined up with it, over an ancestor that clips; Enter choosing and Tab moving on with the list gone; a press outside putting the field back; chips wrapping in the box with room left to type. |
@@ -2304,11 +2335,13 @@ Real, and deliberately left open:
 - **The date picker has no time.** A day or a range of days; a time of day, and
   the time zone that comes with it, are not built. Nor are presets ("last 7
   days") for a range, or two months side by side.
-- **The board does not drag yet.** Pointer drag with auto-scroll at the edges,
-  cards animating into their new places, columns long enough to need windowing,
-  and moving the columns themselves are the next steps. Until then a pointer
-  opens a card, and a move is made from the keyboard or by `move()` — a "Move
-  to…" menu of your own.
+- **The board does not window its columns, or move them.** A column of a few
+  hundred cards renders them all; a column is not dragged to another place;
+  several cards are not moved at once. A "Move to…" menu is yours to build on
+  `move()`.
+- **A column does not scroll on its own while dragging.** The board scrolls
+  sideways and the page up and down; a column given a height of its own and
+  scrolling inside it does not follow the pointer yet.
 - **A tree does not load its children on demand, drag, or rename.** The whole
   tree is given up front; moving a node by dragging and renaming it in place
   are not built. Nor is a range chosen with Shift in a multiple tree.

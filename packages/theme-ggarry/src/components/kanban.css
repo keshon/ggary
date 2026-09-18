@@ -83,6 +83,23 @@
 [data-scope='kanban'][data-part='card'][data-lifted]:focus-visible {
   outline-color: transparent;
 }
+/* Dragged: the card in the list is where it would land — an empty slot of its
+   own size — and a copy, tilted a degree, follows the pointer. */
+[data-scope='kanban'][data-part='card'][data-dragging] {
+  border-style: dashed;
+  border-color: var(--ggarry-border-strong);
+  background: transparent;
+  box-shadow: none;
+  translate: none;
+}
+[data-scope='kanban'][data-part='card'][data-dragging] > * {
+  visibility: hidden;
+}
+[data-scope='kanban'][data-part='card'][data-drag-overlay] {
+  rotate: 1deg;
+  translate: none;
+  cursor: grabbing;
+}
 [data-scope='kanban'][data-part='card'][data-pending] {
   opacity: 0.6;
 }
