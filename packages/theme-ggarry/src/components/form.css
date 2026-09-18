@@ -1,0 +1,70 @@
+/* ==========================================================================
+   GGarry — form
+
+   The summary a failed submit leaves at the form's top: a card with a thick
+   danger edge on its reading side, its heading in the danger ink, and each
+   error a link in the accent's, so it reads as a list of places to go. A
+   control with no Field around it — Select, Combobox, DatePicker — says its
+   form's error under itself as a Field would, and draws its box in danger.
+   ========================================================================== */
+
+[data-scope='form-summary'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-4);
+  border: 1px solid var(--ggarry-border-danger);
+  border-inline-start-width: 4px;
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-surface);
+  font-family: var(--ggarry-font-family-sans);
+  color: var(--ggarry-text-default);
+}
+[data-scope='form-summary'][data-part='root']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+[data-scope='form-summary'][data-part='title'] {
+  color: var(--ggarry-text-danger);
+  font-size: var(--ggarry-font-size-md);
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+[data-scope='form-summary'][data-part='message'] {
+  margin: 0;
+  font-size: var(--ggarry-font-size-sm);
+}
+[data-scope='form-summary'][data-part='list'] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ggarry-space-1);
+  margin: 0;
+  padding-inline-start: var(--ggarry-space-5);
+  font-size: var(--ggarry-font-size-sm);
+}
+[data-scope='form-summary'][data-part='link'] {
+  color: var(--ggarry-text-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+[data-scope='form-summary'][data-part='link']:hover {
+  text-decoration-thickness: 2px;
+}
+[data-scope='form-summary'][data-part='link']:focus-visible {
+  border-radius: 2px;
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: 2px;
+}
+
+[data-scope='form'][data-part='field-error'] {
+  color: var(--ggarry-text-danger);
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 1.4;
+}
+
+/* A composite in error: its box in danger, as a Field's input is — hovered too. */
+[data-scope='select'][data-part='trigger'][data-invalid],
+[data-scope='select'][data-part='trigger'][data-invalid]:hover:not([data-disabled]),
+[data-scope='combobox'][data-part='control']:has([data-part='input'][data-invalid]),
+[data-scope='date-picker'][data-part='control']:has([data-part='input'][data-invalid]) {
+  border-color: var(--ggarry-border-danger);
+}

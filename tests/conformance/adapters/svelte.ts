@@ -17,6 +17,7 @@ import TooltipWithTrigger from './TooltipWithTrigger.svelte'
 import MenuWithTrigger from './MenuWithTrigger.svelte'
 import TabsWithPanels from './TabsWithPanels.svelte'
 import AccordionWithPanels from './AccordionWithPanels.svelte'
+import FormWithFields from './FormWithFields.svelte'
 import DisplayWithContent from './DisplayWithContent.svelte'
 import FieldsetWithGroup from './FieldsetWithGroup.svelte'
 import { type Adapter, type ButtonProps, type CheckboxProps, type Mounted, track } from '../harness'
@@ -100,6 +101,7 @@ export const svelte: Adapter = {
   gridRows: (props, target) => mountSvelte(GridWithRows as Component<any>, props, target),
   accordion: (props, target) => mountSvelte(AccordionWithPanels as Component<any>, props, target),
   tree: (props, target) => mountSvelte(Tree as Component<any>, props, target),
+  form: (props, target) => mountSvelte(FormWithFields as Component<any>, props, target),
   commandPalette: (props, target) => mountSvelte(CommandPalette as Component<any>, props, target),
   kanban: (props, target) => mountSvelte(Kanban as Component<any>, props, target),
   progress: (props, target) => mountSvelte(Progress as Component<any>, props, target),

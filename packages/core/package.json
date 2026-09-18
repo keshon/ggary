@@ -240,6 +240,10 @@
     "./command-palette": {
       "types": "./src/components/command-palette/index.ts",
       "default": "./src/components/command-palette/index.ts"
+    },
+    "./form": {
+      "types": "./src/components/form/index.ts",
+      "default": "./src/components/form/index.ts"
     }
   },
   "dependencies": {

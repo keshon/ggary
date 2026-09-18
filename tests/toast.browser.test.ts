@@ -79,6 +79,8 @@ describe('toast in a real browser', () => {
     before.textContent = 'Before'
     document.body.prepend(before)
     toaster.toast({ title: 'Deleted', duration: 0, action: { label: 'Undo', onClick: () => (undone = true) } })
+    // Drawn when it is drawn: a busy machine draws late, and a fixed wait tabs past it.
+    for (let waited = 0; waited < 1000 && !host.querySelector('[data-part="action"]'); waited += 20) await settle(20)
     await settle(30)
     before.focus()
     await userEvent.tab()

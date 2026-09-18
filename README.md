@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two design languages on top of it.
-Sixty-three components — DataGrid, Kanban, CommandPalette, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Sixty-five components — DataGrid, Kanban, CommandPalette, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 3245 tests, 1292 of them in headless Chrome
+npm test         # 3290 tests, 1311 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -330,7 +330,7 @@ so it is not read as "star"), not markup.
 For inline errors without the browser's bubble on top, put `novalidate` on the
 form and call `form.checkValidity()` in the submit handler: it still fires each
 control's `invalid` event, which is what the fields listen to. The sandbox's
-validated form does exactly that.
+validated form does exactly that — and `Form`, below, does it for you.
 
 **In the elements, the outermost enhancer owns the control.** `<gg-input>` inside
 a `<gg-field>` does nothing; the field applies the input contract itself and reads
@@ -2057,6 +2057,76 @@ Found on the way:
   the character itself made tools read the file as binary; it is `\u0000`,
   the same string.
 
+## Form and FormSummary
+
+A form that checks itself on submit, in three layers, each over the one
+before.
+
+```tsx
+<Form
+  validate={(data) => ({
+    confirm: data.get('confirm') !== data.get('password') ? 'The passwords differ' : null,
+    role: data.get('role') ? null : 'Choose a role',
+  })}
+  onSubmit={async (data) => {
+    const answer = await api.signUp(data)
+    if (!answer.ok) return { errors: answer.errors, message: 'The account was not created.' }
+  }}
+>
+  <FormSummary />
+  <Field name="email" label="Email"><Input type="email" name="email" required /></Field>
+  <Field name="password" label="Password"><Input type="password" name="password" required minLength={8} /></Field>
+  <Field name="confirm" label="Confirm password"><Input type="password" name="confirm" /></Field>
+  <Select name="role" label="Role" items={roles} />
+  <Button type="submit">Create account</Button>
+</Form>
+```
+
+1. **The browser's own constraints** — `required`, `type="email"`,
+   `minlength` — read from each control's validity, as Field already does,
+   with the browser's own words in the page's language.
+2. **Rules**, `validate(data)`: errors by field name for what the browser
+   cannot say — two passwords that differ, a choice required of a Select,
+   Combobox or DatePicker, whose hidden input the browser does not check.
+   A rule may return a promise (is this address taken?); the form waits.
+3. **The server's**, from `onSubmit`: errors by name and a message for the
+   whole form.
+
+**A submit that finds errors is stopped.** Each field says what is wrong; a
+Field with a `name`, or a Select, Combobox or DatePicker, shows the form's
+error for that name, its control `aria-invalid` and described by it. The
+summary — `FormSummary`, anywhere in the form — lists every error in the
+page's order as a link to its control, and takes the focus, so its heading is
+read first; without one, the focus goes to the first field in error. The
+summary reads what each field says off the page, so it and the field never
+word the same error twice.
+
+**Errors leave as they are fixed.** An edit takes that field's rule or server
+error away; once a submit has been tried, the rules run again as the person
+edits, so "The passwords differ" appears and leaves with the typing. A
+composite whose hidden input fires nothing says it was edited itself.
+
+**Without `onSubmit`, a valid form submits natively**, to its `action`, as
+plain HTML does: to a server that renders pages the kit only adds the
+checking, and an asynchronous rule holds the form until it answers, then
+lets it go. With `onSubmit`, the form is `aria-busy` while it waits, and a
+second press sends nothing more.
+
+Found on the way:
+
+- **An edited Select brought its error straight back.** The Select says it was
+  edited as its value changes, before React or Svelte has drawn the new value
+  into its hidden input, so the rules read the old, empty value and put the
+  error back. A composite's edit is taken once the page has caught up.
+- **The summary would not take the focus in Chrome.** It is `hidden` until its
+  items arrive, and it was focused in the same turn that filled it, before it
+  was drawn; jsdom, with no layout, did not mind. The focus now waits for the
+  drawing.
+- **A Select in error kept its accent border under the pointer.** Its hover rule
+  was more specific than the error's; the error now holds on hover too.
+- **`Form.svelte` and `form.svelte.ts` are one file on Windows.** The helper
+  module is `context.svelte.ts`.
+
 ## PageHeader, Section, Container, Stack, Cluster and Grid
 
 What goes inside the work area: the top of a screen, the stretches under it,
@@ -2331,14 +2401,14 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 354 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped. |
+| machine | node | `*.machine.test.ts` | 359 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes. |
 | contract | node | `icons.contract.test.ts` | 338 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1173 tests, 85 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1188 tests, 90 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 34 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 1173 tests, 76 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1188 tests, 81 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
@@ -2347,6 +2417,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
 | browser | Chrome | `date-picker.browser.test.ts` | 4 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. |
+| browser | Chrome | `form.browser.test.ts` | 4 tests. The real keyboard submitting and walking the summary to a field; a valid form going on to its action natively; a rule that asks a server holding the form, then letting it go; a second press while a submission is out sending nothing. |
 | browser | Chrome | `command-palette.browser.test.ts` | 4 tests. The real Ctrl+K opening it modal, high in the viewport, and closing it back to the element before; the list scrolling to keep the highlight in view; a server's records under their heading after the typing pauses; a command that opens a dialog of its own keeping the focus. |
 | browser | Chrome | `kanban.browser.test.ts` | 13 tests. The column's thin themed bar following a dark island; a board given a height holding its columns and a column scrolling to the focus; a drag at a column's edge scrolling it; a real right click opening the card's menu at the pointer and Move to › Done moving it; a card typed with real keys standing faded and giving way to the owner's card with no double. Also A real mouse dragging a card into an empty column, the owner hearing it and the card not opening; a short press still a press; mid-drag, the slot where the card would land and a copy under the pointer, and Escape putting it back; the board scrolling at its edge; a finger that moves scrolling and one held still picking the card up; real keys carrying a card across a board narrower than its columns, the board scrolling to keep it in sight and the card drawn held; Tab out with a card up putting it back and the focus going on; a press on a control inside a card left to the control. |
 | browser | Chrome | `disclosure.browser.test.ts` | 6 tests. A closed section hidden until found, taking no room, and opened by the page's search; a real Space and Enter, the chevron turned; a tree given a height scrolling to the focus under the real keyboard, each level stepped in by 16 pixels with a leaf lined up; a bar's fill measured to the pixel from the start edge in both directions; a ring's sweep and turn. |
@@ -2484,6 +2555,11 @@ Real, and deliberately left open:
 - **The date picker has no time.** A day or a range of days; a time of day, and
   the time zone that comes with it, are not built. Nor are two months side by
   side.
+- **Form errors reach Field, Select, Combobox and DatePicker.** A RadioGroup or
+  CheckboxGroup in a Fieldset keeps the browser's own `required`; a Cascader,
+  Tree or Slider does not yet show a form's error by name. Nor is there a
+  submit button that shows the form is busy by itself: the form is
+  `aria-busy`, and `onStatusChange` says so.
 - **The palette keeps no history.** Recent commands, frecency and a
   "did you mean" are yours to put in `commands`; nothing is remembered
   between openings. A level's children are given up front, not loaded.

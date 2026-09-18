@@ -1,6 +1,7 @@
 <script lang="ts">
   import { connect, createSelectMachine, type SelectItem } from '@ggary/core/select'
-  import { attachPopover, onFormReset, scrollIntoViewIfNeeded, svelteNormalizer, uid } from '@ggary/core'
+  import { attachPopover, mergeProps, onFormReset, scrollIntoViewIfNeeded, svelteNormalizer, uid } from '@ggary/core'
+  import { useFormField } from '../form/context.svelte'
   import { untrack } from 'svelte'
 
   type Props = {
@@ -43,6 +44,7 @@
       onValueChange: (next, item) => {
         value = next
         onValueChange?.(next, item)
+        form.edited()
       },
     })
   )
@@ -55,6 +57,8 @@
 
   // Identical to the React adapter's `connect()` call — different normalizer.
   const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { placeholder, name }))
+  // Inside a Form, by name: the error its rules hold for this choice.
+  const form = useFormField(() => name, () => api.ids.trigger, () => label)
 
   // Props flow in as events, exactly as in React.
   $effect(() => machine.send({ type: 'SYNC_ITEMS', items }))
@@ -106,7 +110,7 @@
     <label {...api.labelProps}>{label}</label>
   {/if}
 
-  <button bind:this={triggerEl} {...api.triggerProps}>
+  <button bind:this={triggerEl} {...mergeProps(api.triggerProps, form.field.controlProps)}>
     <span {...api.valueProps}>{api.displayText}</span>
     <span {...api.indicatorProps}></span>
   </button>
@@ -125,6 +129,7 @@
     </ul>
   </div>
 
+  <span {...form.field.errorProps}>{form.error}</span>
   {#if name}
     <input {...api.hiddenInputProps} />
   {/if}

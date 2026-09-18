@@ -10,8 +10,9 @@ import {
   type DateRange,
 } from '@ggary/core/calendar'
 import { connect, createDatePickerMachine, type DatePickerWords, type DatePreset } from '@ggary/core/date-picker'
-import { attachPopover, reactNormalizer, type Dict, type ISODate } from '@ggary/core'
+import { attachPopover, mergeProps, reactNormalizer, type Dict, type ISODate } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useFormField } from '../form/Form'
 
 interface CalendarOptionsProps {
   mode?: CalendarMode
@@ -114,16 +115,22 @@ export interface DatePickerProps extends CalendarOptionsProps {
 export function DatePicker(props: DatePickerProps) {
   const { label, value, defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, locale, name, placeholder, presets, words } = props
   const id = `gg-date-${useId().replace(/:/g, '')}`
-  const callbacks = useRef({ onValueChange })
-  callbacks.current = { onValueChange }
+  const callbacks = useRef<{ onValueChange?: typeof onValueChange; edited?: () => void }>({ onValueChange })
+  callbacks.current.onValueChange = onValueChange
   const [machine] = useState(() =>
     createDatePickerMachine({
       id, value, defaultValue, mode, min, max, weekStart, isDateDisabled, locale,
-      onValueChange: (next) => callbacks.current.onValueChange?.(next),
+      onValueChange: (next) => {
+        callbacks.current.onValueChange?.(next)
+        callbacks.current.edited?.()
+      },
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
   const api = connect(state, machine.send, reactNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, presets })
+  // Inside a Form, by name: the error its rules hold for this day.
+  const form = useFormField(name, api.ids.input, label)
+  callbacks.current.edited = () => form.edited(document.getElementById(api.ids.input))
 
   useEffect(
     () => machine.send({ type: 'SYNC_OPTIONS', locale, mode, min, max, weekStart, isDateDisabled }),
@@ -167,12 +174,13 @@ export function DatePicker(props: DatePickerProps) {
     <div {...api.rootProps}>
       {label && <label {...api.labelProps}>{label}</label>}
       <div ref={controlRef} {...api.controlProps}>
-        <input ref={inputRef} {...api.inputProps} />
+        <input ref={inputRef} {...mergeProps(api.inputProps, form.field.controlProps)} />
         <button {...api.triggerProps}>
           <span {...api.triggerIconProps} />
         </button>
       </div>
       {api.invalid && <span {...api.errorProps}>{api.errorText}</span>}
+      <span {...form.field.errorProps}>{form.error}</span>
       <div ref={positionerRef} {...api.positionerProps}>
         <div {...api.contentProps}>
           {state.open && (

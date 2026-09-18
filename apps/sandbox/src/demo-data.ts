@@ -526,3 +526,36 @@ export function sandboxCommands(notify: (text: string) => void): PaletteCommand[
 
 export const HINT_PALETTE =
   'Press Ctrl+K (⌘K on a Mac) anywhere on the page, or the button. Type to find a section to go to or a thing to do; the arrows move, Enter runs, a press does too. Colour mode opens a level of its own: Backspace in the empty field or Escape goes back up, Escape at the top closes. Type two letters of a company — "ke", "or" — and the leads that match come from the pretend server under Results.'
+
+/** The new deal form's stages, for its Select. */
+export const stageItems = [
+  { value: 'new', label: 'New' },
+  { value: 'talks', label: 'In talks' },
+  { value: 'offer', label: 'Offer sent' },
+  { value: 'won', label: 'Won' },
+]
+
+/** What the browser cannot check about a new deal. */
+export function dealFormRules(data: FormData) {
+  const stage = String(data.get('stage') ?? '')
+  const due = String(data.get('due') ?? '')
+  return {
+    company: data.get('company') ? null : 'Choose the company',
+    stage: stage ? null : 'Choose a stage',
+    amount: (stage === 'offer' || stage === 'won') && !data.get('amount') ? 'An offer needs an amount' : null,
+    due: !due ? 'Choose the day it should close by' : due < todayISO() ? 'The day has passed' : null,
+  }
+}
+
+/** The pretend server: a title that exists already is refused, with a message for the whole form. */
+export async function saveDealForm(data: FormData) {
+  await new Promise((resolve) => setTimeout(resolve, 600))
+  const title = String(data.get('title') ?? '').trim()
+  if (['annual licence', 'onboarding pilot'].includes(title.toLowerCase())) {
+    return { errors: { title: 'A deal with this title exists' }, message: 'The deal was not saved.' }
+  }
+  return undefined
+}
+
+export const HINT_FORM =
+  'Press Create deal with nothing filled in: the form stops, each field says what is wrong — the browser’s own checks for the title and the email, the form’s rules for the company, stage and date, whose hidden inputs the browser does not check — and the summary at the top lists every error as a link and takes the focus. Fix a field and its error leaves as you type; set the stage to Offer sent and the amount becomes required. Fill it in with the title “Annual licence” and the pretend server refuses it after half a second: the error comes back to the title, and the summary says why.'

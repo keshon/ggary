@@ -4,8 +4,9 @@ import {
   createSelectMachine,
   type SelectItem,
 } from '@ggary/core/select'
-import { attachPopover, reactNormalizer, scrollIntoViewIfNeeded } from '@ggary/core'
+import { attachPopover, mergeProps, reactNormalizer, scrollIntoViewIfNeeded } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useFormField } from '../form/Form'
 
 export interface SelectProps {
   items: SelectItem[]
@@ -27,8 +28,8 @@ export function Select(props: SelectProps) {
 
   // Callbacks change every render; the machine is created once. A ref is the
   // seam between the two.
-  const callbacks = useRef({ onValueChange })
-  callbacks.current = { onValueChange }
+  const callbacks = useRef<{ onValueChange?: typeof onValueChange; edited?: () => void }>({ onValueChange })
+  callbacks.current.onValueChange = onValueChange
 
   const [machine] = useState(() =>
     createSelectMachine({
@@ -37,12 +38,18 @@ export function Select(props: SelectProps) {
       value,
       defaultValue,
       disabled,
-      onValueChange: (next, item) => callbacks.current.onValueChange?.(next, item),
+      onValueChange: (next, item) => {
+        callbacks.current.onValueChange?.(next, item)
+        callbacks.current.edited?.()
+      },
     })
   )
 
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
   const api = connect(state, machine.send, reactNormalizer, { placeholder, name })
+  // Inside a Form, by name: the error its rules hold for this choice.
+  const form = useFormField(name, api.ids.trigger, label)
+  callbacks.current.edited = () => form.edited(document.getElementById(api.ids.trigger))
 
   // Props flow in as events. The machine never reads props directly.
   useEffect(() => machine.send({ type: 'SYNC_ITEMS', items }), [machine, items])
@@ -86,7 +93,7 @@ export function Select(props: SelectProps) {
     <div {...api.rootProps}>
       {label && <label {...api.labelProps}>{label}</label>}
 
-      <button ref={triggerRef} {...api.triggerProps}>
+      <button ref={triggerRef} {...mergeProps(api.triggerProps, form.field.controlProps)}>
         <span {...api.valueProps}>{api.displayText}</span>
         <span {...api.indicatorProps} />
       </button>
@@ -103,6 +110,7 @@ export function Select(props: SelectProps) {
         </ul>
       </div>
 
+      <span {...form.field.errorProps}>{form.error}</span>
       {name && <input {...api.hiddenInputProps} />}
     </div>
   )

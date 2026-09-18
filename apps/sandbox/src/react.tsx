@@ -53,6 +53,8 @@ import {
   Progress,
   Kanban,
   CommandPalette,
+  Form,
+  FormSummary,
   Grid,
   PageHeader,
   Section,
@@ -104,7 +106,7 @@ import {
   ToolbarSpacer,
   Tooltip,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -129,6 +131,7 @@ function App() {
   const [paletteCommands, setPaletteCommands] = useState<PaletteCommand[]>([])
   const [paletteLog, setPaletteLog] = useState('—')
   const [tagList, setTagList] = useState(tagOptions)
+  const [dealFormLog, setDealFormLog] = useState('idle')
   // The sections are read from the page once it is drawn.
   useEffect(() => setPaletteCommands(sandboxCommands((text) => toast({ tone: 'neutral', title: text }))), [])
   const searchLeadCommands = async (query: string, signal: AbortSignal): Promise<PaletteCommand[]> =>
@@ -1215,6 +1218,41 @@ function App() {
         </div>
         <pre className="state">{dealLog}</pre>
         <p className="hint">{HINT_KANBAN}</p>
+      </section>
+
+      <section id="form">
+        <h2>Form — rules, a server and a summary</h2>
+        <Form
+          className="stack form-column"
+          validate={dealFormRules}
+          onSubmit={async (data) => {
+            const answer = await saveDealForm(data)
+            if (!answer) setDealFormLog(`saved: ${[...data.entries()].map(([key, value]) => `${key}=${String(value)}`).join(', ')}`)
+            return answer
+          }}
+          onStatusChange={(status) => setDealFormLog((log) => (status === 'submitted' ? log : status))}
+        >
+          <FormSummary />
+          <Field name="title" label="Deal title">
+            <Input name="title" required />
+          </Field>
+          <Combobox name="company" label="Company" load={searchCompanies} placeholder="Type to search" />
+          <Select name="stage" label="Stage" items={stageItems} placeholder="Choose a stage" />
+          <Field name="amount" label="Amount, ₽" hint="Required once an offer is sent">
+            <Input name="amount" type="number" min={0} step={1000} />
+          </Field>
+          <DatePicker name="due" label="Close by" locale="en-GB" />
+          <Field name="contact" label="Contact email">
+            <Input name="contact" type="email" />
+          </Field>
+          <div className="row">
+            <Button emphasis="high" type="submit">
+              Create deal
+            </Button>
+          </div>
+        </Form>
+        <pre className="state">{dealFormLog}</pre>
+        <p className="hint">{HINT_FORM}</p>
       </section>
 
       <section id="palette">

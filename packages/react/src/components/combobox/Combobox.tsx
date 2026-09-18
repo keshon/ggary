@@ -7,8 +7,9 @@ import {
   type ComboboxLoad,
   type ComboboxWords,
 } from '@ggary/core/combobox'
-import { attachPopover, reactNormalizer, scrollIntoViewIfNeeded } from '@ggary/core'
+import { attachPopover, mergeProps, reactNormalizer, scrollIntoViewIfNeeded } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useFormField } from '../form/Form'
 
 export interface ComboboxProps {
   label?: string
@@ -49,8 +50,8 @@ export function Combobox(props: ComboboxProps) {
     placeholder, disabled = false, limit, name, words,
   } = props
   const id = `gg-combobox-${useId().replace(/:/g, '')}`
-  const callbacks = useRef({ onValueChange, load, onCreate })
-  callbacks.current = { onValueChange, load, onCreate }
+  const callbacks = useRef<{ onValueChange?: typeof onValueChange; load?: typeof load; onCreate?: typeof onCreate; edited?: () => void }>({ onValueChange, load, onCreate })
+  Object.assign(callbacks.current, { onValueChange, load, onCreate })
 
   const [machine] = useState(() =>
     createComboboxMachine({
@@ -63,12 +64,18 @@ export function Combobox(props: ComboboxProps) {
       disabled,
       limit,
       creatable: onCreate !== undefined,
-      onValueChange: (next, chosen) => callbacks.current.onValueChange?.(next, chosen),
+      onValueChange: (next, chosen) => {
+        callbacks.current.onValueChange?.(next, chosen)
+        callbacks.current.edited?.()
+      },
       onCreate: (text) => callbacks.current.onCreate?.(text),
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
   const api = connect(state, machine.send, reactNormalizer, { ...words, placeholder: placeholder ?? words?.placeholder, name })
+  // Inside a Form, by name: the error its rules hold for this choice.
+  const form = useFormField(name, api.ids.input, label)
+  callbacks.current.edited = () => form.edited(document.getElementById(api.ids.input))
 
   useEffect(() => {
     if (!load && items) machine.send({ type: 'SYNC_SOURCE', items })
@@ -124,7 +131,7 @@ export function Combobox(props: ComboboxProps) {
               </span>
             )
           })}
-        <input ref={inputRef} {...api.inputProps} />
+        <input ref={inputRef} {...mergeProps(api.inputProps, form.field.controlProps)} />
         <button {...api.clearProps}>
           <span {...api.clearIconProps} />
         </button>
@@ -132,6 +139,7 @@ export function Combobox(props: ComboboxProps) {
           <span {...api.triggerIconProps} />
         </button>
       </div>
+      <span {...form.field.errorProps}>{form.error}</span>
       <div ref={positionerRef} {...api.positionerProps}>
         <ul ref={contentRef} {...api.contentProps}>
           {api.items.length === 0 && <li {...api.emptyProps}>{api.emptyText}</li>}

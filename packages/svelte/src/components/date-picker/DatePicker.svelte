@@ -1,7 +1,8 @@
 <script lang="ts">
   import { focusCalendarDay, toRange, type CalendarMode, type DateRange } from '@ggary/core/calendar'
   import { connect, createDatePickerMachine, type DatePickerWords, type DatePreset } from '@ggary/core/date-picker'
-  import { attachPopover, onFormReset, svelteNormalizer, uid, type ISODate } from '@ggary/core'
+  import { attachPopover, mergeProps, onFormReset, svelteNormalizer, uid, type ISODate } from '@ggary/core'
+  import { useFormField } from '../form/context.svelte'
   import { untrack } from 'svelte'
   import CalendarView from './CalendarView.svelte'
 
@@ -39,6 +40,7 @@
       onValueChange: (next) => {
         value = mode === 'range' ? next : next.start
         onValueChange?.(next)
+        form.edited()
       },
     })
   )
@@ -48,6 +50,8 @@
   // change would detach and attach them again on each key.
   const isOpen = $derived(snapshot.open)
   const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, presets }))
+  // Inside a Form, by name: the error its rules hold for this day.
+  const form = useFormField(() => name, () => api.ids.input, () => label)
 
   $effect(() => machine.send({ type: 'SYNC_OPTIONS', locale, mode, min, max, weekStart, isDateDisabled }))
   $effect(() => {
@@ -96,10 +100,11 @@
 <div {...api.rootProps}>
   {#if label}<label {...api.labelProps}>{label}</label>{/if}
   <div bind:this={controlEl} {...api.controlProps}>
-    <input bind:this={inputEl} {...api.inputProps} />
+    <input bind:this={inputEl} {...mergeProps(api.inputProps, form.field.controlProps)} />
     <button {...api.triggerProps}><span {...api.triggerIconProps}></span></button>
   </div>
   {#if api.invalid}<span {...api.errorProps}>{api.errorText}</span>{/if}
+  <span {...form.field.errorProps}>{form.error}</span>
   <div bind:this={positionerEl} {...api.positionerProps}>
     <div {...api.contentProps}>
       {#if snapshot.open}

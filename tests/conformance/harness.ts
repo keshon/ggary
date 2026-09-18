@@ -433,6 +433,13 @@ export interface ProgressProps {
   showValue?: boolean
 }
 
+/** A sign-up form: Email, Password and Confirm password in named Fields, Role in a Select, and a summary. */
+export interface FormProps {
+  summary?: boolean
+  validate?: (data: FormData) => Record<string, string | null | undefined> | Promise<Record<string, string | null | undefined>>
+  onSubmit?: (data: FormData) => unknown
+}
+
 export interface CommandPaletteProps {
   commands: import('../../packages/core/src/components/command-palette').PaletteCommand[]
   defaultOpen?: boolean
@@ -761,6 +768,7 @@ export interface Adapter {
   progress?(props: ProgressProps, target: HTMLElement): Promise<Mounted<ProgressProps>>
   kanban?(props: KanbanProps, target: HTMLElement): Promise<Mounted<KanbanProps>>
   commandPalette?(props: CommandPaletteProps, target: HTMLElement): Promise<Mounted<CommandPaletteProps>>
+  form?(props: FormProps, target: HTMLElement): Promise<Mounted<FormProps>>
   datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>

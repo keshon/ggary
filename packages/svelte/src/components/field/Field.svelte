@@ -3,6 +3,7 @@
   import { onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { setContext, untrack, type Snippet } from 'svelte'
   import { FIELD_CONTEXT, type FieldContext } from './context'
+  import { useFormField } from '../form/context.svelte'
 
   type Props = {
     label?: string
@@ -13,12 +14,19 @@
     required?: boolean
     disabled?: boolean
     readOnly?: boolean
+    /** The control's name, inside a Form: the Field shows the error the form's rules or its server hold for it. */
+    name?: string
     children: Snippet
   }
 
-  let { label, hint, error, invalid, required, disabled, readOnly, children }: Props = $props()
+  let { label, hint, error: ownError, invalid: ownInvalid, required, disabled, readOnly, name, children }: Props = $props()
 
   const id = uid('gg-field')
+
+  // The form's error for this name stands over the Field's own, and shows at once, as an owner's does.
+  const form = useFormField(() => name, () => `${id}-control`, () => label)
+  const invalid = $derived(ownInvalid || !!form.error)
+  const error = $derived(form.error ?? ownError)
 
   // Built once from the props at mount; they reach it afterwards through SYNC.
   const machine = untrack(() => createFieldMachine({ id, invalid, required, disabled, readOnly }))

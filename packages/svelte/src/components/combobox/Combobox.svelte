@@ -7,7 +7,8 @@
     type ComboboxLoad,
     type ComboboxWords,
   } from '@ggary/core/combobox'
-  import { attachPopover, onFormReset, scrollIntoViewIfNeeded, svelteNormalizer, uid } from '@ggary/core'
+  import { attachPopover, mergeProps, onFormReset, scrollIntoViewIfNeeded, svelteNormalizer, uid } from '@ggary/core'
+  import { useFormField } from '../form/context.svelte'
   import { untrack } from 'svelte'
 
   type Props = {
@@ -54,6 +55,7 @@
       onValueChange: (next, chosen) => {
         value = multiple ? next : (next[0] ?? null)
         onValueChange?.(next, chosen)
+        form.edited()
       },
     })
   )
@@ -64,6 +66,8 @@
   // change would detach and attach them again on each key.
   const isOpen = $derived(snapshot.open)
   const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, placeholder: placeholder ?? words?.placeholder, name }))
+  // Inside a Form, by name: the error its rules hold for this choice.
+  const form = useFormField(() => name, () => api.ids.input, () => label)
 
   $effect(() => {
     if (!load && items) machine.send({ type: 'SYNC_SOURCE', items })
@@ -115,10 +119,11 @@
         </span>
       {/each}
     {/if}
-    <input bind:this={inputEl} {...api.inputProps} />
+    <input bind:this={inputEl} {...mergeProps(api.inputProps, form.field.controlProps)} />
     <button {...api.clearProps}><span {...api.clearIconProps}></span></button>
     <button {...api.triggerProps}><span {...api.triggerIconProps}></span></button>
   </div>
+  <span {...form.field.errorProps}>{form.error}</span>
   <div bind:this={positionerEl} {...api.positionerProps}>
     <ul bind:this={contentEl} {...api.contentProps}>
       {#if api.items.length === 0}<li {...api.emptyProps}>{api.emptyText}</li>{/if}
