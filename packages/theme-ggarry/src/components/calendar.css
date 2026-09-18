@@ -10,6 +10,9 @@
 
 [data-scope='calendar'][data-part='root'] {
   --day-size: 36px;
+  /* Three pixels short of the cell on each side: neighbouring discs stand
+     apart, not kissing — a fill beside today's ring read as one lump. */
+  --day-disc: calc(var(--day-size) - 6px);
   gap: var(--ggarry-space-2);
   padding: var(--ggarry-space-3);
   font-family: var(--ggarry-font-family-sans);
@@ -70,7 +73,10 @@
   content: '';
   position: absolute;
   z-index: -1;
-  inset: 1px;
+  inset: 0;
+  inline-size: var(--day-disc);
+  block-size: var(--day-disc);
+  margin: auto;
   border-radius: var(--ggarry-radius-full);
 }
 [data-scope='calendar'][data-part='day']:hover:not([data-disabled]):not([data-selected])::before {
@@ -106,25 +112,31 @@
 }
 
 /* A range: one band of tint through the days between the ends, running half
-   into each end, whose disc stands on it. */
+   into each end, whose disc stands on it. The band is the disc's height, so
+   an end sits in it flush rather than as a smaller coin on a wider strip. */
+[data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day']:is([data-in-range], [data-range-start], [data-range-end]) {
+  background-position: center;
+  background-size: 100% var(--day-disc);
+  background-repeat: no-repeat;
+}
 [data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-in-range] {
-  background: var(--ggarry-bg-accent-subtle);
+  background-image: linear-gradient(var(--ggarry-bg-accent-subtle), var(--ggarry-bg-accent-subtle));
   color: var(--ggarry-text-default);
 }
 [data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-in-range]::before {
   background: none;
 }
 [data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-range-start]:not([data-range-end]) {
-  background: linear-gradient(to right, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
+  background-image: linear-gradient(to right, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
 }
 [data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-range-end]:not([data-range-start]) {
-  background: linear-gradient(to left, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
+  background-image: linear-gradient(to left, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
 }
 [data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-range-start]:not([data-range-end]):dir(rtl) {
-  background: linear-gradient(to left, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
+  background-image: linear-gradient(to left, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
 }
 [data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-range-end]:not([data-range-start]):dir(rtl) {
-  background: linear-gradient(to right, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
+  background-image: linear-gradient(to right, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
 }
 [data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day']:is([data-range-start], [data-range-end]) {
   color: var(--ggarry-text-on-accent);

@@ -1636,6 +1636,11 @@ Found on the way:
   a round clip cut the band while the band's gradient cut the disc. The cell now
   carries the band and a layer behind the number carries everything round: the
   disc, today's ring, the focus ring.
+- **The discs kissed.** Each filled its 36-pixel cell to within a pixel, so a
+  chosen day beside today read as one lump, fill against ring. The disc is now 6
+  pixels short of the cell, drawn at a fixed size in its middle — round even if
+  a table stretches the cell — and a range's band is the disc's height, so its
+  ends sit in it flush.
 - **`isISODate` narrowed a string to nothing.** A type guard `text is ISODate`,
   where `ISODate` is `string`, made TypeScript read the text after it as `never`.
 

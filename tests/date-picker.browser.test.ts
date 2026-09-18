@@ -88,8 +88,10 @@ describe('date picker', () => {
     await userEvent.hover(day('2026-09-19'))
     expect(day('2026-09-16').dataset.inRange).toBe('')
     expect(day('2026-09-16').dataset.preview).toBe('')
-    const band = getComputedStyle(day('2026-09-16')).backgroundColor
-    expect(band).not.toBe('rgba(0, 0, 0, 0)')
+    // The band is a strip the disc's height through the middle of the cell.
+    const band = getComputedStyle(day('2026-09-16'))
+    expect(band.backgroundImage).toContain('linear-gradient')
+    expect(band.backgroundSize).toBe('100% 30px')
     await userEvent.click(day('2026-09-19'))
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
   })
