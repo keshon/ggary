@@ -33,6 +33,12 @@
     "--gg-gantt-start": "set by core on a gantt's bar, scale cell and today line: its first day, counted from the chart's",
     "--gg-gantt-span": "set by core on a gantt's bar and scale cell: how many days it spans",
     "--gg-gantt-weekend": "set by core on a gantt's root: the first Saturday, counted from the chart's first day",
+    "--gg-gantt-x1": "set by core on a gantt arrow's segment and head: its first point, in days from the chart's start",
+    "--gg-gantt-x1-gap": "set by core with --gg-gantt-x1: how many of the theme's small gaps beside it",
+    "--gg-gantt-x2": "set by core on a gantt arrow's segment: its second point, in days",
+    "--gg-gantt-x2-gap": "set by core with --gg-gantt-x2: how many of the theme's small gaps beside it",
+    "--gg-gantt-y1": "set by core on a gantt arrow's segment and head: its first point, in rows from the first task's top",
+    "--gg-gantt-y2": "set by core on a gantt arrow's segment: its second point, in rows",
     "--gg-flow-self": "set by a stack or a section on each child: how a component sized by its content stands in the column (it reads it, with auto outside one)",
     "--gg-icon": "mapped from data-icon by @ggary/icons; a theme never declares it on the root"
   },

@@ -187,6 +187,53 @@
   inline-size: 2px;
   background: var(--ggarry-bg-accent);
 }
+/* The arrows. A point is days and gaps across and rows down; a run is the
+   box between two points, its line drawn on one edge. A row is exactly
+   --gantt-row tall (its hairline inside it), so a point's rows land true. */
+[data-scope='gantt'][data-part='row'] {
+  box-sizing: border-box;
+}
+[data-scope='gantt'][data-part='links'] {
+  --gantt-link-gap: 8px;
+  --gantt-link: var(--ggarry-text-subtle);
+}
+[data-scope='gantt'][data-part='link'][data-active] {
+  --gantt-link: var(--ggarry-border-accent);
+}
+[data-scope='gantt'][data-part='link'][data-conflict] {
+  --gantt-link: var(--ggarry-border-danger);
+}
+[data-scope='gantt'][data-part='link-segment'] {
+  --a: calc(var(--gg-gantt-x1) * var(--gantt-day) + var(--gg-gantt-x1-gap) * var(--gantt-link-gap));
+  --b: calc(var(--gg-gantt-x2) * var(--gantt-day) + var(--gg-gantt-x2-gap) * var(--gantt-link-gap));
+  inset-inline-start: calc(var(--gantt-list) + min(var(--a), var(--b)));
+  inset-block-start: calc(min(var(--gg-gantt-y1), var(--gg-gantt-y2)) * var(--gantt-row));
+  inline-size: calc(max(var(--a), var(--b)) - min(var(--a), var(--b)));
+  block-size: calc((max(var(--gg-gantt-y1), var(--gg-gantt-y2)) - min(var(--gg-gantt-y1), var(--gg-gantt-y2))) * var(--gantt-row));
+  box-sizing: border-box;
+}
+[data-scope='gantt'][data-part='link-segment'][data-axis='x'] {
+  border-block-start: 1.5px solid var(--gantt-link);
+  translate: 0 -0.75px;
+}
+[data-scope='gantt'][data-part='link-segment'][data-axis='y'] {
+  border-inline-start: 1.5px solid var(--gantt-link);
+  translate: -0.75px 0;
+}
+/* The head: a small triangle pointing into the task, its tip on the last point. */
+[data-scope='gantt'][data-part='link-head'] {
+  inset-inline-start: calc(var(--gantt-list) + var(--gg-gantt-x1) * var(--gantt-day) + var(--gg-gantt-x1-gap) * var(--gantt-link-gap) - 6px);
+  inset-block-start: calc(var(--gg-gantt-y1) * var(--gantt-row) - 4px);
+  inline-size: 6px;
+  block-size: 8px;
+  background: var(--gantt-link);
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+[data-scope='gantt'][data-part='link'][data-active] :is([data-part='link-segment'], [data-part='link-head']),
+[data-scope='gantt'][data-part='link'][data-conflict] :is([data-part='link-segment'], [data-part='link-head']) {
+  z-index: 1;
+}
+
 /* A bar's ends, 8 pixels to take hold of, shown as a short line on the bar the pointer is over. */
 [data-scope='gantt']:is([data-part='bar-start'], [data-part='bar-end']) {
   inline-size: 8px;

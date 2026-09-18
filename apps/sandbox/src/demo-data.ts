@@ -563,15 +563,15 @@ export const HINT_FORM =
 /** The Gantt's plan: a CRM rollout, dated around today so today's line always crosses it. */
 export const rolloutPlan = [
   { id: 'kickoff', title: 'Kickoff with sales', start: inDays(-21), end: inDays(-21), milestone: true, locked: true },
-  { id: 'audit', title: 'Audit the old pipeline', start: inDays(-20), end: inDays(-12), progress: 1, locked: true },
-  { id: 'fields', title: 'Agree the deal fields', start: inDays(-11), end: inDays(-4), progress: 1, locked: true },
-  { id: 'import', title: 'Import 700,000 leads', start: inDays(-5), end: inDays(6), progress: 0.55 },
-  { id: 'boards', title: 'Set up the boards', start: inDays(-2), end: inDays(9), progress: 0.2 },
-  { id: 'training', title: 'Train the team', start: inDays(8), end: inDays(14), progress: 0 },
-  { id: 'pilot', title: 'Pilot in Kazan', start: inDays(12), end: inDays(26), progress: 0 },
-  { id: 'review', title: 'Review the pilot', start: inDays(27), end: inDays(27), milestone: true },
-  { id: 'rollout', title: 'Roll out to every office', start: inDays(28), end: inDays(55), progress: 0 },
-  { id: 'launch', title: 'Launch', start: inDays(56), end: inDays(56), milestone: true },
+  { id: 'audit', title: 'Audit the old pipeline', start: inDays(-20), end: inDays(-12), progress: 1, locked: true, dependsOn: ['kickoff'] },
+  { id: 'fields', title: 'Agree the deal fields', start: inDays(-11), end: inDays(-4), progress: 1, locked: true, dependsOn: ['audit'] },
+  { id: 'import', title: 'Import 700,000 leads', start: inDays(-5), end: inDays(6), progress: 0.55, dependsOn: ['fields'] },
+  { id: 'boards', title: 'Set up the boards', start: inDays(-2), end: inDays(9), progress: 0.2, dependsOn: ['fields'] },
+  { id: 'training', title: 'Train the team', start: inDays(8), end: inDays(14), progress: 0, dependsOn: ['import'] },
+  { id: 'pilot', title: 'Pilot in Kazan', start: inDays(12), end: inDays(26), progress: 0, dependsOn: ['boards'] },
+  { id: 'review', title: 'Review the pilot', start: inDays(27), end: inDays(27), milestone: true, dependsOn: ['pilot', 'training'] },
+  { id: 'rollout', title: 'Roll out to every office', start: inDays(28), end: inDays(55), progress: 0, dependsOn: ['review'] },
+  { id: 'launch', title: 'Launch', start: inDays(56), end: inDays(56), milestone: true, dependsOn: ['rollout'] },
 ]
 
 /** The pretend server: a change takes a moment, and nothing may end after the launch. */
@@ -587,4 +587,4 @@ export const ganttScales = [
 ]
 
 export const HINT_GANTT =
-  'The chart opens on today, a third of the way in. Tab to it: one stop, on a task. Up and Down walk the tasks — the row is tinted, the bar ringed, and a bar out of sight is brought into view clear of the list — Home and End, PageUp and PageDown; Enter or a double press opens one. A screen reader hears a grid: the task’s name as the row’s header, then its dates in words, how many days, how far along. Switch the scale: days, weeks, months — the core counts in days and the theme says how wide a day is. Drag a bar to move it, or either end to resize it; or with its task focused, Left and Right move it a day (Shift, a week) and Alt with them moves its end — the change is said as it is made, and kept when the keys pause, on Enter, or on moving to another task; Escape puts it back. The pretend server takes a moment and refuses anything that would end after the launch: the bar goes back and the reason is read out. The done tasks are locked. Arrows between tasks are the next step.'
+  'The chart opens on today, a third of the way in. Tab to it: one stop, on a task. Up and Down walk the tasks — the row is tinted, the bar ringed, and a bar out of sight is brought into view clear of the list — Home and End, PageUp and PageDown; Enter or a double press opens one. A screen reader hears a grid: the task’s name as the row’s header, then its dates in words, how many days, how far along, and what it waits for. Switch the scale: days, weeks, months — the core counts in days and the theme says how wide a day is. Drag a bar to move it, or either end to resize it; or with its task focused, Left and Right move it a day (Shift, a week) and Alt with them moves its end — the change is said as it is made, and kept when the keys pause, on Enter, or on moving to another task; Escape puts it back. The pretend server takes a moment and refuses anything that would end after the launch: the bar goes back and the reason is read out. The done tasks are locked. An arrow runs from each task to the ones that wait for it, and turns red where one starts before the other ends — as the import does now; move it and the arrows follow.'

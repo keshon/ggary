@@ -32,6 +32,8 @@ export interface GanttTask {
   milestone?: boolean
   /** Not to be moved or resized: its bar has no grips, and the keys leave it. */
   locked?: boolean
+  /** The tasks that must finish before this one starts: an arrow from each. */
+  dependsOn?: string[]
 }
 
 export interface GanttDates {
@@ -134,6 +136,10 @@ export const ganttAnatomy = createAnatomy('gantt', [
   'bar-start',
   'bar-end',
   'milestone',
+  'links',
+  'link',
+  'link-segment',
+  'link-head',
   'live',
   'instructions',
   'today',
@@ -258,6 +264,79 @@ export function datesFor(state: GanttState, task: GanttTask): GanttDates {
   if (state.draft && state.draft.task === task.id) return datesOf(state.draft.origin, state.draft.edge, state.draft.offset, task.milestone)
   const out = [...state.pending].reverse().find((change) => change.task === task.id)
   return out ? out.to : { start: task.start, end: task.end }
+}
+
+/**
+ * A point of an arrow: `x` days from the chart's start and `gap` of the
+ * theme's small gaps beside it — a pixel count the core does not know — and
+ * `y` rows down, the half a row's middle.
+ */
+export interface LinkPoint {
+  x: number
+  gap: number
+  y: number
+}
+
+export interface GanttLink {
+  from: string
+  to: string
+  /** The task starts before the one it waits for has ended. */
+  conflict: boolean
+  /** The arrow's corners, first to last; the last is where its head is. */
+  points: LinkPoint[]
+}
+
+/** Days of room a straight run needs at each scale, so the arrow does not cut back through a bar. */
+const ROOM: Record<GanttScale, number> = { day: 1, week: 2, month: 5 }
+
+/**
+ * Each dependency as an arrow from the end of the task waited for to the
+ * start of the one waiting. With room between them it runs across, down and
+ * in; with none — or when the task starts before the other ends — it steps
+ * out, runs between the rows, and comes back in, so it never cuts a bar.
+ */
+export function linksOf(state: GanttState, range: GanttRange): GanttLink[] {
+  const index = new Map(state.tasks.map((task, i) => [task.id, i]))
+  const links: GanttLink[] = []
+  for (const task of state.tasks) {
+    for (const id of task.dependsOn ?? []) {
+      const before = state.tasks[index.get(id) ?? -1]
+      if (!before || before.id === task.id) continue
+      const a = datesFor(state, before)
+      const b = datesFor(state, task)
+      const rowA = index.get(before.id)!
+      const rowB = index.get(task.id)!
+      const yA = rowA + 0.5
+      const yB = rowB + 0.5
+      // A bar is left and entered at its edges; a milestone at its tips, a
+      // gap either side of its middle.
+      const fromX = before.milestone ? daysBetween(range.start, a.start) + 0.5 : daysBetween(range.start, a.end) + 1
+      const toX = daysBetween(range.start, b.start) + (task.milestone ? 0.5 : 0)
+      const out = before.milestone ? 1 : 0
+      const into = task.milestone ? -1 : 0
+      // A bar must start after the day the other ends; a milestone is a point in
+      // time, so a task may start on its day, and a milestone fall on a bar's last.
+      const conflict = before.milestone ? b.start < a.start : task.milestone ? b.start < a.end : b.start <= a.end
+      const roomy = toX - fromX >= ROOM[state.scale]
+      const points: LinkPoint[] = roomy
+        ? [
+            { x: fromX, gap: out, y: yA },
+            { x: toX, gap: into - 1, y: yA },
+            { x: toX, gap: into - 1, y: yB },
+            { x: toX, gap: into, y: yB },
+          ]
+        : [
+            { x: fromX, gap: out, y: yA },
+            { x: fromX, gap: out + 1, y: yA },
+            { x: fromX, gap: out + 1, y: rowB > rowA ? rowB : rowB + 1 },
+            { x: toX, gap: into - 1, y: rowB > rowA ? rowB : rowB + 1 },
+            { x: toX, gap: into - 1, y: yB },
+            { x: toX, gap: into, y: yB },
+          ]
+      links.push({ from: before.id, to: task.id, conflict, points })
+    }
+  }
+  return links
 }
 
 const editableTask = (state: GanttState, task: GanttTask | undefined) => !!task && state.editable && !task.locked
@@ -467,6 +546,10 @@ export interface GanttWords {
   changed: (title: string, dates: string) => string
   cancelled: (title: string, dates: string) => string
   failed: (title: string, message: string) => string
+  /** A task's dependencies, after its schedule: "after Write the brief". */
+  after: (titles: string[]) => string
+  /** A task that starts before one it waits for ends. */
+  conflict: (titles: string[]) => string
 }
 
 export const GANTT_WORDS: GanttWords = {
@@ -482,6 +565,8 @@ export const GANTT_WORDS: GanttWords = {
   changed: (title, dates) => `${title}: ${dates}`,
   cancelled: (title, dates) => `${title} put back: ${dates}`,
   failed: (title, message) => (message ? `${title} was not changed: ${message}` : `${title} was not changed.`),
+  after: (titles) => `after ${titles.join(', ')}`,
+  conflict: (titles) => `starts before ${titles.join(', ')} ${titles.length === 1 ? 'ends' : 'end'}`,
 }
 
 const idPart = (value: string) => value.replace(/[^\w-]/g, (char) => `_${char.charCodeAt(0).toString(16)}`)
@@ -522,6 +607,8 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
       ? w.failed(titleOf(said.task), said.message)
       : (said.kind === 'cancelled' ? w.cancelled : w.changed)(titleOf(said.task), formatRange(said.dates.start, said.dates.end, state.locale))
   const pendingTasks = new Set(state.pending.map((change) => change.task))
+  const links = linksOf(state, range)
+  const focused = tabStop(state)
 
   const onKeyDown = (event: KeyboardEvent) => {
     const rtl = (event.currentTarget as Element | null)?.closest?.('[dir]')?.getAttribute('dir') === 'rtl'
@@ -621,7 +708,35 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
     /** The schedule in words, for a screen reader; the bar shows it to the eye. */
     describe: (task: T) => {
       const { start, end } = datesFor(state, task)
-      return task.milestone ? w.milestone(formatDate(start, state.locale)) : w.describe(task, formatRange(start, end, state.locale), daysBetween(start, end) + 1)
+      const schedule = task.milestone ? w.milestone(formatDate(start, state.locale)) : w.describe(task, formatRange(start, end, state.locale), daysBetween(start, end) + 1)
+      const waits = links.filter((link) => link.to === task.id)
+      if (waits.length === 0) return schedule
+      const late = waits.filter((link) => link.conflict).map((link) => titleOf(link.from))
+      const after = w.after(waits.map((link) => titleOf(link.from)))
+      return late.length ? `${schedule}, ${after}; ${w.conflict(late)}` : `${schedule}, ${after}`
+    },
+    links,
+    linksProps: normalize({ ...ganttAnatomy.attrs('links'), 'aria-hidden': 'true' }),
+    getLinkProps: (link: GanttLink) =>
+      normalize({
+        ...ganttAnatomy.attrs('link'),
+        'data-from': link.from,
+        'data-to': link.to,
+        'data-conflict': link.conflict ? '' : undefined,
+        // The arrows of the task the keyboard is on stand out.
+        'data-active': focused !== null && state.focus.task !== null && (link.from === focused || link.to === focused) ? '' : undefined,
+      }),
+    /** The arrow's straight runs, each between two of its corners. */
+    segmentsOf: (link: GanttLink) => link.points.slice(1).map((point, i) => [link.points[i], point] as const),
+    getSegmentProps: ([a, b]: readonly [LinkPoint, LinkPoint]) =>
+      normalize({
+        ...ganttAnatomy.attrs('link-segment'),
+        'data-axis': a.y === b.y ? 'x' : 'y',
+        style: { '--gg-gantt-x1': a.x, '--gg-gantt-x1-gap': a.gap, '--gg-gantt-x2': b.x, '--gg-gantt-x2-gap': b.gap, '--gg-gantt-y1': a.y, '--gg-gantt-y2': b.y },
+      }),
+    getHeadProps: (link: GanttLink) => {
+      const end = link.points[link.points.length - 1]
+      return normalize({ ...ganttAnatomy.attrs('link-head'), style: { '--gg-gantt-x1': end.x, '--gg-gantt-x1-gap': end.gap, '--gg-gantt-y1': end.y } })
     },
     scheduleTextProps: normalize({ ...ganttAnatomy.attrs('schedule-text') }),
     getBarProps: (task: T) => {

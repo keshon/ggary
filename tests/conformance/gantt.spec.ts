@@ -102,6 +102,26 @@ export function ganttConformance(adapter: Adapter) {
       expect(part(schedule('design'), 'gantt', 'bar')!.style.getPropertyValue('--gg-gantt-start')).toBe('9')
     })
 
+    it('draws an arrow for each dependency, hidden from a screen reader, which hears it in the schedule instead', async () => {
+      const tasks = [plan[0], { ...plan[1], start: '2026-09-09', dependsOn: ['brief'] }, { ...plan[2], dependsOn: ['design'] }, plan[3]]
+      const { m, schedule } = await setup({ tasks })
+      const links = part(m.root, 'gantt', 'links')!
+      expect(links.getAttribute('aria-hidden')).toBe('true')
+      const arrows = parts(links, 'gantt', 'link')
+      expect(arrows.map((link) => [link.getAttribute('data-from'), link.getAttribute('data-to'), link.hasAttribute('data-conflict')])).toEqual([
+        ['brief', 'design', true],
+        ['design', 'review', false],
+      ])
+      expect(parts(arrows[0], 'gantt', 'link-segment').map((segment) => segment.getAttribute('data-axis'))).toEqual(['x', 'y', 'x', 'y', 'x'])
+      expect(parts(arrows[1], 'gantt', 'link-head')).toHaveLength(1)
+      const first = part(arrows[0], 'gantt', 'link-segment')!
+      expect(['--gg-gantt-x1', '--gg-gantt-x2', '--gg-gantt-x2-gap', '--gg-gantt-y1'].map((name) => first.style.getPropertyValue(name))).toEqual(['9', '9', '1', '0.5'])
+      expect(part(schedule('design'), 'gantt', 'schedule-text')!.textContent).toBe('9 Sept – 18 Sept 2026, 10 days, 40% done, after Write the brief; starts before Write the brief ends')
+      expect(part(schedule('review'), 'gantt', 'schedule-text')!.textContent).toBe('Milestone, 21 Sept 2026, after Design the flow')
+      await m.update({ tasks: plan })
+      expect(part(m.root, 'gantt', 'links')).toBeNull()
+    })
+
     it('a new scale redraws the header in its own units', async () => {
       const { m, root } = await setup({ scale: 'week' })
       expect(root().getAttribute('data-scale')).toBe('week')

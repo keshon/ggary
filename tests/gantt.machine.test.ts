@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { connect, createGanttMachine, datesFor, NUDGE_SETTLE_MS, rangeOf, scaleRows, tabStop } from '../packages/core/src/components/gantt'
+import { connect, createGanttMachine, datesFor, linksOf, NUDGE_SETTLE_MS, rangeOf, scaleRows, tabStop, type GanttLink, type GanttScale, type GanttTask } from '../packages/core/src/components/gantt'
 import { daysBetween } from '../packages/core/src/utils/calendar'
 import { plan, planRange } from './conformance/plan'
 
@@ -160,5 +160,65 @@ describe('gantt: moving and resizing', () => {
     still.send({ type: 'NUDGE', edge: 'move', days: 1 })
     expect(still.getState().draft).toBeNull()
     expect(connect(still.getState(), still.send, same).getBarProps(plan[0])).toMatchObject({ 'data-editable': undefined })
+  })
+})
+
+describe('gantt: dependencies', () => {
+  const chained: GanttTask[] = [
+    plan[0],
+    { ...plan[1], dependsOn: ['brief'] },
+    { ...plan[2], dependsOn: ['design'] },
+    { ...plan[3], dependsOn: ['review', 'missing', 'build'] },
+  ]
+  const state = (tasks: GanttTask[], scale: GanttScale = 'day') => createGanttMachine({ id: 'g', tasks, range: planRange, locale: 'en-GB', scale }).getState()
+  const corners = (link: GanttLink) => link.points.map((point) => [point.x, point.gap, point.y])
+
+  it('an arrow from the end of each task waited for to the start of the one waiting; a missing task or itself is no arrow', () => {
+    const links = linksOf(state(chained), planRange)
+    expect(links.map((link) => [link.from, link.to, link.conflict])).toEqual([
+      ['brief', 'design', false],
+      ['design', 'review', false],
+      ['review', 'build', false],
+    ])
+    // No room between them: out a gap, down to the rows' seam, back to a gap before the start, down, in.
+    expect(corners(links[0])).toEqual([[9, 0, 0.5], [9, 1, 0.5], [9, 1, 1], [9, -1, 1], [9, -1, 1.5], [9, 0, 1.5]])
+    // Room: across, down, in — to the milestone's tip, a gap short of its middle.
+    expect(corners(links[1])).toEqual([[18, 0, 1.5], [20.5, -2, 1.5], [20.5, -2, 2.5], [20.5, -1, 2.5]])
+    // Out of a milestone at its other tip.
+    expect(corners(links[2])).toEqual([[20.5, 1, 2.5], [20.5, 2, 2.5], [20.5, 2, 3], [20, -1, 3], [20, -1, 3.5], [20, 0, 3.5]])
+  })
+
+  it('the room a straight run needs grows with the scale; an arrow up the chart runs along the seam under the task', () => {
+    expect(linksOf(state(chained, 'week'), planRange)[1].points).toHaveLength(4)
+    expect(linksOf(state(chained, 'month'), planRange)[1].points).toHaveLength(6)
+    const upward = linksOf(state([{ ...plan[0], dependsOn: ['design'] }, plan[1]]), planRange)[0]
+    expect(upward.points[2].y).toBe(1)
+    expect(upward.conflict).toBe(true)
+  })
+
+  it('a conflict: a bar starting on or before the last day of one it waits for; a milestone is a moment, so a task may start on its day', () => {
+    const conflicts = (tasks: GanttTask[]) => linksOf(state(tasks), planRange).map((link) => link.conflict)
+    expect(conflicts([plan[0], { ...plan[1], start: '2026-09-09', dependsOn: ['brief'] }])).toEqual([true])
+    expect(conflicts([plan[0], { ...plan[2], start: '2026-09-09', end: '2026-09-09', dependsOn: ['brief'] }])).toEqual([false])
+    expect(conflicts([plan[0], { ...plan[2], start: '2026-09-08', end: '2026-09-08', dependsOn: ['brief'] }])).toEqual([true])
+    expect(conflicts([plan[2], { ...plan[3], start: '2026-09-20', dependsOn: ['review'] }])).toEqual([true])
+  })
+
+  it('says what a task waits for, and which it starts too early for; its arrows stand out while it has the keyboard; a change moves them', () => {
+    const machine = createGanttMachine({ id: 'g', tasks: [plan[0], { ...plan[1], start: '2026-09-09', dependsOn: ['brief'] }], range: planRange, locale: 'en-GB', onChange: () => undefined })
+    const api = () => connect(machine.getState(), machine.send, same)
+    expect(api().describe(machine.getState().tasks[1])).toBe('9 Sept – 18 Sept 2026, 10 days, 40% done, after Write the brief; starts before Write the brief ends')
+    expect(api().linksProps).toMatchObject({ 'aria-hidden': 'true' })
+    const [link] = api().links
+    expect(api().getLinkProps(link)).toMatchObject({ 'data-from': 'brief', 'data-to': 'design', 'data-conflict': '', 'data-active': undefined })
+    machine.send({ type: 'FOCUS', task: 'design' })
+    expect(api().getLinkProps(api().links[0])).toMatchObject({ 'data-active': '' })
+    machine.send({ type: 'NUDGE', edge: 'move', days: 1 })
+    expect(api().links[0].conflict).toBe(false)
+    expect(api().describe(machine.getState().tasks[1])).toBe('10 Sept – 19 Sept 2026, 10 days, 40% done, after Write the brief')
+    const segments = api().segmentsOf(api().links[0])
+    expect(segments).toHaveLength(5)
+    expect(api().getSegmentProps(segments[0])).toMatchObject({ 'data-axis': 'x', style: { '--gg-gantt-x1': 9, '--gg-gantt-x2-gap': 1, '--gg-gantt-y1': 0.5 } })
+    expect(api().getSegmentProps(segments[1])).toMatchObject({ 'data-axis': 'y' })
   })
 })

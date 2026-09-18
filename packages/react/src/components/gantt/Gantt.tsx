@@ -88,6 +88,18 @@ export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
         </div>
       </div>
       <div {...api.bodyProps}>
+        {api.links.length > 0 && (
+          <div {...api.linksProps}>
+            {api.links.map((link) => (
+              <div key={`${link.from}>${link.to}`} {...api.getLinkProps(link)}>
+                {api.segmentsOf(link).map((segment, index) => (
+                  <span key={index} {...api.getSegmentProps(segment)} />
+                ))}
+                <span {...api.getHeadProps(link)} />
+              </div>
+            ))}
+          </div>
+        )}
         {api.todayInRange && <div {...api.todayProps} />}
         {api.tasks.map((task, index) => (
           <div key={task.id} {...api.getRowProps(task, index)}>

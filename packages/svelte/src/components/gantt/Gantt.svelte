@@ -86,6 +86,16 @@
     </div>
   </div>
   <div {...api.bodyProps}>
+    {#if api.links.length > 0}
+      <div {...api.linksProps}>
+        {#each api.links as link (`${link.from}>${link.to}`)}
+          <div {...api.getLinkProps(link)}>
+            {#each api.segmentsOf(link) as segment, index (index)}<span {...api.getSegmentProps(segment)}></span>{/each}
+            <span {...api.getHeadProps(link)}></span>
+          </div>
+        {/each}
+      </div>
+    {/if}
     {#if api.todayInRange}<div {...api.todayProps}></div>{/if}
     {#each api.tasks as task, index (task.id)}
       <div {...api.getRowProps(task, index)}>

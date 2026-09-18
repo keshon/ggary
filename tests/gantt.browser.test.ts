@@ -145,4 +145,40 @@ describe('gantt by pointer', () => {
     expect(start(bar)).toBe(20)
     expect(bar.hasAttribute('data-pending')).toBe(false)
   })
+
+  it('draws an arrow from a bar’s end to the next one’s start, to a milestone’s tip, under the bars; a conflict in another colour', async () => {
+    const tasks = [plan[0], { ...plan[1], dependsOn: ['brief'] }, { ...plan[2], dependsOn: ['design'] }, { ...plan[3], start: '2026-09-18', dependsOn: ['design'] }, { id: 'docs', title: 'Write the docs', start: '2026-09-14', end: '2026-09-22', dependsOn: ['brief'] }]
+    const { host, schedule } = await mount({ tasks, range: planRange }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const origin = schedule('brief').getBoundingClientRect().left
+    const link = (from: string, to: string) => host.querySelector<HTMLElement>(`[data-part="link"][data-from="${from}"][data-to="${to}"]`)!
+    const box = (el: Element) => el.getBoundingClientRect()
+    // Within a pixel: a line is 1.5px wide, drawn over its edge.
+    const near = (actual: number, expected: number) => expect(Math.abs(actual - expected)).toBeLessThanOrEqual(1)
+    const segments = (el: HTMLElement) => [...el.querySelectorAll<HTMLElement>('[data-part="link-segment"]')].map(box)
+    // Out of the brief where its last day ends, a gap (8px) out, down to the rows’ seam.
+    const [out, down, back] = segments(link('brief', 'design'))
+    near(out.left - origin, 9 * 32)
+    near(out.width, 8)
+    near(down.top + down.height, box(schedule('design')).top)
+    near(back.left - origin, 9 * 32 - 8)
+    // Into the milestone at its left tip: the head’s point on it.
+    const head = box(link('design', 'review').querySelector('[data-part="link-head"]')!)
+    const diamond = box(schedule('review').querySelector('[data-part="milestone"]')!)
+    near(head.right, diamond.left)
+    near(head.top + head.height / 2, diamond.top + diamond.height / 2)
+    // Under the bars: the arrow down to the docs passes behind the design’s bar.
+    // (The arrows take no pointer; the test lets this one, to ask what is on top.)
+    const behind = link('brief', 'docs').querySelectorAll<HTMLElement>('[data-part="link-segment"]')[1]
+    behind.style.pointerEvents = 'auto'
+    behind.style.borderInlineStartWidth = '4px'
+    const crossing = box(behind)
+    const bar = schedule('design').querySelector('[data-part="bar"]')!
+    near(crossing.left - origin, 13 * 32 - 8)
+    const y = box(bar).top + box(bar).height / 2
+    expect(document.elementFromPoint(crossing.left + 1, y)?.closest('[data-part="bar"]')).toBe(bar)
+    expect(document.elementFromPoint(crossing.left + 1, box(schedule('review')).top + 4)).toBe(behind)
+    const colour = (el: HTMLElement) => getComputedStyle(el.querySelector('[data-part="link-segment"]')!).borderTopColor
+    expect(link('design', 'build').hasAttribute('data-conflict')).toBe(true)
+    expect(colour(link('design', 'build'))).not.toBe(colour(link('brief', 'design')))
+  })
 })
