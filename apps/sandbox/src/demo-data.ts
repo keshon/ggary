@@ -1,7 +1,7 @@
 import type { ChipItem } from '@ggary/core/chip-group'
 import { todayISO } from '@ggary/core'
 import type { PaletteCommand } from '@ggary/core/command-palette'
-import { setAxis } from './theme'
+import { setMode, type Mode } from './theme'
 import type { MenuEntry } from '@ggary/core/menu'
 import type { MenubarMenu } from '@ggary/core/menubar'
 import type { TabItem } from '@ggary/core/tabs'
@@ -510,7 +510,7 @@ export function sandboxCommands(notify: (text: string) => void): PaletteCommand[
       group: 'Actions',
       keywords: ['dark', 'light', 'theme', 'appearance'],
       placeholder: 'Which mode?',
-      children: ['system', 'light', 'dark'].map((mode) => ({ id: `mode:${mode}`, label: mode[0].toUpperCase() + mode.slice(1), run: () => setAxis('data-mode', mode) })),
+      children: ['system', 'light', 'dark'].map((mode) => ({ id: `mode:${mode}`, label: mode[0].toUpperCase() + mode.slice(1), run: () => setMode(mode as Mode) })),
     },
     { id: 'notify', label: 'Show a notification', group: 'Actions', keywords: ['toast'], run: () => notify('Sent from the command palette') },
     { id: 'top', label: 'Back to the top', group: 'Actions', shortcut: 'Home', run: () => window.scrollTo({ top: 0 }) },

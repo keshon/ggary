@@ -9,6 +9,8 @@
      gg.structure   what components need to work (shared, @ggary/structure)
      gg.base        theme-wide defaults: type, focus
      gg.components  one file per component
+     gg.forced      what Windows High Contrast needs said again (a11y/forced.css)
+     gg.motion      reserved: reduced motion is answered in each component's file
    ========================================================================== */
 
 @layer gg.tokens, gg.structure, gg.base, gg.components, gg.forced, gg.motion;
@@ -82,3 +84,7 @@
 @import './components/section.css' layer(gg.components);
 @import './components/textarea.css' layer(gg.components);
 @import './components/tooltip.css' layer(gg.components);
+
+/* Forced colours: gg.forced, declared after the components above, so what it
+   says again under Windows High Contrast wins by layer order. */
+@import './a11y/forced.css' layer(gg.forced);

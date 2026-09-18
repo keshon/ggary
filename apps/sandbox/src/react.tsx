@@ -1,6 +1,5 @@
 import './theme'
 import './shared.css'
-import './chrome'
 
 import { StrictMode, useEffect, useMemo, useState, type FormEvent } from 'react'
 import type { DataGridController } from '@ggary/core/data-grid'
@@ -31,6 +30,7 @@ import { applyMove, type KanbanMove } from '@ggary/core/kanban'
 import { rangePresets } from '@ggary/core/date-picker'
 import type { PaletteCommand } from '@ggary/core/command-palette'
 import { createRoot } from 'react-dom/client'
+import { Bar, Navigator } from './Chrome'
 import {
   Avatar,
   AvatarGroup,
@@ -1488,10 +1488,15 @@ function App() {
 
 // Cache the root across HMR updates; createRoot on an already-rooted container
 // warns on every hot reload otherwise.
-const container = document.getElementById('app')! as HTMLElement & { _root?: ReturnType<typeof createRoot> }
-container._root ??= createRoot(container)
-container._root.render(
+type Rooted = HTMLElement & { _root?: ReturnType<typeof createRoot> }
+const rooted = (element: HTMLElement) => ((element as Rooted)._root ??= createRoot(element))
+const container = document.getElementById('app')!
+rooted(container).render(
   <StrictMode>
     <App />
   </StrictMode>
 )
+// The chrome, drawn with the page's own components.
+rooted(document.getElementById('chrome')!).render(<Bar />)
+const navigatorHost = document.getElementById('navigator') ?? document.body.appendChild(Object.assign(document.createElement('div'), { id: 'navigator' }))
+rooted(navigatorHost).render(<Navigator app={container} />)

@@ -50,7 +50,7 @@ describe('core names only glyphs that exist', () => {
 describe('adapters draw no glyphs', () => {
   // A glyph in adapter markup is a glyph no theme can replace, copied into three
   // frameworks. That is exactly what @ggary/icons removed.
-  const adapterFiles = ['react', 'svelte', 'elements'].flatMap((name) =>
+  const adapterFiles = ['react', 'svelte'].flatMap((name) =>
     walk(pkg(name, 'src'), ['.ts', '.tsx', '.svelte'])
   )
 
@@ -64,7 +64,7 @@ describe('themes', () => {
   const themes = readdirSync(join(root, 'packages')).filter((d) => d.startsWith('theme-'))
 
   it('finds the themes (guards the scan itself)', () => {
-    expect(themes.length).toBeGreaterThanOrEqual(2)
+    expect(themes.length).toBeGreaterThanOrEqual(1)
   })
 
   // Without the base set loaded, [data-icon] has no --gg-icon and draws nothing —

@@ -1,11 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { userEvent } from '@vitest/browser/context'
 import '../packages/theme-ggarry/src/index.css'
-import '../packages/elements/src/index'
-import type { GgDataGridElement } from '../packages/elements/src/index'
 import type { ColumnDef, GridSource } from '../packages/core/src/components/data-grid'
 import { StrictMode, createElement } from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot, type Root } from 'react-dom/client'
 import { flushSync, mount as mountSvelte, unmount as unmountSvelte } from 'svelte'
 import { DataGrid as ReactGrid } from '../packages/react/src/index'
 import { DataGrid as SvelteGrid } from '../packages/svelte/src/index'
@@ -57,26 +55,33 @@ const until = async (check: () => boolean, ms = 3000) => {
   }
 }
 
+let root: Root | null = null
 afterEach(() => {
+  root?.unmount()
+  root = null
   document.body.replaceChildren()
 })
 
 async function mount(options: { rows?: Lead[]; source?: GridSource<Lead>; selectable?: boolean } = {}) {
-  const grid = document.createElement('gg-data-grid') as GgDataGridElement<Lead>
-  grid.setAttribute('label', 'Leads')
-  grid.setAttribute('locale', 'en-US')
-  if (options.selectable) grid.setAttribute('selectable', '')
-  grid.style.blockSize = '480px'
-  grid.style.inlineSize = '720px'
-  document.body.append(grid)
-  grid.rowKey = (row) => row.id
-  grid.columns = columns
-  if (options.source) grid.source = options.source
-  else grid.rows = options.rows ?? leads
-  const scroller = grid.querySelector<HTMLElement>('[data-part="root"]')!
-  const rows = () => [...grid.querySelectorAll<HTMLElement>('[data-part="row"]')]
+  const host = document.createElement('div')
+  document.body.append(host)
+  root = createRoot(host)
+  root.render(
+    createElement(ReactGrid<Lead>, {
+      columns,
+      ...(options.source ? { source: options.source } : { rows: options.rows ?? leads }),
+      rowKey: (row) => row.id,
+      label: 'Leads',
+      locale: 'en-US',
+      selectable: options.selectable,
+      style: { blockSize: '480px', inlineSize: '720px' },
+    })
+  )
+  const rows = () => [...host.querySelectorAll<HTMLElement>('[data-part="row"]')]
   const loaded = () => rows().filter((row) => !row.hasAttribute('data-placeholder'))
   await until(() => loaded().length > 0)
+  const grid = host
+  const scroller = host.querySelector<HTMLElement>('[data-scope="data-grid"][data-part="root"]')!
   return { grid, scroller, rows, loaded }
 }
 

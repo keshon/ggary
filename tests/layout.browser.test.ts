@@ -1,8 +1,27 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { page, userEvent } from '@vitest/browser/context'
 import '../packages/theme-ggarry/src/index.css'
-import '../packages/elements/src/index'
-import type { GgShellElement, GgSplitElement } from '../packages/elements/src/index'
+import { createElement as h, type ReactNode } from 'react'
+import { flushSync } from 'react-dom'
+import { createRoot, type Root } from 'react-dom/client'
+import {
+  Badge,
+  Button,
+  ButtonGroup,
+  Container,
+  Field,
+  Grid,
+  Input,
+  Nav,
+  PageHeader,
+  Section,
+  Shell,
+  Split,
+  Stack,
+  StatusBar,
+  StatusBarItem,
+  StatusBarSpacer,
+} from '../packages/react/src/index'
 
 /**
  * The frame where only a browser can say: the one breakpoint, the drawer over
@@ -26,26 +45,49 @@ const until = async (check: () => boolean, ms = 3000) => {
   }
 }
 
+let roots: Root[] = []
 afterEach(async () => {
+  for (const root of roots) root.unmount()
+  roots = []
   document.body.replaceChildren()
   await page.viewport(1200, 800)
 })
 
-function shell(collapse: 'drawer' | 'bar' = 'drawer') {
-  const host = document.createElement('gg-shell') as GgShellElement
-  host.setAttribute('collapse', collapse)
-  host.innerHTML = `
-    <a slot="brand" href="#home">Leads app</a>
-    <gg-nav slot="aside" label="Sections">
-      <div data-group="Work"><a href="#leads" aria-current="page">Leads</a><a href="#deals">Deals</a><a href="#reports">Reports</a></div>
-    </gg-nav>
-    <span slot="header">Registry</span>
-    <span slot="footer">Ready</span>
-    <p style="block-size: 3000px">Work</p>
-    <button id="in-main">In the work area</button>`
-  document.body.style.margin = '0'
+/** Renders into a fresh host on the body, synchronously; returns the component's own root element. */
+function render(node: ReactNode) {
+  const host = document.createElement('div')
   document.body.append(host)
-  const part = (name: string) => host.querySelector<HTMLElement>(`:scope > [data-part="${name}"], :scope > * > [data-part="${name}"]`)!
+  const root = createRoot(host)
+  roots.push(root)
+  flushSync(() => root.render(node))
+  return host.firstElementChild as HTMLElement
+}
+
+function shell(collapse: 'drawer' | 'bar' = 'drawer') {
+  document.body.style.margin = '0'
+  const host = render(
+    h(Shell, {
+      collapse,
+      brand: h('a', { href: '#home' }, 'Leads app'),
+      aside: h(Nav, {
+        label: 'Sections',
+        groups: [
+          {
+            label: 'Work',
+            items: [
+              { label: 'Leads', href: '#leads', current: true },
+              { label: 'Deals', href: '#deals' },
+              { label: 'Reports', href: '#reports' },
+            ],
+          },
+        ],
+      }),
+      header: h('span', null, 'Registry'),
+      footer: h('span', null, 'Ready'),
+      children: [h('p', { key: 'work', style: { blockSize: '3000px' } }, 'Work'), h('button', { key: 'in-main', id: 'in-main' }, 'In the work area')],
+    })
+  )
+  const part = (name: string) => host.querySelector<HTMLElement>(`[data-scope="shell"][data-part="${name}"]`)!
   return { host, part, toggle: () => part('toggle') as HTMLButtonElement, aside: () => part('aside'), main: () => part('main') }
 }
 
@@ -115,13 +157,19 @@ describe('the shell', () => {
 })
 
 describe('the split', () => {
-  function split(attributes: Record<string, string> = {}) {
-    const host = document.createElement('gg-split') as GgSplitElement
-    host.setAttribute('label', 'Resize the list')
-    for (const [name, value] of Object.entries({ 'default-size': '300', min: '200', max: '560', 'rest-min': '240', ...attributes })) host.setAttribute(name, value)
-    host.style.cssText = 'inline-size: 900px; block-size: 300px'
-    host.innerHTML = '<section>List</section><section>Detail</section>'
-    document.body.append(host)
+  function split(options: Record<string, unknown> = {}) {
+    const host = render(
+      h(Split, {
+        label: 'Resize the list',
+        defaultSize: 300,
+        min: 200,
+        max: 560,
+        restMin: 240,
+        ...options,
+        style: { inlineSize: '900px', blockSize: '300px' },
+        children: [h('section', { key: 'list' }, 'List'), h('section', { key: 'detail' }, 'Detail')],
+      })
+    )
     const separator = () => host.querySelector<HTMLElement>('[data-part="separator"]')!
     const first = () => host.querySelector<HTMLElement>('[data-part="pane"]')!
     const drag = async (toX: number) => {
@@ -152,7 +200,7 @@ describe('the split', () => {
   })
 
   it('a drag stops where the other pane would fall under its minimum, and past half the minimum folds a collapsible pane', async () => {
-    const { host, separator, first, drag } = split({ collapsible: '' })
+    const { host, separator, first, drag } = split({ collapsible: true })
     await frames()
     const box = host.getBoundingClientRect()
     await drag(box.right - 10)
@@ -175,12 +223,17 @@ describe('the split', () => {
   })
 })
 
+/** A reading on a status strip. */
+const item = (text: string, tone?: 'error') => h(StatusBarItem, { key: text, tone, children: text })
+
 describe('the status bar', () => {
   it('stays one line in a narrow frame, and pans rather than cut off its end', async () => {
-    const bar = document.createElement('gg-status-bar')
-    bar.style.inlineSize = '220px'
-    bar.innerHTML = '<span>main</span><span data-tone="error">2 errors</span><span>Ln 12, Col 4</span><span data-spacer></span><span>UTF-8</span><span>Spaces: 2</span>'
-    document.body.append(bar)
+    const bar = render(
+      h(StatusBar, {
+        style: { inlineSize: '220px' },
+        children: [item('main'), item('2 errors', 'error'), item('Ln 12, Col 4'), h(StatusBarSpacer, { key: 'spacer' }), item('UTF-8'), item('Spaces: 2')],
+      })
+    )
     await frames()
     const items = [...bar.querySelectorAll('[data-part="item"]')].map((item) => item.getBoundingClientRect())
     expect(new Set(items.map((box) => Math.round(box.top))).size).toBe(1)
@@ -191,10 +244,12 @@ describe('the status bar', () => {
 
 describe('buttons inside the frame', () => {
   it('a status strip keeps air around a button in it, at its own one-line height', async () => {
-    const bar = document.createElement('gg-status-bar')
-    bar.style.inlineSize = '400px'
-    bar.innerHTML = '<span>700,000 leads</span><span data-spacer></span><gg-button size="sm" emphasis="minimal"><button>Sync</button></gg-button>'
-    document.body.append(bar)
+    const bar = render(
+      h(StatusBar, {
+        style: { inlineSize: '400px' },
+        children: [item('700,000 leads'), h(StatusBarSpacer, { key: 'spacer' }), h(Button, { key: 'sync', size: 'sm', emphasis: 'minimal' }, 'Sync')],
+      })
+    )
     await frames()
     const strip = bar.getBoundingClientRect()
     const button = bar.querySelector('button')!.getBoundingClientRect()
@@ -204,11 +259,8 @@ describe('buttons inside the frame', () => {
     expect(strip.height).toBeLessThan(34)
   })
 
-  it('a button group of custom elements stands flush: square inner corners, rounded ends', async () => {
-    const group = document.createElement('gg-button-group')
-    group.setAttribute('label', 'Align')
-    group.innerHTML = ['Left', 'Centre', 'Right'].map((label) => `<gg-button><button>${label}</button></gg-button>`).join('')
-    document.body.append(group)
+  it('a button group of the component stands flush: square inner corners, rounded ends', async () => {
+    const group = render(h(ButtonGroup, { label: 'Align', children: ['Left', 'Centre', 'Right'].map((label) => h(Button, { key: label }, label)) }))
     await frames()
     const buttons = [...group.querySelectorAll('button')]
     const radius = (button: Element) => getComputedStyle(button)
@@ -224,28 +276,32 @@ describe('buttons inside the frame', () => {
 
 describe('flow', () => {
   it('a stack stretches a field to its width and leaves a button, a badge and a group at their own', async () => {
-    const stack = document.createElement('gg-stack')
-    stack.style.inlineSize = '480px'
-    stack.innerHTML = `
-      <gg-field label="Name"><input></gg-field>
-      <gg-button><button>Save</button></gg-button>
-      <gg-badge tone="ok">Done</gg-badge>
-      <gg-button-group label="Align"><gg-button><button>Left</button></gg-button><gg-button><button>Right</button></gg-button></gg-button-group>`
-    document.body.append(stack)
+    const stack = render(
+      h(
+        Stack,
+        { style: { inlineSize: '480px' } },
+        h(Field, { label: 'Name', children: h(Input) }),
+        h(Button, null, 'Save'),
+        h(Badge, { tone: 'ok' }, 'Done'),
+        h(ButtonGroup, { label: 'Align', children: [h(Button, { key: 'l' }, 'Left'), h(Button, { key: 'r' }, 'Right')] })
+      )
+    )
     await frames()
-    const width = (selector: string) => stack.querySelector<HTMLElement>(selector)!.getBoundingClientRect().width
-    expect(width('gg-field')).toBeCloseTo(480, 0)
-    expect(width('gg-button')).toBeLessThan(120)
-    expect(width('gg-badge')).toBeLessThan(120)
-    expect(width('gg-button-group')).toBeLessThan(200)
+    // The column's own children, in order: the field, the button, the badge, the group.
+    const [field, button, badge, group] = [...stack.children] as HTMLElement[]
+    const width = (element: HTMLElement) => element.getBoundingClientRect().width
+    expect(field.dataset.scope).toBe('field')
+    expect(group.dataset.scope).toBe('button-group')
+    expect(width(field)).toBeCloseTo(480, 0)
+    expect(width(button)).toBeLessThan(120)
+    expect(width(badge)).toBeLessThan(120)
+    expect(width(group)).toBeLessThan(200)
     // The channel stops at the column's children: a button inside the group is not sent to its start.
-    expect(getComputedStyle(stack.querySelector('gg-button-group button')!).alignSelf).not.toBe('start')
+    expect(getComputedStyle(group.querySelector('button')!).alignSelf).not.toBe('start')
   })
 
   it('a grid falls to fewer columns as its frame narrows, with no breakpoint', async () => {
-    const grid = document.createElement('gg-grid')
-    grid.innerHTML = '<div>1</div><div>2</div><div>3</div><div>4</div>'
-    document.body.append(grid)
+    const grid = render(h(Grid, null, h('div', null, '1'), h('div', null, '2'), h('div', null, '3'), h('div', null, '4')))
     const columns = () => new Set([...grid.children].map((cell) => Math.round(cell.getBoundingClientRect().left))).size
     grid.style.inlineSize = '1100px'
     await frames()
@@ -260,10 +316,7 @@ describe('flow', () => {
   })
 
   it('a container keeps its ceiling and stands in the middle', async () => {
-    const container = document.createElement('gg-container')
-    container.setAttribute('size', 'narrow')
-    container.innerHTML = '<p>Text</p>'
-    document.body.append(container)
+    const container = render(h(Container, { size: 'narrow' }, h('p', null, 'Text')))
     await frames()
     const box = container.getBoundingClientRect()
     expect(box.width).toBeCloseTo(44 * 16, 0)
@@ -271,12 +324,14 @@ describe('flow', () => {
   })
 
   it('a page header puts its actions at the far edge, and under the title when there is no room', async () => {
-    const header = document.createElement('gg-page-header')
-    header.setAttribute('heading', 'Leads')
-    header.setAttribute('description', 'Everyone the sales team is talking to.')
-    header.innerHTML = '<gg-button slot="actions"><button>New lead</button></gg-button>'
-    header.style.inlineSize = '900px'
-    document.body.append(header)
+    const header = render(
+      h(PageHeader, {
+        title: 'Leads',
+        description: 'Everyone the sales team is talking to.',
+        actions: h(Button, null, 'New lead'),
+        style: { inlineSize: '900px' },
+      })
+    )
     await frames()
     const actions = () => header.querySelector<HTMLElement>('[data-part="actions"]')!.getBoundingClientRect()
     const title = () => header.querySelector<HTMLElement>('[data-part="title"]')!.getBoundingClientRect()
@@ -288,12 +343,9 @@ describe('flow', () => {
   })
 
   it('a section’s line stands under its heading, whatever the width', async () => {
-    const section = document.createElement('gg-section')
-    section.setAttribute('heading', 'Your details')
-    section.setAttribute('description', 'Shown to the leads you write to.')
-    section.style.inlineSize = '1000px'
-    section.innerHTML = '<p>Body</p>'
-    document.body.append(section)
+    const section = render(
+      h(Section, { title: 'Your details', description: 'Shown to the leads you write to.', style: { inlineSize: '1000px' } }, h('p', null, 'Body'))
+    )
     await frames()
     const title = section.querySelector('[data-part="title"]')!.getBoundingClientRect()
     const line = section.querySelector('[data-part="description"]')!.getBoundingClientRect()
@@ -302,12 +354,10 @@ describe('flow', () => {
 
   it('two sections stand farther apart than the rows inside one', async () => {
     const stackOf = (name: string) =>
-      `<gg-section heading="${name}"><p style="margin:0">Row one</p><p style="margin:0">Row two</p></gg-section>`
-    const box = document.createElement('div')
-    box.innerHTML = stackOf('First') + stackOf('Second')
-    document.body.append(box)
+      h(Section, { key: name, title: name }, h('p', { style: { margin: 0 } }, 'Row one'), h('p', { style: { margin: 0 } }, 'Row two'))
+    const box = render(h('div', null, stackOf('First'), stackOf('Second')))
     await frames()
-    const [first, second] = [...box.querySelectorAll('gg-section')]
+    const [first, second] = [...box.querySelectorAll('[data-scope="section"][data-part="root"]')]
     const rows = [...first.querySelectorAll('p')].map((row) => row.getBoundingClientRect())
     const inside = rows[1].top - rows[0].bottom
     const between = second.getBoundingClientRect().top - first.getBoundingClientRect().bottom

@@ -1,12 +1,18 @@
 import { afterEach, describe, expect, it } from 'vitest'
+import { createElement as h } from 'react'
+import { flushSync } from 'react-dom'
+import { createRoot, type Root } from 'react-dom/client'
 import '../packages/structure/src/index.css'
-import '../packages/elements/src/index'
+import { Avatar } from '../packages/react/src/index'
 
 /**
  * What only a browser answers about the display components: an avatar's image
  * really loading or failing, and the initials staying until it has loaded.
  */
+let root: Root | null = null
 afterEach(() => {
+  root?.unmount()
+  root = null
   document.body.replaceChildren()
 })
 
@@ -21,27 +27,36 @@ const until = async (check: () => boolean, ms = 2000) => {
   }
 }
 
+const mount = (name: string, src: string) => {
+  const host = document.createElement('div')
+  document.body.append(host)
+  root = createRoot(host)
+  // Committed at once: the first frame is the one measured, before any load or failure arrives.
+  flushSync(() => root!.render(h(Avatar, { name, src })))
+  return host
+}
+
+const avatar = (host: Element) => host.querySelector<HTMLElement>('[data-scope="avatar"][data-part="root"]')
+
 describe('avatar in a real browser', () => {
   it('shows the picture once it has loaded, over the initials', async () => {
-    document.body.innerHTML = `<gg-avatar name="Ada Lovelace" src="${PIXEL}"></gg-avatar>`
-    const avatar = document.querySelector('gg-avatar')!
-    await until(() => avatar.getAttribute('data-status') === 'loaded')
-    const image = avatar.querySelector('[data-part="image"]') as HTMLImageElement
+    const host = mount('Ada Lovelace', PIXEL)
+    await until(() => avatar(host)?.getAttribute('data-status') === 'loaded')
+    const image = avatar(host)!.querySelector('[data-part="image"]') as HTMLImageElement
     expect(getComputedStyle(image).visibility).toBe('visible')
-    expect(avatar.querySelector('[data-part="fallback"]')!.textContent).toBe('AL')
+    expect(avatar(host)!.querySelector('[data-part="fallback"]')!.textContent).toBe('AL')
   })
 
   it('a picture that fails leaves the initials, and no broken image', async () => {
-    document.body.innerHTML = `<gg-avatar name="Alan Turing" src="data:image/png;base64,broken"></gg-avatar>`
-    const avatar = document.querySelector('gg-avatar')!
-    await until(() => avatar.getAttribute('data-status') === 'error')
-    expect(avatar.querySelector('[data-part="image"]')).toBeNull()
-    expect(avatar.querySelector('[data-part="fallback"]')!.textContent).toBe('AT')
+    const host = mount('Alan Turing', 'data:image/png;base64,broken')
+    await until(() => avatar(host)?.getAttribute('data-status') === 'error')
+    expect(avatar(host)!.querySelector('[data-part="image"]')).toBeNull()
+    expect(avatar(host)!.querySelector('[data-part="fallback"]')!.textContent).toBe('AT')
   })
 
   it('while the picture loads, it is not drawn', () => {
-    document.body.innerHTML = `<gg-avatar name="Grace Hopper" src="/never-arrives.png"></gg-avatar>`
-    const image = document.querySelector('[data-part="image"]')!
+    const host = mount('Grace Hopper', '/never-arrives.png')
+    const image = host.querySelector('[data-part="image"]')!
     expect(getComputedStyle(image).visibility).toBe('hidden')
   })
 })

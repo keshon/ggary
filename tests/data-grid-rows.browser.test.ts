@@ -1,12 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { page, userEvent } from '@vitest/browser/context'
 import '../packages/theme-ggarry/src/index.css'
-import '../packages/elements/src/index'
-import type { GgDataGridElement, GgGridDetailElement, GgGridMenuElement } from '../packages/elements/src/index'
 import type { CellEdit, ColumnDef } from '../packages/core/src/components/data-grid'
-import { StrictMode, createElement, useState } from 'react'
-import { createRoot } from 'react-dom/client'
-import { DataGrid as ReactGrid } from '../packages/react/src/index'
+import { Fragment, StrictMode, createElement, useState, type ComponentType } from 'react'
+import { createRoot, type Root } from 'react-dom/client'
+import { DataGrid as ReactGrid, GridDetail, GridRowMenu } from '../packages/react/src/index'
 import type { DataGridController } from '../packages/core/src/components/data-grid'
 
 /**
@@ -59,33 +57,69 @@ const until = async (check: () => boolean, ms = 3000) => {
   }
 }
 
+let root: Root | null = null
 afterEach(() => {
+  root?.unmount()
+  root = null
   document.body.replaceChildren()
 })
 
-async function mount() {
+interface Extras {
+  /** A row menu beside the grid, sharing its controller. */
+  menu?: boolean
+  /** A detail sheet beside the grid, sharing its controller. */
+  detail?: boolean
+}
+
+async function mount(extras: Extras = {}) {
   const saves: CellEdit<Lead>[] = []
-  const grid = document.createElement('gg-data-grid') as GgDataGridElement<Lead>
-  grid.id = 'leads'
-  grid.setAttribute('label', 'Leads')
-  grid.setAttribute('locale', 'en-US')
-  grid.style.blockSize = '400px'
-  grid.style.inlineSize = '640px'
+  const rows = leads.slice(0, 2000).map((lead) => ({ ...lead }))
+  let controller: DataGridController<Lead> | undefined
+  function Page() {
+    const [grid, setGrid] = useState<DataGridController<Lead>>()
+    return createElement(
+      Fragment,
+      null,
+      createElement(ReactGrid as ComponentType<any>, {
+        columns,
+        rows,
+        rowKey: (row: Lead) => row.id,
+        label: 'Leads',
+        locale: 'en-US',
+        style: { blockSize: '400px', inlineSize: '640px' },
+        onCellEdit: async (edit: CellEdit<Lead>) => void saves.push(edit),
+        controllerRef: (next: DataGridController<Lead>) => {
+          controller = next
+          setGrid(next)
+        },
+      }),
+      grid && extras.menu
+        ? createElement(GridRowMenu as ComponentType<any>, {
+            grid,
+            items: () => [
+              { value: 'open', label: 'Open' },
+              { value: 'archive', label: 'Archive' },
+            ],
+            onSelect: () => undefined,
+          })
+        : null,
+      grid && extras.detail
+        ? createElement(GridDetail as ComponentType<any>, { grid, title: (row: Lead) => row.name, children: (row: Lead) => `Lead ${row.id}` })
+        : null
+    )
+  }
+  const host = document.createElement('div')
   const outside = document.createElement('button')
   outside.textContent = 'Elsewhere'
-  document.body.append(grid, outside)
-  grid.rowKey = (row) => row.id
-  grid.onCellEdit = async (edit) => {
-    saves.push(edit)
-  }
-  grid.columns = columns
-  grid.rows = leads.slice(0, 2000).map((lead) => ({ ...lead }))
-  const scroller = grid.querySelector<HTMLElement>('[data-part="root"]')!
+  document.body.append(host, outside)
+  root = createRoot(host)
+  root.render(createElement(Page))
   const cell = (row: number, column: number) =>
-    grid.querySelector<HTMLElement>(`[data-part="row"][aria-rowindex="${row + 2}"]`)?.querySelectorAll<HTMLElement>('[data-part="cell"]')[column]
+    host.querySelector<HTMLElement>(`[data-part="row"][aria-rowindex="${row + 2}"]`)?.querySelectorAll<HTMLElement>('[data-part="cell"]')[column]
   await until(() => Boolean(cell(0, 0)?.textContent))
-  const editor = () => grid.querySelector<HTMLInputElement & HTMLSelectElement>('[data-part="editor"]')
-  return { grid, scroller, cell, editor, saves, outside }
+  const scroller = host.querySelector<HTMLElement>('[data-scope="data-grid"][data-part="root"]')!
+  const editor = () => host.querySelector<HTMLInputElement & HTMLSelectElement>('[data-part="editor"]')
+  return { host, grid: () => controller!, scroller, cell, editor, saves, outside }
 }
 
 describe('editing in place', () => {
@@ -174,19 +208,12 @@ describe('editing in place', () => {
 
 describe('what opens from a row', () => {
   it('the row menu stands where the pointer was, and gives the focus back to the grid', async () => {
-    const { grid, scroller, cell } = await mount()
-    const menu = document.createElement('gg-grid-menu') as GgGridMenuElement
-    menu.setAttribute('for', 'leads')
-    menu.items = () => [
-      { value: 'open', label: 'Open' },
-      { value: 'archive', label: 'Archive' },
-    ]
-    document.body.append(menu)
+    const { grid, scroller, cell } = await mount({ menu: true })
     await frames()
     const target = cell(3, 1)!
     const box = target.getBoundingClientRect()
     await userEvent.click(target, { button: 'right', position: { x: 20, y: 10 } })
-    const content = menu.querySelector<HTMLElement>('[data-part="content"]')!
+    const content = document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"]')!
     await until(() => content.dataset.state === 'open' && content.style.transform !== '')
     await frames()
     const placed = content.getBoundingClientRect()
@@ -196,30 +223,25 @@ describe('what opens from a row', () => {
     await userEvent.keyboard('{Escape}')
     await until(() => content.dataset.state === 'closed')
     expect(document.activeElement).toBe(scroller)
-    expect(grid.controller?.getSnapshot().grid.focus).toEqual({ row: 3, column: 1 })
+    expect(grid().getSnapshot().grid.focus).toEqual({ row: 3, column: 1 })
   })
 
   it('a press on another row while the sheet is open shows that row', async () => {
     // Wide enough for the grid and the sheet beside it.
     await page.viewport(1200, 700)
-    const { cell } = await mount()
-    const detail = document.createElement('gg-grid-detail') as GgGridDetailElement
-    detail.setAttribute('for', 'leads')
-    detail.heading = (row: Lead) => row.name
-    detail.render = (row: Lead) => `Lead ${row.id}`
-    document.body.append(detail)
+    const { host, cell } = await mount({ detail: true })
     await frames()
     await userEvent.dblClick(cell(2, 2)!)
-    const sheet = detail.querySelector<HTMLDialogElement>('dialog')!
+    const sheet = host.querySelector<HTMLDialogElement>('dialog')!
     await until(() => sheet.open)
-    const title = () => detail.querySelector('[data-part="title"]')!.textContent
+    const title = () => sheet.querySelector('[data-part="title"]')!.textContent
     expect(title()).toBe('Company 3')
     // Non-modal: the grid is still there to press.
     const other = cell(5, 2)!
     expect(document.elementFromPoint(other.getBoundingClientRect().left + 5, other.getBoundingClientRect().top + 5)?.closest('[data-part="cell"]')).toBe(other)
     await userEvent.click(other)
     await until(() => title() === 'Company 6')
-    expect(detail.querySelector('[data-part="position"]')!.textContent).toBe('6 of 2,000')
+    expect(sheet.querySelector('[data-part="position"]')!.textContent).toBe('6 of 2,000')
     expect(sheet.open).toBe(true)
   })
 })

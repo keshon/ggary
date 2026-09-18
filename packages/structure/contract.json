@@ -42,7 +42,7 @@
     "--gg-flow-self": "set by a stack or a section on each child: how a component sized by its content stands in the column (it reads it, with auto outside one)",
     "--gg-icon": "mapped from data-icon by @ggary/icons; a theme never declares it on the root"
   },
-  "$pairs": "What every theme promises through the public names, whatever its language. Deliberately small: only what the token descriptions above promise, and nothing about how a theme builds depth — GGarry divides same-white surfaces with borders, Instrument separates them by lightness, and both are legitimate. min: text 4.5:1, large 3:1, step ΔL 0.022.",
+  "$pairs": "What every theme promises through the public names, whatever its language. Deliberately small: only what the token descriptions above promise, and nothing about how a theme builds depth — GGarry divides same-white surfaces with borders, a theme may as well separate them by lightness, and both are legitimate. min: text 4.5:1, large 3:1, step ΔL 0.022.",
   "pairs": [
     { "label": "contract: text on page", "fg": "--gg-text", "bg": ["--gg-page"], "min": "text" },
     { "label": "contract: text on surface", "fg": "--gg-text", "bg": ["--gg-surface"], "min": "text" },

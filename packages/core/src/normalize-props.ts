@@ -104,8 +104,8 @@ export type DomProps = {
 }
 
 /**
- * Vanilla: split into attributes to set and listeners to add. `spread()` in
- * @ggary/elements consumes this.
+ * Plain DOM: split into attributes to set and listeners to add — for a
+ * helper that draws on the page itself, or a test that reads a connect's props.
  */
 export const domNormalizer: Normalizer<DomProps> = (props: Dict) => {
   const attrs: Record<string, string> = {}

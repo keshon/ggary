@@ -90,9 +90,21 @@ button[data-scope='chip'][data-part='root']:hover:not([data-disabled]) {
   height: 14px;
   margin-inline-end: -4px;
   border-radius: var(--ggarry-radius-full);
+  position: relative;
   opacity: 0.6;
   cursor: pointer;
   transition: opacity var(--ggarry-duration-fast) ease, background-color var(--ggarry-duration-fast) ease;
+}
+/* WCAG 2.2's 24px target for a 14px button: an invisible area on the target
+   part, not the icon — a mask would clip it. */
+[data-scope='chip'][data-part='remove']::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  inline-size: var(--ggarry-size-tap);
+  block-size: var(--ggarry-size-tap);
 }
 [data-scope='chip'][data-part='remove']:hover {
   opacity: 1;

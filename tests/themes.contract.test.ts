@@ -17,7 +17,7 @@ const show = (findings: Finding[]) =>
   findings.map((f) => `[${f.check}]${f.context ? ` (${f.context})` : ''} ${f.message}${f.where ? `  @ ${f.where}` : ''}`)
 
 it('finds the themes (guards the discovery itself)', () => {
-  expect(themeDirs.length).toBeGreaterThanOrEqual(2)
+  expect(themeDirs.length).toBeGreaterThanOrEqual(1)
 })
 
 describe.each(themeDirs)('%s', (dir) => {

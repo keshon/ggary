@@ -1,11 +1,12 @@
 import { expect } from 'vitest'
 import { userEvent } from '@vitest/browser/context'
-import '../../packages/elements/src/index'
-import type { GgMenuElement, GgSelectElement, GgSheetElement } from '../../packages/elements/src/index'
+import { createElement as h, type ReactNode } from 'react'
+import { createRoot, type Root } from 'react-dom/client'
+import { CheckboxGroup, Field, Fieldset, Input, Menu, RadioGroup, Select, Sheet, Tabs } from '../../packages/react/src/index'
 
 /**
- * The spacing rules every theme owes, measured in a real browser on real
- * components. Run once per theme (each theme's CSS in its own page):
+ * The spacing rules the theme owes, measured in a real browser on real
+ * components:
  *
  *   - an option list has one rhythm: label to first option = option to option
  *     = --gg-space-option, for checkboxes and radios alike;
@@ -13,9 +14,9 @@ import type { GgMenuElement, GgSelectElement, GgSheetElement } from '../../packa
  *     above its control, with the field's hint the same distance below;
  *   - groups inside a fieldset are --gg-space-group apart, which is more than
  *     an option step, so a group reads as one thing;
- *   - a highlighted option in the listbox, and a row of a menu, is concentric
- *     with its panel; a closed menu is not drawn, and a row's shortcut stands
- *     at the row's far edge.
+ *   - a highlighted option in the listbox, and a row of a menu, takes the
+ *     field's corner and is 32 pixels tall; a closed menu is not drawn, and a
+ *     row's shortcut stands at the row's far edge.
  *
  * This is what caught the popover whose checkboxes sat 16px apart and whose
  * radios sat 8px apart: two groups, two rhythms, nobody owning the space.
@@ -24,31 +25,81 @@ const px = (value: string) => parseFloat(value)
 const box = (el: Element) => el.getBoundingClientRect()
 const gap = (above: Element, below: Element) => box(below).top - box(above).bottom
 const near = (actual: number, expected: number) => expect(Math.abs(actual - expected)).toBeLessThan(0.75)
+const part = (scope: string, name: string) => document.querySelector(`[data-scope="${scope}"][data-part="${name}"]`)!
 
-export function mountGroups() {
+const frames = (count = 2) =>
+  new Promise<void>((resolve) => {
+    let left = count
+    const tick = () => (--left <= 0 ? resolve() : requestAnimationFrame(tick))
+    requestAnimationFrame(tick)
+  })
+
+/** Renders into a fresh host on the body; the returned function takes it away again. */
+async function render(node: ReactNode) {
+  const host = document.createElement('div')
+  document.body.append(host)
+  const root = createRoot(host)
+  root.render(node)
+  await frames()
+  return () => {
+    root.unmount()
+    host.remove()
+  }
+}
+
+let groups: Root | null = null
+
+export function unmountGroups() {
+  groups?.unmount()
+  groups = null
+  document.body.replaceChildren()
+}
+
+export async function mountGroups() {
+  unmountGroups()
   document.body.style.margin = '0'
-  document.body.innerHTML = `
-    <div style="padding: 24px; inline-size: 320px">
-      <gg-fieldset legend="Filters">
-        <gg-checkbox-group label="Show" name="show">
-          <label><input type="checkbox" value="open" checked> Only open issues</label>
-          <label><input type="checkbox" value="mine"> Assigned to me</label>
-          <label><input type="checkbox" value="starred"> Starred</label>
-        </gg-checkbox-group>
-        <gg-radio-group label="Sort" name="sort">
-          <label><input type="radio" value="new" checked> Newest first</label>
-          <label><input type="radio" value="old"> Oldest first</label>
-          <label><input type="radio" value="active"> Most active</label>
-        </gg-radio-group>
-      </gg-fieldset>
-      <gg-select label="Plan"></gg-select>
-      <gg-field label="Email" hint="Work address"><input type="email"></gg-field>
-      <gg-menu><button slot="trigger">Actions</button></gg-menu>
-    </div>`
-  const select = document.querySelector('gg-select') as GgSelectElement
-  select.items = ['Free', 'Team', 'Business'].map((label) => ({ value: label.toLowerCase(), label }))
-  const menu = document.querySelector('gg-menu') as GgMenuElement
-  menu.items = ['Rename', 'Duplicate', 'Delete'].map((label) => ({ value: label.toLowerCase(), label, shortcut: label[0] }))
+  const host = document.createElement('div')
+  host.style.cssText = 'padding: 24px; inline-size: 320px'
+  document.body.append(host)
+  groups = createRoot(host)
+  groups.render([
+    h(Fieldset, {
+      key: 'fieldset',
+      legend: 'Filters',
+      children: [
+        h(CheckboxGroup, {
+          key: 'show',
+          label: 'Show',
+          name: 'show',
+          defaultValue: ['open'],
+          items: [
+            { value: 'open', label: 'Only open issues' },
+            { value: 'mine', label: 'Assigned to me' },
+            { value: 'starred', label: 'Starred' },
+          ],
+        }),
+        h(RadioGroup, {
+          key: 'sort',
+          label: 'Sort',
+          name: 'sort',
+          defaultValue: 'new',
+          items: [
+            { value: 'new', label: 'Newest first' },
+            { value: 'old', label: 'Oldest first' },
+            { value: 'active', label: 'Most active' },
+          ],
+        }),
+      ],
+    }),
+    h(Select, { key: 'select', label: 'Plan', items: ['Free', 'Team', 'Business'].map((label) => ({ value: label.toLowerCase(), label })) }),
+    h(Field, { key: 'field', label: 'Email', hint: 'Work address', children: h(Input, { type: 'email' }) }),
+    h(Menu, {
+      key: 'menu',
+      items: ['Rename', 'Duplicate', 'Delete'].map((label) => ({ value: label.toLowerCase(), label, shortcut: label[0] })),
+      trigger: (props) => h('button', props, 'Actions'),
+    }),
+  ])
+  await frames()
 }
 
 export async function expectRhythm() {
@@ -59,102 +110,93 @@ export async function expectRhythm() {
   expect(group).toBeGreaterThan(option)
 
   for (const scope of ['checkbox-group', 'radio-group']) {
-    const label = document.querySelector(`[data-scope="${scope}"][data-part="label"]`)!
-    const options = [...document.querySelector(`[data-scope="${scope}"][data-part="list"]`)!.children]
+    const label = part(scope, 'label')
+    const options = [...part(scope, 'list').children]
     near(gap(label, options[0]), option)
     near(gap(options[0], options[1]), option)
     near(gap(options[1], options[2]), option)
   }
 
-  const legend = document.querySelector('[data-scope="fieldset"][data-part="legend"]')!
-  const content = document.querySelector('[data-scope="fieldset"][data-part="content"]')!
-  near(gap(legend, content), option)
-  near(gap(document.querySelector('gg-checkbox-group')!, document.querySelector('gg-radio-group')!), group)
+  near(gap(part('fieldset', 'legend'), part('fieldset', 'content')), option)
+  near(gap(part('checkbox-group', 'root'), part('radio-group', 'root')), group)
 
   // A field's label and hint sit the same step from its control.
-  const field = document.querySelector('gg-field')!
+  const field = part('field', 'root')
   const control = field.querySelector('input')!
   near(gap(field.querySelector('[data-part="label"]')!, control), option)
   near(gap(control, field.querySelector('[data-part="hint"]')!), option)
 }
 
 /**
- * How a theme rounds a list's rows: concentric with the panel — its radius
- * less its padding and border — or with the field's own corner, the one the
- * eye holds a highlighted option against (GGarry's, with its rows 32 pixels).
+ * How the theme rounds a list's rows: with the field's own corner, the one the
+ * eye holds a highlighted option against, and 32 pixels tall — as tall as the
+ * field, a highlight read as a second one.
  */
-export interface RowCorners {
-  corner: 'concentric' | 'field'
-  rowHeight?: number
-}
-let rowCorners: RowCorners = { corner: 'concentric' }
-export const useRowCorners = (rule: RowCorners) => void (rowCorners = rule)
-
-function expectRowCorner(panel: CSSStyleDeclaration, row: Element) {
-  const item = getComputedStyle(row)
-  const field = document.querySelector('gg-select [data-part="trigger"]')!
-  const expected = rowCorners.corner === 'field' ? px(getComputedStyle(field).borderTopLeftRadius) : Math.max(2, px(panel.borderTopLeftRadius) - px(panel.paddingTop) - px(panel.borderTopWidth))
-  near(px(item.borderTopLeftRadius), expected)
-  if (rowCorners.rowHeight !== undefined) near(box(row).height, rowCorners.rowHeight)
+function expectRowCorner(row: Element) {
+  const field = part('select', 'trigger')
+  near(px(getComputedStyle(row).borderTopLeftRadius), px(getComputedStyle(field).borderTopLeftRadius))
+  near(box(row).height, 32)
 }
 
 export async function expectConcentricListbox() {
-  const select = document.querySelector('gg-select') as GgSelectElement
-  await userEvent.click(select.querySelector('[data-part="trigger"]')!)
-  const panel = getComputedStyle(select.querySelector('[data-part="content"]')!)
-  expectRowCorner(panel, select.querySelector('[data-part="item"]')!)
+  await userEvent.click(part('select', 'trigger'))
+  await frames()
+  expectRowCorner(part('select', 'content').querySelector('[data-part="item"]')!)
   await userEvent.keyboard('{Escape}')
+  await frames()
 }
 
 export async function expectConcentricMenu() {
-  const menu = document.querySelector('gg-menu') as GgMenuElement
   // A theme's layout must not outrank the platform's display: none for a
-  // closed popover — Instrument's first menu showed while closed.
-  expect(getComputedStyle(menu.querySelector('[data-part="content"]')!).display).toBe('none')
-  await userEvent.click(menu.querySelector('[slot="trigger"]')!)
-  const panel = getComputedStyle(menu.querySelector('[data-part="content"]')!)
-  const row = menu.querySelector('[data-part="item"]')!
+  // closed popover.
+  expect(getComputedStyle(part('menu', 'content')).display).toBe('none')
+  await userEvent.click([...document.querySelectorAll('button')].find((button) => button.textContent === 'Actions')!)
+  await frames()
+  const row = part('menu', 'content').querySelector('[data-part="item"]')!
   const item = getComputedStyle(row)
-  expectRowCorner(panel, row)
+  expectRowCorner(row)
   near(box(row.querySelector('[data-part="item-shortcut"]')!).right, box(row).right - px(item.paddingRight))
   await userEvent.keyboard('{Escape}')
+  await frames()
 }
 
 /** A sheet stands full height, flush with its edge, and its footer sits at the bottom. */
 export async function expectSheetLayout() {
   for (const side of ['end', 'start'] as const) {
-    const sheet = document.createElement('gg-sheet') as GgSheetElement
-    sheet.setAttribute('heading', 'Parameters')
-    sheet.setAttribute('side', side)
-    sheet.innerHTML = '<p>Body</p><footer><button type="button">Close</button></footer>'
-    document.body.append(sheet)
-    sheet.show()
-    const content = sheet.querySelector('[data-part="content"]')!
+    const unmount = await render(
+      h(Sheet, { title: 'Parameters', side, defaultOpen: true, footer: h('button', { type: 'button' }, 'Close') }, h('p', null, 'Body'))
+    )
+    const content = part('dialog', 'content')
     // Measure where the sheet comes to rest, however long its entrance takes on a busy machine.
     await new Promise((resolve) => requestAnimationFrame(resolve))
-    await Promise.all(sheet.getAnimations({ subtree: true }).map((animation) => animation.finished.catch(() => {})))
+    await Promise.all(content.getAnimations({ subtree: true }).map((animation) => animation.finished.catch(() => {})))
     const rect = box(content)
     near(rect.top, 0)
     near(rect.height, window.innerHeight)
     if (side === 'end') near(rect.right, document.documentElement.clientWidth)
     else near(rect.left, 0)
     expect(rect.width).toBeLessThan(window.innerWidth)
-    near(box(sheet.querySelector('[data-part="footer"]')!).bottom, window.innerHeight)
-    sheet.close()
-    sheet.remove()
+    near(box(content.querySelector('[data-part="footer"]')!).bottom, window.innerHeight)
+    unmount()
   }
 }
 
-/** A chip tab is concentric with the track it lies in, as a listbox row is with its panel. */
+/** A chip tab is concentric with the track it lies in. */
 export async function expectConcentricChipTabs() {
-  const tabs = document.createElement('gg-tabs')
-  tabs.setAttribute('variant', 'chips')
-  tabs.setAttribute('label', 'Open files')
-  tabs.innerHTML = '<section data-tab="a" data-label="tokens.css" data-closable>A</section><section data-tab="b" data-label="layout.css">B</section>'
-  document.body.append(tabs)
-  const list = getComputedStyle(tabs.querySelector('[data-part="list"]')!)
-  const tab = getComputedStyle(tabs.querySelector('[data-part="tab"]')!)
+  const unmount = await render(
+    h(Tabs, {
+      variant: 'chips',
+      label: 'Open files',
+      items: [
+        { value: 'a', label: 'tokens.css', closable: true },
+        { value: 'b', label: 'layout.css' },
+      ],
+      children: (item) => item.value.toUpperCase(),
+    })
+  )
+  const list = getComputedStyle(part('tabs', 'list'))
+  const tab = getComputedStyle(part('tabs', 'tab'))
   const expected = Math.max(2, px(list.borderTopLeftRadius) - px(list.paddingTop) - px(list.borderTopWidth))
   near(px(tab.borderTopLeftRadius), expected)
-  tabs.remove()
+  unmount()
 }

@@ -1,22 +1,31 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { page, userEvent } from '@vitest/browser/context'
-import '../packages/structure/src/index.css'
-import '../packages/elements/src/index'
-import type { GgTabsElement } from '../packages/elements/src/index'
+import '../packages/theme-ggarry/src/index.css'
+import { createElement as h, useState, type ReactNode } from 'react'
+import { flushSync } from 'react-dom'
+import { createRoot, type Root } from 'react-dom/client'
+import { Tabs } from '../packages/react/src/index'
+import type { TabItem } from '../packages/core/src/components/tabs'
 
 /**
  * Tabs where only a browser answers: the real Tab key reaching one stop, a long
  * strip of documents scrolling to keep the focused tab in sight, and a real
  * pointer closing a tab next to the focused one.
  */
+const roots: Root[] = []
 afterEach(() => {
+  for (const root of roots.splice(0)) root.unmount()
   document.body.replaceChildren()
 })
 
-const mount = (html: string) => {
+/** Renders synchronously, so the tabs are in the page when this returns. */
+const mount = (node: ReactNode, style = '') => {
   const host = document.createElement('div')
-  host.innerHTML = html
+  host.style.cssText = style
   document.body.append(host)
+  const root = createRoot(host)
+  roots.push(root)
+  flushSync(() => root.render(node))
   return host
 }
 
@@ -25,42 +34,58 @@ const tabByText = (host: Element, text: string) =>
     (el) => el.querySelector('[data-part="tab-text"]')!.textContent === text
   )!
 
+const panel = (host: Element, value: string) => host.querySelector<HTMLElement>(`[data-scope="tabs"][data-part="panel"][data-value="${value}"]`)
+
+const panelText = (item: TabItem) => `${item.label} panel`
+
 describe('tabs in a real browser', () => {
   it('Tab reaches the selected tab once, the arrows move along, and Tab goes on into the panel', async () => {
-    const host = mount(`
-      <button id="before">Before</button>
-      <gg-tabs label="Object properties">
-        <section data-tab="geometry" data-label="Geometry">Vertices</section>
-        <section data-tab="material" data-label="Material">Textures</section>
-        <section data-tab="scripts" data-label="Scripts">Behaviours</section>
-      </gg-tabs>`)
+    const host = mount([
+      h('button', { key: 'before', id: 'before' }, 'Before'),
+      h(Tabs, {
+        key: 'tabs',
+        label: 'Object properties',
+        items: [
+          { value: 'geometry', label: 'Geometry' },
+          { value: 'material', label: 'Material' },
+          { value: 'scripts', label: 'Scripts' },
+        ],
+        children: panelText,
+      }),
+    ])
     ;(host.querySelector('#before') as HTMLElement).focus()
     await userEvent.tab()
     expect(document.activeElement).toBe(tabByText(host, 'Geometry'))
     await userEvent.keyboard('{ArrowRight}')
     expect(document.activeElement).toBe(tabByText(host, 'Material'))
-    expect(host.querySelector('[data-tab="material"]')!.hasAttribute('hidden')).toBe(false)
+    expect(panel(host, 'material')!.hasAttribute('hidden')).toBe(false)
     // One stop for the whole list: the next Tab leaves it for the panel.
     await userEvent.tab()
-    expect(document.activeElement).toBe(host.querySelector('[data-tab="material"]'))
+    expect(document.activeElement).toBe(panel(host, 'material'))
   })
 
   it('vertical tabs stand beside their panel', async () => {
-    const host = mount(`
-      <gg-tabs orientation="vertical" label="Settings">
-        <section data-tab="account" data-label="Account">Account settings</section>
-        <section data-tab="appearance" data-label="Appearance">Theme and density</section>
-      </gg-tabs>`)
+    const host = mount(
+      h(Tabs, {
+        orientation: 'vertical',
+        label: 'Settings',
+        items: [
+          { value: 'account', label: 'Account' },
+          { value: 'appearance', label: 'Appearance' },
+        ],
+        children: panelText,
+      })
+    )
     const list = host.querySelector('[data-part="list"]')!.getBoundingClientRect()
-    const panel = host.querySelector('[data-tab="account"]')!.getBoundingClientRect()
-    expect(panel.left).toBeGreaterThanOrEqual(list.right - 1)
-    expect(Math.abs(panel.top - list.top)).toBeLessThan(1)
+    const box = panel(host, 'account')!.getBoundingClientRect()
+    expect(box.left).toBeGreaterThanOrEqual(list.right - 1)
+    expect(Math.abs(box.top - list.top)).toBeLessThan(1)
   })
 
   it('a long strip scrolls to keep the focused tab in sight', async () => {
     await page.viewport(600, 400)
-    const panels = Array.from({ length: 30 }, (_, i) => `<section data-tab="f${i}" data-label="file-${i}.css" data-closable>File ${i}</section>`).join('')
-    const host = mount(`<div style="inline-size: 400px"><gg-tabs variant="chips" label="Open files">${panels}</gg-tabs></div>`)
+    const items = Array.from({ length: 30 }, (_, i) => ({ value: `f${i}`, label: `file-${i}.css`, closable: true }))
+    const host = mount(h(Tabs, { variant: 'chips', label: 'Open files', items, children: panelText }), 'inline-size: 400px')
     const list = host.querySelector('[data-part="list"]') as HTMLElement
     expect(list.scrollWidth).toBeGreaterThan(list.clientWidth)
     tabByText(host, 'file-0.css').focus()
@@ -75,20 +100,28 @@ describe('tabs in a real browser', () => {
   })
 
   it('a real click on a close button closes that tab and leaves focus where it was', async () => {
-    const host = mount(`
-      <gg-tabs variant="chips" label="Open files">
-        <section data-tab="a" data-label="a.css" data-closable>A</section>
-        <section data-tab="b" data-label="b.css" data-closable>B</section>
-        <section data-tab="c" data-label="c.css" data-closable>C</section>
-      </gg-tabs>`)
-    const tabs = host.querySelector('gg-tabs') as GgTabsElement
-    tabs.addEventListener('tabclose', (event) => host.querySelector(`[data-tab="${(event as CustomEvent).detail.value}"]`)?.remove())
+    // The owner removes a closed tab from its items, as a page would.
+    function OpenFiles() {
+      const [items, setItems] = useState<TabItem[]>([
+        { value: 'a', label: 'a.css', closable: true },
+        { value: 'b', label: 'b.css', closable: true },
+        { value: 'c', label: 'c.css', closable: true },
+      ])
+      return h(Tabs, {
+        variant: 'chips',
+        label: 'Open files',
+        items,
+        onClose: (value: string) => setItems((current) => current.filter((item) => item.value !== value)),
+        children: panelText,
+      })
+    }
+    const host = mount(h(OpenFiles))
     tabByText(host, 'a.css').focus()
     await userEvent.hover(tabByText(host, 'b.css'))
     await userEvent.click(tabByText(host, 'b.css').querySelector('[data-part="close"]')!)
     await new Promise((resolve) => setTimeout(resolve, 20))
     expect([...host.querySelectorAll('[data-part="tab-text"]')].map((el) => el.textContent)).toEqual(['a.css', 'c.css'])
     expect(document.activeElement).toBe(tabByText(host, 'a.css'))
-    expect(tabs.value).toBe('a')
+    expect(host.querySelector('[data-part="tab"][aria-selected="true"]')!.getAttribute('data-value')).toBe('a')
   })
 })

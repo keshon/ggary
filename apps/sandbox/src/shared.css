@@ -1,8 +1,7 @@
 /* Sandbox chrome only. Nothing here belongs in the kit.
 
-   It reads ONLY the public --gg-* contract, never a theme's private tokens. If
-   this page chrome stays readable in both GGarry and Instrument, the contract is
-   carrying real weight; if it breaks in one, a contract name is missing there.
+   It reads ONLY the public --gg-* contract, never a theme's private tokens, as
+   an application would: the contract is what a page may lean on.
 
    This file is unlayered, so it beats every theme layer without !important —
    which is also the promise the kit makes to real application CSS. */
@@ -27,7 +26,7 @@ body {
   clip-path: inset(50%); white-space: nowrap;
 }
 
-/* The bar: the mark and the name, the framework, the theme. It stays at the top. */
+/* The bar: the mark and the name, the framework, the colour mode. It stays at the top. */
 header.bar {
   /* Over the page, under the kit's own layers: a sheet beside the page (10) stands over it. */
   position: sticky; top: 0; z-index: 5;
@@ -42,22 +41,15 @@ header.bar .brand {
   color: var(--gg-text); text-decoration: none;
   border-radius: 6px;
 }
-header.bar .brand svg { inline-size: 26px; block-size: 26px; color: var(--gg-accent); flex: none; }
+header.bar .brand-mark { display: flex; flex: none; color: var(--gg-accent); }
+header.bar .brand svg { inline-size: 26px; block-size: 26px; }
 header.bar .wordmark { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
 
 .theme-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-left: auto; }
-/* A select's label beside it, small, rather than over it: the bar is one line. */
-.theme-controls [data-scope='select'][data-part='root'] { display: flex; flex-direction: row; align-items: center; gap: 6px; }
-.theme-controls [data-scope='select'][data-part='label'] { font-size: 12px; color: var(--gg-text-muted); margin: 0; }
-.theme-controls [data-scope='select'][data-part='trigger'] { min-inline-size: 112px; block-size: 30px; min-block-size: 0; padding-block: 0; font-size: 13px; }
-/* Narrow: the labels are still there for a screen reader, and the bar may take two lines. */
+/* Narrow: the bar may take two lines. */
 @media (max-width: 760px) {
   header.bar { gap: 8px 16px; padding-inline: 16px; }
   .theme-controls { margin-left: 0; }
-  .theme-controls [data-scope='select'][data-part='label'] {
-    position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
-  }
-  .theme-controls [data-scope='select'][data-part='trigger'] { min-inline-size: 104px; }
 }
 
 /* Sections: numbered, and parted by a dashed line the page's full width. */
@@ -107,9 +99,13 @@ section:not(section section) > h2:first-child::before {
   color: var(--gg-text-faint);
 }
 .toc [data-scope='nav'][data-part='item'] { min-block-size: 28px; font-size: 13px; }
-.toc [data-scope='nav'][data-part='group'] { gap: 1px; }
-.toc-number { font-variant-numeric: tabular-nums; color: var(--gg-text-faint); font-size: 12px; }
-.toc [data-current] .toc-number { color: inherit; }
+.toc [data-scope='nav'][data-part='group'] { gap: 1px; counter-reset: toc; }
+/* Each numbered as its section's heading is. Drawn, so the name a screen reader hears is the title alone. */
+.toc [data-scope='nav'][data-part='item']::before {
+  counter-increment: toc; content: counter(toc, decimal-leading-zero);
+  font-variant-numeric: tabular-nums; color: var(--gg-text-faint); font-size: 12px;
+}
+.toc [data-scope='nav'][data-part='item'][data-current]::before { color: inherit; }
 
 .toc-button { position: fixed; inset: auto 16px 16px auto; z-index: 5; }
 .toc-button button { max-inline-size: min(320px, calc(100vw - 32px)); box-shadow: 0 8px 24px rgb(0 0 0 / 0.2); }

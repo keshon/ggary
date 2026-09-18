@@ -10,13 +10,13 @@ export default defineConfig({
   // hot-reload here with no build step.
   optimizeDeps: {
     exclude: [
-      '@ggary/core', '@ggary/elements', '@ggary/react', '@ggary/svelte',
-      '@ggary/icons', '@ggary/structure', '@ggary/theme-ggarry', '@ggary/theme-instrument',
+      '@ggary/core', '@ggary/react', '@ggary/svelte',
+      '@ggary/icons', '@ggary/structure', '@ggary/theme-ggarry',
     ],
   },
   build: {
     rollupOptions: {
-      input: { vanilla: 'index.html', react: 'react.html', svelte: 'svelte.html' },
+      input: { index: 'index.html', react: 'react.html', svelte: 'svelte.html' },
     },
   },
 })

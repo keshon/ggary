@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { userEvent } from '@vitest/browser/context'
+import { createElement as h, type ReactNode } from 'react'
+import { createRoot, type Root } from 'react-dom/client'
 import '../packages/structure/src/index.css'
-import '../packages/elements/src/index'
+import { NumberField, SegmentedControl, Slider } from '../packages/react/src/index'
 
 /**
  * What only a browser answers about the form controls: the keyboard a native
@@ -9,31 +11,46 @@ import '../packages/elements/src/index'
  * dragging an axis letter with pointer capture, and the fill reaching the
  * track as a real custom property.
  */
+let root: Root | null = null
 afterEach(() => {
+  root?.unmount()
+  root = null
   document.body.replaceChildren()
 })
 
-const mount = (html: string) => {
+const frames = (count = 2) =>
+  new Promise<void>((resolve) => {
+    let left = count
+    const tick = () => (--left <= 0 ? resolve() : requestAnimationFrame(tick))
+    requestAnimationFrame(tick)
+  })
+
+const mount = async (...children: ReactNode[]) => {
   const host = document.createElement('div')
-  host.innerHTML = html
   document.body.append(host)
+  root = createRoot(host)
+  root.render(h('div', null, ...children))
+  await frames()
   return host
 }
 
 const part = (root: Element, scope: string, name: string) =>
   root.querySelector<HTMLElement>(`[data-scope="${scope}"][data-part="${name}"]`)!
 
+const views = [
+  { value: 'list', label: 'List' },
+  { value: 'grid', label: 'Grid' },
+  { value: 'table', label: 'Table' },
+]
+
 describe('segmented control in a real browser', () => {
   it('is one tab stop, and the arrow keys move the choice — the browser’s own, not ours', async () => {
-    const host = mount(`
-      <button id="before">Before</button>
-      <gg-segmented-control label="View mode" name="view">
-        <label><input type="radio" value="list" checked> List</label>
-        <label><input type="radio" value="grid"> Grid</label>
-        <label><input type="radio" value="table"> Table</label>
-      </gg-segmented-control>
-      <button id="after">After</button>`)
-    const control = host.querySelector('gg-segmented-control')!
+    const host = await mount(
+      h('button', { key: 'before', id: 'before' }, 'Before'),
+      h(SegmentedControl, { key: 'control', label: 'View mode', name: 'view', items: views, defaultValue: 'list' }),
+      h('button', { key: 'after', id: 'after' }, 'After')
+    )
+    const control = part(host, 'segmented-control', 'root')
     const inputs = [...control.querySelectorAll('input')]
 
     ;(host.querySelector('#before') as HTMLElement).focus()
@@ -41,6 +58,7 @@ describe('segmented control in a real browser', () => {
     expect(document.activeElement).toBe(inputs[0])
 
     await userEvent.keyboard('{ArrowRight}')
+    await frames(1)
     expect(document.activeElement).toBe(inputs[1])
     expect(inputs[1].checked).toBe(true)
     expect(part(control, 'segmented-control', 'item').dataset.state).toBe('unchecked')
@@ -52,12 +70,8 @@ describe('segmented control in a real browser', () => {
   })
 
   it('a press anywhere on a segment chooses it: the radio covers the whole segment', async () => {
-    const host = mount(`
-      <gg-segmented-control label="View mode">
-        <label><input type="radio" value="list" checked> List</label>
-        <label><input type="radio" value="grid"> Grid</label>
-      </gg-segmented-control>`)
-    const control = host.querySelector('gg-segmented-control')!
+    const host = await mount(h(SegmentedControl, { label: 'View mode', items: views.slice(0, 2), defaultValue: 'list' }))
+    const control = part(host, 'segmented-control', 'root')
     const grid = control.querySelectorAll<HTMLElement>('[data-part="item"]')[1]
     const box = grid.getBoundingClientRect()
 
@@ -69,21 +83,20 @@ describe('segmented control in a real browser', () => {
 
 describe('slider in a real browser', () => {
   it('the arrow keys step it, and the fill reaches the track as a custom property', async () => {
-    const host = mount(`
-      <gg-slider label="Parallel agents" show-value>
-        <input type="range" min="0" max="16" step="2" value="4">
-      </gg-slider>`)
-    const slider = host.querySelector('gg-slider')!
+    const host = await mount(h(Slider, { label: 'Parallel agents', showValue: true, min: 0, max: 16, step: 2, defaultValue: 4 }))
+    const slider = part(host, 'slider', 'root')
     const input = part(slider, 'slider', 'input') as HTMLInputElement
     expect(getComputedStyle(slider).getPropertyValue('--slider-fill').trim()).toBe('25%')
 
     input.focus()
     await userEvent.keyboard('{ArrowRight}')
+    await frames(1)
     expect(input.value).toBe('6')
     expect(getComputedStyle(slider).getPropertyValue('--slider-fill').trim()).toBe('37.5%')
     expect(part(slider, 'slider', 'output').textContent).toBe('6')
 
     await userEvent.keyboard('{End}')
+    await frames(1)
     expect(input.value).toBe('16')
     expect(getComputedStyle(slider).getPropertyValue('--slider-fill').trim()).toBe('100%')
   })
@@ -91,11 +104,8 @@ describe('slider in a real browser', () => {
 
 describe('number field in a real browser', () => {
   it('a real pointer drags the axis letter, and the value follows under capture', async () => {
-    const host = mount(`
-      <gg-number-field axis="X" label="Position X">
-        <input type="number" value="100" step="1">
-      </gg-number-field>`)
-    const field = host.querySelector('gg-number-field')!
+    const host = await mount(h(NumberField, { axis: 'X', label: 'Position X', defaultValue: 100, step: 1 }))
+    const field = part(host, 'number-field', 'root')
     const axis = part(field, 'number-field', 'axis')
     const input = part(field, 'number-field', 'input') as HTMLInputElement
     const box = axis.getBoundingClientRect()
@@ -117,11 +127,8 @@ describe('number field in a real browser', () => {
   })
 
   it('the arrows step it natively: the spin buttons are styled away, not the behaviour', async () => {
-    const host = mount(`
-      <gg-number-field axis="Y" label="Position Y">
-        <input type="number" value="10" step="0.5">
-      </gg-number-field>`)
-    const input = part(host.querySelector('gg-number-field')!, 'number-field', 'input') as HTMLInputElement
+    const host = await mount(h(NumberField, { axis: 'Y', label: 'Position Y', defaultValue: 10, step: 0.5 }))
+    const input = part(part(host, 'number-field', 'root'), 'number-field', 'input') as HTMLInputElement
     input.focus()
     await userEvent.keyboard('{ArrowUp}{ArrowUp}')
     expect(input.value).toBe('11')

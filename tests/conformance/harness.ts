@@ -710,27 +710,22 @@ export interface Mounted<P> {
 }
 
 export interface Adapter {
-  name: 'elements' | 'react' | 'svelte'
+  name: 'react' | 'svelte'
 
   /**
    * What the adapter's public API can express. A spec skips a case the adapter
    * cannot express — and says so in the test name — rather than faking it.
-   * Custom elements have no controlled mode: an attribute cannot be owned by
-   * the page and the element at once.
    */
   supports: {
     controlled: boolean
     /**
      * The owner can REFUSE a change: pass a `value`, ignore the callback, and the
      * component keeps showing the owner's value. React only. Svelte's `bind:`
-     * model writes the change back, and the custom elements follow their own
-     * attributes, so there a change the owner ignores still moves the component.
+     * model writes the change back, so there a change the owner ignores still
+     * moves the component.
      */
     refusal: boolean
-    /**
-     * A component's root can be another element — a card that is an <a>. Not
-     * for custom elements: the host is the root, and a host cannot be a link.
-     */
+    /** A component's root can be another element — a card that is an <a>. */
     linkRoot: boolean
   }
 
@@ -772,7 +767,7 @@ export interface Adapter {
   flow(props: FlowProps, target: HTMLElement): Promise<Mounted<FlowProps>>
   pageHeader(props: PageHeaderProps, target: HTMLElement): Promise<Mounted<PageHeaderProps>>
   section(props: SectionProps, target: HTMLElement): Promise<Mounted<SectionProps>>
-  /** Optional: an adapter without it skips the combobox spec (the custom elements, while vanilla is undecided). */
+  /** Optional: an adapter without it skips the combobox spec. */
   combobox?(props: ComboboxProps, target: HTMLElement): Promise<Mounted<ComboboxProps>>
   calendar?(props: CalendarProps, target: HTMLElement): Promise<Mounted<CalendarProps>>
   cascader?(props: CascaderProps, target: HTMLElement): Promise<Mounted<CascaderProps>>
@@ -861,10 +856,7 @@ export function typeInto(input: HTMLInputElement | HTMLTextAreaElement, text: st
   input.dispatchEvent(new Event('input', { bubbles: true }))
 }
 
-/**
- * The first element that is this part — the root itself included, since a
- * custom element that enhances its host (gg-field, gg-radio-group) IS the part.
- */
+/** The first element that is this part — the root itself included, when a spec is handed the part. */
 export const part = (root: ParentNode, scope: string, name: string) => {
   const selector = `[data-scope="${scope}"][data-part="${name}"]`
   return root instanceof HTMLElement && root.matches(selector) ? root : root.querySelector<HTMLElement>(selector)

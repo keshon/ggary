@@ -1,27 +1,33 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { page, userEvent } from '@vitest/browser/context'
-import '../packages/structure/src/index.css'
-import '../packages/elements/src/index'
-import { createToaster } from '../packages/core/src/components/toast'
-import type { GgToasterElement } from '../packages/elements/src/index'
+import '../packages/theme-ggarry/src/index.css'
+import { createElement as h } from 'react'
+import { flushSync } from 'react-dom'
+import { createRoot, type Root } from 'react-dom/client'
+import { Toaster, createToaster } from '../packages/react/src/index'
+import type { ToastPlacement } from '../packages/core/src/components/toast'
 
 /**
  * Toast where only a browser answers: the region in a corner of the viewport,
  * in the top layer, letting presses through where there is no toast; a real
  * pointer resting on a toast holding it; and the keyboard reaching its action.
  */
+const roots: Root[] = []
 afterEach(() => {
+  for (const root of roots.splice(0)) root.unmount()
   document.body.replaceChildren()
 })
 
 const settle = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
-function mountToaster(placement = 'bottom-end') {
+/** The region, rendered synchronously into `parent` (the body by default). */
+function mountToaster(placement: ToastPlacement = 'bottom-end', parent: HTMLElement = document.body) {
   const toaster = createToaster()
-  const host = document.createElement('gg-toaster') as GgToasterElement
-  host.toaster = toaster
-  host.setAttribute('placement', placement)
-  document.body.append(host)
+  const host = document.createElement('div')
+  parent.append(host)
+  const root = createRoot(host)
+  roots.push(root)
+  flushSync(() => root.render(h(Toaster, { toaster, placement })))
   const region = host.querySelector('[data-part="region"]') as HTMLElement
   return { toaster, host, region }
 }
@@ -32,11 +38,12 @@ describe('toast in a real browser', () => {
     const wrapper = document.createElement('div')
     wrapper.style.cssText = 'position: relative; overflow: hidden; width: 50px; height: 50px'
     document.body.append(wrapper)
-    const { toaster, host, region } = mountToaster('bottom-end')
-    wrapper.append(host)
+    const { toaster, host, region } = mountToaster('bottom-end', wrapper)
     toaster.toast({ title: 'Saved', duration: 0 })
     await settle(50)
     expect(region.matches(':popover-open')).toBe(true)
+    // The theme slides a toast in from its edge: measure where it comes to rest.
+    await Promise.all(host.querySelector('[data-part="toast"]')!.getAnimations().map((animation) => animation.finished))
     const toast = host.querySelector('[data-part="toast"]')!.getBoundingClientRect()
     expect(Math.round(toast.right)).toBe(800 - 16)
     expect(Math.round(toast.bottom)).toBe(600 - 16)

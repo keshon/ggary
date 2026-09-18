@@ -1,5 +1,4 @@
 import { afterEach, describe } from 'vitest'
-import { elements } from './adapters/elements'
 import { react } from './adapters/react'
 import { svelte } from './adapters/svelte'
 import { buttonConformance } from './button.spec'
@@ -45,7 +44,7 @@ import { textareaConformance } from './textarea.spec'
 export function runConformance() {
   afterEach(cleanup)
 
-  for (const adapter of [elements, react, svelte]) {
+  for (const adapter of [react, svelte]) {
     describe(adapter.name, () => {
       buttonConformance(adapter)
       selectConformance(adapter)

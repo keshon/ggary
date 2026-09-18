@@ -10,12 +10,10 @@
   },
   "dependencies": {
     "@ggary/core": "*",
-    "@ggary/elements": "*",
     "@ggary/react": "*",
     "@ggary/structure": "*",
     "@ggary/svelte": "*",
     "@ggary/theme-ggarry": "*",
-    "@ggary/theme-instrument": "*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "svelte": "^5.0.0"

@@ -120,6 +120,16 @@
      selected tab, from the keyboard — and on an unsaved tab as its dot. */
   visibility: hidden;
 }
+/* WCAG 2.2's 24px target for a 20px button: an invisible area around it. */
+[data-scope='tabs'][data-part='close']::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  inline-size: var(--ggarry-size-tap);
+  block-size: var(--ggarry-size-tap);
+}
 [data-scope='tabs'][data-part='tab']:hover > [data-part='close'],
 [data-scope='tabs'][data-part='tab']:focus-within > [data-part='close'],
 [data-scope='tabs'][data-part='tab'][data-state='active'] > [data-part='close'],

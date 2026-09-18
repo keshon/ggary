@@ -1,12 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { userEvent } from '@vitest/browser/context'
-import { act, createElement } from 'react'
-import { createRoot } from 'react-dom/client'
+import { act, createElement, type ReactNode } from 'react'
+import { createRoot, type Root } from 'react-dom/client'
 import '../packages/structure/src/index.css'
-import '../packages/elements/src/index'
-import { Dialog } from '../packages/react/src/index'
+import { Dialog, Select, type DialogProps } from '../packages/react/src/index'
 import { openLayerCount } from '../packages/core/src/utils/dismissable'
-import type { GgDialogElement, GgSelectElement } from '../packages/elements/src/index'
 
 /**
  * What only a real browser can show about Dialog: the top layer, the inert
@@ -16,32 +14,44 @@ import type { GgDialogElement, GgSelectElement } from '../packages/elements/src/
  */
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
-afterEach(() => {
+let root: Root | null = null
+afterEach(async () => {
+  if (root) await act(async () => root!.unmount())
+  root = null
   document.body.replaceChildren()
 })
 
 const settle = () => new Promise((resolve) => setTimeout(resolve, 30))
 
-function mountElement(html: string) {
+/** Renders a Dialog, with whatever stands around it; `render` re-renders it with new props. */
+async function mountDialog(props: DialogProps, around: (dialog: ReactNode) => ReactNode = (dialog) => dialog) {
   const host = document.createElement('div')
-  host.innerHTML = html
   document.body.append(host)
-  return host.querySelector('gg-dialog') as GgDialogElement
+  root = createRoot(host)
+  const render = (next: DialogProps) => act(async () => root!.render(around(createElement(Dialog, next))))
+  await render(props)
+  const content = () => host.querySelector('dialog') as HTMLDialogElement
+  return { host, content, render }
 }
-
-const content = (host: Element) => host.querySelector('dialog') as HTMLDialogElement
 
 describe('dialog in a real browser', () => {
   it('is modal while open — in the top layer, with the page inert — and a real Escape closes it once', async () => {
-    const dialog = mountElement(`
-      <button id="outside">Outside</button>
-      <gg-dialog heading="Rename"><button slot="trigger">Open</button><input aria-label="Name"></gg-dialog>`)
-    const onChange = vi.fn()
-    dialog.addEventListener('openchange', (e) => onChange((e as CustomEvent).detail))
+    const onOpenChange = vi.fn()
+    const { host, content } = await mountDialog(
+      {
+        title: 'Rename',
+        onOpenChange,
+        trigger: (props) => createElement('button', props, 'Open'),
+        children: createElement('input', { 'aria-label': 'Name' }),
+      },
+      (dialog) => [createElement('button', { key: 'outside', id: 'outside' }, 'Outside'), createElement('div', { key: 'dialog' }, dialog)]
+    )
+    const trigger = [...host.querySelectorAll('button')].find((b) => b.textContent === 'Open')!
 
-    await userEvent.click(dialog.querySelector('[slot="trigger"]')!)
-    expect(content(dialog).matches(':modal')).toBe(true)
-    expect(content(dialog).contains(document.activeElement)).toBe(true)
+    await userEvent.click(trigger)
+    await act(async () => settle())
+    expect(content().matches(':modal')).toBe(true)
+    expect(content().contains(document.activeElement)).toBe(true)
 
     // Tab as far as the dialog has stops and further: focus never reaches the page.
     for (let i = 0; i < 5; i++) {
@@ -50,114 +60,106 @@ describe('dialog in a real browser', () => {
     }
 
     await userEvent.keyboard('{Escape}')
-    await settle()
-    expect(content(dialog).open).toBe(false)
-    expect(onChange).toHaveBeenCalledTimes(2)
-    expect(onChange).toHaveBeenLastCalledWith({ open: false, reason: 'escape', returnValue: '' })
-    expect(document.activeElement).toBe(dialog.querySelector('[slot="trigger"]'))
+    await act(async () => settle())
+    expect(content().open).toBe(false)
+    expect(onOpenChange).toHaveBeenCalledTimes(2)
+    expect(onOpenChange).toHaveBeenLastCalledWith(false, { reason: 'escape' })
+    expect(document.activeElement).toBe(trigger)
   })
 
   it('locks the page scroll while modal, and only while modal', async () => {
-    const dialog = mountElement(`<div style="height: 3000px"></div><gg-dialog heading="Hi"></gg-dialog>`)
     const overflow = () => getComputedStyle(document.documentElement).overflow
+    const { content, render } = await mountDialog({ title: 'Hi', open: false }, (dialog) => [
+      createElement('div', { key: 'tall', style: { height: 3000 } }),
+      createElement('div', { key: 'dialog' }, dialog),
+    ])
     expect(overflow()).not.toBe('hidden')
-    dialog.show()
+    await render({ title: 'Hi', open: true })
     expect(overflow()).toBe('hidden')
-    dialog.close()
+    await render({ title: 'Hi', open: false })
     expect(overflow()).not.toBe('hidden')
 
-    dialog.setAttribute('non-modal', '')
-    dialog.show()
-    expect(content(dialog).matches(':modal')).toBe(false)
+    await render({ title: 'Hi', open: true, modal: false })
+    expect(content().open).toBe(true)
+    expect(content().matches(':modal')).toBe(false)
     expect(overflow()).not.toBe('hidden')
-    dialog.close()
+    await render({ title: 'Hi', open: false, modal: false })
   })
 
   it('is not clipped by an ancestor that hides overflow: the top layer needs no portal', async () => {
-    const dialog = mountElement(`
-      <div style="overflow: hidden; height: 4px; transform: translateZ(0)">
-        <gg-dialog heading="Clipped?"><p style="height: 200px">Tall body</p></gg-dialog>
-      </div>`)
-    dialog.show()
-    const box = content(dialog).getBoundingClientRect()
+    const { content } = await mountDialog(
+      { title: 'Clipped?', defaultOpen: true, children: createElement('p', { style: { height: 200 } }, 'Tall body') },
+      (dialog) => createElement('div', { style: { overflow: 'hidden', height: 4, transform: 'translateZ(0)' } }, dialog)
+    )
+    const box = content().getBoundingClientRect()
     expect(box.height).toBeGreaterThan(200)
     const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)
-    expect(content(dialog).contains(hit)).toBe(true)
+    expect(content().contains(hit)).toBe(true)
   })
 
   it('a real click on the backdrop closes it', async () => {
-    const dialog = mountElement(`<gg-dialog heading="Backdrop"><p>Body</p></gg-dialog>`)
-    dialog.show()
+    const { content } = await mountDialog({ title: 'Backdrop', defaultOpen: true, children: createElement('p', null, 'Body') })
     // A position outside the dialog's own box lands on its ::backdrop.
-    await userEvent.click(content(dialog), { position: { x: -20, y: -20 } })
-    await settle()
-    expect(content(dialog).open).toBe(false)
+    await userEvent.click(content(), { position: { x: -20, y: -20 } })
+    await act(async () => settle())
+    expect(content().open).toBe(false)
   })
 
   it('a <form method="dialog"> closes it — through state, not natively — and reports the button’s value', async () => {
-    const dialog = mountElement(`
-      <gg-dialog heading="Delete?">
-        <p>Gone for good.</p>
-        <footer><form method="dialog"><button value="cancel">Cancel</button><button value="delete">Delete</button></form></footer>
-      </gg-dialog>`)
-    const onChange = vi.fn()
-    dialog.addEventListener('openchange', (e) => onChange((e as CustomEvent).detail))
-    dialog.show()
-    await userEvent.click([...dialog.querySelectorAll('button')].find((b) => b.textContent === 'Delete')!)
-    await settle()
-    expect(content(dialog).open).toBe(false)
-    expect(dialog.hasAttribute('open')).toBe(false)
-    expect(onChange).toHaveBeenLastCalledWith({ open: false, reason: 'native', returnValue: 'delete' })
+    const onOpenChange = vi.fn()
+    const footer = createElement(
+      'form',
+      { method: 'dialog' },
+      createElement('button', { key: 'cancel', value: 'cancel' }, 'Cancel'),
+      createElement('button', { key: 'delete', value: 'delete' }, 'Delete')
+    )
+    const { host, content } = await mountDialog({ title: 'Delete?', defaultOpen: true, onOpenChange, footer, children: createElement('p', null, 'Gone for good.') })
+    await userEvent.click([...host.querySelectorAll('button')].find((b) => b.textContent === 'Delete')!)
+    await act(async () => settle())
+    expect(content().open).toBe(false)
+    expect(onOpenChange).toHaveBeenLastCalledWith(false, { reason: 'native', returnValue: 'delete' })
     expect(openLayerCount()).toBe(0)
   })
 
   it('React, controlled: a <form method="dialog"> asks like everything else, and can be refused', async () => {
-    const host = document.createElement('div')
-    document.body.append(host)
-    const root = createRoot(host)
     const onOpenChange = vi.fn()
     const footer = createElement('form', { method: 'dialog' }, createElement('button', { value: 'save' }, 'Save'))
-    await act(async () => root.render(createElement(Dialog, { open: true, onOpenChange, title: 'Form', footer }, 'Body')))
-    const el = host.querySelector('dialog')!
+    const { host, content } = await mountDialog({ open: true, onOpenChange, title: 'Form', footer, children: 'Body' })
+    const el = content()
     await userEvent.click(host.querySelector('button[value="save"]')!)
     await act(async () => settle())
     expect(onOpenChange).toHaveBeenCalledWith(false, { reason: 'native', returnValue: 'save' })
     expect(el.open).toBe(true)
     expect(el.returnValue).toBe('save')
-    await act(async () => root.unmount())
   })
 
   it('a select inside a dialog takes the first Escape; the dialog the second', async () => {
-    const dialog = mountElement(`<gg-dialog heading="Pick"><gg-select label="Plan"></gg-select></gg-dialog>`)
-    const select = dialog.querySelector('gg-select') as GgSelectElement
-    select.items = [
+    const items = [
       { value: 'free', label: 'Free' },
       { value: 'pro', label: 'Pro' },
     ]
-    dialog.show()
-    const trigger = select.querySelector('[data-part="trigger"]') as HTMLElement
+    const { host, content } = await mountDialog({ title: 'Pick', defaultOpen: true, children: createElement(Select, { label: 'Plan', items }) })
+    const trigger = host.querySelector('[data-scope="select"][data-part="trigger"]') as HTMLElement
     await userEvent.click(trigger)
+    await act(async () => settle())
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
     expect(openLayerCount()).toBe(2)
 
     await userEvent.keyboard('{Escape}')
-    await settle()
+    await act(async () => settle())
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
-    expect(content(dialog).open).toBe(true)
+    expect(content().open).toBe(true)
 
     await userEvent.keyboard('{Escape}')
-    await settle()
-    expect(content(dialog).open).toBe(false)
+    await act(async () => settle())
+    expect(content().open).toBe(false)
     expect(openLayerCount()).toBe(0)
   })
 
   it('React, controlled: an owner that refuses a close keeps it open, and hears every request', async () => {
-    const host = document.createElement('div')
-    document.body.append(host)
-    const root = createRoot(host)
     const onOpenChange = vi.fn()
-    await act(async () => root.render(createElement(Dialog, { open: true, onOpenChange, title: 'Stay' }, 'Body')))
-    const el = host.querySelector('dialog')!
+    const { content } = await mountDialog({ open: true, onOpenChange, title: 'Stay', children: 'Body' })
+    const el = content()
     expect(el.matches(':modal')).toBe(true)
 
     await userEvent.keyboard('{Escape}')
@@ -169,6 +171,5 @@ describe('dialog in a real browser', () => {
       [false, { reason: 'escape' }],
       [false, { reason: 'escape' }],
     ])
-    await act(async () => root.unmount())
   })
 })

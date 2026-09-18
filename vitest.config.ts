@@ -49,6 +49,13 @@ export default defineConfig({
             headless: true,
             screenshotFailures: false,
             instances: [{ browser: 'chromium', launch: { channel: process.env.GG_BROWSER_CHANNEL ?? 'chrome' } }],
+            commands: {
+              // Windows High Contrast, emulated: what the theme's gg.forced layer answers.
+              async forcedColors(ctx, active: boolean) {
+                if (ctx.provider.name !== 'playwright') throw new Error('forcedColors needs the playwright provider')
+                await (ctx as unknown as { page: { emulateMedia(options: { forcedColors: 'active' | 'none' }): Promise<void> } }).page.emulateMedia({ forcedColors: active ? 'active' : 'none' })
+              },
+            },
           },
         },
       },

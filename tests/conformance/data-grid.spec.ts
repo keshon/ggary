@@ -258,9 +258,7 @@ export function gridToolsConformance(adapter: Adapter) {
       expect(visible()).toBe(false)
     })
 
-    // The custom elements are frozen with the browser's own date input; React and Svelte use the date picker.
-    const pickerAdapter = adapter.name === 'elements' ? it.skip : it
-    pickerAdapter('a date filter is edited with the kit’s date picker, and the grid follows', async () => {
+    it('a date filter is edited with the kit’s date picker, and the grid follows', async () => {
       const dated = many.map((lead, i) => ({ ...lead, registered: `2026-09-${String(i + 1).padStart(2, '0')}` }))
       const withDate = [...columns, { id: 'registered', header: 'Registered', type: 'date' as const }]
       const { m, chips, rowCount } = await setup({

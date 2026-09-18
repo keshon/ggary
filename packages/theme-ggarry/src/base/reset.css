@@ -12,3 +12,28 @@
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
   outline-offset: var(--ggarry-focus-ring-offset);
 }
+
+/* Figures that change in place, or stand in a column, are set tabular: a
+   count ticking from 9 to 10, a page number, a value under a slider thumb,
+   a column of sums — proportional digits would make them shift and wobble. */
+:is(
+  [data-scope='data-grid'][data-part='cell'],
+  [data-scope='progress'][data-part='value-text'],
+  [data-scope='pagination'][data-part='link'],
+  [data-scope='number-field'][data-part='input'],
+  [data-scope='slider'][data-part='output'],
+  [data-scope='nav'][data-part='count'],
+  [data-scope='status-bar'][data-part='item']
+) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* A mode island — a panel set to data-mode="dark" inside a light page —
+   switches the tokens, and must repaint its own base too: the text colour
+   and canvas it inherited are the page's, and would stay dark-on-dark.
+   Not on a component's own data-mode (the calendar's "range"), which is a
+   state of that component, not an island. */
+:where([data-mode]:not([data-scope])) {
+  color: var(--ggarry-text-default);
+  background-color: var(--ggarry-bg-canvas);
+}

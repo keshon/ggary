@@ -1,0 +1,73 @@
+/* ==========================================================================
+   GGarry — forced colours (Windows High Contrast)
+
+   Under forced colours every fill and shadow is reset to the system's colours;
+   what survives is text and borders. Anything GGarry says with a fill alone —
+   a checked radio's dot, a switch that is on, the highlighted row of a list, a
+   floating surface lifted by its shadow, the busy button's turning arc — is
+   lost unless it is said again here, in system colours.
+
+   Its own layer, gg.forced, after the components: these rules win by layer
+   order, not by !important, which would also beat the application's own
+   unlayered styles and break the kit's promise to it. (Kept from the retired
+   Instrument theme, which had it and GGarry did not.)
+
+   Per-component forced rules that only sharpen an existing border stay in
+   their own files; this one holds what needs saying again.
+   ========================================================================== */
+
+@media (forced-colors: active) {
+  /* Surfaces a shadow lifted: the shadow is gone, so an edge holds them apart. */
+  [data-scope='tooltip'][data-part='content'],
+  [data-scope='popover'][data-part='content'],
+  [data-scope='menu'][data-part='content'],
+  [data-scope='select'][data-part='content'],
+  [data-scope='combobox'][data-part='content'],
+  [data-scope='toast'][data-part='toast'] {
+    border: 1px solid CanvasText;
+  }
+
+  /* The boxes and the track: the fill resets, so the border is what is left of
+     the control, and a checked box or a switch that is on must say so again. */
+  :is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='input'],
+  [data-scope='data-grid'][data-part='checkbox'] {
+    border: 1px solid CanvasText;
+  }
+  :is([data-scope='checkbox'], [data-scope='radio'])[data-part='input']:is(:checked, [data-state='indeterminate']),
+  [data-scope='data-grid'][data-part='checkbox']:is(:checked, :indeterminate),
+  [data-scope='switch'][data-part='input']:checked {
+    forced-color-adjust: none;
+    background: Highlight;
+    border-color: Highlight;
+  }
+  :is([data-scope='checkbox'][data-part='indicator'], [data-scope='data-grid'][data-part='checkbox-indicator']) {
+    forced-color-adjust: none;
+    color: HighlightText;
+  }
+  [data-scope='radio'][data-part='indicator'],
+  [data-scope='switch'][data-part='thumb'] {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+  [data-scope='radio'][data-part='input']:checked + [data-part='indicator'],
+  [data-scope='switch'][data-part='input']:checked + [data-part='thumb'] {
+    background: HighlightText;
+  }
+
+  /* A highlight that is only a fill: the row the keys or the pointer are on. */
+  :is([data-scope='select'], [data-scope='menu'], [data-scope='combobox'], [data-scope='cascader'], [data-scope='command-palette'])[data-part='item'][data-highlighted],
+  [data-scope='menubar'][data-part='item'][data-state='open'],
+  [data-scope='chip-group'] [data-scope='chip'][data-part='root'][data-selected] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  /* The busy button's ring: every border would turn CanvasText, the ring would
+     be even, and the turning would not show at all. */
+  [data-scope='button'][data-part='spinner'] {
+    forced-color-adjust: none;
+    border-color: ButtonFace;
+    border-block-start-color: ButtonText;
+  }
+}

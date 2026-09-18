@@ -44,8 +44,8 @@
   inset-block-start: 50%;
   inset-inline-start: 50%;
   translate: -50% -50%;
-  inline-size: max(100%, 24px);
-  block-size: max(100%, 24px);
+  inline-size: max(100%, var(--ggarry-size-tap));
+  block-size: max(100%, var(--ggarry-size-tap));
 }
 
 :is([data-scope='checkbox'], [data-scope='radio'])[data-part='input'],
@@ -66,10 +66,13 @@
   border-color: var(--ggarry-border-accent);
 }
 
+/* A checked box keeps an edge half a step darker than its fill: a 16px
+   solid square with no edge blurs into its antialiasing, and on a box that
+   small the perimeter is a large share of what the eye sees. */
 :is([data-scope='checkbox'], [data-scope='radio'])[data-part='input']:is(:checked, [data-state='indeterminate']),
 [data-scope='data-grid'][data-part='checkbox']:is(:checked, :indeterminate) {
   background: var(--ggarry-bg-accent);
-  border-color: var(--ggarry-bg-accent);
+  border-color: var(--ggarry-bg-accent-hover);
 }
 
 :is([data-scope='checkbox'], [data-scope='radio'])[data-part='input'][data-invalid]:not(:checked) {

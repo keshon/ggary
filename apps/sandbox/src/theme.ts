@@ -1,139 +1,52 @@
 /**
- * Sandbox-only theme switcher.
- *
- * In a real project a theme is chosen per project: one stylesheet, imported
- * once. The sandbox swaps languages at RUNTIME purely so the same page can be
- * compared across them, so each theme is imported as a string (`?inline`) and
- * exactly one is mounted into a <style> element at a time. Loading both at once
- * would make them fight over the same [data-scope] selectors.
- *
- * Within a theme, the axes are plain attributes on <html> — that part IS how a
- * project would use them.
+ * The sandbox's theme: GGarry, imported once as a project would, and its
+ * colour mode — a plain attribute on <html>, which is how a project would set
+ * it too. "system" is no attribute at all: the theme follows the platform.
  */
-import ggarryCss from '@ggary/theme-ggarry?inline'
-import instrumentCss from '@ggary/theme-instrument?inline'
+import '@ggary/theme-ggarry'
 
-type Axis = { attr: string; label: string; values: string[]; fallback: string }
+export type Mode = 'system' | 'light' | 'dark'
+export const MODES: Mode[] = ['system', 'light', 'dark']
 
-interface ThemeDef {
-  label: string
-  css: string
-  axes: Axis[]
-}
+const STORAGE_KEY = 'ggary-sandbox-mode'
 
-const THEMES: Record<string, ThemeDef> = {
-  ggarry: {
-    label: 'GGarry',
-    css: ggarryCss,
-    axes: [{ attr: 'data-mode', label: 'mode', values: ['system', 'light', 'dark'], fallback: 'system' }],
-  },
-  instrument: {
-    label: 'Instrument',
-    css: instrumentCss,
-    axes: [
-      {
-        attr: 'data-mode',
-        label: 'mode',
-        values: ['system', 'light-neutral', 'light', 'light-cool', 'dark', 'dark-soft'],
-        fallback: 'system',
-      },
-      { attr: 'data-accent', label: 'accent', values: ['petrol', 'graphite', 'indigo', 'clay'], fallback: 'petrol' },
-      { attr: 'data-density', label: 'density', values: ['compact', 'regular', 'comfortable'], fallback: 'regular' },
-      { attr: 'data-scale', label: 'scale', values: ['14', '15', '16', '17', '18'], fallback: '14' },
-    ],
-  },
-}
-
-// Every attribute any theme uses, so switching theme clears the other's.
-const ALL_ATTRS = [...new Set(Object.values(THEMES).flatMap((t) => t.axes.map((a) => a.attr)))]
-
-const STORAGE_KEY = 'ggary-sandbox-theme'
-
-type Settings = { theme: string; axes: Record<string, string> }
-
-function load(): Settings {
+function load(): Mode {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (raw) {
-      const parsed = JSON.parse(raw) as Settings
-      if (parsed.theme in THEMES) return parsed
-    }
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (stored && (MODES as string[]).includes(stored)) return stored as Mode
   } catch {
-    /* storage unavailable: fall through to defaults */
+    /* storage unavailable: the default */
   }
-  return { theme: 'ggarry', axes: {} }
+  return 'system'
 }
 
-function save(settings: Settings): void {
+let mode = load()
+const listeners = new Set<(mode: Mode) => void>()
+
+function apply(): void {
+  const root = document.documentElement
+  if (mode === 'system') root.removeAttribute('data-mode')
+  else root.setAttribute('data-mode', mode)
+}
+
+export const getMode = () => mode
+
+export function setMode(next: Mode): void {
+  if (next === mode) return
+  mode = next
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings))
+    localStorage.setItem(STORAGE_KEY, mode)
   } catch {
     /* non-essential */
   }
+  apply()
+  for (const listener of listeners) listener(mode)
 }
 
-let settings = load()
-
-function styleElement(): HTMLStyleElement {
-  let el = document.getElementById('gg-theme') as HTMLStyleElement | null
-  if (!el) {
-    el = document.createElement('style')
-    el.id = 'gg-theme'
-    document.head.prepend(el)
-  }
-  return el
-}
-
-function apply(): void {
-  const theme = THEMES[settings.theme]
-  const root = document.documentElement
-
-  styleElement().textContent = theme.css
-  root.dataset.ggTheme = settings.theme
-
-  for (const attr of ALL_ATTRS) root.removeAttribute(attr)
-  for (const axis of theme.axes) {
-    const value = settings.axes[`${settings.theme}:${axis.attr}`] ?? axis.fallback
-    // The fallback is the theme's own default: expressing it as "no attribute"
-    // is exactly what a project would ship, and it proves the defaults work.
-    if (value !== axis.fallback) root.setAttribute(axis.attr, value)
-  }
-}
-
-const listeners = new Set<() => void>()
-
-/** The themes, the current one, and its axes with their values: the chrome draws its controls from these. */
-export function themeChoices() {
-  const theme = THEMES[settings.theme]
-  return {
-    themes: Object.entries(THEMES).map(([id, t]) => ({ value: id, label: t.label })),
-    theme: settings.theme,
-    axes: theme.axes.map((axis) => ({ attr: axis.attr, label: axis.label, values: axis.values, value: settings.axes[`${settings.theme}:${axis.attr}`] ?? axis.fallback })),
-  }
-}
-
-/** Called after every change of theme or axis. */
-export function onThemeChange(listener: () => void): () => void {
+/** Called after every change of mode — the bar's control and the command palette's both change it. */
+export function onModeChange(listener: (mode: Mode) => void): () => void {
   listeners.add(listener)
   return () => listeners.delete(listener)
-}
-
-function commit(): void {
-  save(settings)
-  apply()
-  for (const listener of listeners) listener()
-}
-
-export function setTheme(id: string): void {
-  if (!(id in THEMES) || id === settings.theme) return
-  settings = { ...settings, theme: id }
-  commit()
-}
-
-/** Set one of the current theme's axes — the command palette's "Colour mode" does. */
-export function setAxis(attr: string, value: string): void {
-  settings = { ...settings, axes: { ...settings.axes, [`${settings.theme}:${attr}`]: value } }
-  commit()
 }
 
 apply()
