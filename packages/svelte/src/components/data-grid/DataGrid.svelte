@@ -90,7 +90,7 @@
   }
 </script>
 
-<div {...api.frameProps} {style}>
+<div {...api.frameProps} style={[api.frameProps.style, style].filter(Boolean).join('; ')}>
   <div {...api.rootProps} {@attach (root) => grid.attach(root)}>
     <div {...api.headerProps}>
       {#each api.headerCells as header (header.key)}

@@ -151,6 +151,18 @@ describe('<gg-chip-group>', () => {
   })
 })
 
+describe('the host keeps its own style', () => {
+  it('core writes its custom properties beside the page’s inline style, and never over it', () => {
+    document.body.innerHTML = '<gg-split label="Resize" style="block-size: 300px"><p>A</p><p>B</p></gg-split>'
+    const split = document.querySelector('gg-split') as HTMLElement & { size: number }
+    expect(split.style.blockSize).toBe('300px')
+    expect(split.style.getPropertyValue('--gg-split-size')).toBe('320px')
+    split.size = 400
+    expect(split.style.getPropertyValue('--gg-split-size')).toBe('400px')
+    expect(split.style.blockSize).toBe('300px')
+  })
+})
+
 describe('light-DOM enhancement', () => {
   it('<gg-button> keeps the markup’s button type: a plain <button> in a form still submits it', () => {
     document.body.innerHTML = `<form>

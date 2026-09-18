@@ -285,3 +285,19 @@ export const toastDemos = {
   failed: { tone: 'error', title: 'Could not send', text: 'The network is unavailable. Attempt 3 of 5.' },
   warn: { tone: 'warn', title: 'Disk almost full', text: '92% of 512 GB used' },
 } as const
+
+/** The layout demos, the same on every page. */
+export const railItems = [
+  { label: 'Leads', href: '#rail-leads', icon: 'list' as const, count: 3, current: true },
+  { label: 'Deals', href: '#rail-deals', icon: 'grid' as const },
+  { label: 'Reports', href: '#rail-reports', icon: 'chart' as const },
+  { label: 'Settings', href: '#rail-settings', icon: 'settings' as const, end: true },
+]
+
+export const layoutLeads = ['Acme Labs 214', 'Borealis Group 77', 'Cobalt Works 902', 'Delta Retail 18', 'Ember Studio 450', 'Fjord Logistics 33', 'Granite Holding 610']
+
+export const HINT_SHELL =
+  'The frame of an application: the side column, the header, the work area and the status strip, each scrolling on its own. On a window under 60rem the column becomes a drawer behind the button in the header — Escape or a press outside closes it, the page under it is inert, and following a link closes it too; collapse="bar" lays it down under the header instead. Tab once from the top of the frame for the skip link. The separator between the list and the lead is dragged, or moved from the keyboard: arrows, Shift for bigger steps, Home and End, Enter folds the list away, a double click puts it back.'
+
+export const HINT_RAIL =
+  'The sections as a narrow column: a glyph over a short name, so nobody has to learn the pictures. The current one has a fill and a mark at its edge; the ones marked end stand at the bottom.'

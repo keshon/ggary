@@ -1,0 +1,6 @@
+export { default as Shell } from './Shell.svelte'
+export { default as Split } from './Split.svelte'
+export { default as Rail } from './Rail.svelte'
+export { default as StatusBar } from './StatusBar.svelte'
+export { default as StatusBarItem } from './StatusBarItem.svelte'
+export { default as StatusBarSpacer } from './StatusBarSpacer.svelte'

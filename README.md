@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two design languages on top of it.
-Forty-four components — DataGrid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Forty-eight components — DataGrid, Shell, Split, Rail, StatusBar, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 2434 tests, 967 of them in headless Chrome
+npm test         # 2658 tests, 1053 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1441,6 +1441,111 @@ Found on the way:
   everywhere. Open a row from a cell that is not editable, by a double click on
   one, or from the row menu.
 
+## Shell, Split, Rail and StatusBar
+
+The frame of an application, the part Instrument calls the tier that was missing:
+the kit could draw anything inside a panel and could not place the panels.
+
+```tsx
+<Shell
+  brand={<a href="/">Leads</a>}
+  aside={<Nav label="Sections" groups={groups} />}
+  header={<Breadcrumbs items={crumbs} />}
+  footer={
+    <StatusBar label="Registry status">
+      <StatusBarItem>main</StatusBarItem>
+      <StatusBarItem tone="error">3 failed saves</StatusBarItem>
+      <StatusBarSpacer />
+      <Button size="sm" emphasis="minimal">Sync</Button>
+    </StatusBar>
+  }
+>
+  <Split label="Resize the lead list" collapsible defaultSize={320} min={200} max={560}>
+    <LeadList />
+    <Lead />
+  </Split>
+</Shell>
+```
+
+```html
+<gg-shell>
+  <a slot="brand" href="/">Leads</a>
+  <gg-nav slot="aside" label="Sections">…</gg-nav>
+  <gg-breadcrumbs slot="header">…</gg-breadcrumbs>
+  <gg-status-bar slot="footer">…</gg-status-bar>
+  <gg-split label="Resize the lead list" collapsible>
+    <section>…</section>
+    <section>…</section>
+  </gg-split>
+</gg-shell>
+```
+
+**Shell** is a side column, a header, the work area and a status strip, each
+scrolling on its own: the navigation does not move while a table is read. The
+work area is the page's `main`, and a skip link — the first thing a keyboard
+meets — moves the focus there. It has the kit's one breakpoint, 60rem; under it
+the column becomes one of two things, and which one depends on how long the
+navigation is:
+
+- **a drawer** (the default) behind a button in the header, for a navigation of
+  groups and many items. It behaves as the modal it looks like: the rest of the
+  frame is inert, so Tab cannot walk out under the scrim; Escape or a press
+  outside closes it and gives the focus back to the button; following a link
+  closes it. A window that grows past the breakpoint with the drawer open closes
+  it, so it is not found open the next time the window narrows.
+- **a bar** (`collapse="bar"`) under the header, for a short navigation: it needs
+  no script and cannot fail to open.
+
+The breakpoint is written twice, in core's `SHELL_NARROW` and in the structure
+layer's `@media`, because a media query cannot read a custom property; a test
+holds the two to the same number.
+
+**Split** is two panes and the line between them — the window splitter of the
+ARIA practices. The separator is a focusable `separator` whose value is the
+primary pane's size in pixels, between its minimum and maximum. Arrows move it
+(Shift, four steps), Home and End go to the bounds, Enter folds a `collapsible`
+pane away and back, a double click puts it where it started, and a pointer drags
+it with the line staying under the pointer. A drag well past half the minimum
+folds a collapsible pane rather than stopping at a minimum the person is plainly
+trying to get past. The other pane never falls under `restMin`, however far the
+line is pulled, and when the frame narrows the sized pane gives way first. The
+size is `--gg-split-size` on the frame; `onSizeChange` reports every change, for
+a page that keeps the layout.
+
+**Rail** is the sections as a narrow column. Instrument names each glyph for a
+screen reader only; here the name stands under the glyph in small type, so
+nobody has to learn twelve pictures. The current item has a fill and a mark at
+its edge, and items marked `end` stand at the bottom.
+
+**StatusBar** is one line of readings — a branch, a count of errors, an
+encoding — not a toolbar: a toolbar holds controls and is as tall as they are,
+and this strip has to stay one line or it eats the screen of the tool it serves.
+A reading that can be pressed is a small low Button; one that is only read is an
+item, with a tone when it is news. When the strip is too narrow it pans sideways
+rather than cutting off its end, which is often the one control on it.
+
+Found on the way:
+
+- **A custom element wiped the page's own style.** `spread` set the `style`
+  attribute whole, so core's `--gg-split-size` replaced the `block-size` a page
+  had written on `<gg-split>` — and on `<gg-data-grid>`, whose header height is
+  written the same way. Style is now set property by property, and a test in
+  `elements.dom.test.ts` fails without it. React's and Svelte's DataGrid had the
+  mirror image: a `style` prop replaced the grid's own custom property; they now
+  merge.
+- **`onDoubleClick` never fired outside React.** The Svelte and DOM normalizers
+  lower-cased handler names into events, and `doubleclick` is not one — it is
+  `dblclick`. Such names now go through a table.
+- **The drawer refused the focus it was given.** Its `visibility` transition
+  started at `hidden`, and a hidden element cannot take the focus, so the first
+  frame of every opening lost it. Opening is now visible at once, closing hides
+  after the slide, and the drawer asks again on the next frame should a theme
+  fade it in.
+- **The conformance harness declared the same interfaces five times over.**
+  Earlier patch scripts had pasted blocks that were already there; TypeScript
+  merges identical interface declarations, so nothing complained. Thirty-two
+  duplicates are gone.
+
 ## Layering inside core
 
 ```
@@ -1645,20 +1750,22 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 255 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target. |
+| machine | node | `*.machine.test.ts` | 265 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target. |
 | contract | node | `icons.contract.test.ts` | 258 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 942 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 975 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| dom | jsdom | `elements.dom.test.ts` | 33 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 942 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| dom | jsdom | `elements.dom.test.ts` | 34 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
+| browser | Chrome | `conformance.browser.test.ts` | 975 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
 | browser | Chrome | `tabs.browser.test.ts` | 4 tests. One tab stop under the real Tab key, vertical tabs beside their panel, a long strip scrolling to the focused tab, a real click closing a tab without losing focus. |
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
+| machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
+| browser | Chrome | `layout.browser.test.ts` | 8 tests. The column beside the work on a wide screen with only the work scrolling, the drawer out of the tab order until opened and then over an inert page, the window growing past the breakpoint closing it, a bar lying down under the header, a separator dragged by a pointer with its line under it and stopping for the other pane, the keyboard moving it, a status strip staying one line. |
 | browser | Chrome | `data-grid-rows.browser.test.ts` | 6 tests. A double click and a click elsewhere saving, Tab walking the editable cells, an edit surviving its row scrolled out of view (elements, and React under StrictMode), the row menu standing at the pointer and handing the focus back, a press on another row while the sheet is open. |
 | dom | jsdom | `react-strict.dom.test.ts` | 1 test. The grid under React StrictMode, which unmounts and remounts once, still loads. |
 | browser | Chrome | `navigation.browser.test.ts` | 8 tests. A toolbar under the real Tab and arrow keys — wrapping, skipping what is disabled, returning to the tool last used — a field inside it keeping its own arrows, the spacer measured against the strip's inset, the drawn chevron that is in no text, and a step's bar spanning its item. |
@@ -1765,10 +1872,9 @@ Real, and deliberately left open:
 - **Platform close requests** (a back gesture) are cancelled through the `cancel`
   event, which browsers may refuse to let a page cancel without recent user
   activation; the dialog then closes natively and reports `native`.
-- **Not ported from Instrument:** everything beyond these thirty components —
-  prose, the rest of forms (number field, slider, choice cards), tables,
-  the agent components (including the composer, a textarea with a toolbar in one
-  frame) and print styles.
+- **Not ported from Instrument:** prose, charts (meter, sparkline, ring,
+  heatmap), the agent components (including the composer, a textarea with a
+  toolbar in one frame) and print styles.
 - **One cell at a time.** No pasting a block of cells, no fill-down, and no undo
   beyond the rollback of a failed save.
 - **An edit to `rows` is yours to keep.** With an array in the page, the grid
@@ -1786,8 +1892,12 @@ Real, and deliberately left open:
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that is Instrument's position, and it stays available.
-- **No Shell.** The side column, the drawer and the responsive strip Instrument's
-  shell provides are layout, and this kit has no layout components yet.
+- **No page header, section or container yet**, nor the flow primitives (stack,
+  cluster, grid) Instrument has. They are the second half of the layout wave.
+- **The drawer's breakpoint is fixed at 60rem.** A media query cannot read a
+  custom property, so a theme cannot move it; change `SHELL_NARROW` and the
+  structure layer's `@media` together.
+- **A split has two panes.** Three columns are two splits, one inside the other.
 - **An affix names nothing.** "$" and "per hour" are text beside the field, not a
   label: a screen reader announces the field's own name, so put the unit in the
   label or the hint as well.
@@ -1847,8 +1957,8 @@ Real, and deliberately left open:
   a modal holds above a popover opened later (Instrument measured the same). Report a
   result inside the dialog, or show the toast after it closes.
 - **One `Toaster` per toaster.** Two regions on one queue render every toast twice.
-- **No context menu yet.** The Menu machine and content are ready for one opened at
-  the pointer; the trigger is not built.
+- **The only context menu is the grid's row menu.** Menu content can stand at a
+  point now (`anchor`), but there is no general `ContextMenu` for any element yet.
 - **No option descriptions.** A radio or checkbox with a second line of help
   text (Instrument's choice card) is not built.
 - **No character counter.** `maxLength` is enforced by the browser, silently; a

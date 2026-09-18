@@ -1,0 +1,7 @@
+export { shellAnatomy } from './shell.anatomy'
+export type { ShellPart } from './shell.anatomy'
+export { connect, shellIds, SHELL_NARROW } from './shell.connect'
+export type { ShellApi, ShellConnectOptions } from './shell.connect'
+export { createShellMachine, reducer, initialState, DEFAULTS } from './shell.machine'
+export type { ShellMachineConfig } from './shell.machine'
+export type * from './shell.types'

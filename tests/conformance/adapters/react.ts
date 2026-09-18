@@ -23,6 +23,12 @@ import {
   GridDetail,
   GridFilters,
   GridRowMenu,
+  Rail,
+  Shell,
+  Split,
+  StatusBar,
+  StatusBarItem,
+  StatusBarSpacer,
   ChoiceCardGroup,
   FileDrop,
   InputGroup,
@@ -57,6 +63,9 @@ import {
   type Adapter,
   type ButtonGroupProps,
   type GridRowsProps,
+  type ShellProps,
+  type SplitProps,
+  type StatusBarProps,
   type GridToolsProps,
   type ToolbarProps,
   type ButtonProps,
@@ -159,6 +168,39 @@ function ReactGridWithRows(props: GridRowsProps) {
   )
 }
 
+function ReactShell(props: ShellProps) {
+  const column = props.links.length > 0
+  return createElement(
+    Shell as ComponentType<any>,
+    {
+      collapse: props.collapse,
+      defaultOpen: props.defaultOpen,
+      onOpenChange: props.onOpenChange,
+      brand: column && props.brand ? createElement('a', { href: '/' }, props.brand) : undefined,
+      aside: column
+        ? createElement(Nav, { label: 'Sections', groups: [{ items: props.links }] })
+        : undefined,
+      header: props.header ? createElement('span', null, props.header) : undefined,
+      footer: props.footer ? createElement('span', null, props.footer) : undefined,
+    },
+    createElement('p', null, props.body)
+  )
+}
+
+function ReactSplit(props: SplitProps) {
+  const { first, second, ...rest } = props
+  return createElement(Split as ComponentType<any>, { ...rest, children: [createElement('p', null, first), createElement('p', null, second)] })
+}
+
+function ReactStatusBar(props: StatusBarProps) {
+  return createElement(
+    StatusBar as ComponentType<any>,
+    { label: props.label },
+    ...props.items.map((item, i) => createElement(StatusBarItem as ComponentType<any>, { key: `s${i}`, tone: item.tone }, item.text)),
+    ...(props.end ? [createElement(StatusBarSpacer, { key: 'spacer' }), ...props.end.map((item, i) => createElement(StatusBarItem as ComponentType<any>, { key: `e${i}` }, item.text))] : [])
+  )
+}
+
 export const react: Adapter = {
   name: 'react',
   supports: { controlled: true, refusal: true, linkRoot: true },
@@ -192,6 +234,10 @@ export const react: Adapter = {
   fileDrop: (props, target) => mount(FileDrop, props, target),
   breadcrumbs: (props, target) => mount(Breadcrumbs, props, target),
   gridRows: (props, target) => mount(ReactGridWithRows as ComponentType<any>, props, target),
+  shell: (props, target) => mount(ReactShell as ComponentType<any>, props, target),
+  split: (props, target) => mount(ReactSplit as ComponentType<any>, props, target),
+  rail: (props, target) => mount(Rail as ComponentType<any>, props, target),
+  statusBar: (props, target) => mount(ReactStatusBar as ComponentType<any>, props, target),
   gridTools: (props, target) => mount(ReactGridWithTools as ComponentType<any>, props, target),
   dataGrid: (props, target) => mount(DataGrid as ComponentType<any>, { rowKey: (row: { id: unknown }) => row.id, ...props }, target),
   nav: (props, target) => mount(Nav, props, target),

@@ -1,0 +1,75 @@
+/* ==========================================================================
+   GGarry — rail
+
+   The sections as a narrow column: a glyph over a short name, the current one
+   with a fill and a mark at its edge.
+   ========================================================================== */
+
+[data-scope='rail'][data-part='root'] {
+  gap: var(--ggarry-space-1);
+  inline-size: 72px;
+  padding: var(--ggarry-space-3) var(--ggarry-space-2);
+  background: var(--ggarry-bg-subtle);
+  font-family: var(--ggarry-font-family-sans);
+}
+[data-scope='rail'][data-part='item'] {
+  gap: 2px;
+  padding: var(--ggarry-space-2) var(--ggarry-space-1);
+  border-radius: var(--ggarry-radius-md);
+  color: var(--ggarry-text-muted);
+  transition: background-color var(--ggarry-duration-fast) ease, color var(--ggarry-duration-fast) ease;
+}
+[data-scope='rail'][data-part='item']:hover {
+  background: var(--ggarry-bg-muted);
+  color: var(--ggarry-text-default);
+}
+[data-scope='rail'][data-part='item']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+/* Two carriers, as the side column has: a fill, and a mark at the edge that
+   peripheral vision finds without the colour. */
+[data-scope='rail'][data-part='item'][data-current] {
+  background: var(--ggarry-bg-accent-subtle);
+  color: var(--ggarry-text-accent);
+}
+[data-scope='rail'][data-part='item'][data-current]::before {
+  content: '';
+  position: absolute;
+  inset-block: var(--ggarry-space-2);
+  inset-inline-start: calc(var(--ggarry-space-2) * -1);
+  inline-size: 3px;
+  border-radius: 0 var(--ggarry-radius-sm) var(--ggarry-radius-sm) 0;
+  background: var(--ggarry-text-accent);
+}
+[data-scope='rail'][data-part='icon'] {
+  inline-size: 20px;
+  block-size: 20px;
+}
+[data-scope='rail'][data-part='label'] {
+  font-size: 11px;
+  line-height: 1.3;
+}
+[data-scope='rail'][data-part='item'][data-current] > [data-part='label'] {
+  font-weight: var(--ggarry-font-weight-medium);
+}
+[data-scope='rail'][data-part='count'] {
+  inset-block-start: 2px;
+  inset-inline-end: 10px;
+  min-inline-size: 16px;
+  padding-inline: 4px;
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-bg-accent);
+  color: var(--ggarry-text-on-accent);
+  font-size: 10px;
+  font-weight: var(--ggarry-font-weight-medium);
+  line-height: 16px;
+  text-align: center;
+}
+
+@media (forced-colors: active) {
+  [data-scope='rail'][data-part='item'][data-current] { outline: 1px solid Highlight; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='rail'][data-part='item'] { transition: none; }
+}

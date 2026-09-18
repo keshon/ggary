@@ -14,6 +14,7 @@ import { cleanup } from './harness'
 import { inputConformance } from './input.spec'
 import { menuConformance } from './menu.spec'
 import { dataGridConformance, gridRowsConformance, gridToolsConformance } from './data-grid.spec'
+import { layoutConformance } from './layout.spec'
 import { breadcrumbsConformance, navConformance, paginationConformance, stepsConformance, toolbarConformance } from './navigation.spec'
 import { menubarConformance } from './menubar.spec'
 import { popoverConformance, tooltipConformance } from './popover.spec'
@@ -62,6 +63,7 @@ export function runConformance() {
       dataGridConformance(adapter)
       gridToolsConformance(adapter)
       gridRowsConformance(adapter)
+      layoutConformance(adapter)
       checkboxGroupConformance(adapter)
       fieldsetConformance(adapter)
       resetConformance(adapter)

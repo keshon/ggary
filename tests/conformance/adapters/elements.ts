@@ -15,6 +15,10 @@ import {
   type BreadcrumbsProps,
   type DataGridProps,
   type GridRowsProps,
+  type RailProps,
+  type ShellProps,
+  type SplitProps,
+  type StatusBarProps,
   type GridToolsProps,
   type ButtonGroupProps,
   type ChoiceCardGroupProps,
@@ -588,6 +592,112 @@ export const elements: Adapter = {
       update: async (patch) => apply(patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<ButtonGroupProps>)
+  },
+
+  async shell(props, target) {
+    const host = document.createElement('gg-shell')
+    setAttr(host, 'collapse', props.collapse)
+    if (props.defaultOpen) host.setAttribute('open', '')
+    if (props.links.length > 0) {
+      if (props.brand) {
+        const brand = document.createElement('a')
+        brand.href = '/'
+        brand.slot = 'brand'
+        brand.textContent = props.brand
+        host.append(brand)
+      }
+      const nav = document.createElement('gg-nav')
+      nav.slot = 'aside'
+      nav.setAttribute('label', 'Sections')
+      const group = document.createElement('div')
+      for (const link of props.links) {
+        const anchor = document.createElement('a')
+        anchor.href = link.href
+        anchor.textContent = link.label
+        group.append(anchor)
+      }
+      nav.append(group)
+      host.append(nav)
+    }
+    for (const [slot, text] of [['header', props.header], ['footer', props.footer]] as const) {
+      if (!text) continue
+      const span = document.createElement('span')
+      span.slot = slot
+      span.textContent = text
+      host.append(span)
+    }
+    const body = document.createElement('p')
+    body.textContent = props.body
+    host.append(body)
+    host.addEventListener('openchange', (event) => {
+      const { open, reason } = (event as CustomEvent).detail
+      props.onOpenChange?.(open, { reason })
+    })
+    target.append(host)
+    return track({ root: host, update: async () => {}, unmount: async () => host.remove() } satisfies Mounted<ShellProps>)
+  },
+
+  async split(props, target) {
+    const host = document.createElement('gg-split')
+    setAttr(host, 'label', props.label)
+    setAttr(host, 'orientation', props.orientation)
+    setAttr(host, 'primary', props.primary)
+    for (const [name, value] of [['min', props.min], ['max', props.max], ['step', props.step], ['default-size', props.defaultSize]] as const) {
+      if (value !== undefined) host.setAttribute(name, String(value))
+    }
+    if (props.collapsible) host.setAttribute('collapsible', '')
+    for (const text of [props.first, props.second]) {
+      const pane = document.createElement('p')
+      pane.textContent = text
+      host.append(pane)
+    }
+    host.addEventListener('sizechange', (event) => {
+      const { size, collapsed } = (event as CustomEvent).detail
+      props.onSizeChange?.(size, { collapsed })
+    })
+    target.append(host)
+    return track({ root: host, update: async () => {}, unmount: async () => host.remove() } satisfies Mounted<SplitProps>)
+  },
+
+  async rail(props, target) {
+    const host = document.createElement('gg-rail')
+    setAttr(host, 'label', props.label)
+    for (const item of props.items) {
+      const anchor = document.createElement('a')
+      anchor.href = item.href
+      anchor.textContent = item.label
+      anchor.dataset.icon = item.icon
+      if (item.current) anchor.setAttribute('aria-current', 'page')
+      if (item.end) anchor.toggleAttribute('data-end', true)
+      if (item.count !== undefined) {
+        const count = document.createElement('span')
+        count.dataset.count = ''
+        count.textContent = String(item.count)
+        anchor.append(count)
+      }
+      host.append(anchor)
+    }
+    target.append(host)
+    return track({ root: host, update: async () => {}, unmount: async () => host.remove() } satisfies Mounted<RailProps>)
+  },
+
+  async statusBar(props, target) {
+    const host = document.createElement('gg-status-bar')
+    setAttr(host, 'label', props.label)
+    const reading = (text: string, tone?: string) => {
+      const span = document.createElement('span')
+      span.textContent = text
+      if (tone) span.dataset.tone = tone
+      return span
+    }
+    host.append(...props.items.map((item) => reading(item.text, item.tone)))
+    if (props.end) {
+      const spacer = document.createElement('span')
+      spacer.toggleAttribute('data-spacer', true)
+      host.append(spacer, ...props.end.map((item) => reading(item.text)))
+    }
+    target.append(host)
+    return track({ root: host, update: async () => {}, unmount: async () => host.remove() } satisfies Mounted<StatusBarProps>)
   },
 
   async gridRows(props, target) {

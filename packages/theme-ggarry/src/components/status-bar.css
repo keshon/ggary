@@ -1,0 +1,28 @@
+/* ==========================================================================
+   GGarry — status bar
+
+   One small line along the bottom: readings in the muted ink, news in its tone.
+   ========================================================================== */
+
+[data-scope='status-bar'][data-part='root'] {
+  gap: var(--ggarry-space-1);
+  min-block-size: 26px;
+  padding-inline: var(--ggarry-space-2);
+  border-block-start: 1px solid var(--ggarry-border-default);
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-muted);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-xs);
+}
+[data-scope='status-bar'][data-part='item'] {
+  gap: var(--ggarry-space-1);
+  padding-inline: var(--ggarry-space-2);
+}
+[data-scope='status-bar'][data-part='item'] > [data-icon] {
+  inline-size: 12px;
+  block-size: 12px;
+}
+[data-scope='status-bar'][data-part='item'][data-tone='ok'] { color: var(--ggarry-text-success); }
+[data-scope='status-bar'][data-part='item'][data-tone='warn'] { color: var(--ggarry-text-warning); }
+[data-scope='status-bar'][data-part='item'][data-tone='error'] { color: var(--ggarry-text-danger); }
+[data-scope='status-bar'][data-part='item'][data-tone='running'] { color: var(--ggarry-text-accent); }

@@ -95,7 +95,7 @@ export function DataGrid<Row>(props: DataGridProps<Row>) {
   useLayoutEffect(() => (root.current ? controller.attach(root.current) : undefined), [controller])
 
   return (
-    <div {...api.frameProps} style={style}>
+    <div {...api.frameProps} style={{ ...(api.frameProps.style as CSSProperties | undefined), ...style }}>
       <div ref={root} {...api.rootProps}>
         <div {...api.headerProps}>
           {api.headerCells.map((header) => (

@@ -21,7 +21,7 @@ import {
 } from './leads'
 import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
 import type { GgDataGridElement, GgGridDetailElement, GgGridMenuElement, GgAvatarGroupElement, GgCheckboxElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
-import { agentsText, badgeTones, crumbs, densities, importSteps, navGroups, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, layoutLeads, navGroups, railItems, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
 
@@ -571,6 +571,60 @@ app.innerHTML = `
       ${importSteps.map((step) => `<div data-state="${step.state}">${step.name}</div>`).join('')}
     </gg-steps>
     <p class="hint">The bar says where the process is; the word under the name says it again in language, which is what survives a printout and a reader who cannot tell the shades apart.</p>
+  </section>
+
+  <section id="layout">
+    <h2>Shell and split</h2>
+    <div class="shell-demo">
+      <gg-shell>
+        <a slot="brand" href="#layout">Leads</a>
+        <gg-nav slot="aside" label="Sections">
+          ${navGroups
+            .map(
+              (group, index) =>
+                `<div data-group="${group.label}">${group.items
+                  .map(
+                    (item, itemIndex) =>
+                      `<a href="${item.href}" data-icon="${item.icon}"${index === 0 && itemIndex === 0 ? ' aria-current="page"' : ''}>${item.label}${'count' in item && item.count !== undefined ? `<span data-count>${item.count}</span>` : ''}</a>`
+                  )
+                  .join('')}</div>`
+            )
+            .join('')}
+        </gg-nav>
+        <gg-breadcrumbs slot="header" label="Breadcrumbs">
+          ${crumbs.map((crumb) => (crumb.href ? `<a href="${crumb.href}">${crumb.label}</a>` : `<span>${crumb.label}</span>`)).join('')}
+        </gg-breadcrumbs>
+        <gg-status-bar slot="footer" label="Registry status">
+          <span>main</span>
+          <span data-tone="error">3 failed saves</span>
+          <span data-spacer></span>
+          <span>700,000 leads</span>
+          <gg-button size="sm" emphasis="minimal"><button>Sync</button></gg-button>
+        </gg-status-bar>
+        <gg-split label="Resize the lead list" collapsible default-size="260" min="180" max="420" rest-min="220" style="block-size: 100%">
+          <ul>${layoutLeads.map((lead) => `<li>${lead}</li>`).join('')}</ul>
+          <article>
+            <h3 style="margin-top: 0">Acme Labs 214</h3>
+            <p>The lead would stand here, beside the list it was picked from.</p>
+          </article>
+        </gg-split>
+      </gg-shell>
+    </div>
+    <p class="hint">${HINT_SHELL}</p>
+
+    <h2 style="margin-top: 32px">Rail</h2>
+    <div class="rail-demo">
+      <gg-rail label="Workspaces">
+        ${railItems
+          .map(
+            (item) =>
+              `<a href="${item.href}" data-icon="${item.icon}"${item.current ? ' aria-current="page"' : ''}${item.end ? ' data-end' : ''}>${item.label}${item.count !== undefined ? `<span data-count>${item.count}</span>` : ''}</a>`
+          )
+          .join('')}
+      </gg-rail>
+      <div><p>The section's content.</p></div>
+    </div>
+    <p class="hint">${HINT_RAIL}</p>
   </section>
 
   <section id="fields">

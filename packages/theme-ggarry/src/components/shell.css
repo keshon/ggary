@@ -1,0 +1,139 @@
+/* ==========================================================================
+   GGarry — shell
+
+   The application frame. The side column is a quieter ground than the work area
+   and parted from it by a hairline, the header is the page's own ground with a
+   line under it. Nothing in the frame is louder than what it frames.
+   ========================================================================== */
+
+[data-scope='shell'][data-part='root'] {
+  background: var(--ggarry-bg-canvas);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='shell'][data-part='aside'] {
+  gap: var(--ggarry-space-4);
+  inline-size: 232px;
+  padding: var(--ggarry-space-4) var(--ggarry-space-3);
+  border-inline-end: 1px solid var(--ggarry-border-default);
+  background: var(--ggarry-bg-subtle);
+}
+/* A rail in the column is the column: it brings its own inset. */
+[data-scope='shell'][data-part='aside']:has(> [data-scope='rail']:only-child) {
+  inline-size: auto;
+  padding: 0;
+}
+
+[data-scope='shell'][data-part='brand'] {
+  gap: var(--ggarry-space-2);
+  min-block-size: var(--ggarry-size-control-md);
+  padding-inline: var(--ggarry-space-3);
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-lg);
+  font-weight: var(--ggarry-font-weight-semibold);
+  text-decoration: none;
+}
+/* The name is usually a link home: it reads as the name, not as a link. */
+[data-scope='shell'][data-part='brand'] a {
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--ggarry-radius-sm);
+}
+[data-scope='shell'][data-part='brand'] a:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+
+[data-scope='shell'][data-part='header'] {
+  gap: var(--ggarry-space-3) var(--ggarry-space-4);
+  min-block-size: calc(var(--ggarry-size-control-md) + var(--ggarry-space-4));
+  padding: var(--ggarry-space-2) var(--ggarry-space-6);
+  border-block-end: 1px solid var(--ggarry-border-default);
+  background: var(--ggarry-bg-surface);
+}
+
+[data-scope='shell'][data-part='main'] {
+  padding-block: var(--ggarry-space-6);
+}
+
+[data-scope='shell'][data-part='toggle'] {
+  inline-size: var(--ggarry-size-control-md);
+  block-size: var(--ggarry-size-control-md);
+  margin-inline-start: calc(var(--ggarry-space-2) * -1);
+  padding: 0;
+  border: 0;
+  border-radius: var(--ggarry-radius-md);
+  background: transparent;
+  color: var(--ggarry-text-default);
+  cursor: pointer;
+}
+[data-scope='shell'][data-part='toggle']:hover {
+  background: var(--ggarry-bg-subtle);
+}
+[data-scope='shell'][data-part='toggle']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+[data-scope='shell'][data-part='toggle-icon'] {
+  inline-size: 18px;
+  block-size: 18px;
+}
+
+[data-scope='shell'][data-part='skip-link'] {
+  margin: var(--ggarry-space-3);
+  padding: var(--ggarry-space-2) var(--ggarry-space-4);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-accent);
+  font-size: var(--ggarry-font-size-sm);
+  box-shadow: var(--ggarry-shadow-popover);
+}
+[data-scope='shell'][data-part='skip-link']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+
+@media (width < 60rem) {
+  [data-scope='shell'][data-part='header'] {
+    padding-inline: var(--ggarry-space-4);
+  }
+  [data-scope='shell'][data-part='main'] {
+    padding-block: var(--ggarry-space-4);
+  }
+
+  [data-scope='shell'][data-collapse='bar'] > [data-part='aside'] {
+    inline-size: auto;
+    gap: var(--ggarry-space-4);
+    padding: var(--ggarry-space-2) var(--ggarry-space-4);
+    border-inline-end: 0;
+    border-block-end: 1px solid var(--ggarry-border-default);
+  }
+  [data-scope='shell'][data-collapse='bar'] > [data-part='aside'] [data-scope='nav'][data-part='group'] + [data-part='group'] {
+    margin-block-start: 0;
+    margin-inline-start: var(--ggarry-space-4);
+  }
+
+  /* The drawer lies ON the page, so its ground is raised, not recessed. */
+  [data-scope='shell'][data-collapse='drawer'] > [data-part='aside'] {
+    inline-size: min(280px, 86vw);
+    background: var(--ggarry-bg-surface);
+    box-shadow: var(--ggarry-shadow-modal);
+    /* Closing, it hides once it has slid away; opening, it is visible at once
+       — a transition that starts at hidden would refuse the focus it is given. */
+    transition:
+      translate var(--ggarry-duration-normal) ease,
+      visibility 0s linear var(--ggarry-duration-normal);
+  }
+  [data-scope='shell'][data-collapse='drawer'][data-state='open'] > [data-part='aside'] {
+    transition: translate var(--ggarry-duration-normal) ease;
+  }
+  [data-scope='shell'][data-collapse='drawer'][data-state='open']::after {
+    background: var(--ggarry-bg-scrim);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='shell'][data-part='aside'] { transition: none; }
+}

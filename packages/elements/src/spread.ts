@@ -2,8 +2,21 @@ import type { DomProps } from '@ggary/core'
 
 interface Applied {
   attrs: Set<string>
+  /** Style properties set, one by one, so the author's own inline style stays. */
+  styles: Set<string>
   listeners: Map<string, EventListener>
 }
+
+/** "a: 1; --b: 2px" as pairs. Values here are core's: no `;` inside one. */
+const declarations = (text: string) =>
+  text
+    .split(';')
+    .map((declaration) => declaration.trim())
+    .filter(Boolean)
+    .map((declaration) => {
+      const colon = declaration.indexOf(':')
+      return [declaration.slice(0, colon).trim(), declaration.slice(colon + 1).trim()] as const
+    })
 
 const applied = new WeakMap<Element, Map<string, Applied>>()
 
@@ -26,17 +39,29 @@ export function spread(element: Element, props: DomProps, owner = 'self'): void 
   }
   let previous = owners.get(owner)
   if (!previous) {
-    previous = { attrs: new Set(), listeners: new Map() }
+    previous = { attrs: new Set(), styles: new Set(), listeners: new Map() }
     owners.set(owner, previous)
   }
 
   for (const name of previous.attrs) {
-    if (!(name in props.attrs)) element.removeAttribute(name)
+    if (!(name in props.attrs) && name !== 'style') element.removeAttribute(name)
   }
   for (const [name, value] of Object.entries(props.attrs)) {
+    if (name === 'style') continue
     if (element.getAttribute(name) !== value) element.setAttribute(name, value)
   }
   previous.attrs = new Set(Object.keys(props.attrs))
+
+  // Style is set property by property, not as the attribute: the attribute
+  // would wipe whatever the page wrote on the host itself — a height, a width.
+  const style = (element as HTMLElement).style
+  if (style) {
+    const next = declarations(props.attrs.style ?? '')
+    const names = new Set(next.map(([name]) => name))
+    for (const name of previous.styles) if (!names.has(name)) style.removeProperty(name)
+    for (const [name, value] of next) if (style.getPropertyValue(name) !== value) style.setProperty(name, value)
+    previous.styles = names
+  }
 
   // Handlers are recreated on every connect() call, so swap rather than compare.
   // A name ending in "capture" (onInvalidCapture -> "invalidcapture") listens in

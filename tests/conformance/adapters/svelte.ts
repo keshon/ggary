@@ -1,10 +1,13 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, Button, Checkbox, CheckboxGroup, ChipGroup, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, Button, Checkbox, CheckboxGroup, ChipGroup, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
 import GridWithTools from './GridWithTools.svelte'
 import GridWithRows from './GridWithRows.svelte'
+import ShellWith from './ShellWith.svelte'
+import SplitWith from './SplitWith.svelte'
+import StatusBarWith from './StatusBarWith.svelte'
 import DialogWithContent from './DialogWithContent.svelte'
 import PopoverWithContent from './PopoverWithContent.svelte'
 import TooltipWithTrigger from './TooltipWithTrigger.svelte'
@@ -91,6 +94,10 @@ export const svelte: Adapter = {
   buttonGroup: (props, target) => mountSvelte(GroupWithControl as Component<any>, props, target, (p) => ({ ...p, group: 'buttons' })),
   breadcrumbs: (props, target) => mountSvelte(Breadcrumbs as Component<any>, props, target),
   gridRows: (props, target) => mountSvelte(GridWithRows as Component<any>, props, target),
+  shell: (props, target) => mountSvelte(ShellWith as Component<any>, props, target),
+  split: (props, target) => mountSvelte(SplitWith as Component<any>, props, target),
+  rail: (props, target) => mountSvelte(Rail as Component<any>, props, target),
+  statusBar: (props, target) => mountSvelte(StatusBarWith as Component<any>, props, target),
   gridTools: (props, target) => mountSvelte(GridWithTools as Component<any>, props, target),
   dataGrid: (props, target) =>
     mountSvelte(DataGrid as Component<any>, props, target, (p) => ({ rowKey: (row: { id: unknown }) => row.id, ...p })),

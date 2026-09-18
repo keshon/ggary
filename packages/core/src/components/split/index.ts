@@ -1,0 +1,7 @@
+export { splitAnatomy } from './split.anatomy'
+export type { SplitPart } from './split.anatomy'
+export { connect, splitIds } from './split.connect'
+export type { SplitApi, SplitConnectOptions } from './split.connect'
+export { clampSize, createSplitMachine, reducer, initialState, DEFAULTS } from './split.machine'
+export type { SplitMachineConfig } from './split.machine'
+export type * from './split.types'

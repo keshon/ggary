@@ -111,3 +111,37 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
   margin: 2px 0 0;
   overflow-wrap: anywhere;
 }
+
+/* The layout demos: a whole application frame in a box on the page. */
+.shell-demo {
+  position: relative;
+  block-size: 520px;
+  border: 1px solid var(--gg-border);
+  border-radius: var(--gg-radius);
+  overflow: hidden;
+}
+.shell-demo > * {
+  block-size: 100%;
+}
+.shell-demo ul {
+  margin: 0;
+  padding: 12px 16px;
+  list-style: none;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+.shell-demo article {
+  padding: 12px 20px;
+}
+.rail-demo {
+  display: flex;
+  block-size: 320px;
+  border: 1px solid var(--gg-border);
+  border-radius: var(--gg-radius);
+  overflow: hidden;
+}
+.rail-demo > :last-child {
+  flex: 1;
+  padding: 16px 20px;
+}

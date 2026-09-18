@@ -61,5 +61,9 @@
 @import './components/tabs.css' layer(gg.components);
 @import './components/toast.css' layer(gg.components);
 @import './components/toolbar.css' layer(gg.components);
+@import './components/shell.css' layer(gg.components);
+@import './components/split.css' layer(gg.components);
+@import './components/rail.css' layer(gg.components);
+@import './components/status-bar.css' layer(gg.components);
 @import './components/textarea.css' layer(gg.components);
 @import './components/tooltip.css' layer(gg.components);

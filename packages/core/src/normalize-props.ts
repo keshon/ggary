@@ -74,6 +74,15 @@ export const reactNormalizer: Normalizer = (props: Dict) => {
 }
 
 /**
+ * Canonical handler keys are React's. Most lower-case into the DOM event's name
+ * (`onKeyDown` is `keydown`); these few are named otherwise in the DOM.
+ */
+const EVENT_NAMES: Record<string, string> = {
+  onDoubleClick: 'dblclick',
+}
+const eventName = (key: string) => EVENT_NAMES[key] ?? key.slice(2).toLowerCase()
+
+/**
  * Svelte 5: event attributes are lowercase (`onclick`), and attributes are
  * attributes — `tabindex`, `readonly`, `class`.
  */
@@ -81,7 +90,7 @@ export const svelteNormalizer: Normalizer = (props: Dict) => {
   const out: Dict = {}
   for (const [key, value] of Object.entries(props)) {
     if (isAbsentProp(key, value)) continue
-    if (isHandler(key)) out[key.toLowerCase()] = value
+    if (isHandler(key)) out[`on${eventName(key)}`] = value
     else if (key === 'style' && typeof value === 'object') out.style = styleText(value)
     else out[ATTRIBUTE_NAMES[key] ?? key] = value
   }
@@ -103,7 +112,7 @@ export const domNormalizer: Normalizer<DomProps> = (props: Dict) => {
   for (const [key, value] of Object.entries(props)) {
     if (isAbsent(value)) continue
     if (isHandler(key)) {
-      listeners[key.slice(2).toLowerCase()] = value
+      listeners[eventName(key)] = value
       continue
     }
     const name = ATTRIBUTE_NAMES[key] ?? key

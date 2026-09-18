@@ -176,6 +176,22 @@
     "./data-grid": {
       "types": "./src/components/data-grid/index.ts",
       "default": "./src/components/data-grid/index.ts"
+    },
+    "./shell": {
+      "types": "./src/components/shell/index.ts",
+      "default": "./src/components/shell/index.ts"
+    },
+    "./split": {
+      "types": "./src/components/split/index.ts",
+      "default": "./src/components/split/index.ts"
+    },
+    "./rail": {
+      "types": "./src/components/rail/index.ts",
+      "default": "./src/components/rail/index.ts"
+    },
+    "./status-bar": {
+      "types": "./src/components/status-bar/index.ts",
+      "default": "./src/components/status-bar/index.ts"
     }
   },
   "dependencies": {

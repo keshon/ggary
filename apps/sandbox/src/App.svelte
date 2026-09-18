@@ -29,6 +29,12 @@
     Menu,
     Menubar,
     Nav,
+    Rail,
+    Shell,
+    Split,
+    StatusBar,
+    StatusBarItem,
+    StatusBarSpacer,
     Note,
     NumberField,
     Pagination,
@@ -73,7 +79,7 @@
     type Lead,
   } from './leads'
   import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, navGroups, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, layoutLeads, navGroups, railItems, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -853,6 +859,47 @@ invalid  ${taken}`}</pre>
   <h2 style="margin-top: 32px">Steps</h2>
   <Steps items={importSteps} label="Import" />
   <p class="hint">The bar says where the process is; the word under the name says it again in language, which is what survives a printout and a reader who cannot tell the shades apart.</p>
+</section>
+
+<section id="layout">
+  <h2>Shell and split</h2>
+  <div class="shell-demo">
+    <Shell>
+      {#snippet brand()}<a href="#layout">Leads</a>{/snippet}
+      {#snippet aside()}
+        <Nav label="Sections" groups={navGroups.map((group, index) => ({ ...group, items: group.items.map((item, itemIndex) => ({ ...item, current: index === 0 && itemIndex === 0 })) }))} />
+      {/snippet}
+      {#snippet header()}<Breadcrumbs items={crumbs} />{/snippet}
+      {#snippet footer()}
+        <StatusBar label="Registry status">
+          <StatusBarItem>main</StatusBarItem>
+          <StatusBarItem tone="error">3 failed saves</StatusBarItem>
+          <StatusBarSpacer />
+          <StatusBarItem>700,000 leads</StatusBarItem>
+          <Button size="sm" emphasis="minimal">Sync</Button>
+        </StatusBar>
+      {/snippet}
+      <Split label="Resize the lead list" collapsible defaultSize={260} min={180} max={420} restMin={220} style="block-size: 100%">
+        {#snippet first()}
+          <ul>{#each layoutLeads as lead (lead)}<li>{lead}</li>{/each}</ul>
+        {/snippet}
+        {#snippet second()}
+          <article>
+            <h3 style="margin-top: 0">Acme Labs 214</h3>
+            <p>The lead would stand here, beside the list it was picked from.</p>
+          </article>
+        {/snippet}
+      </Split>
+    </Shell>
+  </div>
+  <p class="hint">{HINT_SHELL}</p>
+
+  <h2 style="margin-top: 32px">Rail</h2>
+  <div class="rail-demo">
+    <Rail label="Workspaces" items={railItems} />
+    <div><p>The section's content.</p></div>
+  </div>
+  <p class="hint">{HINT_RAIL}</p>
 </section>
 
 <section id="fields">

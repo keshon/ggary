@@ -44,7 +44,7 @@ const focusable =
 const visible = (el: HTMLElement) =>
   typeof el.checkVisibility === 'function' ? el.checkVisibility() : !el.closest('[hidden]')
 
-function firstFocusable(content: HTMLElement): HTMLElement {
+export function firstFocusable(content: HTMLElement): HTMLElement {
   const autofocus = content.querySelector<HTMLElement>('[autofocus]')
   if (autofocus && visible(autofocus)) return autofocus
   return [...content.querySelectorAll<HTMLElement>(focusable)].find(visible) ?? content

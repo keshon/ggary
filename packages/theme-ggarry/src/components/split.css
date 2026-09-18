@@ -1,0 +1,76 @@
+/* ==========================================================================
+   GGarry — split
+
+   A hairline to see and a wider strip to take hold of; the accent when it is
+   held, and three dots where a hand looks for the grip.
+   ========================================================================== */
+
+/* A hairline to see, and a wider strip to take hold of: the hit area is the
+   separator's own box, the line is drawn inside it. */
+[data-scope='split'][data-part='separator'] {
+  inline-size: 9px;
+  margin-inline: -4px;
+  z-index: 1;
+}
+[data-scope='split'][data-part='separator'][data-orientation='vertical'] {
+  inline-size: auto;
+  block-size: 9px;
+  margin-inline: 0;
+  margin-block: -4px;
+}
+[data-scope='split'][data-part='separator']::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 4px;
+  inline-size: 1px;
+  background: var(--ggarry-border-default);
+  transition: background-color var(--ggarry-duration-fast) ease;
+}
+[data-scope='split'][data-part='separator'][data-orientation='vertical']::before {
+  inset-inline: 0;
+  inset-block-start: 4px;
+  inline-size: auto;
+  block-size: 1px;
+}
+[data-scope='split'][data-part='separator']:is(:hover, :focus-visible)::before,
+[data-scope='split'][data-part='root'][data-dragging] > [data-part='separator']::before {
+  inset-inline-start: 3px;
+  inline-size: 3px;
+  background: var(--ggarry-border-accent);
+}
+[data-scope='split'][data-part='separator'][data-orientation='vertical']:is(:hover, :focus-visible)::before,
+[data-scope='split'][data-part='root'][data-dragging] > [data-part='separator'][data-orientation='vertical']::before {
+  inset-inline-start: 0;
+  inset-block-start: 3px;
+  inline-size: auto;
+  block-size: 3px;
+}
+[data-scope='split'][data-part='separator']:focus-visible {
+  outline: none;
+}
+/* The grip: three dots at the middle of the line, where a hand looks for it. */
+[data-scope='split'][data-part='handle'] {
+  position: relative;
+  inline-size: 3px;
+  block-size: 15px;
+  border-radius: var(--ggarry-radius-full);
+  background: radial-gradient(circle, var(--ggarry-text-subtle) 1.2px, transparent 1.4px) center / 3px 6px repeat-y;
+}
+[data-scope='split'][data-part='separator'][data-orientation='vertical'] > [data-part='handle'] {
+  inline-size: 15px;
+  block-size: 3px;
+  background-size: 6px 3px;
+  background-repeat: repeat-x;
+}
+/* A folded pane leaves the line, marked, so it can be found and pulled back out. */
+[data-scope='split'][data-part='root'][data-collapsed] > [data-part='separator']::before {
+  inset-inline-start: 3px;
+  inline-size: 3px;
+  background: var(--ggarry-border-strong);
+}
+
+@media (forced-colors: active) {
+  [data-scope='split'][data-part='separator']::before { background: CanvasText; }
+  [data-scope='split'][data-part='separator']:focus-visible::before { background: Highlight; }
+}

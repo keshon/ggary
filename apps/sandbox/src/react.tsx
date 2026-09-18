@@ -36,6 +36,12 @@ import {
   GridDetail,
   GridFilters,
   GridRowMenu,
+  Rail,
+  Shell,
+  Split,
+  StatusBar,
+  StatusBarItem,
+  StatusBarSpacer,
   Card,
   Checkbox,
   CheckboxGroup,
@@ -77,7 +83,7 @@ import {
   ToolbarSpacer,
   Tooltip,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, navGroups, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, layoutLeads, navGroups, railItems, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -960,6 +966,48 @@ function App() {
         <h2 style={{ marginTop: 32 }}>Steps</h2>
         <Steps items={importSteps} label="Import" />
         <p className="hint">The bar says where the process is; the word under the name says it again in language, which is what survives a printout and a reader who cannot tell the shades apart.</p>
+      </section>
+
+      <section id="layout">
+        <h2>Shell and split</h2>
+        <div className="shell-demo">
+          <Shell
+            brand={<a href="#layout">Leads</a>}
+            aside={<Nav label="Sections" groups={navGroups.map((group, index) => ({ ...group, items: group.items.map((item, itemIndex) => ({ ...item, current: index === 0 && itemIndex === 0 })) }))} />}
+            header={<Breadcrumbs items={crumbs} />}
+            footer={
+              <StatusBar label="Registry status">
+                <StatusBarItem>main</StatusBarItem>
+                <StatusBarItem tone="error">3 failed saves</StatusBarItem>
+                <StatusBarSpacer />
+                <StatusBarItem>700,000 leads</StatusBarItem>
+                <Button size="sm" emphasis="minimal">Sync</Button>
+              </StatusBar>
+            }
+          >
+            <Split label="Resize the lead list" collapsible defaultSize={260} min={180} max={420} restMin={220} style={{ blockSize: '100%' }}>
+              <ul>
+                {layoutLeads.map((lead) => (
+                  <li key={lead}>{lead}</li>
+                ))}
+              </ul>
+              <article>
+                <h3 style={{ marginTop: 0 }}>Acme Labs 214</h3>
+                <p>The lead would stand here, beside the list it was picked from.</p>
+              </article>
+            </Split>
+          </Shell>
+        </div>
+        <p className="hint">{HINT_SHELL}</p>
+
+        <h2 style={{ marginTop: 32 }}>Rail</h2>
+        <div className="rail-demo">
+          <Rail label="Workspaces" items={railItems} />
+          <div>
+            <p>The section's content.</p>
+          </div>
+        </div>
+        <p className="hint">{HINT_RAIL}</p>
       </section>
 
       <section id="fields">

@@ -239,246 +239,6 @@ export interface ButtonGroupProps {
   buttons?: string[]
 }
 
-export interface ChoiceCardItem {
-  value: string
-  title: string
-  description?: string
-  disabled?: boolean
-}
-
-export interface ChoiceCardGroupProps {
-  items: ChoiceCardItem[]
-  type?: 'radio' | 'checkbox'
-  name?: string
-  value?: string | string[] | null
-  defaultValue?: string | string[] | null
-  onValueChange?: (value: any) => void
-  label?: string
-  orientation?: RadioGroupOrientation
-  disabled?: boolean
-  required?: boolean
-  invalid?: boolean
-}
-
-export interface SearchProps {
-  value?: string
-  defaultValue?: string
-  onValueChange?: (value: string) => void
-  size?: 'sm' | 'md' | 'lg'
-  name?: string
-  placeholder?: string
-  label?: string
-  disabled?: boolean
-  readOnly?: boolean
-  required?: boolean
-  invalid?: boolean
-}
-
-export interface InputGroupProps {
-  prefix?: string
-  suffix?: string
-  size?: 'sm' | 'md' | 'lg'
-  disabled?: boolean
-  invalid?: boolean
-  /** The field inside the group. */
-  input?: InputProps
-}
-
-export interface FileDropProps {
-  name?: string
-  accept?: string
-  multiple?: boolean
-  label?: string
-  hint?: string
-  disabled?: boolean
-  required?: boolean
-  invalid?: boolean
-  onFilesChange?: (files: File[]) => void
-}
-
-export interface ButtonGroupProps {
-  size?: 'sm' | 'md' | 'lg'
-  label?: string
-  /** The labels of the buttons inside. */
-  buttons?: string[]
-}
-
-export interface ChoiceCardItem {
-  value: string
-  title: string
-  description?: string
-  disabled?: boolean
-}
-
-export interface ChoiceCardGroupProps {
-  items: ChoiceCardItem[]
-  type?: 'radio' | 'checkbox'
-  name?: string
-  value?: string | string[] | null
-  defaultValue?: string | string[] | null
-  onValueChange?: (value: any) => void
-  label?: string
-  orientation?: RadioGroupOrientation
-  disabled?: boolean
-  required?: boolean
-  invalid?: boolean
-}
-
-export interface SearchProps {
-  value?: string
-  defaultValue?: string
-  onValueChange?: (value: string) => void
-  size?: 'sm' | 'md' | 'lg'
-  name?: string
-  placeholder?: string
-  label?: string
-  disabled?: boolean
-  readOnly?: boolean
-  required?: boolean
-  invalid?: boolean
-}
-
-export interface InputGroupProps {
-  prefix?: string
-  suffix?: string
-  size?: 'sm' | 'md' | 'lg'
-  disabled?: boolean
-  invalid?: boolean
-  /** The field inside the group. */
-  input?: InputProps
-}
-
-export interface FileDropProps {
-  name?: string
-  accept?: string
-  multiple?: boolean
-  label?: string
-  hint?: string
-  disabled?: boolean
-  required?: boolean
-  invalid?: boolean
-  onFilesChange?: (files: File[]) => void
-}
-
-export interface ButtonGroupProps {
-  size?: 'sm' | 'md' | 'lg'
-  label?: string
-  /** The labels of the buttons inside. */
-  buttons?: string[]
-}
-
-export interface BreadcrumbsProps {
-  items: { label: string; href?: string }[]
-  label?: string
-}
-
-export interface NavProps {
-  label: string
-  groups: { label?: string; items: { label: string; href: string; icon?: string; count?: number | string; current?: boolean }[] }[]
-}
-
-export interface PaginationProps {
-  items: { label: string; href?: string; page?: number; current?: boolean; disabled?: boolean; gap?: boolean }[]
-  label?: string
-  onPageChange?: (page: number, event: Event) => void
-}
-
-export interface StepsProps {
-  items: { name: string; note?: string; state: 'done' | 'current' | 'todo' }[]
-  label?: string
-}
-
-export interface ToolbarProps {
-  label?: string
-  orientation?: 'horizontal' | 'vertical'
-  /** The labels of the buttons in the strip; a `|` is a separator and a `>` the spacer. */
-  tools?: string[]
-}
-
-export interface BreadcrumbsProps {
-  items: { label: string; href?: string }[]
-  label?: string
-}
-
-export interface NavProps {
-  label: string
-  groups: { label?: string; items: { label: string; href: string; icon?: string; count?: number | string; current?: boolean }[] }[]
-}
-
-export interface PaginationProps {
-  items: { label: string; href?: string; page?: number; current?: boolean; disabled?: boolean; gap?: boolean }[]
-  label?: string
-  onPageChange?: (page: number, event: Event) => void
-}
-
-export interface StepsProps {
-  items: { name: string; note?: string; state: 'done' | 'current' | 'todo' }[]
-  label?: string
-}
-
-export interface ToolbarProps {
-  label?: string
-  orientation?: 'horizontal' | 'vertical'
-  /** The labels of the buttons in the strip; a `|` is a separator and a `>` the spacer. */
-  tools?: string[]
-}
-
-export interface BreadcrumbsProps {
-  items: { label: string; href?: string }[]
-  label?: string
-}
-
-export interface NavProps {
-  label: string
-  groups: { label?: string; items: { label: string; href: string; icon?: string; count?: number | string; current?: boolean }[] }[]
-}
-
-export interface PaginationProps {
-  items: { label: string; href?: string; page?: number; current?: boolean; disabled?: boolean; gap?: boolean }[]
-  label?: string
-  onPageChange?: (page: number, event: Event) => void
-}
-
-export interface StepsProps {
-  items: { name: string; note?: string; state: 'done' | 'current' | 'todo' }[]
-  label?: string
-}
-
-export interface ToolbarProps {
-  label?: string
-  orientation?: 'horizontal' | 'vertical'
-  /** The labels of the buttons in the strip; a `|` is a separator and a `>` the spacer. */
-  tools?: string[]
-}
-
-export interface BreadcrumbsProps {
-  items: { label: string; href?: string }[]
-  label?: string
-}
-
-export interface NavProps {
-  label: string
-  groups: { label?: string; items: { label: string; href: string; icon?: string; count?: number | string; current?: boolean }[] }[]
-}
-
-export interface PaginationProps {
-  items: { label: string; href?: string; page?: number; current?: boolean; disabled?: boolean; gap?: boolean }[]
-  label?: string
-  onPageChange?: (page: number, event: Event) => void
-}
-
-export interface StepsProps {
-  items: { name: string; note?: string; state: 'done' | 'current' | 'todo' }[]
-  label?: string
-}
-
-export interface ToolbarProps {
-  label?: string
-  orientation?: 'horizontal' | 'vertical'
-  /** The labels of the buttons in the strip; a `|` is a separator and a `>` the spacer. */
-  tools?: string[]
-}
-
 export interface BreadcrumbsProps {
   items: { label: string; href?: string }[]
   label?: string
@@ -540,6 +300,46 @@ export interface GridRowsProps {
   onMenuSelect: (value: string, target: import('../../packages/core/src/components/data-grid').RowMenuTarget<any>) => void
   detailTitle: (row: any) => string
   detailBody: (row: any) => string
+}
+
+/** A shell around a nav of links, with a header, a footer and a paragraph of work area. */
+export interface ShellProps {
+  collapse?: 'bar' | 'drawer'
+  brand?: string
+  /** Links in the side column; none means a shell with no column. */
+  links: { label: string; href: string }[]
+  header?: string
+  footer?: string
+  body: string
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean, details: { reason: string }) => void
+}
+
+/** A split of two paragraphs. */
+export interface SplitProps {
+  label: string
+  orientation?: 'horizontal' | 'vertical'
+  primary?: 'start' | 'end'
+  min?: number
+  max?: number
+  step?: number
+  defaultSize?: number
+  collapsible?: boolean
+  first: string
+  second: string
+  onSizeChange?: (size: number, details: { collapsed: boolean }) => void
+}
+
+export interface RailProps {
+  label: string
+  items: { label: string; href: string; icon: string; count?: number | string; current?: boolean; end?: boolean }[]
+}
+
+/** Readings; the ones in `end` stand after the spacer. */
+export interface StatusBarProps {
+  label?: string
+  items: { text: string; tone?: 'neutral' | 'running' | 'ok' | 'warn' | 'error' }[]
+  end?: { text: string }[]
 }
 
 export interface CheckboxGroupProps {
@@ -828,6 +628,11 @@ export interface Adapter {
   /** Updates are not supported: a grid's props are read at mount. */
   dataGrid(props: DataGridProps, target: HTMLElement): Promise<Mounted<DataGridProps>>
   gridTools(props: GridToolsProps, target: HTMLElement): Promise<Mounted<GridToolsProps>>
+  /** Updates are not supported: the frame is read at mount. */
+  shell(props: ShellProps, target: HTMLElement): Promise<Mounted<ShellProps>>
+  split(props: SplitProps, target: HTMLElement): Promise<Mounted<SplitProps>>
+  rail(props: RailProps, target: HTMLElement): Promise<Mounted<RailProps>>
+  statusBar(props: StatusBarProps, target: HTMLElement): Promise<Mounted<StatusBarProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
   /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */
