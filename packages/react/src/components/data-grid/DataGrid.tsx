@@ -139,6 +139,11 @@ export function DataGrid<Row>(props: DataGridProps<Row>) {
                   ) : (
                     cell.text
                   )}
+                  {cell.openProps && (
+                    <button {...cell.openProps}>
+                      <span {...api.openIconProps} />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

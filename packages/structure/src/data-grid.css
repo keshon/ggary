@@ -108,6 +108,36 @@
   margin: 0;
 }
 
+/* A row's Open button, at the end of its first cell, over the text's end.
+   Shown while the row is pointed at or has the keyboard; always on a screen
+   with no hover. */
+[data-scope='data-grid'][data-part='cell']:has(> [data-part='open']):not([data-pinned]) {
+  position: relative;
+}
+[data-scope='data-grid'][data-part='open'] {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  display: none;
+  align-items: center;
+  margin-block: auto;
+  cursor: pointer;
+  white-space: nowrap;
+}
+[data-scope='data-grid'][data-part='row']:is(:hover, :has([data-focused])) [data-part='open'] {
+  display: inline-flex;
+}
+@media (hover: none) {
+  [data-scope='data-grid'][data-part='open'] { display: inline-flex; }
+}
+[data-scope='data-grid'][data-part='open-icon'] {
+  flex: none;
+}
+/* Its word, drawn: out of the cell's text, so a copied or spoken cell is its value alone. */
+[data-scope='data-grid'][data-part='open']::after {
+  content: attr(data-label);
+}
+
 [data-scope='data-grid'][data-part='placeholder'] {
   display: inline-block;
   vertical-align: middle;

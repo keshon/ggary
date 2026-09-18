@@ -21,6 +21,8 @@ export interface DataGridConnectOptions extends FormatOptions {
   totalText?: (total: number) => string
   selectAllLabel?: string
   selectRowLabel?: string
+  /** The button that opens a row, in its first column: "Open". */
+  openRowLabel?: string
   /** "Could not save Paid: the deal is closed"; receives the column's header and the reason. */
   saveFailedText?: (column: string, message: string) => string
 }
@@ -201,10 +203,20 @@ export function connect<Row, T = Dict>(
       text: string
       props: T
       checkboxProps: T
+      /**
+       * The row's Open button, in its first column when a row opens — a detail
+       * sheet is there, or `onRowActivate` — and it is not being edited. Null elsewhere.
+       */
+      openProps: T | null
       /** Present while this cell is being edited: draw the editor instead of the text. */
       editor: CellEditor<T> | undefined
     }[]
   }[] = []
+
+  // A row opens from its first column's Open button when there is something to open it into.
+  const firstData = layout.columns.findIndex((column) => column.state.id !== SELECT_COLUMN)
+  const opensRows = controller.provides('detail') || controller.options.onRowActivate !== undefined
+  const openLabel = options.openRowLabel ?? 'Open'
 
   const editing = grid.editing
   const anyEditable = layout.columns.some((column) => column.def?.editable)
@@ -284,6 +296,7 @@ export function connect<Row, T = Dict>(
       cells: layout.columns.map((column, columnIndex) => {
         const def = column.def
         const isSelect = column.state.id === SELECT_COLUMN
+        const opens = columnIndex === firstData && opensRows && row !== undefined
         const value = row !== undefined && def ? cellValue(def, row) : undefined
         const text = row !== undefined && def ? formatterFor(def, options)(value) : ''
         const editable = isEditable(def, row)
@@ -296,6 +309,30 @@ export function connect<Row, T = Dict>(
           value,
           text,
           editor: isEditing ? editorFor(def!, index, columnIndex) : undefined,
+          openProps:
+            opens && !isEditing
+              ? normalize({
+                  ...dataGridAnatomy.attrs('open'),
+                  type: 'button',
+                  // For the pointer. The keyboard opens a row with Shift+Enter, which the
+                  // cell says; to a screen reader the button would be a word in the cell's
+                  // text, so it is hidden, and its word is drawn from `data-label`, out of
+                  // the cell's text — a copied cell is the value alone.
+                  tabIndex: -1,
+                  'aria-hidden': 'true',
+                  'data-label': openLabel,
+                  title: `${openLabel} (Shift+Enter)`,
+                  // The focus stays on the cell.
+                  onPointerDown: (event: PointerEvent) => event.preventDefault(),
+                  onMouseDown: (event: MouseEvent) => event.preventDefault(),
+                  onClick: (event: MouseEvent) => {
+                    // Not a press on the cell: nothing is selected, nothing starts editing.
+                    event.stopPropagation()
+                    controller.activate(index)
+                  },
+                  onDoubleClick: (event: MouseEvent) => event.stopPropagation(),
+                })
+              : null,
           props: normalize({
             ...dataGridAnatomy.attrs('cell'),
             id: cellId(index, columnIndex),
@@ -310,6 +347,7 @@ export function connect<Row, T = Dict>(
             'data-save': save?.status,
             // Cells that cannot be edited say so, once any column can.
             'aria-readonly': anyEditable && !editable && !isSelect ? 'true' : undefined,
+            'aria-keyshortcuts': opens ? 'Shift+Enter' : undefined,
             title: save?.status === 'failed' ? save.message : undefined,
             ...pinAttrs(column),
             style: placement(column),
@@ -425,6 +463,8 @@ export function connect<Row, T = Dict>(
      * header's or a row's `checkboxProps`, with the row's mark in it.
      */
     checkboxControlProps: normalize({ ...dataGridAnatomy.attrs('checkbox-control') }),
+    /** The Open button's icon, before its word. */
+    openIconProps: normalize({ ...dataGridAnatomy.attrs('open-icon'), 'aria-hidden': 'true', 'data-icon': 'expand' }),
     checkboxIndicatorProps: normalize({ ...dataGridAnatomy.attrs('checkbox-indicator'), 'aria-hidden': 'true', 'data-icon': 'check' }),
     statusProps: normalize({ ...dataGridAnatomy.attrs('status'), role: 'status', 'aria-live': 'polite' }),
     overlayProps: normalize({

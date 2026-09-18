@@ -20,6 +20,8 @@ export const dataGridAnatomy = createAnatomy('data-grid', [
   'checkbox-control',
   'checkbox',
   'checkbox-indicator',
+  'open',
+  'open-icon',
   'editor',
   'editor-error',
   'placeholder',

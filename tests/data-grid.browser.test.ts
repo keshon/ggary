@@ -230,3 +230,95 @@ describe('every adapter scrolls the whole list', () => {
     await unmountSvelte(instance)
   })
 })
+
+describe('a row by a real pointer', () => {
+  const few = leads.slice(0, 20)
+  const editable: ColumnDef<Lead>[] = columns.map((column) => (column.id === 'status' ? { ...column, editable: true } : column))
+  type Mounted = { host: HTMLElement; opened: number[]; selections: unknown[]; unmount: () => Promise<void> | void }
+  const adapters: [string, () => Mounted][] = [
+    [
+      'React',
+      () => {
+        const host = document.createElement('div')
+        host.style.blockSize = '420px'
+        document.body.append(host)
+        const opened: number[] = []
+        const selections: unknown[] = []
+        const root = createRoot(host)
+        root.render(
+          createElement(ReactGrid<Lead>, {
+            columns: editable, rows: few, rowKey: (row: Lead) => row.id, label: 'Leads', locale: 'en-US', selectable: true,
+            onRowActivate: (_row: Lead, index: number) => void opened.push(index),
+            onSelectionChange: (selection: unknown) => void selections.push(selection),
+            onCellEdit: () => undefined,
+          } as never)
+        )
+        return { host, opened, selections, unmount: () => root.unmount() }
+      },
+    ],
+    [
+      'Svelte',
+      () => {
+        const host = document.createElement('div')
+        document.body.append(host)
+        const opened: number[] = []
+        const selections: unknown[] = []
+        const instance = mountSvelte(SvelteGrid, {
+          target: host,
+          props: {
+            columns: editable, rows: few, rowKey: (row: Lead) => row.id, label: 'Leads', locale: 'en-US', selectable: true, style: 'block-size: 420px',
+            onRowActivate: (_row: Lead, index: number) => void opened.push(index),
+            onSelectionChange: (selection: unknown) => void selections.push(selection),
+            onCellEdit: () => undefined,
+          } as never,
+        })
+        flushSync()
+        return { host, opened, selections, unmount: () => unmountSvelte(instance) }
+      },
+    ],
+  ]
+
+  for (const [name, mountGrid] of adapters) {
+    it(`${name}: a press on a row's checkbox checks it, and again unchecks it`, async () => {
+      const { host, unmount } = mountGrid()
+      const rows = () => [...host.querySelectorAll<HTMLElement>('[data-part="row"]:not([data-placeholder])')]
+      await until(() => rows().length > 3)
+      const box = rows()[1].querySelector<HTMLInputElement>('[data-part="checkbox"]')!
+      await userEvent.click(box)
+      await until(() => box.checked)
+      expect(rows()[1].hasAttribute('data-selected')).toBe(true)
+      // The mark over it is drawn, and takes no press of its own: the input is what the pointer finds at its middle.
+      const mark = rows()[1].querySelector<HTMLElement>('[data-part="checkbox-indicator"]')!
+      expect(getComputedStyle(mark).visibility).toBe('visible')
+      const at = box.getBoundingClientRect()
+      expect(document.elementFromPoint(at.left + at.width / 2, at.top + at.height / 2)).toBe(box)
+      await userEvent.click(box)
+      await until(() => !box.checked)
+      await unmount()
+    })
+
+    it(`${name}: a row opens from the Open button its first cell shows under the pointer, and by Shift+Enter from a cell that edits`, async () => {
+      const { host, opened, unmount } = mountGrid()
+      const rows = () => [...host.querySelectorAll<HTMLElement>('[data-part="row"]:not([data-placeholder])')]
+      await until(() => rows().length > 3)
+      const open = () => rows()[2].querySelector<HTMLElement>('[data-part="open"]')!
+      expect(getComputedStyle(open()).display).toBe('none')
+      const first = rows()[2].querySelector<HTMLElement>('[data-part="cell"]:not([data-select])')!
+      await userEvent.hover(first)
+      expect(getComputedStyle(open()).display).not.toBe('none')
+      expect(getComputedStyle(open(), '::after').content).toBe('"Open"')
+      expect(first.textContent).toBe(few[2].name)
+      await userEvent.click(open())
+      expect(opened).toEqual([2])
+      // The press was the button's: the row is not selected, nothing is being edited.
+      expect(rows()[2].hasAttribute('data-selected')).toBe(false)
+      expect(host.querySelector('[data-part="editor"]')).toBeNull()
+      // A cell that edits: a double press edits it, Shift+Enter opens the row.
+      const status = rows()[3].querySelector<HTMLElement>('[data-part="cell"][data-editable]')!
+      await userEvent.click(status)
+      await userEvent.keyboard('{Shift>}{Enter}{/Shift}')
+      expect(opened).toEqual([2, 3])
+      await unmount()
+    })
+  }
+})

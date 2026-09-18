@@ -34,10 +34,11 @@
 }
 
 /* WCAG 2.2's 24px target without a 24px box: an invisible area on the control.
+   Not on the grid's: with no label around it to hand the press to the input,
+   the area would take the press itself — the grid's cell is its target.
    On the control, not the input — an <input> renders no pseudo-elements in
    every browser, and the control is the element that is always there. */
-:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='control']::before,
-[data-scope='data-grid'][data-part='checkbox-control']::before {
+:is([data-scope='checkbox'], [data-scope='radio'], [data-scope='switch'])[data-part='control']::before {
   content: '';
   position: absolute;
   inset-block-start: 50%;

@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 3385 tests, 1350 of them in headless Chrome
+npm test         # 3390 tests, 1354 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -193,9 +193,10 @@ open it — imported one by one (`@ggary/elements/components/…`), so the React
 and Svelte pages carry those four and no others: about 5 KB gzipped, in the
 chunk the pages share. The bar sticks to the top with the mark, two G's
 sharing a crossbar; the sections are numbered and parted by a dashed line the
-page's width; the navigator lists them with the one being read marked,
-beside the page where there is room and behind a button at the corner where
-there is not.
+page's width; the navigator lists them with the one being read marked — a
+column at the page's left edge, under the bar, where there is room, and
+behind a button at the corner where there is not. The bar stands under the
+kit's own layers: a sheet beside the page covers it.
 
 ### `@ggary/structure`
 
@@ -1430,9 +1431,11 @@ to the grid. The browser's own menu stays unless a row menu is on the page. On
 a row inside a selection of several, `target.selection` carries the selection,
 so an action can take all of it, as a file manager's does.
 
-**The detail sheet shows one row and walks to the next.** Enter on a cell that
-is not editable, a double click, or `grid.openDetail(index)` opens it beside
-the grid; ↑ and ↓ step through the rows without closing, "6 of 104,802" says
+**The detail sheet shows one row and walks to the next.** A row's **Open**
+button — at the end of its first cell, shown while the row is pointed at or
+has the keyboard, always on a screen with no hover — Shift+Enter on any cell,
+Enter or a double click on a cell that is not editable, or
+`grid.activate(index)` opens it beside the grid (and calls `onRowActivate`); ↑ and ↓ step through the rows without closing, "6 of 104,802" says
 where you are, and the row being shown is marked in the list. It is not modal:
 the grid stays usable, and pressing another row — or moving with the arrow keys
 — shows that one. A row stepped to that is not loaded yet is asked for and
@@ -1499,8 +1502,18 @@ Found on the way:
   The element now keeps it and starts from it; a test in `elements.dom.test.ts`
   fails without the fix.
 - **Enter means "edit" on an editable cell.** It used to open the row
-  everywhere. Open a row from a cell that is not editable, by a double click on
-  one, or from the row menu.
+  everywhere. Open a row with its Open button, Shift+Enter, from a cell that
+  is not editable, or from the row menu.
+- **A grid whose cells all edit had no way to open a row but its checkbox.**
+  A double click edits an editable cell, so in the sandbox, where nearly every
+  column edits, the only cell left to double-click was the selection box. The
+  Open button and Shift+Enter open a row from anywhere; the custom element,
+  frozen, has Shift+Enter and not the button.
+- **The grid's checkbox took no press.** Drawn as the Checkbox's, it took the
+  Checkbox's invisible 24-pixel target too — which works there because a label
+  hands the press to the input. The grid has no label, so the target took the
+  press itself. The grid's box has no such target; a test presses it with a
+  real pointer, and fails with the target put back.
 
 ## Shell, Split, Rail and StatusBar
 
@@ -2553,7 +2566,7 @@ one needs JS anyway; the children themselves stay the author's.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 379 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row. |
-| contract | node | `icons.contract.test.ts` | 350 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `icons.contract.test.ts` | 351 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
 | dom | jsdom | `conformance.dom.test.ts` | 1218 tests, 100 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
@@ -2565,7 +2578,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
 | browser | Chrome | `tabs.browser.test.ts` | 4 tests. One tab stop under the real Tab key, vertical tabs beside their panel, a long strip scrolling to the focused tab, a real click closing a tab without losing focus. |
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
-| browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
+| browser | Chrome | `data-grid.browser.test.ts` | 13 tests. A row's checkbox pressed by a real pointer, React and Svelte; its Open button shown under the pointer and opening the row without selecting or editing it, and Shift+Enter opening it from a cell that edits. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
 | browser | Chrome | `date-picker.browser.test.ts` | 4 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. |
 | browser | Chrome | `gantt.browser.test.ts` | 9 tests. A group's summary measured to the pixel, closed by a press on its name, its chevron turned, a hidden task's arrow leaving the heading's row. An arrow out of a bar's last day, a gap out, down to the rows' seam; into a milestone at its tip; behind a bar it crosses; a conflict in another colour. A bar dragged three days' worth moving three days and the owner hearing it on release; its end resized by the grip, and Escape in the middle putting it back; a refused move springing back. Also Bars measured to the pixel at the day and the week scale, a milestone on its day; the list at the left edge and the scale at the top as the chart scrolls; a task reached by the keyboard brought into view clear of the list; the chart opening on today, a third of the way in. |

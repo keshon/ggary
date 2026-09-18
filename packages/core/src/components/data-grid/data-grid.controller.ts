@@ -106,6 +106,12 @@ export interface DataGridController<Row> {
   saveCell(row: number, column: string, value: unknown): Promise<boolean>
 
   openDetail(row: number): void
+  /**
+   * Open a row: its detail sheet when there is one, and `onRowActivate`. What
+   * Enter on a cell that does not edit does, Shift+Enter on any cell, a double
+   * press on a cell that does not edit, and the Open button in its first column.
+   */
+  activate(row: number): void
   /** The next (1) or previous (-1) row in the detail sheet; the grid follows. */
   stepDetail(delta: number): void
   closeDetail(): void
@@ -444,6 +450,8 @@ export function createDataGrid<Row>(initialOptions: DataGridOptions<Row>): DataG
         break
       case 'Enter':
         if (focus.row === -1) sortColumn(focus.column, event.shiftKey)
+        // Shift+Enter opens the row from any cell, one that edits included.
+        else if (event.shiftKey) activate(focus.row)
         else if (!startEdit(focus.row, focus.column)) activate(focus.row)
         break
       case 'F2':
@@ -617,6 +625,7 @@ export function createDataGrid<Row>(initialOptions: DataGridOptions<Row>): DataG
     cancelEdit,
     saveCell,
     openDetail,
+    activate,
     stepDetail(delta) {
       const { detail } = machine.getState()
       const total = data.getState().total ?? 0

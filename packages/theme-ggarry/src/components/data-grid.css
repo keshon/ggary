@@ -121,6 +121,31 @@
   box-shadow: inset 1px 0 0 var(--ggarry-border-default);
 }
 
+/* A row's Open button: a small surface chip at the end of its first cell,
+   over the end of the text, which the chip covers. */
+[data-scope='data-grid'][data-part='open'] {
+  gap: 4px;
+  block-size: 24px;
+  margin-inline-end: 6px;
+  padding-inline: 6px 8px;
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-sm);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-muted);
+  font: inherit;
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-medium);
+  line-height: 1;
+}
+[data-scope='data-grid'][data-part='open']:hover {
+  border-color: var(--ggarry-border-strong);
+  color: var(--ggarry-text-default);
+}
+[data-scope='data-grid'][data-part='open-icon'] {
+  inline-size: 12px;
+  block-size: 12px;
+}
+
 /* The selection boxes are drawn by checkbox.css, as the Checkbox's are. */
 [data-scope='data-grid'][data-part='checkbox'] {
   cursor: pointer;

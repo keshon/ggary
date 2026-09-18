@@ -129,7 +129,7 @@
                 {@render cell(line.row, item.def as ColumnDef<Row>, item.text)}
               {:else}
                 {item.text}
-              {/if}
+              {/if}{#if item.openProps}<button {...item.openProps}><span {...api.openIconProps}></span></button>{/if}
             </div>
           {/each}
         </div>

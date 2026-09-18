@@ -29,13 +29,13 @@ body {
 
 /* The bar: the mark and the name, the framework, the theme. It stays at the top. */
 header.bar {
-  position: sticky; top: 0; z-index: 20;
+  /* Over the page, under the kit's own layers: a sheet beside the page (10) stands over it. */
+  position: sticky; top: 0; z-index: 5;
   display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
   min-block-size: var(--chrome-height); box-sizing: border-box;
   padding: 8px 24px;
   border-bottom: 1px solid var(--gg-border);
-  background: color-mix(in srgb, var(--gg-surface) 88%, transparent);
-  backdrop-filter: blur(8px);
+  background: var(--gg-surface);
 }
 header.bar .brand {
   display: flex; align-items: center; gap: 8px;
@@ -112,17 +112,23 @@ section:not(section section) > h2:first-child::before {
 .toc-number { font-variant-numeric: tabular-nums; color: var(--gg-text-faint); font-size: 12px; }
 .toc [data-current] .toc-number { color: inherit; }
 
-.toc-button { position: fixed; inset: auto 16px 16px auto; z-index: 20; }
+.toc-button { position: fixed; inset: auto 16px 16px auto; z-index: 5; }
 .toc-button button { max-inline-size: min(320px, calc(100vw - 32px)); box-shadow: 0 8px 24px rgb(0 0 0 / 0.2); }
 .toc-button [data-icon] { inline-size: 16px; block-size: 16px; flex: none; }
 .toc-current { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-@media (min-width: 1360px) {
+/* Where there is room, a column at the page's left edge under the bar, on its
+   own surface, and the page centred in what is left. */
+@media (min-width: 1280px) {
+  .page { padding-inline-start: calc(260px + 24px); }
   .toc {
     display: block;
-    inset: calc(var(--chrome-height) + 24px) auto auto max(16px, calc(50% - 440px - 272px));
-    inline-size: 232px; max-block-size: calc(100vh - var(--chrome-height) - 48px);
-    padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+    inset: var(--chrome-height) auto 0 0;
+    /* The browser gives a popover fit-content: here it runs from the bar to the bottom. */
+    inline-size: 260px; block-size: auto; max-block-size: none;
+    padding: 16px 12px 24px;
+    border: 0; border-inline-end: 1px solid var(--gg-border); border-radius: 0;
+    background: var(--gg-surface); box-shadow: none;
   }
   .toc-button { display: none; }
 }
