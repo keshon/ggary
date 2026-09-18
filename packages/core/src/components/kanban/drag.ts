@@ -184,7 +184,7 @@ export function attachKanbanDrag(root: HTMLElement, send: (event: KanbanEvent) =
     flipKanban(root, () => send({ type: 'PLACE', to }))
   }
 
-  /** Near an edge of the board, it scrolls toward it; near the window's top or bottom, the page does. */
+  /** Near an edge of the board it scrolls toward it; near a column's top or bottom, the column does; near the window's, the page. */
   const tick = () => {
     if (!drag) return
     const box = root.getBoundingClientRect()
@@ -196,6 +196,18 @@ export function attachKanbanDrag(root: HTMLElement, send: (event: KanbanEvent) =
     } else if (drag.x > box.right - EDGE && root.scrollLeft + root.clientWidth < root.scrollWidth) {
       root.scrollLeft += speed(box.right - drag.x)
       moved = true
+    }
+    // A column that scrolls its own cards follows the pointer to its top and bottom.
+    const list = doc.elementFromPoint(drag.x, drag.y)?.closest<HTMLElement>(LIST)
+    if (list && root.contains(list) && list.scrollHeight > list.clientHeight) {
+      const lane = list.getBoundingClientRect()
+      if (drag.y < lane.top + EDGE && list.scrollTop > 0) {
+        list.scrollTop -= speed(drag.y - lane.top)
+        moved = true
+      } else if (drag.y > lane.bottom - EDGE && list.scrollTop + list.clientHeight < list.scrollHeight) {
+        list.scrollTop += speed(lane.bottom - drag.y)
+        moved = true
+      }
     }
     if (drag.y < EDGE && win.scrollY > 0) {
       win.scrollBy(0, -speed(drag.y))

@@ -1,5 +1,7 @@
 import { createMachine, withEffects, type Machine } from '../../machine'
 import { createAnatomy, type Dict, type Normalizer } from '../../types'
+import type { IconName } from '@ggary/icons'
+import type { MenuEntry } from '../menu'
 import { flipKanban } from './drag'
 
 export { attachKanbanDrag, flipKanban, type KanbanDragOptions } from './drag'
@@ -56,8 +58,20 @@ interface Pending {
 }
 
 export type KanbanAnnouncement =
-  | { kind: 'lifted' | 'moved' | 'dropped' | 'cancelled'; card: string; column: string; position: number; total: number }
+  | { kind: 'lifted' | 'moved' | 'dropped' | 'cancelled' | 'placed'; card: string; column: string; position: number; total: number }
   | { kind: 'failed'; card: string; message: string }
+  | { kind: 'added'; title: string; column: string }
+  | { kind: 'add-failed'; title: string; message: string }
+
+/** A card being added: shown at the end of its column, faded, until the owner answers. */
+export interface KanbanPendingAdd {
+  id: number
+  column: string
+  title: string
+  /** The cards when it was sent: an answer that comes before the owner's new cards waits for them. */
+  cards: KanbanCard[]
+  settled: boolean
+}
 
 export interface KanbanState<T extends KanbanCard = KanbanCard> {
   id: string
@@ -73,6 +87,14 @@ export interface KanbanState<T extends KanbanCard = KanbanCard> {
   announcement: { value: KanbanAnnouncement | null; nonce: number }
   moveIntent: { value: Pending | null; nonce: number }
   openIntent: { value: string | null; nonce: number }
+  /** A card's menu asked for: at the pointer, under its menu button, or under the card for the keyboard. */
+  menu: { card: string | null; point: { x: number; y: number } | null; via: 'pointer' | 'keyboard' | 'button'; nonce: number }
+  /** The column whose "Add a card" field is open, and what is typed in it. */
+  adding: { column: string; draft: string } | null
+  adds: KanbanPendingAdd[]
+  addIntent: { value: KanbanPendingAdd | null; nonce: number }
+  /** Where the focus goes for the add field: into it, or back to its column's button. */
+  addFocus: { column: string | null; target: 'input' | 'trigger'; nonce: number }
 }
 
 export type KanbanEvent =
@@ -91,6 +113,13 @@ export type KanbanEvent =
   | { type: 'MOVE'; card: string; to: KanbanPlace }
   | { type: 'SETTLE'; move: number; ok: boolean; message?: string }
   | { type: 'OPEN'; card?: string }
+  /** Ask for a card's menu: a right click, Shift+F10 or the menu key, or its menu button. */
+  | { type: 'MENU'; card: string; point?: { x: number; y: number }; via: 'pointer' | 'keyboard' | 'button' }
+  | { type: 'ADD_OPEN'; column: string }
+  | { type: 'ADD_DRAFT'; text: string }
+  | { type: 'ADD_SUBMIT' }
+  | { type: 'ADD_CLOSE'; refocus?: boolean }
+  | { type: 'ADD_SETTLE'; add: number; ok: boolean; message?: string }
   | { type: 'SYNC_CARDS'; cards: KanbanCard[] }
   | { type: 'SYNC_COLUMNS'; columns: KanbanColumn[] }
 
@@ -104,7 +133,17 @@ export const kanbanAnatomy = createAnatomy('kanban', [
   'card',
   'card-title',
   'card-body',
+  'card-menu',
+  'card-menu-icon',
+  'pending-card',
   'empty',
+  'add-trigger',
+  'add-trigger-icon',
+  'add-form',
+  'add-input',
+  'add-actions',
+  'add-submit',
+  'add-cancel',
   'live',
   'instructions',
 ] as const)
@@ -163,7 +202,7 @@ function announce<T extends KanbanCard>(state: KanbanState<T>, value: KanbanAnno
   return { ...state, announcement: { value, nonce: state.announcement.nonce + 1 } }
 }
 
-function where<T extends KanbanCard>(state: KanbanState<T>, kind: 'lifted' | 'moved' | 'dropped' | 'cancelled', card: string): KanbanState<T> {
+function where<T extends KanbanCard>(state: KanbanState<T>, kind: 'lifted' | 'moved' | 'dropped' | 'cancelled' | 'placed', card: string): KanbanState<T> {
   const place = placeOf(state.order, card)
   if (!place) return state
   return announce(state, { kind, card, column: place.column, position: place.index + 1, total: state.order[place.column].length })
@@ -270,7 +309,7 @@ export function reducer<T extends KanbanCard>(state: KanbanState<T>, event: Kanb
       const order = moveInOrder(state.order, event.card, event.to)
       const to = placeOf(order, event.card)!
       if (samePlace(from, to)) return state
-      return where(startMove(refocus({ ...state, order, lifted: null }, event.card), event.card, from, to), 'dropped', event.card)
+      return where(startMove(refocus({ ...state, order, lifted: null }, event.card), event.card, from, to), 'placed', event.card)
     }
 
     case 'SETTLE': {
@@ -292,6 +331,61 @@ export function reducer<T extends KanbanCard>(state: KanbanState<T>, event: Kanb
       return { ...state, openIntent: { value: card, nonce: state.openIntent.nonce + 1 } }
     }
 
+    case 'MENU': {
+      if (state.lifted || !placeOf(state.order, event.card)) return state
+      return {
+        ...state,
+        focus: { card: event.card, nonce: state.focus.nonce },
+        menu: { card: event.card, point: event.point ?? null, via: event.via, nonce: state.menu.nonce + 1 },
+      }
+    }
+
+    case 'ADD_OPEN':
+      if (!state.order[event.column]) return state
+      return {
+        ...state,
+        adding: { column: event.column, draft: state.adding?.column === event.column ? state.adding.draft : '' },
+        addFocus: { column: event.column, target: 'input', nonce: state.addFocus.nonce + 1 },
+      }
+
+    case 'ADD_DRAFT':
+      return state.adding ? { ...state, adding: { ...state.adding, draft: event.text } } : state
+
+    case 'ADD_SUBMIT': {
+      const title = state.adding?.draft.trim()
+      if (!state.adding || !title) return state
+      const add: KanbanPendingAdd = { id: state.addIntent.nonce + 1, column: state.adding.column, title, cards: state.cards, settled: false }
+      // The field stays open, empty, with the focus in it: the next card is typed straight after.
+      return {
+        ...state,
+        adding: { ...state.adding, draft: '' },
+        adds: [...state.adds, add],
+        addIntent: { value: add, nonce: add.id },
+        addFocus: { column: add.column, target: 'input', nonce: state.addFocus.nonce + 1 },
+      }
+    }
+
+    case 'ADD_CLOSE': {
+      if (!state.adding) return state
+      const { column } = state.adding
+      const closed = { ...state, adding: null }
+      return event.refocus ? { ...closed, addFocus: { column, target: 'trigger' as const, nonce: state.addFocus.nonce + 1 } } : closed
+    }
+
+    case 'ADD_SETTLE': {
+      const add = state.adds.find((candidate) => candidate.id === event.add)
+      if (!add) return state
+      const rest = state.adds.filter((candidate) => candidate !== add)
+      if (!event.ok) {
+        // The title comes back to the field, if the field is still open on that column and empty.
+        const adding = state.adding && state.adding.column === add.column && state.adding.draft === '' ? { ...state.adding, draft: add.title } : state.adding
+        return announce({ ...state, adds: rest, adding }, { kind: 'add-failed', title: add.title, message: event.message ?? '' })
+      }
+      const said = announce(state, { kind: 'added', title: add.title, column: add.column })
+      // The owner's new cards already came: the stand-in goes. Not yet: it waits for them.
+      return add.cards !== state.cards ? { ...said, adds: rest } : { ...said, adds: state.adds.map((candidate) => (candidate === add ? { ...add, settled: true } : candidate)) }
+    }
+
     case 'SYNC_CARDS': {
       if (event.cards === state.cards) return state
       const cards = event.cards as T[]
@@ -304,7 +398,7 @@ export function reducer<T extends KanbanCard>(state: KanbanState<T>, event: Kanb
         lifted = at && cards.some((card) => card.id === lifted!.card) ? lifted : null
         if (lifted && at) order = moveInOrder(order, lifted.card, at)
       }
-      return { ...state, cards, order, lifted }
+      return { ...state, cards, order, lifted, adds: state.adds.filter((add) => !add.settled) }
     }
 
     case 'SYNC_COLUMNS': {
@@ -346,6 +440,12 @@ export interface KanbanMachineConfig<T extends KanbanCard> {
   onMove?: (move: KanbanMove<T>) => Promise<unknown> | unknown
   /** Enter on a card, or a press on it: open it. */
   onOpen?: (card: T) => void
+  /**
+   * A card was typed into a column's "Add a card" field. It stands at the end
+   * of the column, faded, until this answers: add it to your cards, then
+   * resolve. A rejection takes it away and puts the title back in the field.
+   */
+  onAdd?: (column: string, title: string) => Promise<unknown> | unknown
 }
 
 export function initialState<T extends KanbanCard>(config: KanbanMachineConfig<T>): KanbanState<T> {
@@ -360,6 +460,11 @@ export function initialState<T extends KanbanCard>(config: KanbanMachineConfig<T
     announcement: { value: null, nonce: 0 },
     moveIntent: { value: null, nonce: 0 },
     openIntent: { value: null, nonce: 0 },
+    menu: { card: null, point: null, via: 'keyboard', nonce: 0 },
+    adding: null,
+    adds: [],
+    addIntent: { value: null, nonce: 0 },
+    addFocus: { column: null, target: 'input', nonce: 0 },
   }
 }
 
@@ -371,6 +476,15 @@ export function createKanbanMachine<T extends KanbanCard>(config: KanbanMachineC
     if (next.openIntent.nonce !== previous.openIntent.nonce && next.openIntent.value) {
       const card = next.cards.find((candidate) => candidate.id === next.openIntent.value)
       if (card) config.onOpen?.(card)
+    }
+    if (next.addIntent.nonce !== previous.addIntent.nonce && next.addIntent.value) {
+      const add = next.addIntent.value
+      Promise.resolve()
+        .then(() => config.onAdd?.(add.column, add.title))
+        .then(
+          () => machine.send({ type: 'ADD_SETTLE', add: add.id, ok: true }),
+          (error) => machine.send({ type: 'ADD_SETTLE', add: add.id, ok: false, message: messageOf(error) })
+        )
     }
     if (next.moveIntent.nonce !== previous.moveIntent.nonce && next.moveIntent.value) {
       const move = next.moveIntent.value
@@ -397,6 +511,20 @@ export interface KanbanWords {
   dropped: (card: string, column: string, position: number, total: number) => string
   cancelled: (card: string, column: string, position: number, total: number) => string
   failed: (card: string, message: string) => string
+  /** A card moved in one go, from its menu: "Call Aigul moved to Doing, 2 of 3." */
+  placed: (card: string, column: string, position: number, total: number) => string
+  /** The name of a card's menu, and of its button. */
+  menu: (card: string) => string
+  moveTo: string
+  moveToTop: string
+  moveToBottom: string
+  addCard: string
+  /** The add field's name, for its column. */
+  addLabel: (column: string) => string
+  addSubmit: string
+  addCancel: string
+  added: (title: string, column: string) => string
+  addFailed: (title: string, message: string) => string
   /** A column's count, with its limit when it has one. */
   count: (count: number, limit?: number) => string
   empty: string
@@ -407,15 +535,57 @@ export interface KanbanConnectOptions {
   headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
 }
 
+/** The values of the menu items the board adds itself. */
+export const KANBAN_MENU = { move: 'gg-kanban-move', moveTo: 'gg-kanban-move:', top: 'gg-kanban-top', bottom: 'gg-kanban-bottom' } as const
+
+/** A card's menu: "Move to" each other column, to the top or the bottom of its own — then yours, after a separator. */
+export function cardMenuItems(state: KanbanState, card: string, words: Partial<KanbanWords> = {}, own: MenuEntry[] = []): MenuEntry[] {
+  const w = { ...KANBAN_WORDS, ...words }
+  const place = placeOf(state.order, card)
+  if (!place) return own
+  const last = (state.order[place.column]?.length ?? 1) - 1
+  const others = state.columns.filter((column) => column.id !== place.column)
+  const board: MenuEntry[] = [
+    { type: 'submenu', value: KANBAN_MENU.move, label: w.moveTo, disabled: others.length === 0, items: others.map((column) => ({ value: `${KANBAN_MENU.moveTo}${column.id}`, label: column.title })) },
+    { value: KANBAN_MENU.top, label: w.moveToTop, disabled: place.index === 0 },
+    { value: KANBAN_MENU.bottom, label: w.moveToBottom, disabled: place.index === last },
+  ]
+  return own.length === 0 ? board : [...board, { type: 'separator' }, ...own]
+}
+
+/** Where a board menu item sends the card; null for an item that is yours. Another column: its end. */
+export function cardMenuPlace(state: KanbanState, card: string, value: string): KanbanPlace | null {
+  const place = placeOf(state.order, card)
+  if (!place) return null
+  if (value === KANBAN_MENU.top) return { column: place.column, index: 0 }
+  if (value === KANBAN_MENU.bottom) return { column: place.column, index: state.order[place.column].length - 1 }
+  if (value.startsWith(KANBAN_MENU.moveTo)) {
+    const column = value.slice(KANBAN_MENU.moveTo.length)
+    return state.order[column] ? { column, index: state.order[column].length } : null
+  }
+  return null
+}
+
 export const KANBAN_WORDS: KanbanWords = {
   label: 'Board',
   card: 'card',
-  instructions: 'Press Space to pick the card up; the arrows move it, Space drops it, Escape puts it back. Enter opens it.',
+  instructions: 'Press Space to pick the card up; the arrows move it, Space drops it, Escape puts it back. Enter opens it; Shift+F10 opens its menu.',
   lifted: (card, column, position, total) => `Picked up ${card}. ${column}, ${position} of ${total}.`,
   moved: (_card, column, position, total) => `${column}, ${position} of ${total}.`,
   dropped: (card, column, position, total) => `Dropped ${card} in ${column}, ${position} of ${total}.`,
   cancelled: (card, column, position, total) => `${card} put back in ${column}, ${position} of ${total}.`,
   failed: (card, message) => (message ? `${card} was not moved: ${message}` : `${card} was not moved.`),
+  placed: (card, column, position, total) => `${card} moved to ${column}, ${position} of ${total}.`,
+  menu: (card) => `Actions for ${card}`,
+  moveTo: 'Move to',
+  moveToTop: 'Move to top',
+  moveToBottom: 'Move to bottom',
+  addCard: 'Add a card',
+  addLabel: (column) => `New card in ${column}`,
+  addSubmit: 'Add card',
+  addCancel: 'Cancel',
+  added: (title, column) => `Added ${title} to ${column}.`,
+  addFailed: (title, message) => (message ? `${title} was not added: ${message}` : `${title} was not added.`),
   count: (count, limit) => (limit === undefined ? String(count) : `${count} / ${limit}`),
   empty: 'No cards',
 }
@@ -429,6 +599,9 @@ export const kanbanIds = (id: string) => ({
   card: (card: string) => `${id}-card-${idPart(card)}`,
   cardTitle: (card: string) => `${id}-card-${idPart(card)}-title`,
   cardBody: (card: string) => `${id}-card-${idPart(card)}-body`,
+  cardMenu: (card: string) => `${id}-card-${idPart(card)}-menu`,
+  addTrigger: (column: string) => `${id}-column-${idPart(column)}-add`,
+  addInput: (column: string) => `${id}-column-${idPart(column)}-add-input`,
 })
 
 /** Run a keyboard move with the cards animating to their new places. */
@@ -456,11 +629,16 @@ export function connect<T extends KanbanCard, P = Dict>(state: KanbanState<T>, s
     ? ''
     : said.kind === 'failed'
       ? w.failed(titleOf(said.card), said.message)
-      : w[said.kind](titleOf(said.card), columnTitle(said.column), said.position, said.total)
+      : said.kind === 'added'
+        ? w.added(said.title, columnTitle(said.column))
+        : said.kind === 'add-failed'
+          ? w.addFailed(said.title, said.message)
+          : w[said.kind](titleOf(said.card), columnTitle(said.column), said.position, said.total)
 
   const rtl = (event: KeyboardEvent) => (event.currentTarget as Element | null)?.closest?.('[dir]')?.getAttribute('dir') === 'rtl'
   const onCardKeyDown = (event: KeyboardEvent) => {
     if (event.target !== event.currentTarget || event.ctrlKey || event.metaKey || event.altKey) return
+    if (event.key === 'F10' && !event.shiftKey) return
     // A key comes from the card that has the focus, whatever the board last
     // heard: a focus event can be missed (a window without system focus fires
     // none), and the key must act on this card, not on the one before.
@@ -492,6 +670,11 @@ export function connect<T extends KanbanCard, P = Dict>(state: KanbanState<T>, s
       // Tab carries the focus out; BLUR puts the card back.
       return
     }
+    // Shift+F10 and the menu key are the keyboard's right click.
+    if (event.key === 'ContextMenu' || (event.key === 'F10' && event.shiftKey)) {
+      const own = (event.currentTarget as HTMLElement | null)?.dataset?.card
+      if (own) return handled({ type: 'MENU', card: own, via: 'keyboard' })
+    }
     if (direction) return handled({ type: 'WALK', direction })
     if (event.key === ' ') return handled({ type: 'LIFT' })
     if (event.key === 'Enter') return handled({ type: 'OPEN' })
@@ -508,6 +691,8 @@ export function connect<T extends KanbanCard, P = Dict>(state: KanbanState<T>, s
     columns: state.columns.map((column) => ({
       column,
       cards: (state.order[column.id] ?? []).map((id) => byId.get(id)).filter((card): card is T => card !== undefined),
+      /** Cards typed in and not yet answered: shown after the others, faded. */
+      adds: state.adds.filter((add) => add.column === column.id),
     })),
     move: (card: string, to: KanbanPlace) => send({ type: 'MOVE', card, to }),
 
@@ -554,6 +739,9 @@ export function connect<T extends KanbanCard, P = Dict>(state: KanbanState<T>, s
         ...kanbanAnatomy.attrs('list'),
         role: 'list',
         'aria-labelledby': ids.columnTitle(column.id),
+        // A list that scrolls would be a tab stop of its own in Chrome, one per
+        // column, since its cards are out of the tab order. The cards scroll it.
+        tabIndex: -1,
         'data-column': column.id,
       }),
     emptyProps: normalize({ ...kanbanAnatomy.attrs('empty') }),
@@ -583,8 +771,82 @@ export function connect<T extends KanbanCard, P = Dict>(state: KanbanState<T>, s
           if (inner && inner !== event.currentTarget && (event.currentTarget as Element).contains(inner)) return
           send({ type: 'OPEN', card: card.id })
         },
+        onContextMenu: (event: MouseEvent) => {
+          if (state.lifted) return
+          event.preventDefault()
+          send({ type: 'MENU', card: card.id, point: { x: event.clientX, y: event.clientY }, via: 'pointer' })
+        },
       })
     },
+
+    /** The card's menu button: for a pointer, and on a touch screen, which has no right click. Out of the tab order: Shift+F10 is the keyboard's. */
+    getCardMenuProps: (card: T) =>
+      normalize({
+        ...kanbanAnatomy.attrs('card-menu'),
+        id: ids.cardMenu(card.id),
+        type: 'button',
+        tabIndex: -1,
+        'aria-label': w.menu(card.title),
+        'aria-haspopup': 'menu',
+        onClick: (event: MouseEvent) => {
+          event.stopPropagation()
+          send({ type: 'MENU', card: card.id, via: 'button' })
+        },
+      }),
+    cardMenuIconProps: normalize({ ...kanbanAnatomy.attrs('card-menu-icon'), 'aria-hidden': 'true', 'data-icon': 'more' satisfies IconName }),
+    /** Watch this: when it changes, open the card menu for `menuRequest.card`. */
+    menuRequest: state.menu,
+    getPendingCardProps: (add: KanbanPendingAdd) =>
+      normalize({ ...kanbanAnatomy.attrs('pending-card'), role: 'listitem', 'aria-busy': 'true', 'data-pending': '', 'data-add': add.id }),
+
+    adding: state.adding?.column ?? null,
+    draft: state.adding?.draft ?? '',
+    /** Watch this: when it changes, move real focus to `addFocusId`. */
+    addFocusNonce: state.addFocus.nonce,
+    addFocusId: state.addFocus.column === null ? null : state.addFocus.target === 'input' ? ids.addInput(state.addFocus.column) : ids.addTrigger(state.addFocus.column),
+    getAddTriggerProps: (column: KanbanColumn) =>
+      normalize({
+        ...kanbanAnatomy.attrs('add-trigger'),
+        id: ids.addTrigger(column.id),
+        type: 'button',
+        'data-column': column.id,
+        onClick: () => send({ type: 'ADD_OPEN', column: column.id }),
+      }),
+    addTriggerIconProps: normalize({ ...kanbanAnatomy.attrs('add-trigger-icon'), 'aria-hidden': 'true', 'data-icon': 'plus' satisfies IconName }),
+    getAddFormProps: (column: KanbanColumn) =>
+      normalize({
+        ...kanbanAnatomy.attrs('add-form'),
+        'data-column': column.id,
+        // Leaving an empty field closes it; a field with a title in it stays, the title kept.
+        onFocusOut: (event: FocusEvent) => {
+          const form = event.currentTarget as HTMLElement | null
+          const next = event.relatedTarget as Node | null
+          if (form && next && form.contains(next)) return
+          if (!state.adding?.draft.trim()) send({ type: 'ADD_CLOSE' })
+        },
+      }),
+    getAddInputProps: (column: KanbanColumn) =>
+      normalize({
+        ...kanbanAnatomy.attrs('add-input'),
+        id: ids.addInput(column.id),
+        'aria-label': w.addLabel(column.title),
+        rows: 2,
+        value: state.adding?.column === column.id ? state.adding.draft : '',
+        onInput: (event: Event) => send({ type: 'ADD_DRAFT', text: (event.target as HTMLTextAreaElement).value }),
+        onKeyDown: (event: KeyboardEvent) => {
+          if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+            event.preventDefault()
+            send({ type: 'ADD_SUBMIT' })
+          } else if (event.key === 'Escape') {
+            event.preventDefault()
+            event.stopPropagation()
+            send({ type: 'ADD_CLOSE', refocus: true })
+          }
+        },
+      }),
+    addActionsProps: normalize({ ...kanbanAnatomy.attrs('add-actions') }),
+    addSubmitProps: normalize({ ...kanbanAnatomy.attrs('add-submit'), type: 'button', onClick: () => send({ type: 'ADD_SUBMIT' }) }),
+    addCancelProps: normalize({ ...kanbanAnatomy.attrs('add-cancel'), type: 'button', onClick: () => send({ type: 'ADD_CLOSE', refocus: true }) }),
     getCardTitleProps: (card: T) => normalize({ ...kanbanAnatomy.attrs('card-title'), id: ids.cardTitle(card.id) }),
     getCardBodyProps: (card: T) => normalize({ ...kanbanAnatomy.attrs('card-body'), id: ids.cardBody(card.id) }),
 

@@ -101,7 +101,7 @@ import {
   ToolbarSpacer,
   Tooltip,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, dealStages, initialDeals, saveDealMove, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -128,6 +128,11 @@ function App() {
     await saveDealMove(move.card, move.to.column)
     setDeals((current) => applyMove(current, move))
     setDealLog(`moved: ${move.card.title} → ${move.to.column}, ${move.to.index + 1}`)
+  }
+  const addDeal = async (column: string, title: string) => {
+    await saveNewDeal(title)
+    setDeals((current) => [...current, { id: `new-${Date.now()}`, column, title, company: 'New lead' }])
+    setDealLog(`added: ${title} → ${column}`)
   }
   const [imported, setImported] = useState<number | null>(0)
   const runImport = () => {
@@ -1147,14 +1152,45 @@ function App() {
 
       <section id="kanban">
         <h2>Kanban</h2>
-        <Kanban columns={dealStages} cards={deals} onMove={moveDeal} onOpen={(deal) => setDealLog(`open: ${deal.title}`)} words={{ label: 'Deals' }}>
-          {(deal) => (
-            <>
-              <div>{deal.company}</div>
-              <div>{formatAmount(deal.amount)}</div>
-            </>
-          )}
-        </Kanban>
+        <div className="kanban-frame">
+          <Kanban
+            columns={dealStages}
+            cards={deals}
+            onMove={moveDeal}
+            onOpen={(deal) => setDealLog(`open: ${deal.title}`)}
+            onAdd={addDeal}
+            cardMenu={() => dealMenu}
+            onCardMenuSelect={(value, deal) => setDealLog(`${value}: ${deal.title}`)}
+            words={{ label: 'Deals' }}
+          >
+            {(deal) => (
+              <div className="deal-card">
+                <div className="deal-company">{deal.company}</div>
+                {deal.labels && (
+                  <div className="deal-labels">
+                    {deal.labels.map((label) => (
+                      <Badge key={label} variant="outline">
+                        {label}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                {deal.checklist && (
+                  <Progress size="sm" value={deal.checklist.done} max={deal.checklist.total} label={`Checklist, ${deal.checklist.done} of ${deal.checklist.total}`} valueText={(done) => `${done} of ${deal.checklist!.total}`} hideLabel tone={deal.checklist.done === deal.checklist.total ? 'ok' : 'running'} />
+                )}
+                <div className="deal-footer">
+                  <span className="deal-amount">{formatAmount(deal.amount)}</span>
+                  {deal.due && (
+                    <span className="deal-due" data-due={dueOf(deal.due).state}>
+                      {dueOf(deal.due).text}
+                    </span>
+                  )}
+                  {deal.owner && <Avatar name={deal.owner} size="sm" />}
+                </div>
+              </div>
+            )}
+          </Kanban>
+        </div>
         <pre className="state">{dealLog}</pre>
         <p className="hint">{HINT_KANBAN}</p>
       </section>

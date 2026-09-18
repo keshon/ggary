@@ -1,7 +1,21 @@
 <script lang="ts" generics="T extends KanbanCard">
-  import { attachKanbanDrag, connect, createKanbanMachine, focusKanbanCard, type KanbanCard, type KanbanColumn, type KanbanMove, type KanbanWords } from '@ggary/core/kanban'
-  import { svelteNormalizer, uid } from '@ggary/core'
+  import {
+    attachKanbanDrag,
+    cardMenuItems,
+    cardMenuPlace,
+    connect,
+    createKanbanMachine,
+    flipKanban,
+    focusKanbanCard,
+    type KanbanCard,
+    type KanbanColumn,
+    type KanbanMove,
+    type KanbanWords,
+  } from '@ggary/core/kanban'
+  import { connect as connectMenu, createMenuMachine, type MenuEntry } from '@ggary/core/menu'
+  import { svelteNormalizer, uid, type VirtualElement } from '@ggary/core'
   import { untrack, type Snippet } from 'svelte'
+  import MenuContent from '../menu/MenuContent.svelte'
 
   type Props = {
     columns: KanbanColumn[]
@@ -15,6 +29,15 @@
     onMove?: (move: KanbanMove<T>) => Promise<unknown> | unknown
     /** Enter on a card, or a press on it. */
     onOpen?: (card: T) => void
+    /**
+     * A card typed into a column's "Add a card" field. Without it, a column has
+     * no such field. Add the card to `cards`, then resolve; a rejection puts the
+     * title back in the field and reads out why.
+     */
+    onAdd?: (column: string, title: string) => Promise<unknown> | unknown
+    /** Items of your own in a card's menu, after the board's "Move to". */
+    cardMenu?: (card: T) => MenuEntry[]
+    onCardMenuSelect?: (value: string, card: T) => void
     /** Whether a card may be dragged by a pointer. Default: all of them. The keyboard can still move it. */
     canDrag?: (card: T) => boolean
     /** What a card shows under its title. */
@@ -25,16 +48,18 @@
     words?: Partial<KanbanWords>
   }
 
-  /** Columns of cards, a card moved by the keyboard from one place to another. */
-  let { columns, cards, onMove, onOpen, canDrag, card: body, headingLevel, words }: Props = $props()
+  /** Columns of cards, a card moved by the keyboard, a pointer or its menu. */
+  let { columns, cards, onMove, onOpen, onAdd, cardMenu, onCardMenuSelect, canDrag, card: body, headingLevel, words }: Props = $props()
 
+  const id = uid('gg-kanban')
   const machine = untrack(() =>
     createKanbanMachine<T>({
-      id: uid('gg-kanban'),
+      id,
       columns,
       cards,
       onMove: (move) => onMove?.(move),
       onOpen: (card) => onOpen?.(card),
+      onAdd: (column, title) => onAdd?.(column, title),
     })
   )
   let snapshot = $state.raw(machine.getState())
@@ -66,10 +91,65 @@
     lastFocusNonce = focusNonce
     untrack(() => focusKanbanCard(document, api.ids.card(focusCard)))
   })
+  let lastAddFocus = 0
+  $effect(() => {
+    const { addFocusNonce, addFocusId } = api
+    if (addFocusNonce === 0 || addFocusNonce === lastAddFocus || !addFocusId) return
+    lastAddFocus = addFocusNonce
+    untrack(() => document.getElementById(addFocusId)?.focus())
+  })
+
+  // One menu for the board, opened for a card: at the pointer, under its button, or under the card.
+  let menuCard: string | null = null
+  let menuAnchor: Element | VirtualElement | null = null
+  const menu = createMenuMachine({
+    id: `${id}-menu`,
+    items: [],
+    onSelect: (value) => {
+      const key = menuCard
+      if (!key) return
+      const place = cardMenuPlace(machine.getState(), key, value)
+      if (place) {
+        const move = () => machine.send({ type: 'MOVE', card: key, to: place })
+        if (rootEl) flipKanban(rootEl, move)
+        else move()
+        return
+      }
+      const card = machine.getState().cards.find((candidate) => candidate.id === key)
+      if (card) onCardMenuSelect?.(value, card)
+    },
+  })
+  let menuState = $state.raw(menu.getState())
+  $effect(() => menu.subscribe(() => (menuState = menu.getState())))
+  const menuTitle = $derived(snapshot.cards.find((card) => card.id === snapshot.menu.card)?.title ?? '')
+  const menuApi = $derived(connectMenu(menuState, menu.send, svelteNormalizer, { label: api.words.menu(menuTitle) }))
+
+  let lastMenuNonce = 0
+  $effect(() => {
+    const request = snapshot.menu
+    if (!request.nonce || request.nonce === lastMenuNonce || !request.card) return
+    lastMenuNonce = request.nonce
+    untrack(() => {
+      const key = request.card!
+      const card = machine.getState().cards.find((candidate) => candidate.id === key)
+      if (!card) return
+      menuCard = key
+      const element = document.getElementById(api.ids.card(key))
+      const point = request.point
+      menuAnchor = point
+        ? { getBoundingClientRect: () => new DOMRect(point.x, point.y, 0, 0), contextElement: element ?? undefined }
+        : request.via === 'button'
+          ? document.getElementById(api.ids.cardMenu(key))
+          : element
+      menu.send({ type: 'SYNC_ITEMS', items: cardMenuItems(machine.getState(), key, words, cardMenu?.(card) ?? []) })
+      // The keyboard lands on the first item; a pointer, on the menu itself.
+      menu.send({ type: 'OPEN', reason: 'api', focus: request.via === 'pointer' ? 'none' : 'first' })
+    })
+  })
 </script>
 
 <div bind:this={rootEl} {...api.rootProps}>
-  {#each api.columns as { column, cards: inColumn } (column.id)}
+  {#each api.columns as { column, cards: inColumn, adds } (column.id)}
     <section {...api.getColumnProps(column)}>
       <header {...api.columnHeaderProps}>
         <div {...api.getColumnTitleProps(column)}>{column.title}</div>
@@ -80,12 +160,36 @@
           <div {...api.getCardProps(item)}>
             <div {...api.getCardTitleProps(item)}>{item.title}</div>
             <div {...api.getCardBodyProps(item)}>{#if body}{@render body(item)}{/if}</div>
+            <button {...api.getCardMenuProps(item)}><span {...api.cardMenuIconProps}></span></button>
           </div>
         {/each}
+        {#each adds as add (add.id)}
+          <div {...api.getPendingCardProps(add)}>{add.title}</div>
+        {/each}
       </div>
-      {#if inColumn.length === 0}<p {...api.emptyProps}>{api.words.empty}</p>{/if}
+      {#if inColumn.length === 0 && adds.length === 0 && api.adding !== column.id}<p {...api.emptyProps}>{api.words.empty}</p>{/if}
+      {#if onAdd}
+        {#if api.adding === column.id}
+          <div {...api.getAddFormProps(column)}>
+            <textarea {...api.getAddInputProps(column)}></textarea>
+            <div {...api.addActionsProps}>
+              <button {...api.addSubmitProps}>{api.words.addSubmit}</button>
+              <button {...api.addCancelProps}>{api.words.addCancel}</button>
+            </div>
+          </div>
+        {:else}
+          <button {...api.getAddTriggerProps(column)}><span {...api.addTriggerIconProps}></span>{api.words.addCard}</button>
+        {/if}
+      {/if}
     </section>
   {/each}
   <div {...api.liveProps}>{api.announcement}</div>
   <div {...api.instructionsProps}>{api.words.instructions}</div>
+  <MenuContent
+    api={menuApi}
+    getState={menu.getState}
+    reference={() => (menuCard ? document.getElementById(api.ids.card(menuCard)) : null)}
+    anchor={() => menuAnchor}
+    dismissOnReference
+  />
 </div>

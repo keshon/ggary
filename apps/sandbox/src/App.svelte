@@ -97,7 +97,7 @@
   } from './leads'
   import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, dealStages, initialDeals, saveDealMove, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -123,6 +123,11 @@
     await saveDealMove(move.card, move.to.column)
     deals = applyMove(deals, move)
     dealLog = `moved: ${move.card.title} → ${move.to.column}, ${move.to.index + 1}`
+  }
+  const addDeal = async (column: string, title: string) => {
+    await saveNewDeal(title)
+    deals = [...deals, { id: `new-${Date.now()}`, column, title, company: 'New lead' }]
+    dealLog = `added: ${title} → ${column}`
   }
   let imported = $state<number | null>(0)
   const runImport = () => {
@@ -1030,12 +1035,37 @@ invalid  ${taken}`}</pre>
 
 <section id="kanban">
   <h2>Kanban</h2>
-  <Kanban columns={dealStages} cards={deals} onMove={moveDeal} onOpen={(deal) => (dealLog = `open: ${deal.title}`)} words={{ label: 'Deals' }}>
-    {#snippet card(deal)}
-      <div>{deal.company}</div>
-      <div>{formatAmount(deal.amount)}</div>
-    {/snippet}
-  </Kanban>
+  <div class="kanban-frame">
+    <Kanban
+      columns={dealStages}
+      cards={deals}
+      onMove={moveDeal}
+      onOpen={(deal) => (dealLog = `open: ${deal.title}`)}
+      onAdd={addDeal}
+      cardMenu={() => dealMenu}
+      onCardMenuSelect={(value, deal) => (dealLog = `${value}: ${deal.title}`)}
+      words={{ label: 'Deals' }}
+    >
+      {#snippet card(deal)}
+        <div class="deal-card">
+          <div class="deal-company">{deal.company}</div>
+          {#if deal.labels}
+            <div class="deal-labels">
+              {#each deal.labels as label (label)}<Badge variant="outline">{label}</Badge>{/each}
+            </div>
+          {/if}
+          {#if deal.checklist}
+            <Progress size="sm" value={deal.checklist.done} max={deal.checklist.total} label={`Checklist, ${deal.checklist.done} of ${deal.checklist.total}`} valueText={(done) => `${done} of ${deal.checklist!.total}`} hideLabel tone={deal.checklist.done === deal.checklist.total ? 'ok' : 'running'} />
+          {/if}
+          <div class="deal-footer">
+            <span class="deal-amount">{formatAmount(deal.amount)}</span>
+            {#if deal.due}<span class="deal-due" data-due={dueOf(deal.due).state}>{dueOf(deal.due).text}</span>{/if}
+            {#if deal.owner}<Avatar name={deal.owner} size="sm" />{/if}
+          </div>
+        </div>
+      {/snippet}
+    </Kanban>
+  </div>
   <pre class="state">{dealLog}</pre>
   <p class="hint">{HINT_KANBAN}</p>
 </section>

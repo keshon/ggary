@@ -171,3 +171,45 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
 .tree-frame > * { flex: 1; }
 .progress-stack { display: flex; flex-direction: column; gap: 20px; }
 .progress-rings { display: flex; gap: 16px; align-items: center; }
+
+/* The kanban demo: a board held to a height, so its columns scroll; a deal's card laid out from kit parts. */
+.kanban-frame {
+  display: flex;
+  block-size: 560px;
+}
+.kanban-frame > * {
+  flex: 1;
+  min-inline-size: 0;
+}
+.deal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.deal-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.deal-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 24px;
+}
+.deal-amount {
+  margin-inline-end: auto;
+  font-variant-numeric: tabular-nums;
+}
+.deal-due {
+  font-size: 12px;
+  white-space: nowrap;
+}
+.deal-due[data-due='overdue'] {
+  color: var(--gg-danger-text);
+  font-weight: 600;
+}
+.deal-due[data-due='today'] {
+  color: var(--gg-accent-text);
+  font-weight: 600;
+}

@@ -436,6 +436,9 @@ export interface KanbanProps {
   cards: import('../../packages/core/src/components/kanban').KanbanCard[]
   onMove?: (move: import('../../packages/core/src/components/kanban').KanbanMove) => unknown
   onOpen?: (card: import('../../packages/core/src/components/kanban').KanbanCard) => void
+  onAdd?: (column: string, title: string) => unknown
+  cardMenu?: (card: import('../../packages/core/src/components/kanban').KanbanCard) => import('../../packages/core/src/components/menu').MenuEntry[]
+  onCardMenuSelect?: (value: string, card: import('../../packages/core/src/components/kanban').KanbanCard) => void
 }
 
 export interface CascaderProps {

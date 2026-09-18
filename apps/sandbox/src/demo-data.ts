@@ -1,4 +1,5 @@
 import type { ChipItem } from '@ggary/core/chip-group'
+import { todayISO } from '@ggary/core'
 import type { MenuEntry } from '@ggary/core/menu'
 import type { MenubarMenu } from '@ggary/core/menubar'
 import type { TabItem } from '@ggary/core/tabs'
@@ -438,16 +439,31 @@ export interface Deal {
   title: string
   company: string
   amount?: number
+  labels?: string[]
+  owner?: string
+  /** A day, YYYY-MM-DD. */
+  due?: string
+  checklist?: { done: number; total: number }
 }
 
+/** Days from today, as YYYY-MM-DD: the demo's due dates stay near today whenever it is opened. */
+const inDays = (days: number) => {
+  const day = new Date(`${todayISO()}T00:00:00Z`)
+  day.setUTCDate(day.getUTCDate() + days)
+  return day.toISOString().slice(0, 10)
+}
+
+const leadNames = ['Kazan Metro', 'Tatspirtprom', 'Innopolis Park', 'Kamaz Service', 'Taif Group', 'Ak Bars Bank', 'Sber Kazan', 'Kazanorgsintez', 'Tatenergo', 'Elabuga SEZ', 'Aviastar', 'Magnit Kazan']
+
 export const initialDeals: Deal[] = [
-  { id: 'd1', column: 'new', title: 'Warehouse automation', company: 'KamAZ Logistics' },
-  { id: 'd2', column: 'new', title: 'CRM seats for sales', company: 'Tatneft Retail', amount: 480_000 },
-  { id: 'd3', column: 'talks', title: 'Onboarding pilot', company: 'Ak Bars Digital', amount: 1_200_000 },
-  { id: 'd4', column: 'talks', title: 'Support contract', company: 'Kazan Helicopters' },
-  { id: 'd5', column: 'talks', title: 'Training days', company: 'Innopolis University', amount: 260_000 },
-  { id: 'd6', column: 'offer', title: 'Annual licence', company: 'Sber Kazan', amount: 2_400_000 },
-  { id: 'd7', column: 'won', title: 'Integration with 1C', company: 'Nizhnekamskneftekhim', amount: 900_000 },
+  { id: 'd1', column: 'new', title: 'Warehouse automation', company: 'KamAZ Logistics', labels: ['Inbound'], owner: 'Aigul Safina', due: inDays(3), checklist: { done: 1, total: 4 } },
+  { id: 'd2', column: 'new', title: 'CRM seats for sales', company: 'Tatneft Retail', amount: 480_000, labels: ['Renewal'], owner: 'Innokentiy Sokolov' },
+  ...leadNames.map((company, i): Deal => ({ id: `n${i}`, column: 'new', title: `First call: ${company}`, company, owner: i % 3 === 0 ? 'Rustem Galiev' : undefined, due: i % 4 === 0 ? inDays(i - 2) : undefined })),
+  { id: 'd3', column: 'talks', title: 'Onboarding pilot', company: 'Ak Bars Digital', amount: 1_200_000, labels: ['Pilot', 'Priority'], owner: 'Aigul Safina', due: inDays(-2), checklist: { done: 3, total: 5 } },
+  { id: 'd4', column: 'talks', title: 'Support contract', company: 'Kazan Helicopters', owner: 'Rustem Galiev', due: inDays(9) },
+  { id: 'd5', column: 'talks', title: 'Training days', company: 'Innopolis University', amount: 260_000, labels: ['Education'], checklist: { done: 2, total: 2 } },
+  { id: 'd6', column: 'offer', title: 'Annual licence', company: 'Sber Kazan', amount: 2_400_000, labels: ['Priority'], owner: 'Innokentiy Sokolov', due: inDays(0), checklist: { done: 5, total: 6 } },
+  { id: 'd7', column: 'won', title: 'Integration with 1C', company: 'Nizhnekamskneftekhim', amount: 900_000, owner: 'Aigul Safina' },
 ]
 
 /** The pretend server: a move takes half a second, and a deal is not won without an amount. */
@@ -456,7 +472,25 @@ export const saveDealMove = (deal: Deal, to: string) =>
     setTimeout(() => (to === 'won' && deal.amount === undefined ? reject(new Error('a deal needs an amount before it is won')) : resolve()), 500)
   )
 
+/** When a deal is due, in words and as a state: overdue, today, or later. The words say it, not the colour alone. */
+export const dueOf = (due: string) => {
+  const today = todayISO()
+  const day = new Date(`${due}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })
+  if (due < today) return { state: 'overdue', text: `Overdue ${day}` }
+  if (due === today) return { state: 'today', text: 'Due today' }
+  return { state: 'later', text: `Due ${day}` }
+}
+
+export const dealMenu = [
+  { value: 'copy-link', label: 'Copy link' },
+  { value: 'archive', label: 'Archive', tone: 'danger' as const },
+]
+
+/** The pretend server: a new deal takes a moment, and a title in capitals is refused. */
+export const saveNewDeal = (title: string) =>
+  new Promise<void>((resolve, reject) => setTimeout(() => (title === title.toUpperCase() && /[A-ZА-Я]/.test(title) ? reject(new Error('no titles in capitals, please')) : resolve()), 400))
+
 export const formatAmount = (amount?: number) => (amount === undefined ? 'No amount yet' : `${amount.toLocaleString('ru-RU')} ₽`)
 
 export const HINT_KANBAN =
-  'Tab to the board: one stop, on a card. The arrows walk the cards; Space picks the focused one up, and then the arrows carry it — up and down, across the columns, Home and End — while a screen reader hears where it is; Space or Enter drops it, Escape puts it back, and Tab away does too. Enter on a card opens it. A move stands at once and fades until the pretend server answers, half a second later; move a deal with no amount into Won and it is refused — the card goes back and the reason is read out. In talks has a limit of 3: past it, the count turns red. Or drag a card: past a few pixels it comes up, a copy follows the pointer and the card’s slot moves where it would land; near the board’s edge the board scrolls; Escape puts it back. On a touch screen, hold a card still for a moment to pick it up — a quick swipe still scrolls.'
+  'Tab to the board: one stop, on a card. The arrows walk the cards; Space picks the focused one up, and then the arrows carry it — up and down, across the columns, Home and End — while a screen reader hears where it is; Space or Enter drops it, Escape puts it back, and Tab away does too. Enter on a card opens it. A move stands at once and fades until the pretend server answers, half a second later; move a deal with no amount into Won and it is refused — the card goes back and the reason is read out. In talks has a limit of 3: past it, the count turns red. The board is held to a height here: each column scrolls its own cards, and a card dragged to a column\u2019s top or bottom scrolls it. Right-click a card, press Shift+F10 on it, or use its ⋯ button for its menu: Move to another column, to the top or the bottom, or the demo\u2019s own Copy link and Archive. Add a card at a column\u2019s foot: Enter adds it and leaves the field open for the next; a title in capitals is refused and comes back to the field. Or drag a card: past a few pixels it comes up, a copy follows the pointer and the card’s slot moves where it would land; near the board’s edge the board scrolls; Escape puts it back. On a touch screen, hold a card still for a moment to pick it up — a quick swipe still scrolls.'

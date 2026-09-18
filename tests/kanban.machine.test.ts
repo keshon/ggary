@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyMove, connect, createKanbanMachine, orderOf, tabStop, type KanbanMove } from '../packages/core/src/components/kanban'
+import { applyMove, cardMenuItems, cardMenuPlace, connect, createKanbanMachine, KANBAN_MENU, orderOf, tabStop, type KanbanMove } from '../packages/core/src/components/kanban'
 import { columns, tasks, type Task } from './conformance/board'
 
 /**
@@ -11,7 +11,7 @@ import { columns, tasks, type Task } from './conformance/board'
 const same = (props: Record<string, unknown>) => props
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0))
 
-const board = (onMove?: (move: KanbanMove<Task>) => unknown) => {
+const board = (onMove?: (move: KanbanMove<Task>) => unknown, onAdd?: (column: string, title: string) => unknown) => {
   const moves: KanbanMove<Task>[] = []
   const opened: string[] = []
   const machine = createKanbanMachine<Task>({
@@ -23,6 +23,7 @@ const board = (onMove?: (move: KanbanMove<Task>) => unknown) => {
       return onMove?.(move)
     },
     onOpen: (card) => opened.push(card.id),
+    onAdd,
   })
   const order = () => machine.getState().order
   const focused = () => tabStop(machine.getState())
@@ -167,6 +168,81 @@ describe('kanban', () => {
     send({ type: 'PLACE', to: { column: 'done', index: 1 } })
     send({ type: 'CANCEL' })
     expect(order()).toEqual({ todo: ['a', 'b', 'c'], doing: ['d', 'e'], review: [], done: ['f'] })
+  })
+
+  it('a card’s menu: move to each other column, to the top or bottom of its own, then yours', () => {
+    const { machine } = board()
+    const items = cardMenuItems(machine.getState(), 'b', {}, [{ value: 'archive', label: 'Archive' }])
+    expect(items[0]).toMatchObject({ type: 'submenu', label: 'Move to', items: [{ label: 'Doing' }, { label: 'Review' }, { label: 'Done' }] })
+    expect(items.slice(1).map((item) => ('label' in item ? item.label : item.type))).toEqual(['Move to top', 'Move to bottom', 'separator', 'Archive'])
+    const top = cardMenuItems(machine.getState(), 'a')
+    expect(top[1]).toMatchObject({ disabled: true })
+    expect(cardMenuPlace(machine.getState(), 'b', `${KANBAN_MENU.moveTo}done`)).toEqual({ column: 'done', index: 1 })
+    expect(cardMenuPlace(machine.getState(), 'b', KANBAN_MENU.top)).toEqual({ column: 'todo', index: 0 })
+    expect(cardMenuPlace(machine.getState(), 'b', 'archive')).toBeNull()
+  })
+
+  it('a move from the menu says where the card went', () => {
+    const { send, said } = board()
+    send({ type: 'MOVE', card: 'b', to: { column: 'done', index: 1 } })
+    expect(said()).toBe('Send the offer moved to Done, 2 of 2.')
+  })
+
+  it('a right click, Shift+F10 or the menu button asks for a card’s menu; not while one is carried', () => {
+    const { machine, send } = board()
+    send({ type: 'MENU', card: 'c', point: { x: 10, y: 20 }, via: 'pointer' })
+    expect(machine.getState().menu).toEqual({ card: 'c', point: { x: 10, y: 20 }, via: 'pointer', nonce: 1 })
+    send({ type: 'LIFT' })
+    send({ type: 'MENU', card: 'a', via: 'keyboard' })
+    expect(machine.getState().menu.nonce).toBe(1)
+  })
+
+  it('a card typed in stands faded at its column’s end until the owner answers, and the field stays open for the next', async () => {
+    let answer: (ok: boolean) => void = () => {}
+    const added: string[][] = []
+    const { machine, send, said } = board(undefined, (column, title) => {
+      added.push([column, title])
+      return new Promise((resolve, reject) => (answer = (ok) => (ok ? resolve(undefined) : reject(new Error('the board is full')))))
+    })
+    send({ type: 'ADD_OPEN', column: 'review' })
+    send({ type: 'ADD_DRAFT', text: '  Ask for feedback ' })
+    send({ type: 'ADD_SUBMIT' })
+    expect(machine.getState().adding).toEqual({ column: 'review', draft: '' })
+    expect(machine.getState().adds.map((add) => [add.column, add.title])).toEqual([['review', 'Ask for feedback']])
+    await tick()
+    expect(added).toEqual([['review', 'Ask for feedback']])
+    // The answer comes before the owner's new cards: the stand-in waits for them.
+    answer(true)
+    await tick()
+    await tick()
+    expect(said()).toBe('Added Ask for feedback to Review.')
+    expect(machine.getState().adds).toHaveLength(1)
+    send({ type: 'SYNC_CARDS', cards: [...tasks, { id: 'n', column: 'review', title: 'Ask for feedback' }] })
+    expect(machine.getState().adds).toEqual([])
+  })
+
+  it('a refused card goes, and its title comes back to the empty field', async () => {
+    const { machine, send, said } = board(undefined, () => Promise.reject(new Error('the board is full')))
+    send({ type: 'ADD_OPEN', column: 'todo' })
+    send({ type: 'ADD_DRAFT', text: 'Call back' })
+    send({ type: 'ADD_SUBMIT' })
+    await tick()
+    await tick()
+    await tick()
+    expect(machine.getState().adds).toEqual([])
+    expect(machine.getState().adding).toEqual({ column: 'todo', draft: 'Call back' })
+    expect(said()).toBe('Call back was not added: the board is full')
+  })
+
+  it('an empty title is not sent; Escape closes the field and gives the focus back to its button', () => {
+    const { machine, send } = board()
+    send({ type: 'ADD_OPEN', column: 'todo' })
+    send({ type: 'ADD_DRAFT', text: '   ' })
+    send({ type: 'ADD_SUBMIT' })
+    expect(machine.getState().adds).toEqual([])
+    send({ type: 'ADD_CLOSE', refocus: true })
+    expect(machine.getState().adding).toBeNull()
+    expect(machine.getState().addFocus).toMatchObject({ column: 'todo', target: 'trigger' })
   })
 
   it('Enter opens a card; it does not while one is carried', () => {

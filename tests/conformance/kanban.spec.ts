@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { type Adapter, type KanbanProps, click, freshTarget, keydown, part, parts } from './harness'
+import { type Adapter, type KanbanProps, click, freshTarget, keydown, part, parts, typeInto } from './harness'
 import { columns, tasks } from './board'
 import type { KanbanMove } from '../../packages/core/src/components/kanban'
 
@@ -30,6 +30,7 @@ export function kanbanConformance(adapter: Adapter) {
       expect(root.getAttribute('aria-label')).toBe('Board')
       const doing = column('doing')
       expect(doing.getAttribute('role')).toBe('list')
+      expect(doing.getAttribute('tabindex')).toBe('-1')
       expect(document.getElementById(doing.getAttribute('aria-labelledby')!)!.textContent).toBe('Doing')
       const first = card('a')
       expect(first.getAttribute('role')).toBe('listitem')
@@ -107,6 +108,67 @@ export function kanbanConformance(adapter: Adapter) {
       await adapter.act(() => void keydown(card('c'), ' '))
       expect(card('c').hasAttribute('data-lifted')).toBe(true)
       expect(live()).toBe('Picked up Book the demo. To do, 3 of 3.')
+    })
+
+    it('Shift+F10 opens a card’s menu on its first item; Move to bottom moves it, the focus back on it', async () => {
+      const { m, card, titles } = await setup()
+      card('a').focus()
+      await adapter.act(() => {})
+      await adapter.act(() => void card('a').dispatchEvent(new KeyboardEvent('keydown', { key: 'F10', shiftKey: true, bubbles: true, cancelable: true })))
+      await adapter.wait(0)
+      const menu = part(m.root, 'menu', 'content')!
+      expect(menu.dataset.state).toBe('open')
+      expect(menu.getAttribute('aria-label')).toBe('Actions for Call Aigul')
+      const items = parts(menu, 'menu', 'item')
+      expect(items.map((item) => part(item, 'menu', 'item-text')!.textContent)).toEqual(['Move to', 'Move to top', 'Move to bottom'])
+      expect(part(document.activeElement!, 'menu', 'item-text')?.textContent).toBe('Move to')
+      await adapter.act(() => click(items[2]))
+      await adapter.wait(0)
+      expect(titles('todo')).toEqual(['Send the offer', 'Book the demo', 'Call Aigul'])
+      expect(document.activeElement).toBe(card('a'))
+    })
+
+    it('a card’s menu button is named for it; a right click opens the menu with your items after the board’s', async () => {
+      const chosen: string[] = []
+      const { m, card } = await setup({ cardMenu: () => [{ value: 'archive', label: 'Archive' }], onCardMenuSelect: (value, item) => void chosen.push(`${value}:${item.id}`) })
+      const button = part(card('c'), 'kanban', 'card-menu')!
+      expect(button.getAttribute('aria-label')).toBe('Actions for Book the demo')
+      expect(button.getAttribute('aria-haspopup')).toBe('menu')
+      expect(button.tabIndex).toBe(-1)
+      const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 30, clientY: 40 })
+      await adapter.act(() => void card('c').dispatchEvent(event))
+      await adapter.wait(0)
+      expect(event.defaultPrevented).toBe(true)
+      const items = parts(part(m.root, 'menu', 'content')!, 'menu', 'item')
+      expect(items.map((item) => part(item, 'menu', 'item-text')!.textContent)).toEqual(['Move to', 'Move to top', 'Move to bottom', 'Archive'])
+      await adapter.act(() => click(items[3]))
+      await adapter.wait(0)
+      expect(chosen).toEqual(['archive:c'])
+    })
+
+    it('Add a card: typed and sent with Enter, it stands faded at the column’s end; the field stays open and empty', async () => {
+      const added: string[][] = []
+      const { m, column } = await setup({ onAdd: (col, title) => new Promise(() => void added.push([col, title])) })
+      const trigger = parts(m.root, 'kanban', 'add-trigger').find((button) => button.dataset.column === 'review')!
+      expect(trigger.textContent).toBe('Add a card')
+      await adapter.act(() => click(trigger))
+      await adapter.wait(0)
+      const input = part(m.root, 'kanban', 'add-input') as HTMLTextAreaElement
+      expect(document.activeElement).toBe(input)
+      expect(input.getAttribute('aria-label')).toBe('New card in Review')
+      await adapter.act(() => typeInto(input, 'Ask for feedback'))
+      await adapter.act(() => void keydown(input, 'Enter'))
+      await adapter.wait(0)
+      const pending = parts(column('review'), 'kanban', 'pending-card')
+      expect(pending.map((element) => [element.textContent, element.getAttribute('aria-busy')])).toEqual([['Ask for feedback', 'true']])
+      expect(added).toEqual([['review', 'Ask for feedback']])
+      const again = part(m.root, 'kanban', 'add-input') as HTMLTextAreaElement
+      expect(again.value).toBe('')
+      expect(document.activeElement).toBe(again)
+      await adapter.act(() => void keydown(again, 'Escape'))
+      await adapter.wait(0)
+      expect(part(m.root, 'kanban', 'add-input')).toBeNull()
+      expect(document.activeElement).toBe(parts(m.root, 'kanban', 'add-trigger').find((button) => button.dataset.column === 'review'))
     })
 
     it('Enter or a press opens a card', async () => {

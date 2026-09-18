@@ -8,11 +8,14 @@
   min-inline-size: 0;
   overflow-x: auto;
 }
+/* Given a height, the board holds its columns to it and each column scrolls
+   its own cards; without one, a column is as tall as its cards. */
 [data-scope='kanban'][data-part='column'] {
   display: flex;
   flex: none;
   flex-direction: column;
   min-block-size: 0;
+  max-block-size: 100%;
 }
 [data-scope='kanban'][data-part='column-header'] {
   display: flex;
@@ -35,6 +38,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 [data-scope='kanban'][data-part='card'] {
   position: relative;
@@ -52,6 +58,50 @@
 }
 [data-scope='kanban'][data-part='empty'] {
   margin: 0;
+}
+[data-scope='kanban'][data-part='card-menu'] {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+[data-scope='kanban'][data-part='add-trigger'],
+[data-scope='kanban'][data-part='add-submit'],
+[data-scope='kanban'][data-part='add-cancel'] {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+}
+[data-scope='kanban'][data-part='add-trigger'] {
+  flex: none;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: start;
+}
+[data-scope='kanban'][data-part='add-form'] {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+}
+[data-scope='kanban'][data-part='add-input'] {
+  box-sizing: border-box;
+  inline-size: 100%;
+  font: inherit;
+  resize: none;
+}
+[data-scope='kanban'][data-part='add-actions'] {
+  display: flex;
+  align-items: center;
 }
 
 /* Spoken, not shown: where a carried card is, and how to carry one. */
