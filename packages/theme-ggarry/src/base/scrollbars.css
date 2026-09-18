@@ -1,0 +1,21 @@
+/* ==========================================================================
+   GGarry — scrollbars
+
+   Thin, with a thumb in the strong border's grey and no track or arrows, so
+   a column that scrolls reads as part of the board rather than a window's
+   chrome. The standard properties, not ::-webkit-scrollbar: Chrome and
+   Firefox draw them, and a browser that does not keeps its own bar.
+
+   The colour is inherited, so it is set where a mode is — on the root and on
+   every [data-mode] island — to follow light and dark. The width is not
+   inherited: it is set on the kit's own elements, which are the scrollers
+   the kit makes, and on the page's root; a scroller of the page's own keeps
+   whatever width the page gives it.
+   ========================================================================== */
+
+:where(:root, [data-mode]) {
+  scrollbar-color: var(--ggarry-border-strong) transparent;
+}
+:where(:root, [data-scope]) {
+  scrollbar-width: thin;
+}

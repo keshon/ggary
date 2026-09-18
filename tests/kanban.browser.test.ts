@@ -211,6 +211,17 @@ describe('a practical board', () => {
     expect(document.documentElement.scrollTop).toBe(0)
   })
 
+  it('a column scrolls with the theme’s thin bar, which follows a dark island', async () => {
+    const { host, list } = await mountTall()
+    const style = getComputedStyle(list('todo'))
+    expect(style.scrollbarWidth).toBe('thin')
+    const light = style.scrollbarColor
+    expect(light).toMatch(/^rgb\(.+\) rgba\(0, 0, 0, 0\)$/)
+    host.dataset.mode = 'dark'
+    await frames(1)
+    expect(getComputedStyle(list('todo')).scrollbarColor).not.toBe(light)
+  })
+
   it('a card dragged to a column’s bottom edge scrolls the column', async () => {
     const { list, card } = await mountTall()
     const lane = list('todo').getBoundingClientRect()

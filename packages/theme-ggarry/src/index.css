@@ -20,6 +20,7 @@
 @import '@ggary/structure' layer(gg.structure);
 
 @import './base/reset.css' layer(gg.base);
+@import './base/scrollbars.css' layer(gg.base);
 
 @import './components/avatar.css' layer(gg.components);
 @import './components/badge.css' layer(gg.components);

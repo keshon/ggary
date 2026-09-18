@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 3160 tests, 1257 of them in headless Chrome
+npm test         # 3161 tests, 1258 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -170,6 +170,17 @@ theme's axes are runtime attributes on any subtree:
 |---|---|
 | GGarry | `data-mode`: light · dark (default: system) |
 | Instrument | `data-mode`: light-neutral · light · light-cool · dark · dark-soft<br>`data-accent`: petrol · graphite · indigo · clay<br>`data-density`: compact · regular · comfortable<br>`data-scale`: 14 · 15 · 16 · 17 · 18 |
+
+**GGarry draws its own scrollbars**: thin, a thumb in the strong border's grey,
+no track and no arrows — a board's scrolling column reads as part of the board,
+not as a window's chrome. It uses the standard `scrollbar-width` and
+`scrollbar-color`, not `::-webkit-scrollbar`, so Chrome and Firefox draw them
+and a browser that has neither keeps its own bar. The colour is set on the root
+and on every `[data-mode]` island, so a dark island has dark bars; the width is
+set on the kit's own elements and the page's root, and a scroller of the page's
+own keeps whatever the page gives it. (A headless browser draws overlay bars
+that hide when idle, so the look is checked by computed style, not by a
+screenshot.)
 
 The sandbox is the one place that swaps whole languages at runtime, purely so a
 page can be compared across them. It mounts one theme stylesheet at a time —
@@ -2242,7 +2253,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
 | browser | Chrome | `date-picker.browser.test.ts` | 4 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. |
-| browser | Chrome | `kanban.browser.test.ts` | 12 tests. A board given a height holding its columns and a column scrolling to the focus; a drag at a column's edge scrolling it; a real right click opening the card's menu at the pointer and Move to › Done moving it; a card typed with real keys standing faded and giving way to the owner's card with no double. Also A real mouse dragging a card into an empty column, the owner hearing it and the card not opening; a short press still a press; mid-drag, the slot where the card would land and a copy under the pointer, and Escape putting it back; the board scrolling at its edge; a finger that moves scrolling and one held still picking the card up; real keys carrying a card across a board narrower than its columns, the board scrolling to keep it in sight and the card drawn held; Tab out with a card up putting it back and the focus going on; a press on a control inside a card left to the control. |
+| browser | Chrome | `kanban.browser.test.ts` | 13 tests. The column's thin themed bar following a dark island; a board given a height holding its columns and a column scrolling to the focus; a drag at a column's edge scrolling it; a real right click opening the card's menu at the pointer and Move to › Done moving it; a card typed with real keys standing faded and giving way to the owner's card with no double. Also A real mouse dragging a card into an empty column, the owner hearing it and the card not opening; a short press still a press; mid-drag, the slot where the card would land and a copy under the pointer, and Escape putting it back; the board scrolling at its edge; a finger that moves scrolling and one held still picking the card up; real keys carrying a card across a board narrower than its columns, the board scrolling to keep it in sight and the card drawn held; Tab out with a card up putting it back and the focus going on; a press on a control inside a card left to the control. |
 | browser | Chrome | `disclosure.browser.test.ts` | 6 tests. A closed section hidden until found, taking no room, and opened by the page's search; a real Space and Enter, the chevron turned; a tree given a height scrolling to the focus under the real keyboard, each level stepped in by 16 pixels with a leaf lined up; a bar's fill measured to the pixel from the start edge in both directions; a ring's sweep and turn. |
 | browser | Chrome | `cascader.browser.test.ts` | 2 tests. The columns side by side under the button over an ancestor that clips, the card keeping to a phone's screen with the focused item scrolled into view; the real keyboard walking down and across, Enter choosing and the focus back on the button. |
 | browser | Chrome | `combobox.browser.test.ts` | 4 tests. Real typing; the list under the field, lined up with it, over an ancestor that clips; Enter choosing and Tab moving on with the list gone; a press outside putting the field back; chips wrapping in the box with room left to type. |
