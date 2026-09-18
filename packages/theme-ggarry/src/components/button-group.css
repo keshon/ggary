@@ -16,7 +16,10 @@
 [data-scope='button-group'][data-part='root'][data-size='sm'] { --group-radius: var(--ggarry-radius-sm); }
 [data-scope='button-group'][data-part='root'][data-size='lg'] { --group-radius: var(--ggarry-radius-lg); }
 
-[data-scope='button-group'][data-part='root'] > [data-scope='button'][data-part='root'] {
+/* A button stands in the group itself (React, Svelte) or inside its <gg-button>
+   host (the custom elements): both are the group's buttons. */
+[data-scope='button-group'][data-part='root'] > [data-scope='button'][data-part='root'],
+[data-scope='button-group'][data-part='root'] > * > [data-scope='button'][data-part='root'] {
   border-radius: 0;
   box-shadow: none;
 }

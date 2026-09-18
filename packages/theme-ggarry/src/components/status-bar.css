@@ -6,8 +6,8 @@
 
 [data-scope='status-bar'][data-part='root'] {
   gap: var(--ggarry-space-1);
-  min-block-size: 26px;
-  padding-inline: var(--ggarry-space-2);
+  min-block-size: 28px;
+  padding: 2px var(--ggarry-space-2);
   border-block-start: 1px solid var(--ggarry-border-default);
   background: var(--ggarry-bg-subtle);
   color: var(--ggarry-text-muted);
@@ -26,3 +26,14 @@
 [data-scope='status-bar'][data-part='item'][data-tone='warn'] { color: var(--ggarry-text-warning); }
 [data-scope='status-bar'][data-part='item'][data-tone='error'] { color: var(--ggarry-text-danger); }
 [data-scope='status-bar'][data-part='item'][data-tone='running'] { color: var(--ggarry-text-accent); }
+
+/* A reading that can be pressed is a button made to the strip's measure: the
+   strip's small type, a box one line tall with air above and below, and the
+   same inset as a reading — not a small button, which is as tall as the strip
+   and would fill it edge to edge. */
+[data-scope='status-bar'][data-part='root'] [data-scope='button'][data-part='root'] {
+  --button-height: 22px;
+  --button-padding-x: var(--ggarry-space-2);
+  --button-font-size: var(--ggarry-font-size-xs);
+  border-radius: var(--ggarry-radius-sm);
+}

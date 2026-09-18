@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 2658 tests, 1053 of them in headless Chrome
+npm test         # 2660 tests, 1055 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1541,6 +1541,14 @@ Found on the way:
   frame of every opening lost it. Opening is now visible at once, closing hides
   after the slide, and the drawer asks again on the next frame should a theme
   fade it in.
+- **A button group of custom elements never stood flush.** The rule that squares
+  the inner corners matched a button standing in the group itself, as React and
+  Svelte render it, but not one inside its `<gg-button>` host: on the vanilla page
+  every button kept its own rounded box. It had been so since ButtonGroup was
+  built; a browser test now measures the corners and the seam.
+- **A button in the status strip filled it edge to edge.** A small button is as
+  tall as the strip, so the strip grew to it and left no air. Inside the strip a
+  button now takes the strip's own measure: small type, a box one line tall.
 - **The conformance harness declared the same interfaces five times over.**
   Earlier patch scripts had pasted blocks that were already there; TypeScript
   merges identical interface declarations, so nothing complained. Thirty-two
@@ -1765,7 +1773,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
-| browser | Chrome | `layout.browser.test.ts` | 8 tests. The column beside the work on a wide screen with only the work scrolling, the drawer out of the tab order until opened and then over an inert page, the window growing past the breakpoint closing it, a bar lying down under the header, a separator dragged by a pointer with its line under it and stopping for the other pane, the keyboard moving it, a status strip staying one line. |
+| browser | Chrome | `layout.browser.test.ts` | 10 tests. The column beside the work on a wide screen with only the work scrolling, the drawer out of the tab order until opened and then over an inert page, the window growing past the breakpoint closing it, a bar lying down under the header, a separator dragged by a pointer with its line under it and stopping for the other pane, the keyboard moving it, a status strip staying one line with air around a button in it, and a button group of custom elements standing flush. |
 | browser | Chrome | `data-grid-rows.browser.test.ts` | 6 tests. A double click and a click elsewhere saving, Tab walking the editable cells, an edit surviving its row scrolled out of view (elements, and React under StrictMode), the row menu standing at the pointer and handing the focus back, a press on another row while the sheet is open. |
 | dom | jsdom | `react-strict.dom.test.ts` | 1 test. The grid under React StrictMode, which unmounts and remounts once, still loads. |
 | browser | Chrome | `navigation.browser.test.ts` | 8 tests. A toolbar under the real Tab and arrow keys — wrapping, skipping what is disabled, returning to the tool last used — a field inside it keeping its own arrows, the spacer measured against the strip's inset, the drawn chevron that is in no text, and a step's bar spanning its item. |

@@ -188,3 +188,36 @@ describe('the status bar', () => {
     expect(bar.scrollWidth).toBeGreaterThan(bar.clientWidth)
   })
 })
+
+describe('buttons inside the frame', () => {
+  it('a status strip keeps air around a button in it, at its own one-line height', async () => {
+    const bar = document.createElement('gg-status-bar')
+    bar.style.inlineSize = '400px'
+    bar.innerHTML = '<span>700,000 leads</span><span data-spacer></span><gg-button size="sm" emphasis="minimal"><button>Sync</button></gg-button>'
+    document.body.append(bar)
+    await frames()
+    const strip = bar.getBoundingClientRect()
+    const button = bar.querySelector('button')!.getBoundingClientRect()
+    expect(button.top - strip.top).toBeGreaterThanOrEqual(2)
+    expect(strip.bottom - button.bottom).toBeGreaterThanOrEqual(2)
+    expect(strip.right - button.right).toBeGreaterThanOrEqual(4)
+    expect(strip.height).toBeLessThan(34)
+  })
+
+  it('a button group of custom elements stands flush: square inner corners, rounded ends', async () => {
+    const group = document.createElement('gg-button-group')
+    group.setAttribute('label', 'Align')
+    group.innerHTML = ['Left', 'Centre', 'Right'].map((label) => `<gg-button><button>${label}</button></gg-button>`).join('')
+    document.body.append(group)
+    await frames()
+    const buttons = [...group.querySelectorAll('button')]
+    const radius = (button: Element) => getComputedStyle(button)
+    expect(radius(buttons[1]).borderTopLeftRadius).toBe('0px')
+    expect(radius(buttons[1]).borderTopRightRadius).toBe('0px')
+    expect(radius(buttons[0]).borderTopRightRadius).toBe('0px')
+    expect(radius(buttons[0]).borderTopLeftRadius).not.toBe('0px')
+    expect(radius(buttons[2]).borderTopRightRadius).not.toBe('0px')
+    const [a, b] = buttons.map((button) => button.getBoundingClientRect())
+    expect(Math.abs(b.left - a.right)).toBeLessThan(1)
+  })
+})
