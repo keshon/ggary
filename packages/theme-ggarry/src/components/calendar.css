@@ -1,0 +1,152 @@
+/* ==========================================================================
+   GGarry — calendar
+
+   A month on a card. Days are round targets on a quiet grid: the chosen one
+   is the accent's fill, today a ring and a heavier number, the days of the
+   months around it muted, and a day that cannot be chosen struck through as
+   well as faded — colour alone would not say "not this one". A range is one
+   band of tint between two filled ends, not a row of separate discs.
+   ========================================================================== */
+
+[data-scope='calendar'][data-part='root'] {
+  --day-size: 36px;
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-3);
+  font-family: var(--ggarry-font-family-sans);
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='calendar'][data-part='header'] {
+  gap: var(--ggarry-space-1);
+}
+[data-scope='calendar'][data-part='title'] {
+  font-size: var(--ggarry-font-size-md);
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+[data-scope='calendar']:is([data-part='prev'], [data-part='next']) {
+  inline-size: 30px;
+  block-size: 30px;
+  border-radius: var(--ggarry-radius-md);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='calendar']:is([data-part='prev'], [data-part='next']):hover:not(:disabled) {
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-default);
+}
+[data-scope='calendar']:is([data-part='prev'], [data-part='next']):focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+[data-scope='calendar']:is([data-part='prev'], [data-part='next']):disabled {
+  color: var(--ggarry-text-subtle);
+}
+[data-scope='calendar'][data-part='nav-icon'] {
+  inline-size: 14px;
+  block-size: 14px;
+}
+
+[data-scope='calendar'][data-part='weekday'] {
+  inline-size: var(--day-size);
+  block-size: 28px;
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+
+/* A day is two layers: the cell carries the band of a range, square, from
+   edge to edge; a disc behind the number (::before) carries everything round —
+   the hover, the choice, today's ring and the focus ring. Painted on one box,
+   the two fight: a round band, a clipped disc. */
+[data-scope='calendar'][data-part='day'] {
+  position: relative;
+  isolation: isolate;
+  inline-size: var(--day-size);
+  block-size: var(--day-size);
+  font-size: var(--ggarry-font-size-sm);
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+[data-scope='calendar'][data-part='day']::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 1px;
+  border-radius: var(--ggarry-radius-full);
+}
+[data-scope='calendar'][data-part='day']:hover:not([data-disabled]):not([data-selected])::before {
+  background: var(--ggarry-bg-subtle);
+}
+[data-scope='calendar'][data-part='day'][data-outside] {
+  color: var(--ggarry-text-muted);
+}
+[data-scope='calendar'][data-part='day'][data-today] {
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+[data-scope='calendar'][data-part='day'][data-today]::before {
+  box-shadow: inset 0 0 0 1px var(--ggarry-border-accent);
+}
+[data-scope='calendar'][data-part='day'][data-selected] {
+  color: var(--ggarry-text-on-accent);
+}
+[data-scope='calendar'][data-part='day'][data-selected]::before {
+  background: var(--ggarry-bg-accent);
+}
+[data-scope='calendar'][data-part='day'][data-disabled] {
+  color: var(--ggarry-text-subtle);
+  text-decoration: line-through;
+}
+/* The focus ring rides the disc, outside it, and stands over the neighbours. */
+[data-scope='calendar'][data-part='day']:focus-visible {
+  z-index: 1;
+}
+[data-scope='calendar'][data-part='day']:focus-visible::before {
+  box-shadow:
+    0 0 0 var(--ggarry-focus-ring-offset) var(--ggarry-bg-surface),
+    0 0 0 calc(var(--ggarry-focus-ring-offset) + var(--ggarry-focus-ring-width)) var(--ggarry-focus-ring);
+}
+
+/* A range: one band of tint through the days between the ends, running half
+   into each end, whose disc stands on it. */
+[data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-in-range] {
+  background: var(--ggarry-bg-accent-subtle);
+  color: var(--ggarry-text-default);
+}
+[data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-in-range]::before {
+  background: none;
+}
+[data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-range-start]:not([data-range-end]) {
+  background: linear-gradient(to right, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
+}
+[data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-range-end]:not([data-range-start]) {
+  background: linear-gradient(to left, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
+}
+[data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-range-start]:not([data-range-end]):dir(rtl) {
+  background: linear-gradient(to left, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
+}
+[data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-range-end]:not([data-range-start]):dir(rtl) {
+  background: linear-gradient(to right, transparent 50%, var(--ggarry-bg-accent-subtle) 50%);
+}
+[data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day']:is([data-range-start], [data-range-end]) {
+  color: var(--ggarry-text-on-accent);
+}
+[data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day']:is([data-range-start], [data-range-end])::before {
+  background: var(--ggarry-bg-accent);
+}
+/* Drawn from the pointer, before the second press: the same shapes, a step lighter. */
+[data-scope='calendar'][data-part='root'][data-mode='range'] [data-part='day'][data-preview]:is([data-range-start], [data-range-end])::before {
+  background: var(--ggarry-bg-accent-hover);
+}
+
+@media (forced-colors: active) {
+  [data-scope='calendar'][data-part='day'][data-selected]::before {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  [data-scope='calendar'][data-part='day'][data-selected] {
+    forced-color-adjust: none;
+    color: HighlightText;
+  }
+  [data-scope='calendar'][data-part='day']:focus-visible {
+    outline: 2px solid Highlight;
+  }
+}

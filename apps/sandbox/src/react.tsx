@@ -3,6 +3,7 @@ import './shared.css'
 
 import { StrictMode, useEffect, useMemo, useState, type FormEvent } from 'react'
 import type { DataGridController } from '@ggary/core/data-grid'
+import { todayISO } from '@ggary/core'
 import {
   assignLeads,
   debounce,
@@ -40,7 +41,9 @@ import {
   GridDetail,
   GridFilters,
   GridRowMenu,
+  Calendar,
   Combobox,
+  DatePicker,
   Grid,
   PageHeader,
   Section,
@@ -92,7 +95,7 @@ import {
   ToolbarSpacer,
   Tooltip,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, layoutLeads, navGroups, railItems, weekTiles, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -110,6 +113,7 @@ function App() {
   const [leadGrid, setLeadGrid] = useState<DataGridController<Lead>>()
   const [leadLog, setLeadLog] = useState('—')
   const [comboLog, setComboLog] = useState('—')
+  const [dateLog, setDateLog] = useState('—')
   const searchLeads = useMemo(() => debounce((text: string) => leadGrid?.send({ type: 'SET_SEARCH', search: text })), [leadGrid])
   useEffect(() => {
     if (!leadGrid) return
@@ -1068,6 +1072,19 @@ function App() {
         </div>
         <pre className="state">{comboLog}</pre>
         <p className="hint">{HINT_COMBOBOX}</p>
+      </section>
+
+      <section id="dates">
+        <h2>Date picker and calendar</h2>
+        <div className="fields">
+          <DatePicker label="Follow up on" locale="en-GB" min={todayISO()} onValueChange={(value) => setDateLog(`follow up: ${value.start ?? '—'}`)} name="follow" />
+          <DatePicker label="Registered between" mode="range" locale="en-GB" onValueChange={(value) => setDateLog(`registered: ${value.start ?? '…'} – ${value.end ?? '…'}`)} />
+        </div>
+        <div style={{ marginTop: 16 }}>
+          <Calendar locale="en-GB" isDateDisabled={isWeekend} onValueChange={(value) => setDateLog(`call on: ${value.start}`)} />
+        </div>
+        <pre className="state">{dateLog}</pre>
+        <p className="hint">{HINT_DATES}</p>
       </section>
 
       <section id="fields">

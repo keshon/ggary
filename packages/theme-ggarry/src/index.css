@@ -52,6 +52,8 @@
 @import './components/radio-group.css' layer(gg.components);
 @import './components/select.css' layer(gg.components);
 @import './components/combobox.css' layer(gg.components);
+@import './components/calendar.css' layer(gg.components);
+@import './components/date-picker.css' layer(gg.components);
 @import './components/search.css' layer(gg.components);
 @import './components/segmented-control.css' layer(gg.components);
 @import './components/skeleton.css' layer(gg.components);

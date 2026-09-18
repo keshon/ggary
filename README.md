@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two design languages on top of it.
-Fifty-five components — DataGrid, Combobox, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Fifty-seven components — DataGrid, Combobox, DatePicker, Calendar, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 2797 tests, 1113 of them in headless Chrome
+npm test         # 2889 tests, 1147 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -66,6 +66,35 @@ packages/
 apps/sandbox/        the three demo pages
 tests/               machine (node) · contract (node) · conformance and elements (jsdom)
 ```
+
+## The vanilla adapter is frozen
+
+The custom elements (`@ggary/elements`) are kept, tested and not grown: a
+component added after the Combobox has a React and a Svelte adapter and no
+custom element. The reasons, measured on this repo:
+
+- **What it costs to ship.** The sandbox's three pages, each carrying every
+  component and the demo, come to 44 KB of JavaScript gzipped on the vanilla
+  page, 53 KB on the Svelte page and 93 KB on the React page. Svelte is nine
+  kilobytes over hand-written custom elements; that is the whole "payment".
+- **Where it runs.** Svelte and React compile to static `.js` and `.css` files.
+  A Go server — or any server — serves them as it serves an image (`embed.FS`,
+  `http.FileServer`); nothing needs Node at run time, only at build time. A page
+  rendered by Go templates mounts a Svelte component into an element where it
+  needs one.
+- **What it costs to build.** The elements adapter is the one without a
+  framework to render for it, so it hand-writes moving children into parts,
+  keeping focus while it does, and keeping the page's own inline style. It
+  produced a large share of the adapter bugs found so far (see "Found on the
+  way" under ButtonGroup's, the layout's and the grid's sections).
+- **What it would still be for.** A plain HTML page with no build step. If one
+  needs a tag, Svelte can compile a component into a custom element
+  (`<svelte:options customElement>`), which is cheaper than a third adapter.
+
+Core stays framework-agnostic either way: React and Svelte differ enough that
+two adapters catch core leaning on either. The conformance specs skip an
+adapter that lacks a component (`adapter.combobox ? describe : describe.skip`),
+which is how the elements adapter runs the suite without the new components.
 
 ## How one component reaches three frameworks
 
@@ -1554,6 +1583,62 @@ Found on the way:
   merges identical interface declarations, so nothing complained. Thirty-two
   duplicates are gone.
 
+## DatePicker and Calendar
+
+A field for a day, or a range of days, and the month behind it.
+
+```tsx
+<DatePicker label="Follow up on" min={todayISO()} name="follow" />
+<DatePicker label="Registered between" mode="range" onValueChange={({ start, end }) => filter(start, end)} />
+<Calendar isDateDisabled={isWeekend} onValueChange={({ start }) => book(start)} />
+```
+
+**Days, not instants.** A value is `YYYY-MM-DD`: a day on a wall calendar, the
+same 18 September in Moscow and in Vladivostok. The arithmetic is done in UTC,
+where no day is 23 or 25 hours long, so a clock change never moves one; 31
+January plus a month is the last day of February, not 3 March. A range submits
+as one ISO 8601 interval, `2026-09-01/2026-09-18`.
+
+**The field is the quick way.** Type a day the way the locale writes it —
+`18.09.2026`, `9/18/2026`, `18 Sep 2026`, `18 сентября 2026`, or ISO — and press
+Enter or move on; the order of day, month and year is read from the locale, a
+month may be a word in the locale's language (its genitive too), and a
+two-digit year is this century's. The field then shows the day in the locale's
+own words. Text that is not a day — or is one the picker refuses — marks the
+field invalid and says how to write one, with an example in the locale's order.
+
+**The calendar is the browsing way**: the date grid of the ARIA practices, in a
+non-modal dialog under the field. One tab stop, on the chosen day or today.
+Arrows move a day or a week and carry the focus into the next month, Home and End
+go to the ends of the week, PageUp and PageDown a month (Shift, a year), Enter
+chooses and brings the focus back to the field; Escape and a press outside close
+without choosing. The week starts where the locale's does, from `Intl.Locale`'s
+week info or, where the platform lacks it, a list of the regions that start on
+Sunday or Saturday. Each day is named in full for a screen reader — "Friday, 18
+September 2026" — today is `aria-current="date"`, and a day outside `min` and
+`max` or refused by `isDateDisabled` is `aria-disabled`, faded and struck through,
+and still reachable, so the arrows do not skip it without a word.
+
+**A range** is two presses in either order. Between them, the range a second
+press would make is drawn under the pointer — a band of tint with a disc at each
+end — and a range typed backwards is turned round.
+
+Found on the way:
+
+- **The focus fell out of the calendar at the end of the month.** Arrowing past
+  the last day turned the page, the focused day went with the old month, and the
+  focus dropped to the page — where the rule "only refocus a grid that has the
+  focus" then refused to put it back. A key the grid acts on now marks it, and
+  the focus follows the day onto the new page; a Tab out, which the grid does not
+  act on, marks nothing, so turning the page with the buttons leaves the focus
+  on the button.
+- **A range drew half-discs.** The band and the disc were painted on one box, and
+  a round clip cut the band while the band's gradient cut the disc. The cell now
+  carries the band and a layer behind the number carries everything round: the
+  disc, today's ring, the focus ring.
+- **`isISODate` narrowed a string to nothing.** A type guard `text is ISODate`,
+  where `ISODate` is `string`, made TypeScript read the text after it as `never`.
+
 ## Combobox
 
 A text field with a list under it: type to narrow the list, choose with the
@@ -1875,14 +1960,14 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 279 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target. |
-| contract | node | `icons.contract.test.ts` | 258 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 298 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target. |
+| contract | node | `icons.contract.test.ts` | 303 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1023 tests, 35 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1053 tests, 45 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 34 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 1023 tests, 26 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1053 tests, 36 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
@@ -1890,6 +1975,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
+| browser | Chrome | `date-picker.browser.test.ts` | 4 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. |
 | browser | Chrome | `combobox.browser.test.ts` | 4 tests. Real typing; the list under the field, lined up with it, over an ancestor that clips; Enter choosing and Tab moving on with the list gone; a press outside putting the field back; chips wrapping in the box with room left to type. |
 | browser | Chrome | `layout.browser.test.ts` | 16 tests. The column beside the work on a wide screen with only the work scrolling, the drawer out of the tab order until opened and then over an inert page, the window growing past the breakpoint closing it, a bar lying down under the header, a separator dragged by a pointer with its line under it and stopping for the other pane, the keyboard moving it, a status strip staying one line with air around a button in it, a button group of custom elements standing flush; a stack stretching a field and not a button, a grid falling to fewer columns, a container centred under its ceiling, a page header's actions falling under its title, a section's line under its heading, and sections farther apart than their rows. |
 | browser | Chrome | `data-grid-rows.browser.test.ts` | 6 tests. A double click and a click elsewhere saving, Tab walking the editable cells, an edit surviving its row scrolled out of view (elements, and React under StrictMode), the row menu standing at the pointer and handing the focus back, a press on another row while the sheet is open. |
@@ -2018,8 +2104,13 @@ Real, and deliberately left open:
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that is Instrument's position, and it stays available.
-- **Combobox has no custom element.** Whether the vanilla adapter keeps growing
-  is being decided; its conformance spec skips an adapter without `combobox`.
+- **No custom elements for Combobox, DatePicker or Calendar.** The vanilla
+  adapter is frozen (see its section); their specs skip it.
+- **The date picker has no time.** A day or a range of days; a time of day, and
+  the time zone that comes with it, are not built. Nor are presets ("last 7
+  days") for a range, or two months side by side.
+- **The grid's date filter is still the browser's date input.** It could be this
+  picker now.
 - **A combobox cannot create an option.** Typing a value the list does not hold
   and pressing Enter does nothing; a "Create …" option is not built.
 - **The flow channel knows eight components.** Button, badge, chip, button group,

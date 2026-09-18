@@ -29,7 +29,9 @@
     Menu,
     Menubar,
     Nav,
+    Calendar,
     Combobox,
+    DatePicker,
     Grid,
     PageHeader,
     Section,
@@ -66,6 +68,7 @@
     Tooltip,
   } from '@ggary/svelte'
   import type { DataGridController } from '@ggary/core/data-grid'
+  import { todayISO } from '@ggary/core'
   import {
     assignLeads,
     debounce,
@@ -88,7 +91,7 @@
     type Lead,
   } from './leads'
   import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, layoutLeads, navGroups, railItems, weekTiles, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -105,6 +108,7 @@
   let leadGrid = $state<DataGridController<Lead>>()
   let leadLog = $state('—')
   let comboLog = $state('—')
+  let dateLog = $state('—')
   const searchLeads = debounce((text: string) => leadGrid?.send({ type: 'SET_SEARCH', search: text }))
   $effect(() => {
     if (!leadGrid) return
@@ -951,6 +955,19 @@ invalid  ${taken}`}</pre>
   </div>
   <pre class="state">{comboLog}</pre>
   <p class="hint">{HINT_COMBOBOX}</p>
+</section>
+
+<section id="dates">
+  <h2>Date picker and calendar</h2>
+  <div class="fields">
+    <DatePicker label="Follow up on" locale="en-GB" min={todayISO()} onValueChange={(value) => (dateLog = `follow up: ${value.start ?? '—'}`)} name="follow" />
+    <DatePicker label="Registered between" mode="range" locale="en-GB" onValueChange={(value) => (dateLog = `registered: ${value.start ?? '…'} – ${value.end ?? '…'}`)} />
+  </div>
+  <div style="margin-top: 16px">
+    <Calendar locale="en-GB" isDateDisabled={isWeekend} onValueChange={(value) => (dateLog = `call on: ${value.start}`)} />
+  </div>
+  <pre class="state">{dateLog}</pre>
+  <p class="hint">{HINT_DATES}</p>
 </section>
 
 <section id="fields">

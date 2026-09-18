@@ -1,0 +1,99 @@
+/* The calendar: a header over a table of days. Geometry only. */
+
+[data-scope='calendar'][data-part='root'] {
+  display: inline-flex;
+  flex-direction: column;
+}
+[data-scope='calendar'][data-part='header'] {
+  display: flex;
+  align-items: center;
+}
+[data-scope='calendar'][data-part='title'] {
+  flex: 1;
+  text-align: center;
+}
+[data-scope='calendar']:is([data-part='prev'], [data-part='next']) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+[data-scope='calendar']:is([data-part='prev'], [data-part='next']):disabled {
+  cursor: default;
+}
+[data-scope='calendar'][data-part='nav-icon'][data-direction='prev'] {
+  rotate: 180deg;
+}
+[data-scope='calendar'][data-part='nav-icon'][data-direction='prev']:dir(rtl),
+[data-scope='calendar'][data-part='nav-icon'][data-direction='next']:dir(rtl) {
+  scale: -1 1;
+}
+[data-scope='calendar'][data-part='grid'] {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+[data-scope='calendar']:is([data-part='weekday'], [data-part='day']) {
+  padding: 0;
+  text-align: center;
+}
+[data-scope='calendar'][data-part='day'] {
+  cursor: pointer;
+  user-select: none;
+}
+[data-scope='calendar'][data-part='day'][data-disabled] {
+  cursor: default;
+}
+
+/* The date picker: a field with the calendar's button inside its box, and the calendar in the top layer. */
+[data-scope='date-picker'][data-part='root'] {
+  display: inline-flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='date-picker'][data-part='control'] {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+}
+[data-scope='date-picker'][data-part='input'] {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  outline: none;
+}
+[data-scope='date-picker'][data-part='trigger'] {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+[data-scope='date-picker'][data-part='positioner'] {
+  position: fixed;
+  inset: 0 auto auto 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+}
+[data-scope='date-picker'][data-part='positioner'][data-state='closed'] {
+  display: none;
+}

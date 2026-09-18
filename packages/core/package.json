@@ -208,6 +208,14 @@
     "./combobox": {
       "types": "./src/components/combobox/index.ts",
       "default": "./src/components/combobox/index.ts"
+    },
+    "./calendar": {
+      "types": "./src/components/calendar/index.ts",
+      "default": "./src/components/calendar/index.ts"
+    },
+    "./date-picker": {
+      "types": "./src/components/date-picker/index.ts",
+      "default": "./src/components/date-picker/index.ts"
     }
   },
   "dependencies": {

@@ -1,0 +1,85 @@
+/* ==========================================================================
+   GGarry — date picker
+
+   An input's box with the calendar's button at its end, and the calendar on a
+   popover card under it. A field whose text is not a day is an invalid field:
+   the danger edge, and the reason under it.
+   ========================================================================== */
+
+[data-scope='date-picker'][data-part='root'] {
+  gap: var(--ggarry-space-1);
+  min-inline-size: 180px;
+  font-family: var(--ggarry-font-family-sans);
+}
+[data-scope='date-picker'][data-part='root'][data-mode='range'] {
+  min-inline-size: 280px;
+}
+
+[data-scope='date-picker'][data-part='label'] {
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='date-picker'][data-part='control'] {
+  gap: var(--ggarry-space-1);
+  block-size: var(--ggarry-size-control-md);
+  padding-inline: var(--ggarry-space-3) 3px;
+  border: 1px solid var(--ggarry-border-control);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-md);
+  transition: border-color var(--ggarry-duration-fast) ease;
+}
+[data-scope='date-picker'][data-part='control']:hover,
+[data-scope='date-picker'][data-part='control'][data-state='open'] {
+  border-color: var(--ggarry-border-accent);
+}
+[data-scope='date-picker'][data-part='control']:has([data-part='input']:focus-visible) {
+  border-color: var(--ggarry-border-accent);
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+[data-scope='date-picker'][data-part='control'][data-invalid] {
+  border-color: var(--ggarry-border-danger);
+}
+[data-scope='date-picker'][data-part='input']:focus-visible {
+  outline: none;
+}
+[data-scope='date-picker'][data-part='input']::placeholder {
+  color: var(--ggarry-text-muted);
+  opacity: 1;
+}
+
+[data-scope='date-picker'][data-part='trigger'] {
+  inline-size: 30px;
+  block-size: 30px;
+  border-radius: var(--ggarry-radius-sm);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='date-picker'][data-part='trigger']:hover,
+[data-scope='date-picker'][data-part='trigger'][data-state='open'] {
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-default);
+}
+[data-scope='date-picker'][data-part='trigger']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: 0;
+}
+[data-scope='date-picker'][data-part='trigger-icon'] {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+[data-scope='date-picker'][data-part='content'] {
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-surface);
+  box-shadow: var(--ggarry-shadow-popover);
+}
+
+[data-scope='date-picker'][data-part='error'] {
+  color: var(--ggarry-text-danger);
+  font-size: var(--ggarry-font-size-sm);
+}

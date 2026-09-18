@@ -385,6 +385,20 @@ export interface ComboboxProps {
   name?: string
 }
 
+export interface CalendarProps {
+  mode?: 'single' | 'range'
+  defaultValue?: string | { start: string | null; end: string | null } | null
+  min?: string
+  max?: string
+  locale?: string
+  onValueChange?: (value: { start: string | null; end: string | null }) => void
+}
+
+export interface DatePickerProps extends CalendarProps {
+  label: string
+  name?: string
+}
+
 export interface CheckboxGroupProps {
   items: RadioItem[]
   name?: string
@@ -681,6 +695,8 @@ export interface Adapter {
   section(props: SectionProps, target: HTMLElement): Promise<Mounted<SectionProps>>
   /** Optional: an adapter without it skips the combobox spec (the custom elements, while vanilla is undecided). */
   combobox?(props: ComboboxProps, target: HTMLElement): Promise<Mounted<ComboboxProps>>
+  calendar?(props: CalendarProps, target: HTMLElement): Promise<Mounted<CalendarProps>>
+  datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
   /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */

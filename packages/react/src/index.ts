@@ -92,3 +92,5 @@ export { Cluster, ClusterSpacer, Container, Grid, PageHeader, Section, Stack } f
 export type { PageHeaderProps, SectionProps } from './components/layout'
 export { Combobox } from './components/combobox'
 export type { ComboboxProps } from './components/combobox'
+export { Calendar, DatePicker } from './components/date-picker'
+export type { CalendarProps, DatePickerProps } from './components/date-picker'

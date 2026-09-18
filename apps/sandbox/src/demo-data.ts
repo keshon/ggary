@@ -311,3 +311,12 @@ export const weekTiles = [
   { title: 'Paid', value: 'RUB 4.2M' },
   { title: 'Unassigned', value: '104,802' },
 ]
+
+/** Saturdays and Sundays: no calls booked. */
+export const isWeekend = (date: string) => {
+  const day = new Date(date + 'T00:00:00Z').getUTCDay()
+  return day === 0 || day === 6
+}
+
+export const HINT_DATES =
+  'Type a day the way your locale writes it — 18.09.2026, 9/18/2026, 18 Sep 2026 — and press Enter or move on; the field shows it back in the locale\'s words and submits it as 2026-09-18. Or open the calendar: arrows walk the days and cross into the next month, Home and End go to the ends of the week, PageUp and PageDown a month (with Shift, a year), Enter chooses. A range is two presses in either order, drawn under the pointer before the second; it submits as one ISO interval, 2026-09-01/2026-09-18. The week starts where the locale\'s does.'
