@@ -258,3 +258,102 @@
 @media (prefers-reduced-motion: reduce) {
   [data-scope='data-grid'][data-part='frame'][data-stale] [data-part='body'] { transition: none; }
 }
+
+/* --- editing in place ----------------------------------------------------- */
+
+/* The editor takes the whole cell and keeps the text where it stood, so
+   opening it does not shift what was being read. */
+[data-scope='data-grid'][data-part='cell'][data-editing] {
+  padding-inline: 0;
+}
+[data-scope='data-grid'][data-part='editor'] {
+  padding-inline: var(--ggarry-space-3);
+  border: 0;
+  border-radius: 0;
+  outline: 2px solid var(--ggarry-focus-ring);
+  outline-offset: -2px;
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+}
+[data-scope='data-grid'][data-part='editor'][data-kind='select'] {
+  padding-inline: var(--ggarry-space-2);
+}
+[data-scope='data-grid'][data-part='editor'][aria-invalid='true'] {
+  outline-color: var(--ggarry-border-danger);
+}
+[data-scope='data-grid'][data-part='editor-error'] {
+  margin-block-start: 2px;
+  padding: var(--ggarry-space-1) var(--ggarry-space-2);
+  border: 1px solid var(--ggarry-border-danger);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-danger);
+  font-size: var(--ggarry-font-size-xs);
+  box-shadow: var(--ggarry-shadow-popover);
+}
+
+/* An editable cell says so on hover, quietly: the text-edit cursor. */
+[data-scope='data-grid'][data-part='cell'][data-editable]:not([data-editing]):hover {
+  cursor: text;
+}
+/* On its way to the server: the new value, underlined as not yet settled.
+   Not muted — muted text on a selected row's tint is under 4.5:1. */
+[data-scope='data-grid'][data-part='cell'][data-save='saving'] {
+  text-decoration: underline dotted var(--ggarry-text-muted);
+  text-underline-offset: 4px;
+}
+/* The save failed and the old value is back: marked until the next save of this cell. */
+[data-scope='data-grid'][data-part='cell'][data-save='failed'] {
+  background: var(--ggarry-bg-danger-subtle);
+  box-shadow: inset 2px 0 0 var(--ggarry-border-danger);
+}
+
+/* The row open in the detail sheet: a bar at its start, so the list says which
+   row the sheet beside it is showing. */
+[data-scope='data-grid'][data-part='row'][data-open] > [data-part='cell']:first-child {
+  box-shadow: inset 3px 0 0 var(--ggarry-border-accent);
+}
+/* …and the pinned edge, when the first column is also the last pinned one. */
+[data-scope='data-grid'][data-part='row'][data-open] > [data-part='cell']:first-child[data-pinned='start'][data-pin-edge] {
+  box-shadow: inset 3px 0 0 var(--ggarry-border-accent), inset -1px 0 0 var(--ggarry-border-default);
+}
+
+/* --- the detail sheet's row steps ----------------------------------------- */
+
+[data-scope='grid-detail'][data-part='nav'] {
+  gap: var(--ggarry-space-1);
+  margin-inline-end: auto;
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-sm);
+}
+[data-scope='grid-detail']:is([data-part='prev'], [data-part='next']) {
+  inline-size: 28px;
+  block-size: 28px;
+  padding: 0;
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-md);
+  background: transparent;
+  color: var(--ggarry-text-default);
+}
+[data-scope='grid-detail']:is([data-part='prev'], [data-part='next']):hover {
+  background: var(--ggarry-bg-subtle);
+}
+[data-scope='grid-detail']:is([data-part='prev'], [data-part='next']):focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+[data-scope='grid-detail']:is([data-part='prev'], [data-part='next'])[aria-disabled='true'] {
+  color: var(--ggarry-text-subtle);
+  cursor: default;
+}
+[data-scope='grid-detail'][data-part='icon'] {
+  inline-size: 14px;
+  block-size: 14px;
+}
+[data-scope='grid-detail'][data-part='icon'][data-direction='prev'] {
+  rotate: 180deg;
+}
+[data-scope='grid-detail'][data-part='position'] {
+  min-inline-size: 7ch;
+  text-align: center;
+}

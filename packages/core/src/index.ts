@@ -36,7 +36,7 @@ export type { AttachDialogOptions, AttachedDialog } from './utils/modal'
 export { attachPopover, contentInsets, submenuOffsets } from './utils/popover'
 export type { AttachPopoverOptions, AttachedPopover } from './utils/popover'
 export { attachPositioner } from './utils/position'
-export type { Placement, PositionOptions } from './utils/position'
+export type { Placement, PositionOptions, VirtualElement } from './utils/position'
 export { openLayerCount, trackDismissable, scrollIntoViewIfNeeded } from './utils/dismissable'
 export type { DismissableOptions, DismissReason } from './utils/dismissable'
 

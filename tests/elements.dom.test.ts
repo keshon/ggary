@@ -14,9 +14,11 @@ import type { GgChipGroupElement, GgSelectElement } from '../packages/elements/s
 // the positioner directly, and a mock of the package entry would miss them.
 vi.mock('../packages/core/src/utils/position', () => ({ attachPositioner: () => () => {} }))
 
+// The whole package is transformed on this import: alone that is a second or
+// two, beside thirty other test files starting at once it has passed ten.
 beforeAll(async () => {
   await import('../packages/elements/src/index')
-})
+}, 60_000)
 
 beforeEach(() => {
   document.body.replaceChildren()
@@ -62,6 +64,17 @@ describe('<gg-select>', () => {
     ;(el.querySelector('[data-part="trigger"]') as HTMLElement).click()
     ;(el.querySelectorAll('[data-part="item"]')[1] as HTMLElement).click()
     expect(seen).toEqual([{ value: 'b', item: selectItems[1] }])
+  })
+
+  it('keeps a value set before it was on the page — a select built in script and then appended', () => {
+    document.body.innerHTML = ''
+    const el = document.createElement('gg-select') as GgSelectElement
+    el.items = selectItems
+    el.value = 'b'
+    expect(el.value).toBe('b')
+    document.body.append(el)
+    expect(el.value).toBe('b')
+    expect(el.querySelector('[data-part="trigger"]')!.textContent).toContain('Bravo')
   })
 
   it('reads items from a JSON attribute when no property was set — for server-rendered pages', () => {

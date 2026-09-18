@@ -3,8 +3,10 @@
     connect,
     createArraySource,
     createDataGrid,
+    type CellEdit,
     type ColumnDef,
     type DataGridController,
+    type EditWords,
     type GridQuery,
     type GridSource,
     type RowKey,
@@ -26,6 +28,11 @@
     onQueryChange?: (query: GridQuery) => void
     onSelectionChange?: (selection: Selection) => void
     onRowActivate?: (row: Row, index: number) => void
+    /** Save an edited cell (columns opt in with `editable`); a rejection puts the old value back. */
+    onCellEdit?: (edit: CellEdit<Row>) => Promise<Row | void> | Row | void
+    editWords?: EditWords
+    /** "Could not save Paid: the deal is closed". */
+    saveFailedText?: (column: string, message: string) => string
     /** A cell of your own; `text` is the formatted value. */
     cell?: Snippet<[Row, ColumnDef<Row>, string]>
     /** Shown when the query matches nothing. */
@@ -44,7 +51,7 @@
   let {
     columns, rows, source, rowKey, label, selectable, initialQuery, onQueryChange, onSelectionChange, onRowActivate,
     cell, empty, emptyText, errorText, retryLabel = 'Try again', locale, rowHeight, blockSize,
-    controller = $bindable(), style,
+    controller = $bindable(), style, onCellEdit, editWords, saveFailedText,
   }: Props = $props()
 
   const id = uid('gg-grid')
@@ -58,13 +65,13 @@
   const grid = untrack(() =>
     createDataGrid<Row>({
       columns, source: sourceFor(source, rows), rowKey, selectable, rowHeight, blockSize, query: initialQuery,
-      onQueryChange, onSelectionChange, onRowActivate,
+      onQueryChange, onSelectionChange, onRowActivate, onCellEdit, editWords,
     })
   )
   untrack(() => (controller = grid))
 
   $effect(() => {
-    grid.update({ columns, source: sourceFor(source, rows), rowKey, onQueryChange, onSelectionChange, onRowActivate })
+    grid.update({ columns, source: sourceFor(source, rows), rowKey, onQueryChange, onSelectionChange, onRowActivate, onCellEdit })
   })
 
   let snapshot = $state.raw(grid.getSnapshot())
@@ -74,7 +81,13 @@
     grid.destroy()
   })
 
-  const api = $derived(connect(snapshot, grid, svelteNormalizer, { id, label, emptyText, errorText, locale }))
+  const api = $derived(connect(snapshot, grid, svelteNormalizer, { id, label, emptyText, errorText, locale, saveFailedText }))
+
+  // The editor takes the focus when it appears, the caret after what it holds.
+  const takeFocus = (field: HTMLInputElement | HTMLSelectElement) => {
+    field.focus({ preventScroll: true })
+    if (field instanceof HTMLInputElement && field.type === 'text') field.setSelectionRange(field.value.length, field.value.length)
+  }
 </script>
 
 <div {...api.frameProps} {style}>
@@ -101,6 +114,17 @@
                 <input {...item.checkboxProps} />
               {:else if line.row === undefined}
                 <span {...api.placeholderProps}></span>
+              {:else if item.editor}
+                {#if item.editor.kind === 'select'}
+                  <select {...item.editor.inputProps} {@attach takeFocus}>
+                    {#each item.editor.options as option (option.value)}
+                      <option value={option.value}>{option.label}</option>
+                    {/each}
+                  </select>
+                {:else}
+                  <input {...item.editor.inputProps} {@attach takeFocus} />
+                {/if}
+                {#if item.editor.error}<span {...item.editor.errorProps}>{item.editor.error}</span>{/if}
               {:else if cell && item.def}
                 {@render cell(line.row, item.def as ColumnDef<Row>, item.text)}
               {:else}

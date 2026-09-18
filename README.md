@@ -1329,11 +1329,67 @@ in the address and follows the back button; `attachColumnStorage(grid, key)` kee
 widths, order and hidden columns in `localStorage`, and a page with storage
 blocked still works.
 
+### From a row
+
+Editing in place, a row's context menu and a detail sheet. The grid does the
+work; the menu and the sheet are the kit's own Menu and Sheet, placed by it.
+
+```tsx
+<DataGrid
+  columns={[
+    { id: 'company', header: 'Company', editable: true, validate: (v) => (v ? null : 'A lead needs a company') },
+    { id: 'sum', header: 'Paid', type: 'money', editable: (lead) => lead.status !== 'won' },
+  ]}
+  onCellEdit={({ key, column, value }) => api.patch(key, { [column.id]: value })}  // reject to roll back
+  controllerRef={setGrid}
+  …
+/>
+<GridRowMenu grid={grid} items={(target) => entries} onSelect={(value, target) => run(value, target)} />
+<GridDetail grid={grid} title={(lead) => lead.company}>
+  {(lead, index) => <LeadFields lead={lead} onStatus={(s) => grid.saveCell(index, 'status', s)} />}
+</GridDetail>
+```
+
+**An edit shows at once and is taken back if the server says no.** A column
+opts in with `editable` (a function decides per row). F2, Enter, a double click
+or just typing opens the editor in the cell — a text field, a number field that
+reads "1 250,5" as well as "1,250.5", a date, or a select of the column's
+options. Enter saves, Escape puts the cell back, Tab goes on to the next
+editable cell of the row, and a click elsewhere keeps what was typed. The new
+value is drawn straight away and marked as saving; `onCellEdit` gets the row,
+the value and the one before, and if it rejects, that cell — only that cell,
+not the row — gets its old value back, is marked, and the status line says why.
+A value the column refuses (`validate`, or "lots" in a number) keeps the editor
+open with the reason under it. Saves are matched to rows by key, so a save that
+comes back after the rows moved still lands on its row, and a late answer for
+an edit since replaced says nothing. `grid.saveCell(index, column, value)` is
+the same path for a form of your own.
+
+**The row being edited is never recycled.** Rows are reused as they scroll;
+the one with the editor is drawn even while it is out of view, so its focus and
+its half-typed value survive a scroll of 700,000 rows.
+
+**A right click, Shift+F10 or the menu key opens the row's menu** — at the
+pointer, or under the active cell for the keyboard, and it gives the focus back
+to the grid. The browser's own menu stays unless a row menu is on the page. On
+a row inside a selection of several, `target.selection` carries the selection,
+so an action can take all of it, as a file manager's does.
+
+**The detail sheet shows one row and walks to the next.** Enter on a cell that
+is not editable, a double click, or `grid.openDetail(index)` opens it beside
+the grid; ↑ and ↓ step through the rows without closing, "6 of 104,802" says
+where you are, and the row being shown is marked in the list. It is not modal:
+the grid stays usable, and pressing another row — or moving with the arrow keys
+— shows that one. A row stepped to that is not loaded yet is asked for and
+shown when it arrives.
+
 In the sandbox, each page carries the registry: 700,000 generated leads, answered
 after 120ms as a server would. It has a search field, status badges in cells,
-Enter to open a lead, filters with four views, a column picker, "Assign to…" on
-any selection including all matching, and CSV export of the query or the
-selection.
+filters with four views, a column picker, "Assign to…" on any selection
+including all matching, CSV export of the query or the selection, six editable
+columns saved after 400ms (a sum typed on a Lost lead is refused, to show the
+rollback), a row menu with Assign and Status submenus, and the lead in a sheet
+with its status to change.
 
 Found on the way:
 
@@ -1363,6 +1419,27 @@ Found on the way:
 - **A test typed into a hidden input.** gg-select carries a hidden input for its
   form value, and "the first input in the editor" found it. The tests now skip
   hidden inputs.
+- **A non-modal sheet sat at the bottom of the page.** A dialog opened with
+  show() is not in the top layer, and the browser places it absolutely, where
+  it is in the page; the sheet layout had only ever met showModal(). A sheet is
+  now fixed to the viewport's edge either way.
+- **The custom element focused its editor before it was on the page.** The
+  editor was created and focused while its row was still being put together,
+  and focusing a detached field does nothing. It is focused once the row is in.
+- **"Saving" in muted text failed contrast on a selected row** (4.36:1). A saving
+  value is underlined, dotted, instead, and keeps its colour.
+- **`controllerRef` could crash React.** The effect returned whatever the
+  callback returned, and React calls a returned value as the cleanup: a
+  callback written `(c) => (grid = c)` threw "destroy is not a function". The
+  effect now returns nothing.
+- **A `<gg-select>` built in script lost its value.** A value set before the
+  element was on the page went to a machine that did not exist yet, and was
+  dropped: the detail sheet's Status select came up empty on the vanilla page.
+  The element now keeps it and starts from it; a test in `elements.dom.test.ts`
+  fails without the fix.
+- **Enter means "edit" on an editable cell.** It used to open the row
+  everywhere. Open a row from a cell that is not editable, by a double click on
+  one, or from the row menu.
 
 ## Layering inside core
 
@@ -1568,20 +1645,21 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 239 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage. |
+| machine | node | `*.machine.test.ts` | 255 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target. |
 | contract | node | `icons.contract.test.ts` | 258 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 915 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 942 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 915 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| dom | jsdom | `elements.dom.test.ts` | 33 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
+| browser | Chrome | `conformance.browser.test.ts` | 942 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
 | browser | Chrome | `tabs.browser.test.ts` | 4 tests. One tab stop under the real Tab key, vertical tabs beside their panel, a long strip scrolling to the focused tab, a real click closing a tab without losing focus. |
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
+| browser | Chrome | `data-grid-rows.browser.test.ts` | 6 tests. A double click and a click elsewhere saving, Tab walking the editable cells, an edit surviving its row scrolled out of view (elements, and React under StrictMode), the row menu standing at the pointer and handing the focus back, a press on another row while the sheet is open. |
 | dom | jsdom | `react-strict.dom.test.ts` | 1 test. The grid under React StrictMode, which unmounts and remounts once, still loads. |
 | browser | Chrome | `navigation.browser.test.ts` | 8 tests. A toolbar under the real Tab and arrow keys — wrapping, skipping what is disabled, returning to the tool last used — a field inside it keeping its own arrows, the spacer measured against the strip's inset, the drawn chevron that is in no text, and a step's bar spanning its item. |
 | browser | Chrome | `controls.browser.test.ts` | 5 tests. One tab stop and the arrow keys on a segmented control, a radio really covering its segment, a range input stepped by the keyboard with the fill following as a computed property, and a real pointer dragging an axis letter under capture. |
@@ -1691,11 +1769,14 @@ Real, and deliberately left open:
   prose, the rest of forms (number field, slider, choice cards), tables,
   the agent components (including the composer, a textarea with a toolbar in one
   frame) and print styles.
-- **The grid does not edit yet.** Built: the engine, the grid, virtual
-  scrolling, sorting, selection with "all matching", pinning, resizing,
-  keyboard, URL views, the filter bar, views, the column picker, the bulk bar
-  and export. Not yet: inline editing with rollback, a detail sheet and a
-  context menu.
+- **One cell at a time.** No pasting a block of cells, no fill-down, and no undo
+  beyond the rollback of a failed save.
+- **An edit to `rows` is yours to keep.** With an array in the page, the grid
+  shows the edit and calls `onCellEdit`; write the value into your array there,
+  or the next query reads the old one. A server source has the same rule: save
+  it, and the next answer carries it.
+- **The detail sheet does not close from the grid.** Escape in the grid clears
+  the selection; the sheet closes from its ✕ or Escape inside it.
 - **Columns are reordered only through the state.** The picker hides and shows;
   there is no dragging of headers yet.
 - **Export is CSV.** No XLSX: that would add a dependency for a format Excel

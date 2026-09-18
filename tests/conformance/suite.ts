@@ -13,7 +13,7 @@ import { checkboxGroupConformance, fieldsetConformance } from './fieldset.spec'
 import { cleanup } from './harness'
 import { inputConformance } from './input.spec'
 import { menuConformance } from './menu.spec'
-import { dataGridConformance, gridToolsConformance } from './data-grid.spec'
+import { dataGridConformance, gridRowsConformance, gridToolsConformance } from './data-grid.spec'
 import { breadcrumbsConformance, navConformance, paginationConformance, stepsConformance, toolbarConformance } from './navigation.spec'
 import { menubarConformance } from './menubar.spec'
 import { popoverConformance, tooltipConformance } from './popover.spec'
@@ -61,6 +61,7 @@ export function runConformance() {
       toolbarConformance(adapter)
       dataGridConformance(adapter)
       gridToolsConformance(adapter)
+      gridRowsConformance(adapter)
       checkboxGroupConformance(adapter)
       fieldsetConformance(adapter)
       resetConformance(adapter)

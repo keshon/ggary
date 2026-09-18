@@ -1,5 +1,5 @@
 import '../../../packages/elements/src/index'
-import type { GgAvatarGroupElement, GgChoiceCardsElement, GgDataGridElement, GgGridFiltersElement, GgNumberFieldElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
+import type { GgAvatarGroupElement, GgChoiceCardsElement, GgDataGridElement, GgGridDetailElement, GgGridFiltersElement, GgGridMenuElement, GgNumberFieldElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
 import {
   type Adapter,
   type ButtonProps,
@@ -14,6 +14,7 @@ import {
   type RadioGroupProps,
   type BreadcrumbsProps,
   type DataGridProps,
+  type GridRowsProps,
   type GridToolsProps,
   type ButtonGroupProps,
   type ChoiceCardGroupProps,
@@ -587,6 +588,41 @@ export const elements: Adapter = {
       update: async (patch) => apply(patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<ButtonGroupProps>)
+  },
+
+  async gridRows(props, target) {
+    const box = document.createElement('div')
+    const id = `grid-${Math.random().toString(36).slice(2)}`
+    const grid = document.createElement('gg-data-grid') as GgDataGridElement
+    grid.id = id
+    grid.setAttribute('label', 'Leads')
+    setAttr(grid, 'locale', props.locale)
+    const menu = document.createElement('gg-grid-menu') as GgGridMenuElement
+    menu.setAttribute('for', id)
+    menu.items = props.menuItems
+    menu.addEventListener('itemselect', (event) => {
+      const { value, target } = (event as CustomEvent).detail
+      props.onMenuSelect(value, target)
+    })
+    const detail = document.createElement('gg-grid-detail') as GgGridDetailElement
+    detail.setAttribute('for', id)
+    detail.heading = props.detailTitle
+    detail.render = (row) => {
+      const text = document.createElement('p')
+      text.textContent = props.detailBody(row)
+      return text
+    }
+    box.append(grid, menu, detail)
+    target.append(box)
+    grid.rowKey = (row: { id: number }) => row.id
+    grid.onCellEdit = props.onCellEdit
+    grid.columns = props.columns
+    grid.rows = props.rows
+    return track({
+      root: box,
+      update: async () => {},
+      unmount: async () => box.remove(),
+    } satisfies Mounted<GridRowsProps>)
   },
 
   async gridTools(props, target) {

@@ -1,5 +1,5 @@
 import { trackDismissable, type DismissableOptions } from './dismissable'
-import { attachPositioner, type PositionOptions } from './position'
+import { attachPositioner, type PositionOptions, type VirtualElement } from './position'
 
 export interface AttachPopoverOptions extends Omit<PositionOptions, 'strategy'> {
   onDismiss: (reason: 'escape' | 'outside') => void
@@ -19,6 +19,17 @@ export interface AttachPopoverOptions extends Omit<PositionOptions, 'strategy'> 
    */
   dismissable?: boolean
   exclude?: (HTMLElement | null)[]
+  /**
+   * Where to stand, when it is not the reference: a context menu stands at
+   * the pointer, and still returns focus to the reference when it closes.
+   */
+  anchor?: Element | VirtualElement
+  /**
+   * A press on the reference is not "outside". Default true: a trigger's own
+   * press toggles. A context menu's reference is the whole grid, and a press
+   * there should close the menu like any other.
+   */
+  excludeReference?: boolean
 }
 
 export interface AttachedPopover {
@@ -76,7 +87,7 @@ export function attachPopover(reference: HTMLElement, content: HTMLElement, init
   }
 
   const position = () =>
-    attachPositioner(reference, content, {
+    attachPositioner(options.anchor ?? reference, content, {
       placement: options.placement,
       gutter: options.gutter,
       crossOffset: options.crossOffset,
@@ -87,7 +98,7 @@ export function attachPopover(reference: HTMLElement, content: HTMLElement, init
 
   const layerOptions: DismissableOptions = {
     onDismiss: (reason) => options.onDismiss(reason === 'escape' ? 'escape' : 'outside'),
-    exclude: [reference, ...(options.exclude ?? [])],
+    exclude: [...(options.excludeReference === false ? [] : [reference]), ...(options.exclude ?? [])],
   }
   const syncLayer = () =>
     Object.assign(layerOptions, {

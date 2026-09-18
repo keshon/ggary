@@ -1,13 +1,17 @@
 import {
   collectRows,
   createArraySource,
+  createFormatter,
   downloadText,
   selectedCount,
   toCsv,
+  type CellEdit,
   type ColumnDef,
   type DataGridController,
   type GridView,
+  type RowMenuTarget,
 } from '@ggary/core/data-grid'
+import type { MenuEntry } from '@ggary/core/menu'
 
 /**
  * A leads registry the size of the one that prompted the data grid: 700,000
@@ -80,15 +84,22 @@ export function makeLeads(count: number): Lead[] {
 export const statusTone = { new: 'running', working: 'warn', won: 'ok', lost: 'neutral' } as const
 
 export const leadColumns: ColumnDef<Lead>[] = [
-  { id: 'company', header: 'Company', pinned: 'start', width: 220 },
-  { id: 'contact', header: 'Contact', width: 170 },
-  { id: 'email', header: 'Email', width: 260 },
+  { id: 'company', header: 'Company', pinned: 'start', width: 220, editable: true, validate: (value) => (value ? null : 'A lead needs a company') },
+  { id: 'contact', header: 'Contact', width: 170, editable: true },
+  {
+    id: 'email',
+    header: 'Email',
+    width: 260,
+    editable: true,
+    validate: (value) => (value && !String(value).includes('@') ? 'An email has an @ in it' : null),
+  },
   { id: 'phone', header: 'Phone', width: 160, sortable: false },
   {
     id: 'status',
     header: 'Status',
     type: 'enum',
     width: 130,
+    editable: true,
     options: [
       { value: 'new', label: 'New' },
       { value: 'working', label: 'In work' },
@@ -101,10 +112,11 @@ export const leadColumns: ColumnDef<Lead>[] = [
     header: 'Manager',
     type: 'enum',
     width: 150,
+    editable: true,
     options: [...MANAGERS.map((name) => ({ value: name, label: name })), { value: null, label: 'Unassigned' }],
   },
   { id: 'users', header: 'Users', type: 'number', width: 100, description: 'People in the account' },
-  { id: 'sum', header: 'Paid', type: 'money', currency: 'RUB', width: 140, description: 'Paid in all, in roubles' },
+  { id: 'sum', header: 'Paid', type: 'money', currency: 'RUB', width: 140, description: 'Paid in all, in roubles', editable: true },
   { id: 'quality', header: 'Quality', type: 'percent', width: 100, description: 'How likely the lead is to buy' },
   { id: 'registered', header: 'Registered', type: 'date', width: 140 },
   { id: 'active', header: 'Active this week', type: 'boolean', width: 150 },
@@ -161,7 +173,7 @@ function scope(grid: DataGridController<Lead>) {
 }
 
 /** A bulk action as a server would run it: on the query or the keys, then the grid reloads what it shows. */
-export async function assignLeads(grid: DataGridController<Lead>, manager: string): Promise<number> {
+export async function assignLeads(grid: DataGridController<Lead>, manager: string | null): Promise<number> {
   const { query, selection } = scope(grid)
   const targets = await collectRows(bulkSource, query, { selection, rowKey: (lead) => lead.id, blockSize: 100_000 })
   for (const lead of targets) lead.manager = manager
@@ -188,3 +200,90 @@ export function debounce<A extends unknown[]>(run: (...args: A) => void, ms = 20
     timer = setTimeout(() => run(...args), ms)
   }
 }
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+/**
+ * A save as a server would take it: after a delay, and not always. A lost
+ * lead refuses a payment, so the grid's rollback can be seen: type a sum on a
+ * "Lost" row.
+ */
+export async function saveLead(edit: CellEdit<Lead>): Promise<void> {
+  await wait(400)
+  const lead = leads[edit.row.id - 1]
+  if (edit.column.id === 'sum' && lead.status === 'lost') throw new Error('a lost lead has nothing to pay')
+  ;(lead as unknown as Record<string, unknown>)[edit.column.id] = edit.value
+  // The next query sorts and filters the changed list.
+  leadSource.invalidate()
+  bulkSource.invalidate()
+}
+
+const STATUS_LABELS = { new: 'New', working: 'In work', won: 'Won', lost: 'Lost' } as const
+export const statusItems = STATUSES.map((status) => ({ value: status, label: STATUS_LABELS[status] }))
+
+/** A row's context menu. On a row inside a selection of several, the actions name the selection. */
+export function leadMenu(target: RowMenuTarget<Lead>): MenuEntry[] {
+  const lead = target.row
+  const many = target.selection
+  const count = many ? (many.mode === 'keys' ? many.keys.length.toLocaleString('en-US') : 'all') : ''
+  return [
+    { value: 'open', label: 'Open', shortcut: 'Enter', disabled: Boolean(many) },
+    {
+      type: 'submenu',
+      value: 'assign',
+      label: many ? `Assign ${count} leads to` : 'Assign to',
+      items: [
+        ...MANAGERS.map((name) => ({ type: 'radio' as const, value: `assign:${name}`, label: name, checked: !many && lead.manager === name })),
+        { type: 'separator' as const },
+        { value: 'assign:', label: 'Nobody' },
+      ],
+    },
+    {
+      type: 'submenu',
+      value: 'status',
+      label: 'Status',
+      disabled: Boolean(many),
+      items: statusItems.map((item) => ({ type: 'radio' as const, value: `status:${item.value}`, label: item.label, checked: lead.status === item.value })),
+    },
+    { type: 'separator' },
+    { value: 'copy', label: 'Copy email', disabled: Boolean(many) },
+  ]
+}
+
+/** What a menu choice does. Returns the words for a toast, or null. */
+export async function runLeadMenu(grid: DataGridController<Lead>, value: string, target: RowMenuTarget<Lead>): Promise<string | null> {
+  if (value === 'open') {
+    grid.openDetail(target.index)
+    return null
+  }
+  if (value === 'copy') {
+    await navigator.clipboard?.writeText(target.row.email).catch(() => {})
+    return `Copied ${target.row.email}`
+  }
+  const [kind, argument] = value.split(':')
+  if (kind === 'assign') {
+    const manager = argument || null
+    if (target.selection) {
+      const count = await assignLeads(grid, manager)
+      return manager ? `Assigned ${count.toLocaleString('en-US')} leads to ${manager}` : `Unassigned ${count.toLocaleString('en-US')} leads`
+    }
+    const saved = await grid.saveCell(target.index, 'manager', manager)
+    return saved ? null : 'Not saved'
+  }
+  if (kind === 'status') await grid.saveCell(target.index, 'status', argument)
+  return null
+}
+
+const byId = new Map(leadColumns.map((column) => [column.id, column]))
+const formatters = new Map(leadColumns.map((column) => [column.id, createFormatter(column, { locale: 'en-US' })]))
+
+/** What the detail sheet lists for a lead, as label and text. */
+export function leadFacts(lead: Lead): { label: string; text: string }[] {
+  return ['contact', 'email', 'phone', 'manager', 'users', 'sum', 'quality', 'registered', 'active', 'source'].map((id) => ({
+    label: byId.get(id)!.header,
+    text: formatters.get(id)!((lead as unknown as Record<string, unknown>)[id]),
+  }))
+}
+
+export const HINT_ROWS =
+  'Company, contact, email, status, manager and paid are editable: F2, Enter, a double click or just typing opens the editor; Enter saves, Escape undoes, Tab goes on to the next editable cell. The save takes 400 ms and shows at once — type a sum on a Lost lead and the server refuses it, the old sum comes back and the grid says why. Right-click a row (or Shift+F10) for its menu; on a row inside a selection the menu acts on all of it. Enter on a non-editable cell, or Open, shows the lead in a sheet that walks to the next and previous lead and follows the grid.'

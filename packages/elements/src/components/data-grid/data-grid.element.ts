@@ -2,14 +2,16 @@ import {
   connect,
   createArraySource,
   createDataGrid,
+  type CellEdit,
+  type CellEditor,
   type ColumnDef,
   type DataGridController,
   type GridQuery,
   type GridSource,
   type RowKey,
 } from '@ggary/core/data-grid'
-import { domNormalizer, uid } from '@ggary/core'
-import { h, spread } from '../../spread'
+import { domNormalizer, uid, type DomProps } from '@ggary/core'
+import { h, reconcileChildren, spread } from '../../spread'
 
 type Cell = { element: HTMLDivElement; box: HTMLInputElement | null; placeholder: HTMLSpanElement | null }
 type Line = { element: HTMLDivElement; cells: Cell[] }
@@ -23,7 +25,8 @@ type Line = { element: HTMLDivElement; cells: Cell[] }
  *   grid.rows = leads            // or grid.source = { load(request, signal) { … } }
  *
  * Attributes: label, selectable, locale (else the page's lang). Properties: columns, rows, source, rowKey,
- * renderCell (row, column, text) => Node | string, initialQuery, controller.
+ * renderCell (row, column, text) => Node | string, initialQuery, controller, onCellEdit (edit) => Promise,
+ * saveFailedText (column, message) => string.
  * Events: gridready, querychange { query }, selectionchange { selection }, rowactivate { row, index }.
  *
  * Rows are drawn from a pool that is reused as they scroll: the elements stay,
@@ -38,6 +41,11 @@ export class GgDataGridElement<Row = any> extends HTMLElement {
   #rowKey: (row: Row) => RowKey = (row) => (row as { id: RowKey }).id
   #renderCell: ((row: Row, column: ColumnDef<Row>, text: string) => Node | string) | null = null
   #initialQuery: Partial<GridQuery> | undefined
+  #onCellEdit: ((edit: CellEdit<Row>) => Promise<Row | void> | Row | void) | undefined
+  #saveFailedText: ((column: string, message: string) => string) | undefined
+  /** The row being edited has a line of its own, so recycling the pool never moves its editor. */
+  #editLine: Line | null = null
+  #editor: { session: string; kind: string; field: HTMLInputElement | HTMLSelectElement; error: HTMLSpanElement; fresh: boolean } | null = null
   #controller: DataGridController<Row> | null = null
   #stopAttach: (() => void) | null = null
   #stopSubscribe: (() => void) | null = null
@@ -89,6 +97,17 @@ export class GgDataGridElement<Row = any> extends HTMLElement {
   set initialQuery(next: Partial<GridQuery> | undefined) {
     this.#initialQuery = next
   }
+  /** Saves an edited cell; a rejection puts the old value back. Columns opt in with `editable`. */
+  get onCellEdit() {
+    return this.#onCellEdit
+  }
+  set onCellEdit(next: ((edit: CellEdit<Row>) => Promise<Row | void> | Row | void) | undefined) {
+    this.#onCellEdit = next
+  }
+  set saveFailedText(next: ((column: string, message: string) => string) | undefined) {
+    this.#saveFailedText = next
+    this.#render()
+  }
   /** For bulk actions, a filter bar, a refresh after a save. */
   get controller(): DataGridController<Row> | null {
     return this.#controller
@@ -129,6 +148,7 @@ export class GgDataGridElement<Row = any> extends HTMLElement {
         onQueryChange: (query) => this.dispatchEvent(new CustomEvent('querychange', { detail: { query }, bubbles: true })),
         onSelectionChange: (selection) => this.dispatchEvent(new CustomEvent('selectionchange', { detail: { selection }, bubbles: true })),
         onRowActivate: (row, index) => this.dispatchEvent(new CustomEvent('rowactivate', { detail: { row, index }, bubbles: true })),
+        onCellEdit: (edit) => this.#onCellEdit?.(edit),
       })
       this.#build()
       this.#stopSubscribe = this.#controller.subscribe(() => this.#render())
@@ -158,6 +178,7 @@ export class GgDataGridElement<Row = any> extends HTMLElement {
       id: this.#id,
       label: this.getAttribute('label') ?? '',
       locale: this.#locale,
+      saveFailedText: this.#saveFailedText,
     })
 
     spread(this, api.frameProps, 'data-grid')
@@ -197,9 +218,20 @@ export class GgDataGridElement<Row = any> extends HTMLElement {
       this.#header.replaceChildren(...this.#headerCells)
     }
 
-    // The body: a pool of rows, reused as the window moves.
-    while (this.#pool.length < api.rows.length) this.#pool.push({ element: h('div'), cells: [] })
-    const lines = this.#pool.slice(0, api.rows.length)
+    // The body: a pool of rows, reused as the window moves. The row being
+    // edited keeps a line of its own, last in the body, so it is never moved:
+    // moving the focused editor would blur it, and a blur saves.
+    const editingRow = controller.getSnapshot().grid.editing?.row
+    if (editingRow === undefined) {
+      this.#editLine = null
+      this.#editor = null
+    } else {
+      this.#editLine ??= { element: h('div'), cells: [] }
+    }
+    const pooledCount = api.rows.filter((line) => line.index !== editingRow).length
+    while (this.#pool.length < pooledCount) this.#pool.push({ element: h('div'), cells: [] })
+    let next = 0
+    const lines = api.rows.map((line) => (line.index === editingRow ? this.#editLine! : this.#pool[next++]))
     api.rows.forEach((line, i) => {
       const pooled = lines[i]
       spread(pooled.element, line.props)
@@ -217,6 +249,8 @@ export class GgDataGridElement<Row = any> extends HTMLElement {
           slot.placeholder ??= h('span')
           spread(slot.placeholder, api.placeholderProps)
           if (slot.element.firstChild !== slot.placeholder) slot.element.replaceChildren(slot.placeholder)
+        } else if (cell.editor) {
+          this.#placeEditor(slot.element, cell.editor, line.index + ':' + c)
         } else if (this.#renderCell && cell.def) {
           const content = this.#renderCell(line.row, cell.def as ColumnDef<Row>, cell.text)
           slot.element.replaceChildren(content)
@@ -225,13 +259,15 @@ export class GgDataGridElement<Row = any> extends HTMLElement {
         }
       })
       if (pooled.element.childElementCount !== pooled.cells.length || [...pooled.element.children].some((child, c) => child !== pooled.cells[c].element)) {
-        pooled.element.replaceChildren(...pooled.cells.map((slot) => slot.element))
+        reconcileChildren(pooled.element, pooled.cells.map((slot) => slot.element))
       }
     })
-    const wanted = lines.map((line) => line.element)
+    const wanted = lines.filter((line) => line !== this.#editLine).map((line) => line.element)
+    if (this.#editLine && lines.includes(this.#editLine)) wanted.push(this.#editLine.element)
     if (this.#body.childElementCount !== wanted.length || [...this.#body.children].some((child, i) => child !== wanted[i])) {
-      this.#body.replaceChildren(...wanted)
+      reconcileChildren(this.#body, wanted)
     }
+    this.#focusEditor()
 
     spread(this.#overlay, api.overlayProps)
     if (api.overlay) {
@@ -253,6 +289,41 @@ export class GgDataGridElement<Row = any> extends HTMLElement {
 
     spread(this.#status, api.statusProps)
     if (this.#status.textContent !== api.statusText) this.#status.textContent = api.statusText
+  }
+
+  /** The editor of the cell being edited: one field per edit, kept as long as the edit lasts. */
+  #placeEditor(cell: HTMLElement, editor: CellEditor<DomProps>, session: string): void {
+    let current = this.#editor
+    if (!current || current.session !== session || current.kind !== editor.kind) {
+      const field = editor.kind === 'select' ? h('select') : h('input')
+      if (field instanceof HTMLSelectElement) {
+        for (const option of editor.options) {
+          const element = h('option')
+          element.value = option.value
+          element.textContent = option.label
+          field.append(element)
+        }
+      }
+      current = this.#editor = { session, kind: editor.kind, field, error: h('span'), fresh: true }
+    }
+    const { field, error } = current
+    spread(field, editor.inputProps)
+    const draft = editor.inputProps.attrs.value ?? ''
+    if (field.value !== draft) field.value = draft
+    spread(error, editor.errorProps)
+    if (error.textContent !== (editor.error ?? '')) error.textContent = editor.error ?? ''
+    for (const node of [...cell.childNodes]) if (node.nodeType !== Node.ELEMENT_NODE) node.remove()
+    reconcileChildren(cell, editor.error ? [field, error] : [field])
+  }
+
+  /** A new editor takes the focus once its row is in the page: focusing a detached field does nothing. */
+  #focusEditor(): void {
+    const current = this.#editor
+    if (!current?.fresh || !current.field.isConnected) return
+    current.fresh = false
+    const { field } = current
+    field.focus({ preventScroll: true })
+    if (field instanceof HTMLInputElement && field.type === 'text') field.setSelectionRange(field.value.length, field.value.length)
   }
 }
 

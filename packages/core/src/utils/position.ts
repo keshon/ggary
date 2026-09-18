@@ -1,4 +1,4 @@
-import { autoUpdate, computePosition, flip, offset, shift, size, type Placement } from '@floating-ui/dom'
+import { autoUpdate, computePosition, flip, offset, shift, size, type Placement, type VirtualElement } from '@floating-ui/dom'
 
 /**
  * `core` has exactly one runtime dependency, and this is why.
@@ -8,7 +8,7 @@ import { autoUpdate, computePosition, flip, offset, shift, size, type Placement 
  * problem; reimplementing it is a multi-month detour that ends in a worse
  * version of Floating UI.
  */
-export type { Placement }
+export type { Placement, VirtualElement }
 
 export interface PositionOptions {
   placement?: Placement
@@ -35,7 +35,8 @@ export interface PositionOptions {
 }
 
 export function attachPositioner(
-  reference: HTMLElement,
+  /** An element, or a point or box of your own: a context menu stands where the pointer was. */
+  reference: Element | VirtualElement,
   floating: HTMLElement,
   { placement = 'bottom-start', gutter = 4, crossOffset = 0, sameWidth = true, strategy = 'absolute', onPlaced }: PositionOptions = {}
 ): () => void {

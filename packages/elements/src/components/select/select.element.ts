@@ -22,6 +22,8 @@ export class GgSelectElement extends HTMLElement {
   #unsubscribe: (() => void) | null = null
   #teardownOpen: (() => void) | null = null
   #items: SelectItem[] = []
+  /** A value set before the element met the page: the machine starts from it. */
+  #pendingValue: { value: string | null } | null = null
   #id = uid('gg-select')
 
   // DOM refs, built once in #build()
@@ -45,10 +47,11 @@ export class GgSelectElement extends HTMLElement {
   }
 
   get value(): string | null {
-    return this.#machine?.getState().value ?? null
+    return this.#machine ? this.#machine.getState().value : (this.#pendingValue?.value ?? this.getAttribute('value'))
   }
   set value(next: string | null) {
-    this.#machine?.send({ type: 'SYNC_VALUE', value: next })
+    if (this.#machine) this.#machine.send({ type: 'SYNC_VALUE', value: next })
+    else this.#pendingValue = { value: next }
   }
 
   // --- lifecycle -------------------------------------------------------------
@@ -82,7 +85,7 @@ export class GgSelectElement extends HTMLElement {
     this.#machine = createSelectMachine({
       id: this.#id,
       items: this.#items,
-      defaultValue: this.getAttribute('value'),
+      defaultValue: this.#pendingValue ? this.#pendingValue.value : this.getAttribute('value'),
       disabled: this.hasAttribute('disabled'),
       onValueChange: (value, item) => {
         this.dispatchEvent(new CustomEvent('valuechange', { detail: { value, item }, bubbles: true }))

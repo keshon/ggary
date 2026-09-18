@@ -2,6 +2,7 @@ import type { Dict, Normalizer } from '../../types'
 import { dataGridAnatomy } from './data-grid.anatomy'
 import { SELECT_COLUMN, type DataGridController, type DataGridSnapshot, type LaidColumn } from './data-grid.controller'
 import { alignOf, createFormatter, type FormatOptions } from './data-grid.format'
+import { cellKey, editorKindOf, editorOptions, isEditable, type EditorKind } from './data-grid.edit'
 import { cellValue } from './data-grid.query'
 import { isAllSelected, isSelected, selectedCount } from './data-grid.selection'
 import type { ColumnDef } from './data-grid.types'
@@ -20,6 +21,19 @@ export interface DataGridConnectOptions extends FormatOptions {
   totalText?: (total: number) => string
   selectAllLabel?: string
   selectRowLabel?: string
+  /** "Could not save Paid: the deal is closed"; receives the column's header and the reason. */
+  saveFailedText?: (column: string, message: string) => string
+}
+
+export interface CellEditor<T> {
+  kind: EditorKind
+  /** A select editor's choices; the draft is the chosen one's `value`. */
+  options: { value: string; label: string }[]
+  /** An input, or a select for `kind: 'select'`. */
+  inputProps: T
+  /** Why the draft cannot be saved, or undefined. */
+  error: string | undefined
+  errorProps: T
 }
 
 const formatters = new WeakMap<ColumnDef, (value: unknown) => string>()
@@ -177,10 +191,69 @@ export function connect<Row, T = Dict>(
     key: string | number
     row: Row | undefined
     props: T
-    cells: { key: string; isSelect: boolean; def: ColumnDef | undefined; value: unknown; text: string; props: T; checkboxProps: T }[]
+    cells: {
+      key: string
+      isSelect: boolean
+      def: ColumnDef | undefined
+      value: unknown
+      text: string
+      props: T
+      checkboxProps: T
+      /** Present while this cell is being edited: draw the editor instead of the text. */
+      editor: CellEditor<T> | undefined
+    }[]
   }[] = []
 
-  for (let index = start; index < end; index += 1) {
+  const editing = grid.editing
+  const anyEditable = layout.columns.some((column) => column.def?.editable)
+  // The row being edited is drawn even when it has scrolled out of view: its
+  // editor holds the focus and a draft, and neither should be dropped.
+  const indices: number[] = []
+  if (editing && editing.row >= 0 && editing.row < start) indices.push(editing.row)
+  for (let index = start; index < end; index += 1) indices.push(index)
+  if (editing && editing.row >= end) indices.push(editing.row)
+
+  const editorFor = (def: ColumnDef, index: number, columnIndex: number): CellEditor<T> => {
+    const kind = editorKindOf(def)
+    const errorId = `${cellId(index, columnIndex)}-error`
+    const error = editing!.error
+    return {
+      kind,
+      options: kind === 'select' ? editorOptions(def, { yes: options.yes, no: options.no }).map((option, i) => ({ value: String(i), label: option.label })) : [],
+      error,
+      inputProps: normalize({
+        ...dataGridAnatomy.attrs('editor'),
+        'data-kind': kind,
+        type: kind === 'select' ? undefined : kind === 'date' ? 'date' : kind === 'datetime' ? 'datetime-local' : 'text',
+        inputMode: kind === 'number' ? 'decimal' : undefined,
+        autoComplete: 'off',
+        value: editing!.draft,
+        'aria-label': def.header,
+        'aria-invalid': error ? 'true' : undefined,
+        'aria-describedby': error ? errorId : undefined,
+        onInput: (event: Event) => controller.setDraft((event.currentTarget as HTMLInputElement).value),
+        onKeyDown: (event: KeyboardEvent) => {
+          if (event.key === 'Enter' && !event.isComposing) {
+            event.preventDefault()
+            controller.commitEdit()
+          } else if (event.key === 'Escape') {
+            // The edit is what Escape undoes here, not a sheet or a dialog around the grid.
+            event.preventDefault()
+            event.stopPropagation()
+            controller.cancelEdit()
+          } else if (event.key === 'Tab') {
+            event.preventDefault()
+            controller.commitEdit({ move: event.shiftKey ? 'prev' : 'next' })
+          }
+        },
+        // Clicking elsewhere keeps what was typed, as a spreadsheet does.
+        onFocusOut: () => controller.commitEdit({ refocus: false }),
+      }),
+      errorProps: normalize({ ...dataGridAnatomy.attrs('editor-error'), id: errorId }),
+    }
+  }
+
+  for (const index of indices) {
     const row = controller.data.rowAt(index)
     const key = row === undefined ? `placeholder-${index}` : controller.options.rowKey(row)
     const selected = row !== undefined && selectable && isSelected(grid.selection, key)
@@ -196,6 +269,8 @@ export function connect<Row, T = Dict>(
         'aria-selected': selectable ? (selected ? 'true' : 'false') : undefined,
         'data-selected': selected ? '' : undefined,
         'data-focused': focusedRow ? '' : undefined,
+        // The row the detail sheet shows: marked while the focus is in the sheet.
+        'data-open': grid.detail === index ? '' : undefined,
         'data-placeholder': row === undefined ? '' : undefined,
         'data-even': index % 2 === 1 ? '' : undefined,
         style: {
@@ -209,12 +284,16 @@ export function connect<Row, T = Dict>(
         const isSelect = column.state.id === SELECT_COLUMN
         const value = row !== undefined && def ? cellValue(def, row) : undefined
         const text = row !== undefined && def ? formatterFor(def, options)(value) : ''
+        const editable = isEditable(def, row)
+        const isEditing = Boolean(editing && editing.row === index && editing.column === columnIndex && def && row !== undefined)
+        const save = row !== undefined && def ? grid.saves[cellKey(key, def.id)] : undefined
         return {
           key: column.state.id,
           isSelect,
           def,
           value,
           text,
+          editor: isEditing ? editorFor(def!, index, columnIndex) : undefined,
           props: normalize({
             ...dataGridAnatomy.attrs('cell'),
             id: cellId(index, columnIndex),
@@ -224,15 +303,30 @@ export function connect<Row, T = Dict>(
             'data-type': def?.type ?? (isSelect ? undefined : 'text'),
             'data-focused': focusedRow && focus?.column === columnIndex ? '' : undefined,
             'data-select': isSelect ? '' : undefined,
+            'data-editable': editable ? '' : undefined,
+            'data-editing': isEditing ? '' : undefined,
+            'data-save': save?.status,
+            // Cells that cannot be edited say so, once any column can.
+            'aria-readonly': anyEditable && !editable && !isSelect ? 'true' : undefined,
+            title: save?.status === 'failed' ? save.message : undefined,
             ...pinAttrs(column),
             style: placement(column),
-            onClick: (event: MouseEvent) =>
+            onClick: (event: MouseEvent) => {
+              // A press inside the editor is the editor's.
+              if ((event.target as Element | null)?.closest?.('[data-part="editor"]')) return
               controller.press(index, columnIndex, {
                 shiftKey: event.shiftKey,
                 ctrlKey: event.ctrlKey,
                 metaKey: event.metaKey,
                 detail: event.detail,
-              }),
+              })
+            },
+            onContextMenu: (event: MouseEvent) => {
+              // The browser's own menu stays unless a row menu is there to replace it.
+              if (row === undefined || isSelect || isEditing || !controller.provides('menu')) return
+              event.preventDefault()
+              controller.openMenu(index, columnIndex, { x: event.clientX, y: event.clientY })
+            },
           }),
           checkboxProps: normalize({
             ...dataGridAnatomy.attrs('checkbox'),
@@ -256,13 +350,22 @@ export function connect<Row, T = Dict>(
   }
 
   const empty = total === 0 && !data.loading && !data.stale && !data.error
-  const statusText = data.error
+  const notice = grid.notice
+  const noticeHeader = notice ? (controller.options.columns.find((column) => column.id === notice.column)?.header ?? notice.column) : ''
+  const noticeText = notice
+    ? options.saveFailedText
+      ? options.saveFailedText(noticeHeader, notice.message)
+      : `Could not save ${noticeHeader}: ${notice.message}`
+    : ''
+  const listText = data.error
     ? (options.errorText ?? 'The rows could not be loaded.')
     : total === undefined
       ? 'Loading…'
       : [options.totalText ? options.totalText(total) : `${total.toLocaleString(options.locale)} rows`, count > 0 ? (options.selectedText ? options.selectedText(count) : `${count.toLocaleString(options.locale)} selected`) : '']
           .filter(Boolean)
           .join(', ')
+  // A failed save is said first: it is news, and the old value is back.
+  const statusText = noticeText ? `${noticeText}. ${listText}` : listText
 
   return {
     total,

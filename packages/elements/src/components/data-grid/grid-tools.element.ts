@@ -29,10 +29,11 @@ import { h, spread } from '../../spread'
 type Controller = DataGridController<unknown>
 
 /** Find the grid by id, now or once it has its controller. */
-abstract class GridTool extends HTMLElement {
+export abstract class GridTool extends HTMLElement {
   protected grid: Controller | null = null
   #stop: (() => void) | null = null
   #wait: (() => void) | null = null
+  #release: (() => void) | void = undefined
 
   connectedCallback(): void {
     this.#bind()
@@ -43,6 +44,8 @@ abstract class GridTool extends HTMLElement {
     this.#stop = null
     this.#wait?.()
     this.#wait = null
+    this.#release?.()
+    this.#release = undefined
   }
 
   #bind(): void {
@@ -56,8 +59,12 @@ abstract class GridTool extends HTMLElement {
     }
     this.grid = target.controller
     this.#stop = this.grid.subscribe(() => this.update())
+    this.#release = this.bound()
     this.update()
   }
+
+  /** The grid was found; what this returns runs when the tool leaves the page. */
+  protected bound(): (() => void) | void {}
 
   protected abstract update(): void
 }

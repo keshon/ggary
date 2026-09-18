@@ -214,3 +214,50 @@
   justify-items: start;
   overflow: auto;
 }
+
+/* --- editing in place ----------------------------------------------------- */
+
+/* The cell being edited lets its error show below it, over the next row; its
+   row stands above the rows after it for the same reason. */
+[data-scope='data-grid'][data-part='row']:has(> [data-editing]) {
+  z-index: 2;
+}
+[data-scope='data-grid'][data-part='cell'][data-editing] {
+  position: relative;
+  overflow: visible;
+}
+[data-scope='data-grid'][data-part='cell'][data-editing][data-pinned] {
+  position: sticky;
+}
+[data-scope='data-grid'][data-part='editor'] {
+  display: block;
+  box-sizing: border-box;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  font: inherit;
+  text-align: inherit;
+}
+[data-scope='data-grid'][data-part='editor-error'] {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: 0;
+  white-space: nowrap;
+  line-height: normal;
+}
+
+/* --- the detail sheet's row steps ----------------------------------------- */
+
+[data-scope='grid-detail'][data-part='nav'] {
+  display: flex;
+  align-items: center;
+}
+[data-scope='grid-detail']:is([data-part='prev'], [data-part='next']) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+[data-scope='grid-detail'][data-part='position'] {
+  font-variant-numeric: tabular-nums;
+}

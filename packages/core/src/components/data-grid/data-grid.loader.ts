@@ -48,6 +48,12 @@ export interface GridData<Row> {
   /** Change a loaded row in place — an optimistic edit, before the server confirms it. */
   replaceRow(index: number, row: Row): void
   /**
+   * Change loaded rows wherever they are — the way an edit reaches its row
+   * after the rows around it moved. `update` returns the new row, or
+   * undefined to leave one as it is.
+   */
+  updateRows(update: (row: Row) => Row | undefined): void
+  /**
    * Abort what is in flight and stay usable: the grid left the page, and may
    * come back — React's StrictMode takes every component away once and puts it
    * back. The next ensureRange asks again for what is missing.
@@ -213,6 +219,26 @@ export function createGridData<Row>(source: GridSource<Row>, initial: GridQuery,
       next[index - block * blockSize] = row
       blocks.set(block, next)
       set({})
+    },
+    updateRows(update) {
+      let changed = false
+      for (const map of [blocks, staleBlocks]) {
+        if (!map) continue
+        for (const [block, rows] of map) {
+          let next: Row[] | null = null
+          rows.forEach((row, i) => {
+            const replaced = update(row)
+            if (replaced === undefined || replaced === row) return
+            next ??= rows.slice()
+            next[i] = replaced
+          })
+          if (next) {
+            map.set(block, next)
+            changed = true
+          }
+        }
+      }
+      if (changed) set({})
     },
     cancel() {
       abortAll()

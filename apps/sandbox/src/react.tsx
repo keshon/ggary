@@ -3,7 +3,23 @@ import './shared.css'
 
 import { StrictMode, useEffect, useMemo, useState, type FormEvent } from 'react'
 import type { DataGridController } from '@ggary/core/data-grid'
-import { assignLeads, debounce, exportLeads, leadColumns, leadSource, leadViews, managerItems, statusTone, type Lead } from './leads'
+import {
+  assignLeads,
+  debounce,
+  exportLeads,
+  leadColumns,
+  leadFacts,
+  leadMenu,
+  leadSource,
+  leadViews,
+  managerItems,
+  runLeadMenu,
+  saveLead,
+  statusItems,
+  HINT_ROWS,
+  statusTone,
+  type Lead,
+} from './leads'
 import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
 import { createRoot } from 'react-dom/client'
 import {
@@ -17,7 +33,9 @@ import {
   DataGrid,
   GridBulkBar,
   GridColumns,
+  GridDetail,
   GridFilters,
+  GridRowMenu,
   Card,
   Checkbox,
   CheckboxGroup,
@@ -848,11 +866,50 @@ function App() {
             column.id === 'status' ? <Badge tone={statusTone[lead.status]}>{text}</Badge> : text
           }
           onRowActivate={(lead) => setLeadLog(`opened ${lead.company} — ${lead.contact}`)}
+          onCellEdit={saveLead}
           onSelectionChange={(selection) =>
             setLeadLog(selection.mode === 'matching' ? 'selected: every lead matching' : `selected: ${selection.keys.size}`)
           }
         />
+        {leadGrid && (
+          <GridRowMenu
+            grid={leadGrid}
+            items={leadMenu}
+            onSelect={async (value, target) => {
+              const said = await runLeadMenu(leadGrid, value, target)
+              if (said) toast({ tone: 'ok', title: said })
+            }}
+          />
+        )}
+        {leadGrid && (
+          <GridDetail
+            grid={leadGrid}
+            title={(lead) => lead.company}
+            description={(lead) => `Lead ${lead.id.toLocaleString('en-US')}`}
+            words={{ locale: 'en-US' }}
+          >
+            {(lead, index) => (
+              <div className="lead-detail">
+                <Select
+                  label="Status"
+                  items={statusItems}
+                  value={lead.status}
+                  onValueChange={(status) => status && void leadGrid.saveCell(index, 'status', status)}
+                />
+                <dl>
+                  {leadFacts(lead).map((fact) => (
+                    <div key={fact.label}>
+                      <dt>{fact.label}</dt>
+                      <dd>{fact.text}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
+          </GridDetail>
+        )}
         <pre className="state">{leadLog}</pre>
+        <p className="hint">{HINT_ROWS}</p>
         <p className="hint">Filters are chips: press one to change it, × to remove it; Views applies a named query, and the whole query lives in the address bar. Columns hides and shows columns and remembers the layout. Select rows and the bar offers every lead the query matches; Assign really reassigns them and the grid reloads, Export writes the query or the selection.</p>
         <p className="hint">700,000 leads, answered after a 120 ms delay as a server would. Only a screenful of rows exists at a time; the scrollbar covers the whole list, and the last row is reachable. Sort by a header (Shift adds a second key), drag a header edge to resize, scroll sideways and the company stays pinned. The grid is one Tab stop: arrows move the active cell, Space selects, Shift+arrows extend, Ctrl+A selects all matching, Enter opens a lead.</p>
       </section>

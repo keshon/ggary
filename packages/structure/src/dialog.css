@@ -14,6 +14,17 @@
   overflow: hidden;
 }
 
+/* A sheet shown without a modal — show(), not showModal(), so the page beside
+   it stays usable, as a detail sheet beside a list — is not in the top layer,
+   and the UA places such a dialog absolutely, wherever it sits in the page.
+   A sheet belongs at the edge of the viewport either way; the theme's margins
+   put it at its side, as they do for the modal one. */
+[data-scope='dialog'][data-part='content']:is([data-placement='start'], [data-placement='end'])[open]:not(:modal) {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+}
+
 /* The UA's <dialog> box is a bordered, padded block; the parts lay it out. */
 [data-scope='dialog'][data-part='content'] {
   padding: 0;

@@ -527,6 +527,21 @@ export interface GridToolsProps {
   locale?: string
 }
 
+/**
+ * A grid with editable columns, a row menu and a detail sheet. The detail's
+ * body is a paragraph of `detailBody(row)`; the menu's choices land in `onMenuSelect`.
+ */
+export interface GridRowsProps {
+  columns: import('../../packages/core/src/components/data-grid').ColumnDef<any>[]
+  rows: any[]
+  locale?: string
+  onCellEdit?: (edit: import('../../packages/core/src/components/data-grid').CellEdit<any>) => Promise<any> | any
+  menuItems: (target: import('../../packages/core/src/components/data-grid').RowMenuTarget<any>) => import('../../packages/core/src/components/menu').MenuEntry[]
+  onMenuSelect: (value: string, target: import('../../packages/core/src/components/data-grid').RowMenuTarget<any>) => void
+  detailTitle: (row: any) => string
+  detailBody: (row: any) => string
+}
+
 export interface CheckboxGroupProps {
   items: RadioItem[]
   name?: string
@@ -813,6 +828,7 @@ export interface Adapter {
   /** Updates are not supported: a grid's props are read at mount. */
   dataGrid(props: DataGridProps, target: HTMLElement): Promise<Mounted<DataGridProps>>
   gridTools(props: GridToolsProps, target: HTMLElement): Promise<Mounted<GridToolsProps>>
+  gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
   /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */
   fieldset(props: FieldsetProps, target: HTMLElement): Promise<Mounted<FieldsetProps>>

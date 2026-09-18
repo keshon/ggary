@@ -2,9 +2,25 @@ import './theme'
 import './shared.css'
 import '@ggary/elements'
 import { toast } from '@ggary/elements'
-import { assignLeads, debounce, exportLeads, leadColumns, leadSource, leadViews, managerItems, statusTone, type Lead } from './leads'
+import {
+  assignLeads,
+  debounce,
+  exportLeads,
+  leadColumns,
+  leadFacts,
+  leadMenu,
+  leadSource,
+  leadViews,
+  managerItems,
+  runLeadMenu,
+  saveLead,
+  statusItems,
+  statusTone,
+  HINT_ROWS,
+  type Lead,
+} from './leads'
 import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
-import type { GgDataGridElement, GgAvatarGroupElement, GgCheckboxElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
+import type { GgDataGridElement, GgGridDetailElement, GgGridMenuElement, GgAvatarGroupElement, GgCheckboxElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
 import { agentsText, badgeTones, crumbs, densities, importSteps, navGroups, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
@@ -489,7 +505,10 @@ app.innerHTML = `
       </gg-grid-bulk>
     </div>
     <gg-data-grid id="leads" label="Leads" selectable locale="en-US" style="block-size: 520px"></gg-data-grid>
+    <gg-grid-menu for="leads" id="lead-menu"></gg-grid-menu>
+    <gg-grid-detail for="leads" id="lead-detail"></gg-grid-detail>
     <pre class="state" id="lead-state">—</pre>
+    <p class="hint">${HINT_ROWS}</p>
     <p class="hint">Filters are chips: press one to change it, × to remove it; Views applies a named query, and the whole query lives in the address bar. Columns hides and shows columns and remembers the layout. Select rows and the bar offers every lead the query matches; Assign really reassigns them and the grid reloads, Export writes the query or the selection.</p>
     <p class="hint">700,000 leads, answered after a 120 ms delay as a server would. Only a screenful of rows exists at a time; the scrollbar covers the whole list, and the last row is reachable. Sort by a header (Shift adds a second key), drag a header edge to resize, scroll sideways and the company stays pinned. The grid is one Tab stop: arrows move the active cell, Space selects, Shift+arrows extend, Ctrl+A selects all matching, Enter opens a lead.</p>
   </section>
@@ -961,7 +980,45 @@ leadGrid.renderCell = (lead, column, text) => {
   badge.textContent = text
   return badge
 }
+leadGrid.onCellEdit = saveLead
 leadGrid.source = leadSource
+
+// What opens from a row: its menu, and the lead in a sheet.
+const leadMenuElement = document.getElementById('lead-menu') as GgGridMenuElement
+leadMenuElement.items = (target) => leadMenu(target as Parameters<typeof leadMenu>[0])
+leadMenuElement.addEventListener('itemselect', async (event) => {
+  const { value, target } = (event as CustomEvent).detail
+  const said = await runLeadMenu(leadGrid.controller!, value, target)
+  if (said) toast({ tone: 'ok', title: said })
+})
+const leadDetail = document.getElementById('lead-detail') as GgGridDetailElement
+leadDetail.words = { locale: 'en-US' }
+leadDetail.heading = (lead: Lead) => lead.company
+leadDetail.description = (lead: Lead) => `Lead ${lead.id.toLocaleString('en-US')}`
+leadDetail.render = (lead: Lead, index: number) => {
+  const box = document.createElement('div')
+  box.className = 'lead-detail'
+  const status = document.createElement('gg-select') as GgSelectElement
+  status.setAttribute('label', 'Status')
+  status.items = statusItems
+  status.value = lead.status
+  status.addEventListener('valuechange', (event) => {
+    const next = (event as CustomEvent).detail.value
+    if (next && next !== lead.status) void leadGrid.controller!.saveCell(index, 'status', next)
+  })
+  const facts = document.createElement('dl')
+  for (const fact of leadFacts(lead)) {
+    const item = document.createElement('div')
+    const term = document.createElement('dt')
+    term.textContent = fact.label
+    const text = document.createElement('dd')
+    text.textContent = fact.text
+    item.append(term, text)
+    facts.append(item)
+  }
+  box.append(status, facts)
+  return box
+}
 const leadState = document.getElementById('lead-state')!
 const leadCount = document.getElementById('lead-count')!
 const showCount = () => {

@@ -45,6 +45,15 @@ export interface ColumnDef<Row = any> {
   options?: ColumnOption[]
   /** ISO 4217, for money columns. */
   currency?: string
+  /**
+   * Edited in place: F2, Enter, a double click or typing. A function decides
+   * per row — a closed deal's sum, say, stays as it is.
+   */
+  editable?: boolean | ((row: Row) => boolean)
+  /** Writes an edited value into a copy of the row. Defaults to `{ ...row, [id]: value }`. */
+  setValue?: (row: Row, value: unknown) => Row
+  /** Refuses a value before it is saved: return the words to show, or nothing. */
+  validate?: (value: unknown, row: Row) => string | null | undefined
 }
 
 export type SortDirection = 'asc' | 'desc'
@@ -120,3 +129,14 @@ export type Selection =
 export type SelectionPayload =
   | { mode: 'keys'; keys: RowKey[] }
   | { mode: 'matching'; query: GridQuery; except: RowKey[] }
+
+/** What a save is handed: the row as it was, as it will be, and the one value that changed. */
+export interface CellEdit<Row> {
+  row: Row
+  next: Row
+  key: RowKey
+  index: number
+  column: ColumnDef<Row>
+  value: unknown
+  previous: unknown
+}

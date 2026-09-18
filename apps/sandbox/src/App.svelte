@@ -10,7 +10,9 @@
     DataGrid,
     GridBulkBar,
     GridColumns,
+    GridDetail,
     GridFilters,
+    GridRowMenu,
     Card,
     Checkbox,
     CheckboxGroup,
@@ -53,7 +55,23 @@
     Tooltip,
   } from '@ggary/svelte'
   import type { DataGridController } from '@ggary/core/data-grid'
-  import { assignLeads, debounce, exportLeads, leadColumns, leadSource, leadViews, managerItems, statusTone, type Lead } from './leads'
+  import {
+    assignLeads,
+    debounce,
+    exportLeads,
+    leadColumns,
+    leadFacts,
+    leadMenu,
+    leadSource,
+    leadViews,
+    managerItems,
+    runLeadMenu,
+    saveLead,
+    statusItems,
+    statusTone,
+    HINT_ROWS,
+    type Lead,
+  } from './leads'
   import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
   import { agentsText, badgeTones, crumbs, densities, importSteps, navGroups, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
@@ -750,6 +768,7 @@ invalid  ${taken}`}</pre>
     bind:controller={leadGrid}
     style="block-size: 520px"
     onRowActivate={(lead: Lead) => (leadLog = `opened ${lead.company} — ${lead.contact}`)}
+    onCellEdit={saveLead}
     onSelectionChange={(selection) =>
       (leadLog = selection.mode === 'matching' ? 'selected: every lead matching' : `selected: ${selection.keys.size}`)}
   >
@@ -757,7 +776,35 @@ invalid  ${taken}`}</pre>
       {#if column.id === 'status'}<Badge tone={statusTone[lead.status]}>{text}</Badge>{:else}{text}{/if}
     {/snippet}
   </DataGrid>
+  {#if leadGrid}
+    <GridRowMenu
+      grid={leadGrid}
+      items={leadMenu}
+      onSelect={async (value, target) => {
+        const said = await runLeadMenu(leadGrid!, value, target)
+        if (said) toast({ tone: 'ok', title: said })
+      }}
+    />
+    <GridDetail grid={leadGrid} title={(lead: Lead) => lead.company} description={(lead: Lead) => `Lead ${lead.id.toLocaleString('en-US')}`} words={{ locale: 'en-US' }}>
+      {#snippet children(lead: Lead, index: number)}
+        <div class="lead-detail">
+          <Select
+            label="Status"
+            items={statusItems}
+            value={lead.status}
+            onValueChange={(status) => status && void leadGrid!.saveCell(index, 'status', status)}
+          />
+          <dl>
+            {#each leadFacts(lead) as fact (fact.label)}
+              <div><dt>{fact.label}</dt><dd>{fact.text}</dd></div>
+            {/each}
+          </dl>
+        </div>
+      {/snippet}
+    </GridDetail>
+  {/if}
   <pre class="state">{leadLog}</pre>
+  <p class="hint">{HINT_ROWS}</p>
   <p class="hint">Filters are chips: press one to change it, × to remove it; Views applies a named query, and the whole query lives in the address bar. Columns hides and shows columns and remembers the layout. Select rows and the bar offers every lead the query matches; Assign really reassigns them and the grid reloads, Export writes the query or the selection.</p>
   <p class="hint">700,000 leads, answered after a 120 ms delay as a server would. Only a screenful of rows exists at a time; the scrollbar covers the whole list, and the last row is reachable. Sort by a header (Shift adds a second key), drag a header edge to resize, scroll sideways and the company stays pinned. The grid is one Tab stop: arrows move the active cell, Space selects, Shift+arrows extend, Ctrl+A selects all matching, Enter opens a lead.</p>
 </section>

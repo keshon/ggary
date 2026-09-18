@@ -27,11 +27,13 @@ import { h, spread } from '../../spread'
  * Attributes: open, heading, description, size, placement (center, start,
  * end: a sheet at that edge), alert (role alertdialog),
  * non-modal, persistent (neither Escape nor an outside press closes it),
+ * no-outside-close (Escape still does: a non-modal sheet beside a list),
  * no-close-button, close-label. Methods: show(), close().
  */
 export class GgDialogElement extends HTMLElement {
   static observedAttributes = [
     'open', 'heading', 'description', 'size', 'placement', 'side', 'alert', 'non-modal', 'persistent', 'no-close-button', 'close-label',
+    'no-outside-close',
   ]
 
   /** Where a dialog stands without a `placement` attribute. <gg-sheet> overrides it. */
@@ -94,7 +96,7 @@ export class GgDialogElement extends HTMLElement {
     if (!machine) return
     if (name === 'open') {
       if (!this.#reflecting) machine.send({ type: 'SYNC_OPEN', open: this.hasAttribute('open') })
-    } else if (['alert', 'non-modal', 'persistent'].includes(name)) {
+    } else if (['alert', 'non-modal', 'persistent', 'no-outside-close'].includes(name)) {
       machine.send({ type: 'SYNC_OPTIONS', ...this.#options() })
     }
     if (this.isConnected) this.#render()
@@ -106,7 +108,7 @@ export class GgDialogElement extends HTMLElement {
       modal: !this.hasAttribute('non-modal'),
       role: this.hasAttribute('alert') ? ('alertdialog' as const) : ('dialog' as const),
       closeOnEscape: !persistent,
-      closeOnOutside: !persistent,
+      closeOnOutside: !persistent && !this.hasAttribute('no-outside-close'),
     }
   }
 

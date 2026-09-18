@@ -6,6 +6,7 @@ import {
   revealMenuTarget,
   type AttachedPopover,
   type DomProps,
+  type VirtualElement,
 } from '@ggary/core'
 import { h, reconcileChildren, spread } from '../../spread'
 
@@ -28,7 +29,9 @@ export class MenuRenderer {
 
   constructor(
     private readonly getState: () => MenuState,
-    private readonly reference: () => HTMLElement | null
+    private readonly reference: () => HTMLElement | null,
+    /** Where to stand when that is not the reference, and whether a press on the reference closes: a context menu's. */
+    private readonly place: { anchor?: () => Element | VirtualElement | null; dismissOnReference?: boolean } = {}
   ) {}
 
   render(api: Api): void {
@@ -36,9 +39,9 @@ export class MenuRenderer {
     spread(this.content, api.contentProps)
     this.#renderLevel(api, this.content, api.nodes, [], new Map())
 
-    const anchor = this.reference()
-    if (state.open && !this.#root && anchor) {
-      this.#root = attachPopover(anchor, this.content, {
+    const reference = this.reference()
+    if (state.open && !this.#root && reference) {
+      this.#root = attachPopover(reference, this.content, {
         placement: state.placement,
         gutter: 4,
         // Focus goes back to the anchor on close; while open it follows the focus target.
@@ -46,6 +49,8 @@ export class MenuRenderer {
         onDismiss: (reason) => api.dismiss(reason),
         // Placement is asynchronous and shortens the list: keep the row in view after it.
         onPlaced: () => revealMenuTarget(document, menuFocusTarget(this.getState())),
+        anchor: this.place.anchor?.() ?? undefined,
+        excludeReference: !this.place.dismissOnReference,
       })
     } else if (!state.open && this.#root) {
       this.#closeSubmenus(new Set())

@@ -20,7 +20,29 @@ export interface GridState {
    * the header row), and a column by its position among the visible ones.
    */
   focus: { row: number; column: number } | null
+  /**
+   * The cell being edited, and what its editor holds. `error` is why the draft
+   * cannot be saved yet; the editor stays open until it can, or is cancelled.
+   */
+  editing: { row: number; column: number; draft: string; error?: string } | null
+  /**
+   * Cells with a save in flight or a save that failed, by `cellKey`. They
+   * outlive a query: a save does not care where its row is shown now.
+   */
+  saves: Readonly<Record<string, CellSave>>
+  /** The row open in the detail sheet, by index; it follows the active row. */
+  detail: number | null
+  /**
+   * The last request for a row's context menu. A menu listens for a new
+   * `nonce`; `point` is where the pointer was, or null for the keyboard's
+   * request, which opens at the active cell.
+   */
+  menu: { row: number; column: number; point: { x: number; y: number } | null; nonce: number } | null
+  /** The last save that failed, for the status line to say so. Cleared by the next edit. */
+  notice: { column: string; message: string } | null
 }
+
+export type CellSave = { status: 'saving' } | { status: 'failed'; message: string; column: string }
 
 export type GridEvent =
   /** Cycles asc → desc → off. With `additive`, the column joins the sort instead of replacing it. */
@@ -45,6 +67,16 @@ export type GridEvent =
   | { type: 'SELECT_RANGE'; keys: readonly RowKey[]; index: number }
   | { type: 'SELECT_ALL_MATCHING' }
   | { type: 'CLEAR_SELECTION' }
+  | { type: 'EDIT_START'; row: number; column: number; draft: string }
+  | { type: 'EDIT_DRAFT'; draft: string }
+  | { type: 'EDIT_ERROR'; error: string }
+  | { type: 'EDIT_END' }
+  | { type: 'SAVE_START'; cell: string }
+  | { type: 'SAVE_DONE'; cell: string }
+  | { type: 'SAVE_FAILED'; cell: string; column: string; message: string }
+  | { type: 'OPEN_DETAIL'; row: number }
+  | { type: 'CLOSE_DETAIL' }
+  | { type: 'REQUEST_MENU'; row: number; column: number; point: { x: number; y: number } | null }
 
 export const DEFAULT_WIDTHS: Record<string, number> = {
   text: 180,
@@ -75,6 +107,11 @@ export function initialGridState(columns: readonly ColumnDef[], query: Partial<G
     selection: emptySelection,
     anchor: null,
     focus: null,
+    editing: null,
+    saves: {},
+    detail: null,
+    menu: null,
+    notice: null,
   }
 }
 
@@ -99,10 +136,26 @@ function withQuery(state: GridState, query: GridQuery): GridState {
   if (queryKey(query) === queryKey(state.query)) return state.query === query ? state : { ...state, query }
   // The active cell goes back to the first row: its old row is somewhere else now.
   const focus = state.focus === null ? null : { row: Math.min(state.focus.row, 0), column: state.focus.column }
-  return { ...state, query, selection: emptySelection, anchor: null, focus }
+  // An edit, an open row and a menu all point at rows by their place in the
+  // old answer, so they close with it. Saves stay: they are keyed by row.
+  return { ...state, query, selection: emptySelection, anchor: null, focus, editing: null, detail: null, menu: null }
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
+
+/** The open detail follows the active row, so arrow keys in the grid walk through it. */
+const withFocus = (state: GridState, focus: { row: number; column: number }): GridState => ({
+  ...state,
+  focus,
+  detail: state.detail !== null && focus.row >= 0 ? focus.row : state.detail,
+})
+
+const withoutSave = (saves: GridState['saves'], cell: string) => {
+  if (!(cell in saves)) return saves
+  const next = { ...saves }
+  delete next[cell]
+  return next
+}
 
 export function gridReducer(state: GridState, event: GridEvent): GridState {
   switch (event.type) {
@@ -160,27 +213,55 @@ export function gridReducer(state: GridState, event: GridEvent): GridState {
 
     case 'FOCUS':
       if (state.focus?.row === event.row && state.focus.column === event.column) return state
-      return { ...state, focus: { row: event.row, column: event.column } }
+      return withFocus(state, { row: event.row, column: event.column })
     case 'BLUR':
       return state.focus === null ? state : { ...state, focus: null }
     case 'TOGGLE':
-      return {
-        ...state,
-        selection: toggleKey(state.selection, event.key),
-        anchor: event.index,
-        focus: { row: event.index, column: state.focus?.column ?? 0 },
-      }
+      return withFocus(
+        { ...state, selection: toggleKey(state.selection, event.key), anchor: event.index },
+        { row: event.index, column: state.focus?.column ?? 0 }
+      )
     case 'SELECT_RANGE':
-      return {
-        ...state,
-        selection: setKeys(state.selection, event.keys, true),
-        focus: { row: event.index, column: state.focus?.column ?? 0 },
-      }
+      return withFocus({ ...state, selection: setKeys(state.selection, event.keys, true) }, { row: event.index, column: state.focus?.column ?? 0 })
     case 'SELECT_ALL_MATCHING':
       return { ...state, selection: selectAllMatching(), anchor: null }
     case 'CLEAR_SELECTION':
       if (state.selection.mode === 'keys' && state.selection.keys.size === 0) return state
       return { ...state, selection: emptySelection, anchor: null }
+
+    case 'EDIT_START':
+      return {
+        ...withFocus(state, { row: event.row, column: event.column }),
+        editing: { row: event.row, column: event.column, draft: event.draft },
+        notice: null,
+      }
+    case 'EDIT_DRAFT':
+      // Typing again takes the complaint away: it was about the old text.
+      return state.editing ? { ...state, editing: { row: state.editing.row, column: state.editing.column, draft: event.draft } } : state
+    case 'EDIT_ERROR':
+      return state.editing ? { ...state, editing: { ...state.editing, error: event.error } } : state
+    case 'EDIT_END':
+      return state.editing ? { ...state, editing: null } : state
+    case 'SAVE_START':
+      return { ...state, saves: { ...state.saves, [event.cell]: { status: 'saving' } } }
+    case 'SAVE_DONE':
+      return { ...state, saves: withoutSave(state.saves, event.cell) }
+    case 'SAVE_FAILED':
+      return {
+        ...state,
+        saves: { ...state.saves, [event.cell]: { status: 'failed', message: event.message, column: event.column } },
+        notice: { column: event.column, message: event.message },
+      }
+
+    case 'OPEN_DETAIL':
+      return { ...state, detail: event.row, focus: { row: event.row, column: state.focus?.column ?? 0 } }
+    case 'CLOSE_DETAIL':
+      return state.detail === null ? state : { ...state, detail: null }
+    case 'REQUEST_MENU':
+      return {
+        ...withFocus(state, { row: event.row, column: event.column }),
+        menu: { row: event.row, column: event.column, point: event.point, nonce: (state.menu?.nonce ?? 0) + 1 },
+      }
   }
 }
 

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { ColumnDef, GridSource } from '../../packages/core/src/components/data-grid'
 import { setInputValue } from '../../packages/core/src/index'
-import { type Adapter, type DataGridProps, type GridToolsProps, click, freshTarget, part } from './harness'
+import { type Adapter, type DataGridProps, type GridToolsProps, click, freshTarget, part, parts } from './harness'
 
 interface Lead {
   id: number
@@ -269,6 +269,199 @@ export function gridToolsConformance(adapter: Adapter) {
       expect(headers()).toEqual(['Company', 'Status'])
       await adapter.act(() => click([...picker.querySelectorAll<HTMLButtonElement>('button')].find((b) => b.textContent?.trim() === 'Reset columns')!))
       expect(headers()).toEqual(['Company', 'Sum', 'Status'])
+    })
+  })
+}
+
+/**
+ * What opens from a row: an editor in its cell, a context menu, a detail
+ * sheet. The same behaviour in each framework, down to where the focus goes.
+ */
+export function gridRowsConformance(adapter: Adapter) {
+  describe('grid rows: editing, the row menu, the detail sheet', () => {
+    const editable: ColumnDef<Lead>[] = [
+      { id: 'name', header: 'Company', editable: true },
+      { id: 'sum', header: 'Sum', type: 'money', currency: 'USD', editable: true },
+      { ...columns[2], editable: true },
+      { id: 'id', header: 'Number', type: 'number' },
+    ]
+
+    const setup = async () => {
+      const saves: { value: unknown; previous: unknown; key: unknown }[] = []
+      const chosen: { value: string; id: number; selection: unknown }[] = []
+      const control = { reject: null as string | null }
+      const m = await adapter.gridRows(
+        {
+          columns: editable,
+          rows: leads.map((lead) => ({ ...lead })),
+          locale: 'en-US',
+          onCellEdit: async (edit) => {
+            saves.push({ value: edit.value, previous: edit.previous, key: edit.key })
+            if (control.reject) throw new Error(control.reject)
+          },
+          menuItems: () => [
+            { value: 'open', label: 'Open' },
+            { value: 'archive', label: 'Archive' },
+          ],
+          onMenuSelect: (value, target) => chosen.push({ value, id: target.row.id, selection: target.selection }),
+          detailTitle: (row) => row.name,
+          detailBody: (row) => `Lead number ${row.id}`,
+        },
+        freshTarget()
+      )
+      await adapter.wait(0)
+      await adapter.wait(0)
+      const grid = () => part(m.root, 'data-grid', 'root')!
+      const cell = (row: number, column: number) =>
+        [...m.root.querySelectorAll('[data-scope="data-grid"][data-part="row"]')]
+          .find((line) => line.getAttribute('aria-rowindex') === String(row + 2))!
+          .querySelectorAll<HTMLElement>('[data-part="cell"]')[column]
+      const editor = () => part(m.root, 'data-grid', 'editor') as (HTMLInputElement & HTMLSelectElement) | null
+      const status = () => part(m.root, 'data-grid', 'status')!.textContent
+      const menu = () => part(m.root, 'menu', 'content')!
+      const sheet = () => part(m.root, 'dialog', 'content') as HTMLDialogElement
+      const press = (target: Element, name: string, init: KeyboardEventInit = {}) => adapter.act(() => void key(target, name, init))
+      const focusCell = async (column: number) => {
+        await adapter.act(() => grid().focus())
+        for (let i = 0; i < column; i += 1) await press(grid(), 'ArrowRight')
+      }
+      return { m, saves, chosen, control, grid, cell, editor, status, menu, sheet, press, focusCell }
+    }
+
+    it('F2 opens the editor in the cell; Enter saves, shows the value and gives the focus back', async () => {
+      const { saves, grid, cell, editor, press, focusCell } = await setup()
+      expect(cell(0, 1).hasAttribute('data-editable')).toBe(true)
+      expect(cell(0, 3).getAttribute('aria-readonly')).toBe('true')
+      await focusCell(1)
+      await press(grid(), 'F2')
+      const input = editor()!
+      expect(input.tagName).toBe('INPUT')
+      expect(input.getAttribute('aria-label')).toBe('Sum')
+      expect(input.value).toBe('1200')
+      expect(document.activeElement).toBe(input)
+      expect(cell(0, 1).hasAttribute('data-editing')).toBe(true)
+
+      await adapter.act(() => setInputValue(input, '1 500'))
+      await press(input, 'Enter')
+      await adapter.wait(0)
+      expect(saves).toEqual([{ value: 1500, previous: 1200, key: 1 }])
+      expect(editor()).toBeNull()
+      expect(cell(0, 1).textContent).toBe('$1,500.00')
+      expect(document.activeElement).toBe(grid())
+    })
+
+    it('Escape puts the cell back as it was, and saves nothing', async () => {
+      const { saves, grid, cell, editor, press, focusCell } = await setup()
+      await focusCell(0)
+      await press(grid(), 'Enter')
+      await adapter.act(() => setInputValue(editor()!, 'Zeta'))
+      await press(editor()!, 'Escape')
+      expect(editor()).toBeNull()
+      expect(cell(0, 0).textContent).toBe('Acme')
+      expect(saves).toEqual([])
+      expect(document.activeElement).toBe(grid())
+    })
+
+    it('typing on a cell starts its edit with what was typed', async () => {
+      const { grid, editor, press, focusCell } = await setup()
+      await focusCell(0)
+      await press(grid(), 'Z')
+      expect(editor()!.value).toBe('Z')
+    })
+
+    it('a failed save puts the old value back and says why', async () => {
+      const { control, grid, cell, editor, status, press, focusCell } = await setup()
+      control.reject = 'the deal is closed'
+      await focusCell(0)
+      await press(grid(), 'Z')
+      await press(editor()!, 'Enter')
+      await adapter.wait(0)
+      await adapter.wait(0)
+      expect(cell(0, 0).textContent).toBe('Acme')
+      expect(cell(0, 0).dataset.save).toBe('failed')
+      expect(status()).toContain('Could not save Company: the deal is closed')
+    })
+
+    it('a value that is not one keeps the editor open, marked, with the reason', async () => {
+      const { saves, grid, editor, m, press, focusCell } = await setup()
+      await focusCell(1)
+      await press(grid(), 'F2')
+      await adapter.act(() => setInputValue(editor()!, 'lots'))
+      await press(editor()!, 'Enter')
+      expect(editor()!.getAttribute('aria-invalid')).toBe('true')
+      const error = part(m.root, 'data-grid', 'editor-error')!
+      expect(error.textContent).toBe('Enter a number')
+      expect(editor()!.getAttribute('aria-describedby')).toBe(error.id)
+      expect(saves).toEqual([])
+    })
+
+    it('a list column edits with a select of its options', async () => {
+      const { saves, grid, cell, editor, press, focusCell } = await setup()
+      await focusCell(2)
+      await press(grid(), 'Enter')
+      const select = editor()!
+      expect(select.tagName).toBe('SELECT')
+      expect([...select.options].map((option) => option.textContent)).toEqual(['—', 'New', 'Won'])
+      expect(select.value).toBe('1')
+      await adapter.act(() => {
+        select.value = '2'
+        select.dispatchEvent(new Event('input', { bubbles: true }))
+        select.dispatchEvent(new Event('change', { bubbles: true }))
+      })
+      await press(select, 'Enter')
+      await adapter.wait(0)
+      expect(saves).toEqual([{ value: 'won', previous: 'new', key: 1 }])
+      expect(cell(0, 2).textContent).toBe('Won')
+    })
+
+    it('a right click opens the row menu at the pointer; a choice reports the row', async () => {
+      const { chosen, grid, cell, menu, m } = await setup()
+      expect(menu().dataset.state).toBe('closed')
+      const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 40, clientY: 60 })
+      await adapter.act(() => void cell(1, 0).dispatchEvent(event))
+      await adapter.wait(0)
+      expect(event.defaultPrevented).toBe(true)
+      expect(menu().dataset.state).toBe('open')
+      expect(menu().getAttribute('aria-label')).toBe('Row actions')
+      const items = parts(m.root, 'menu', 'item')
+      expect(items.map((item) => part(item, 'menu', 'item-text')!.textContent)).toEqual(['Open', 'Archive'])
+      await adapter.act(() => click(items[1]))
+      await adapter.wait(0)
+      expect(chosen).toEqual([{ value: 'archive', id: 2, selection: null }])
+      expect(menu().dataset.state).toBe('closed')
+      expect(document.activeElement).toBe(grid())
+    })
+
+    it('Shift+F10 opens the row menu from the keyboard, on its first item', async () => {
+      const { grid, menu, press, focusCell } = await setup()
+      await focusCell(3)
+      await press(grid(), 'F10', { shiftKey: true })
+      await adapter.wait(0)
+      expect(menu().dataset.state).toBe('open')
+      expect(part(document.activeElement!, 'menu', 'item-text')?.textContent).toBe('Open')
+    })
+
+    it('Enter on a row opens it in a sheet that walks to the next row', async () => {
+      const { grid, sheet, m, press, focusCell } = await setup()
+      await focusCell(3)
+      await press(grid(), 'Enter')
+      await adapter.wait(0)
+      expect(sheet().open).toBe(true)
+      expect(part(m.root, 'dialog', 'title')!.textContent).toBe('Acme')
+      expect(part(m.root, 'dialog', 'body')!.textContent).toBe('Lead number 1')
+      expect(part(m.root, 'grid-detail', 'position')!.textContent).toBe('1 of 3')
+      expect(part(m.root, 'grid-detail', 'prev')!.getAttribute('aria-disabled')).toBe('true')
+
+      await adapter.act(() => click(part(m.root, 'grid-detail', 'next')!))
+      await adapter.wait(0)
+      expect(part(m.root, 'dialog', 'title')!.textContent).toBe('Borealis')
+      expect(part(m.root, 'grid-detail', 'position')!.textContent).toBe('2 of 3')
+      // The grid's active row went along.
+      expect(grid().getAttribute('aria-activedescendant')).toMatch(/r1c3$/)
+
+      await adapter.act(() => click(part(m.root, 'dialog', 'close')!))
+      await adapter.wait(0)
+      expect(sheet().open).toBe(false)
     })
   })
 }

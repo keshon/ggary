@@ -20,7 +20,9 @@ import {
   DataGrid,
   GridBulkBar,
   GridColumns,
+  GridDetail,
   GridFilters,
+  GridRowMenu,
   ChoiceCardGroup,
   FileDrop,
   InputGroup,
@@ -54,6 +56,7 @@ import {
 import {
   type Adapter,
   type ButtonGroupProps,
+  type GridRowsProps,
   type GridToolsProps,
   type ToolbarProps,
   type ButtonProps,
@@ -130,6 +133,32 @@ function ReactGridWithTools(props: GridToolsProps) {
   )
 }
 
+/** The grid with a row menu and a detail sheet, sharing one controller. */
+function ReactGridWithRows(props: GridRowsProps) {
+  const [grid, setGrid] = useState<DataGridController<any>>()
+  return createElement(
+    Fragment,
+    null,
+    createElement(DataGrid as ComponentType<any>, {
+      columns: props.columns,
+      rows: props.rows,
+      rowKey: (row: { id: number }) => row.id,
+      label: 'Leads',
+      locale: props.locale,
+      onCellEdit: props.onCellEdit,
+      controllerRef: setGrid,
+    }),
+    grid ? createElement(GridRowMenu as ComponentType<any>, { grid, items: props.menuItems, onSelect: props.onMenuSelect }) : null,
+    grid
+      ? createElement(GridDetail as ComponentType<any>, {
+          grid,
+          title: props.detailTitle,
+          children: (row: unknown) => createElement('p', null, props.detailBody(row)),
+        })
+      : null
+  )
+}
+
 export const react: Adapter = {
   name: 'react',
   supports: { controlled: true, refusal: true, linkRoot: true },
@@ -162,6 +191,7 @@ export const react: Adapter = {
     mount(InputGroup, props, target, ({ input, ...rest }: InputGroupProps) => [rest, createElement(Input, input ?? {})]),
   fileDrop: (props, target) => mount(FileDrop, props, target),
   breadcrumbs: (props, target) => mount(Breadcrumbs, props, target),
+  gridRows: (props, target) => mount(ReactGridWithRows as ComponentType<any>, props, target),
   gridTools: (props, target) => mount(ReactGridWithTools as ComponentType<any>, props, target),
   dataGrid: (props, target) => mount(DataGrid as ComponentType<any>, { rowKey: (row: { id: unknown }) => row.id, ...props }, target),
   nav: (props, target) => mount(Nav, props, target),

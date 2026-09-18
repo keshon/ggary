@@ -1,13 +1,17 @@
 import { Fragment, useEffect, useRef } from 'react'
 import { hasIndicator, menuFocusTarget, type MenuApi, type MenuItem, type MenuNode, type MenuState, type MenuSubmenuItem } from '@ggary/core/menu'
-import { attachPopover, submenuOffsets, focusMenuTarget, revealMenuTarget, type AttachedPopover } from '@ggary/core'
+import { attachPopover, submenuOffsets, focusMenuTarget, revealMenuTarget, type AttachedPopover, type VirtualElement } from '@ggary/core'
 
 export interface MenuContentProps {
   api: MenuApi
   /** The machine's current state, read at the moment an effect runs. */
   getState: () => MenuState
-  /** What the menu is anchored to: a Menu's trigger, a Menubar's item. */
+  /** What the menu is anchored to: a Menu's trigger, a Menubar's item. Focus goes back to it on close. */
   reference: () => HTMLElement | null
+  /** Where the menu stands when that is not the reference: a context menu stands at the pointer. */
+  anchor?: () => Element | VirtualElement | null
+  /** A press on the reference closes the menu, as for a context menu. Default false: a trigger toggles. */
+  dismissOnReference?: boolean
 }
 
 /**
@@ -20,15 +24,15 @@ export interface MenuContentProps {
  * Passive effects run after that restore, and still before paint for a click
  * or a key.
  */
-export function MenuContent({ api, getState, reference }: MenuContentProps) {
+export function MenuContent({ api, getState, reference, anchor, dismissOnReference }: MenuContentProps) {
   const contentRef = useRef<HTMLDivElement>(null)
   const attached = useRef<AttachedPopover | null>(null)
 
   useEffect(() => {
     const content = contentRef.current
-    const anchor = reference()
-    if (!api.open || !content || !anchor) return
-    const instance = attachPopover(anchor, content, {
+    const element = reference()
+    if (!api.open || !content || !element) return
+    const instance = attachPopover(element, content, {
       placement: getState().placement,
       gutter: 4,
       // Focus goes back to the anchor on close; where it goes while open is
@@ -37,6 +41,8 @@ export function MenuContent({ api, getState, reference }: MenuContentProps) {
       onDismiss: (reason) => api.dismiss(reason),
       // Placement is asynchronous and shortens the list: keep the row in view after it.
       onPlaced: () => revealMenuTarget(document, menuFocusTarget(getState())),
+      anchor: anchor?.() ?? undefined,
+      excludeReference: !dismissOnReference,
     })
     attached.current = instance
     return () => {

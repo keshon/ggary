@@ -1,17 +1,21 @@
 <script lang="ts">
   import { hasIndicator, menuFocusTarget, type MenuApi, type MenuItem, type MenuNode, type MenuState } from '@ggary/core/menu'
-  import { attachPopover, submenuOffsets, focusMenuTarget, revealMenuTarget, type AttachedPopover } from '@ggary/core'
+  import { attachPopover, submenuOffsets, focusMenuTarget, revealMenuTarget, type AttachedPopover, type VirtualElement } from '@ggary/core'
   import { untrack } from 'svelte'
 
   type Props = {
     api: MenuApi
     /** The machine's current state, read at the moment an effect runs. */
     getState: () => MenuState
-    /** What the menu is anchored to: a Menu's trigger, a Menubar's item. */
+    /** What the menu is anchored to: a Menu's trigger, a Menubar's item. Focus goes back to it on close. */
     reference: () => HTMLElement | null
+    /** Where the menu stands when that is not the reference: a context menu stands at the pointer. */
+    anchor?: () => Element | VirtualElement | null
+    /** A press on the reference closes the menu, as for a context menu. Default false: a trigger toggles. */
+    dismissOnReference?: boolean
   }
 
-  let { api, getState, reference }: Props = $props()
+  let { api, getState, reference, anchor, dismissOnReference }: Props = $props()
 
   /*
    * The menu panel and every submenu under it, shared by Menu and Menubar, which
@@ -25,9 +29,9 @@
   $effect(() => {
     if (!open) return
     const instance = untrack(() => {
-      const anchor = reference()
-      if (!anchor) return null
-      return attachPopover(anchor, content, {
+      const element = reference()
+      if (!element) return null
+      return attachPopover(element, content, {
         placement: getState().placement,
         gutter: 4,
         // Focus goes back to the anchor on close; while open it follows the focus target, below.
@@ -35,6 +39,8 @@
         onDismiss: (reason) => api.dismiss(reason),
         // Placement is asynchronous and shortens the list: keep the row in view after it.
         onPlaced: () => revealMenuTarget(document, menuFocusTarget(getState())),
+        anchor: anchor?.() ?? undefined,
+        excludeReference: !dismissOnReference,
       })
     })
     attached = instance
