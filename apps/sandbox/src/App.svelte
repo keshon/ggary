@@ -36,6 +36,7 @@
     Accordion,
     Tree,
     Progress,
+    Kanban,
     Grid,
     PageHeader,
     Section,
@@ -95,7 +96,8 @@
     type Lead,
   } from './leads'
   import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { applyMove, type KanbanMove } from '@ggary/core/kanban'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, dealStages, initialDeals, saveDealMove, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -115,6 +117,13 @@
   let dateLog = $state('—')
   let placeLog = $state('—')
   let boardLog = $state('—')
+  let deals = $state.raw(initialDeals)
+  let dealLog = $state('—')
+  const moveDeal = async (move: KanbanMove<Deal>) => {
+    await saveDealMove(move.card, move.to.column)
+    deals = applyMove(deals, move)
+    dealLog = `moved: ${move.card.title} → ${move.to.column}, ${move.to.index + 1}`
+  }
   let imported = $state<number | null>(0)
   const runImport = () => {
     imported = null
@@ -1017,6 +1026,18 @@ invalid  ${taken}`}</pre>
   </div>
   <pre class="state">{boardLog}</pre>
   <p class="hint">{HINT_DISCLOSURE}</p>
+</section>
+
+<section id="kanban">
+  <h2>Kanban</h2>
+  <Kanban columns={dealStages} cards={deals} onMove={moveDeal} onOpen={(deal) => (dealLog = `open: ${deal.title}`)} words={{ label: 'Deals' }}>
+    {#snippet card(deal)}
+      <div>{deal.company}</div>
+      <div>{formatAmount(deal.amount)}</div>
+    {/snippet}
+  </Kanban>
+  <pre class="state">{dealLog}</pre>
+  <p class="hint">{HINT_KANBAN}</p>
 </section>
 
 <section id="fields">

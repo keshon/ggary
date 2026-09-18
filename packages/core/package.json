@@ -232,6 +232,10 @@
     "./progress": {
       "types": "./src/components/progress/index.ts",
       "default": "./src/components/progress/index.ts"
+    },
+    "./kanban": {
+      "types": "./src/components/kanban/index.ts",
+      "default": "./src/components/kanban/index.ts"
     }
   },
   "dependencies": {

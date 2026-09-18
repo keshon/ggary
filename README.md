@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two design languages on top of it.
-Sixty-one components — DataGrid, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Sixty-two components — DataGrid, Kanban, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 3064 tests, 1215 of them in headless Chrome
+npm test         # 3123 tests, 1239 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1814,6 +1814,70 @@ Found on the way:
   not say how far there was to go. It is the default border now, the same
   weight as the accordion's hairlines.
 
+## Kanban
+
+Columns of cards, and a card moved from one to another. This is its first
+step: the board, and every move by the keyboard. Dragging with a pointer is
+the next.
+
+```tsx
+<Kanban
+  columns={stages}
+  cards={deals}
+  onMove={async (move) => {
+    await api.moveDeal(move.card.id, move.to)   // a rejection puts the card back
+    setDeals((current) => applyMove(current, move))
+  }}
+  onOpen={(deal) => openSheet(deal)}
+>
+  {(deal) => <DealMeta deal={deal} />}
+</Kanban>
+```
+
+**One tab stop, on a card.** There is no APG pattern for a board; this is what
+the accessible ones agree on. The arrows walk the cards — up and down a
+column, across to the nearest card of the next column that has any. **Space
+picks the focused card up**, and then the arrows carry it: up and down, across
+into the next column (an empty one too), Home and End to the ends of its
+column. Space or Enter drops it; Escape puts it back where it was, and so
+does Tab, the focus going on. Enter on a card that is not held opens it, as a
+press does — unless the press is on a control inside the card. A card is a
+`listitem` in its column's `list`, named by its title, with `aria-roledescription`
+"card", and described by what it shows and by the instructions. At each step
+a live region says where the held card is: "Picked up Call Aigul. To do, 1 of
+3", "Doing, 2 of 3", "Dropped Call Aigul in Doing, 2 of 3". The words are
+`words`, for another language.
+
+**A move stands at once, and waits for its answer faded.** `onMove` gets the
+card, where it was and where it went. Return a promise: a rejection puts that
+card back — that card only — and the live region reads out the error's
+message: "Warehouse automation was not moved: a deal needs an amount before
+it is won". An answer to a move since overtaken by another of the same card
+says nothing. Meanwhile the board shows the cards it is given, with the moves
+still out laid over them, so a refresh of the cards does not undo a move in
+flight. When a move holds, apply it to your cards — `applyMove` places the
+card in the array so that its column's order puts it where it was dropped.
+The DataGrid's cell saves work the same way.
+
+**A limit is soft.** A column with `limit` shows its count against it, "4 / 3",
+and turns the count red past it; a move past it is not refused, since a
+kanban's limit is a signal to the team, not a lock. A move the server refuses
+is refused by the server.
+
+Found on the way:
+
+- **A key moved the card the board last heard about, not the one it came
+  from.** Focusing a card from a script in a window without system focus
+  fires no focus event, so the board still thought the first card had it,
+  and Space picked that one up. A key now brings the board's focus to its
+  own card before it acts.
+- **A held card did not look held in dark mode.** The popover's shadow is lost
+  on a dark page, and a one-pixel accent edge is easy to miss. A held card
+  now has a doubled accent edge and rises two pixels.
+- **jsdom has no `scrollIntoView`.** The focus-and-reveal after a move went
+  into one core helper, `focusKanbanCard`, which both adapters call and which
+  checks before it scrolls.
+
 ## PageHeader, Section, Container, Stack, Cluster and Grid
 
 What goes inside the work area: the top of a screen, the stretches under it,
@@ -2088,14 +2152,14 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 322 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words. |
-| contract | node | `icons.contract.test.ts` | 326 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 332 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back, moves shown at once and taken back per card, what the live region says. |
+| contract | node | `icons.contract.test.ts` | 330 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1113 tests, 65 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1134 tests, 72 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 34 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 1113 tests, 56 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1134 tests, 63 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
@@ -2104,6 +2168,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
 | browser | Chrome | `date-picker.browser.test.ts` | 4 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. |
+| browser | Chrome | `kanban.browser.test.ts` | 3 tests. Real keys carrying a card across a board narrower than its columns, the board scrolling to keep it in sight and the card drawn held; Tab out with a card up putting it back and the focus going on; a press on a control inside a card left to the control. |
 | browser | Chrome | `disclosure.browser.test.ts` | 6 tests. A closed section hidden until found, taking no room, and opened by the page's search; a real Space and Enter, the chevron turned; a tree given a height scrolling to the focus under the real keyboard, each level stepped in by 16 pixels with a leaf lined up; a bar's fill measured to the pixel from the start edge in both directions; a ring's sweep and turn. |
 | browser | Chrome | `cascader.browser.test.ts` | 2 tests. The columns side by side under the button over an ancestor that clips, the card keeping to a phone's screen with the focused item scrolled into view; the real keyboard walking down and across, Enter choosing and the focus back on the button. |
 | browser | Chrome | `combobox.browser.test.ts` | 4 tests. Real typing; the list under the field, lined up with it, over an ancestor that clips; Enter choosing and Tab moving on with the list gone; a press outside putting the field back; chips wrapping in the box with room left to type. |
@@ -2234,11 +2299,16 @@ Real, and deliberately left open:
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that is Instrument's position, and it stays available.
-- **No custom elements for Combobox, DatePicker, Calendar, Cascader, Accordion, Tree or Progress.** The vanilla
+- **No custom elements for Kanban, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree or Progress.** The vanilla
   adapter is frozen (see its section); their specs skip it.
 - **The date picker has no time.** A day or a range of days; a time of day, and
   the time zone that comes with it, are not built. Nor are presets ("last 7
   days") for a range, or two months side by side.
+- **The board does not drag yet.** Pointer drag with auto-scroll at the edges,
+  cards animating into their new places, columns long enough to need windowing,
+  and moving the columns themselves are the next steps. Until then a pointer
+  opens a card, and a move is made from the keyboard or by `move()` — a "Move
+  to…" menu of your own.
 - **A tree does not load its children on demand, drag, or rename.** The whole
   tree is given up front; moving a node by dragging and renaming it in place
   are not built. Nor is a range chosen with Shift in a multiple tree.

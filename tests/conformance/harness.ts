@@ -431,6 +431,13 @@ export interface ProgressProps {
   showValue?: boolean
 }
 
+export interface KanbanProps {
+  columns: import('../../packages/core/src/components/kanban').KanbanColumn[]
+  cards: import('../../packages/core/src/components/kanban').KanbanCard[]
+  onMove?: (move: import('../../packages/core/src/components/kanban').KanbanMove) => unknown
+  onOpen?: (card: import('../../packages/core/src/components/kanban').KanbanCard) => void
+}
+
 export interface CascaderProps {
   label: string
   items: import('../../packages/core/src/components/cascader').CascaderNode[]
@@ -741,6 +748,7 @@ export interface Adapter {
   accordion?(props: AccordionProps, target: HTMLElement): Promise<Mounted<AccordionProps>>
   tree?(props: TreeProps, target: HTMLElement): Promise<Mounted<TreeProps>>
   progress?(props: ProgressProps, target: HTMLElement): Promise<Mounted<ProgressProps>>
+  kanban?(props: KanbanProps, target: HTMLElement): Promise<Mounted<KanbanProps>>
   datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>

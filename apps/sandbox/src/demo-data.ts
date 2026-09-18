@@ -423,3 +423,40 @@ export const projectTree = [
 
 export const HINT_DISCLOSURE =
   'The accordion: one section at a time, a press or Enter opens it, Up and Down walk the buttons. A closed section is still in the page: press Ctrl+F and search for "Innoprom" — the browser opens History to show it. The tree: Up and Down walk the rows, Right opens a branch and steps in, Left steps out and closes it, Home and End, * opens every sibling, typing jumps to a name. A press on a row chooses it and opens or closes a branch; a press on the chevron only opens or closes. Progress: run the import to watch a bar and a ring move; a failed sync stays red.'
+
+/** The kanban's board: a sales pipeline. */
+export const dealStages = [
+  { id: 'new', title: 'New' },
+  { id: 'talks', title: 'In talks', limit: 3 },
+  { id: 'offer', title: 'Offer sent' },
+  { id: 'won', title: 'Won' },
+]
+
+export interface Deal {
+  id: string
+  column: string
+  title: string
+  company: string
+  amount?: number
+}
+
+export const initialDeals: Deal[] = [
+  { id: 'd1', column: 'new', title: 'Warehouse automation', company: 'KamAZ Logistics' },
+  { id: 'd2', column: 'new', title: 'CRM seats for sales', company: 'Tatneft Retail', amount: 480_000 },
+  { id: 'd3', column: 'talks', title: 'Onboarding pilot', company: 'Ak Bars Digital', amount: 1_200_000 },
+  { id: 'd4', column: 'talks', title: 'Support contract', company: 'Kazan Helicopters' },
+  { id: 'd5', column: 'talks', title: 'Training days', company: 'Innopolis University', amount: 260_000 },
+  { id: 'd6', column: 'offer', title: 'Annual licence', company: 'Sber Kazan', amount: 2_400_000 },
+  { id: 'd7', column: 'won', title: 'Integration with 1C', company: 'Nizhnekamskneftekhim', amount: 900_000 },
+]
+
+/** The pretend server: a move takes half a second, and a deal is not won without an amount. */
+export const saveDealMove = (deal: Deal, to: string) =>
+  new Promise<void>((resolve, reject) =>
+    setTimeout(() => (to === 'won' && deal.amount === undefined ? reject(new Error('a deal needs an amount before it is won')) : resolve()), 500)
+  )
+
+export const formatAmount = (amount?: number) => (amount === undefined ? 'No amount yet' : `${amount.toLocaleString('ru-RU')} ₽`)
+
+export const HINT_KANBAN =
+  'Tab to the board: one stop, on a card. The arrows walk the cards; Space picks the focused one up, and then the arrows carry it — up and down, across the columns, Home and End — while a screen reader hears where it is; Space or Enter drops it, Escape puts it back, and Tab away does too. Enter on a card opens it. A move stands at once and fades until the pretend server answers, half a second later; move a deal with no amount into Won and it is refused — the card goes back and the reason is read out. In talks has a limit of 3: past it, the count turns red. Dragging with a pointer is the next step.'

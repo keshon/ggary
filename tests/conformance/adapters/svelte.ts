@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, Button, Calendar, Cascader, Tree, Progress, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, Button, Calendar, Cascader, Tree, Progress, Kanban, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
@@ -100,6 +100,7 @@ export const svelte: Adapter = {
   gridRows: (props, target) => mountSvelte(GridWithRows as Component<any>, props, target),
   accordion: (props, target) => mountSvelte(AccordionWithPanels as Component<any>, props, target),
   tree: (props, target) => mountSvelte(Tree as Component<any>, props, target),
+  kanban: (props, target) => mountSvelte(Kanban as Component<any>, props, target),
   progress: (props, target) => mountSvelte(Progress as Component<any>, props, target),
   cascader: (props, target) => mountSvelte(Cascader as Component<any>, props, target),
   calendar: (props, target) => mountSvelte(Calendar as Component<any>, props, target),

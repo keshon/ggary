@@ -26,6 +26,7 @@ import {
   type Lead,
 } from './leads'
 import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
+import { applyMove, type KanbanMove } from '@ggary/core/kanban'
 import { createRoot } from 'react-dom/client'
 import {
   Avatar,
@@ -48,6 +49,7 @@ import {
   Accordion,
   Tree,
   Progress,
+  Kanban,
   Grid,
   PageHeader,
   Section,
@@ -99,7 +101,7 @@ import {
   ToolbarSpacer,
   Tooltip,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, dealStages, initialDeals, saveDealMove, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -120,6 +122,13 @@ function App() {
   const [dateLog, setDateLog] = useState('—')
   const [placeLog, setPlaceLog] = useState('—')
   const [boardLog, setBoardLog] = useState('—')
+  const [deals, setDeals] = useState(initialDeals)
+  const [dealLog, setDealLog] = useState('—')
+  const moveDeal = async (move: KanbanMove<Deal>) => {
+    await saveDealMove(move.card, move.to.column)
+    setDeals((current) => applyMove(current, move))
+    setDealLog(`moved: ${move.card.title} → ${move.to.column}, ${move.to.index + 1}`)
+  }
   const [imported, setImported] = useState<number | null>(0)
   const runImport = () => {
     setImported(null)
@@ -1134,6 +1143,20 @@ function App() {
         </div>
         <pre className="state">{boardLog}</pre>
         <p className="hint">{HINT_DISCLOSURE}</p>
+      </section>
+
+      <section id="kanban">
+        <h2>Kanban</h2>
+        <Kanban columns={dealStages} cards={deals} onMove={moveDeal} onOpen={(deal) => setDealLog(`open: ${deal.title}`)} words={{ label: 'Deals' }}>
+          {(deal) => (
+            <>
+              <div>{deal.company}</div>
+              <div>{formatAmount(deal.amount)}</div>
+            </>
+          )}
+        </Kanban>
+        <pre className="state">{dealLog}</pre>
+        <p className="hint">{HINT_KANBAN}</p>
       </section>
 
       <section id="fields">

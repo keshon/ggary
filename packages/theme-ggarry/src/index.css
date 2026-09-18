@@ -56,6 +56,7 @@
 @import './components/accordion.css' layer(gg.components);
 @import './components/tree.css' layer(gg.components);
 @import './components/progress.css' layer(gg.components);
+@import './components/kanban.css' layer(gg.components);
 @import './components/calendar.css' layer(gg.components);
 @import './components/date-picker.css' layer(gg.components);
 @import './components/search.css' layer(gg.components);
