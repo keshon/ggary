@@ -122,6 +122,74 @@ export function ganttConformance(adapter: Adapter) {
       expect(part(m.root, 'gantt', 'links')).toBeNull()
     })
 
+    const groups = [
+      { id: 'discovery', title: 'Discovery' },
+      { id: 'delivery', title: 'Delivery' },
+    ]
+    const grouped = plan.map((task) => (task.milestone ? task : { ...task, group: task.id === 'build' ? 'delivery' : 'discovery' }))
+    const rowIds = (root: HTMLElement) => parts(root, 'gantt', 'row').map((row) => row.getAttribute('data-group') ? `[${row.getAttribute('data-group')}]` : row.getAttribute('data-task'))
+
+    it('with groups, a treegrid: each heading a row with its level and whether it is open, a summary its tasks’ days long', async () => {
+      const { m, root } = await setup({ tasks: grouped, groups })
+      expect(root().getAttribute('role')).toBe('treegrid')
+      expect(root().getAttribute('aria-rowcount')).toBe('7')
+      expect(rowIds(m.root)).toEqual(['[discovery]', 'brief', 'design', 'review', '[delivery]', 'build'])
+      const heading = m.root.querySelector<HTMLElement>('[data-part="row"][data-group="discovery"]')!
+      expect([heading.getAttribute('aria-level'), heading.getAttribute('aria-expanded'), heading.getAttribute('aria-rowindex')]).toEqual(['1', 'true', '2'])
+      expect(part(heading, 'gantt', 'title')!.textContent).toBe('Discovery')
+      expect(part(heading, 'gantt', 'title')!.getAttribute('role')).toBe('rowheader')
+      const cell = part(heading, 'gantt', 'schedule')!
+      expect([cell.getAttribute('role'), cell.getAttribute('aria-expanded')]).toEqual(['gridcell', 'true'])
+      expect(part(cell, 'gantt', 'schedule-text')!.textContent).toBe('2 tasks, 7 Sept – 18 Sept 2026, 12 days, 55% done')
+      const summary = part(cell, 'gantt', 'summary')!
+      expect([summary.style.getPropertyValue('--gg-gantt-start'), summary.style.getPropertyValue('--gg-gantt-span')]).toEqual(['6', '12'])
+      expect(part(summary, 'gantt', 'summary-progress')!.style.getPropertyValue('--gg-progress')).toBe('0.55')
+      expect(part(heading, 'gantt', 'group-toggle')!.getAttribute('aria-hidden')).toBe('true')
+      const brief = m.root.querySelector<HTMLElement>('[data-part="row"][data-task="brief"]')!
+      expect([brief.getAttribute('aria-level'), brief.getAttribute('aria-rowindex')]).toEqual(['2', '3'])
+      expect(m.root.querySelector('[data-part="row"][data-task="review"]')!.getAttribute('aria-level')).toBe('1')
+    })
+
+    it('a heading’s name closes and opens it; on a heading the arrows across do, and the keyboard stays on it', async () => {
+      const told: string[][] = []
+      const { m, press } = await setup({ tasks: grouped, groups, onCollapsedChange: (next) => void told.push(next) })
+      const title = () => m.root.querySelector<HTMLElement>('[data-part="title"][data-group="discovery"]')!
+      await adapter.act(() => title().click())
+      expect(rowIds(m.root)).toEqual(['[discovery]', 'review', '[delivery]', 'build'])
+      expect(m.root.querySelector('[data-part="row"][data-group="discovery"]')!.getAttribute('aria-expanded')).toBe('false')
+      expect(told).toEqual([['discovery']])
+      const cell = m.root.querySelector<HTMLElement>('[data-part="schedule"][data-group="delivery"]')!
+      cell.focus()
+      await adapter.act(() => {})
+      await press('ArrowLeft')
+      expect(rowIds(m.root)).toEqual(['[discovery]', 'review', '[delivery]'])
+      await press('ArrowRight')
+      expect(rowIds(m.root)).toEqual(['[discovery]', 'review', '[delivery]', 'build'])
+      expect(document.activeElement).toBe(m.root.querySelector('[data-part="schedule"][data-group="delivery"]'))
+      await press('ArrowDown')
+      expect(document.activeElement).toBe(m.root.querySelector('[data-part="schedule"][data-task="build"]'))
+    })
+
+    it('closing the group the keyboard is in takes it to the heading; controlled, the chart waits to be told', async () => {
+      const told: string[][] = []
+      const { m, schedule, press } = await setup({ tasks: grouped, groups, collapsed: [], onCollapsedChange: (next) => void told.push(next) })
+      schedule('build').focus()
+      await adapter.act(() => {})
+      await press('ArrowUp')
+      await press('ArrowLeft')
+      expect(told).toEqual([['delivery']])
+      // Only where an owner can refuse a change does the chart wait; Svelte's bind: writes it back.
+      if (adapter.supports.refusal) expect(rowIds(m.root)).toContain('build')
+      await m.update({ collapsed: ['delivery'] })
+      expect(rowIds(m.root)).not.toContain('build')
+      await m.update({ collapsed: [] })
+      schedule('build').focus()
+      await adapter.act(() => {})
+      await adapter.act(() => m.root.querySelector<HTMLElement>('[data-part="title"][data-group="delivery"]')!.click())
+      await m.update({ collapsed: ['delivery'] })
+      expect(document.activeElement).toBe(m.root.querySelector('[data-part="schedule"][data-group="delivery"]'))
+    })
+
     it('a new scale redraws the header in its own units', async () => {
       const { m, root } = await setup({ scale: 'week' })
       expect(root().getAttribute('data-scale')).toBe('week')

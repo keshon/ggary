@@ -447,6 +447,10 @@ export interface GanttProps {
   locale?: string
   onOpen?: (task: import('../../packages/core/src/components/gantt').GanttTask) => void
   onChange?: (change: import('../../packages/core/src/components/gantt').GanttChange) => unknown
+  groups?: import('../../packages/core/src/components/gantt').GanttGroup[]
+  collapsed?: string[]
+  defaultCollapsed?: string[]
+  onCollapsedChange?: (collapsed: string[]) => void
 }
 
 export interface CommandPaletteProps {

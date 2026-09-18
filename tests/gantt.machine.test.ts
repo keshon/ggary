@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { connect, createGanttMachine, datesFor, linksOf, NUDGE_SETTLE_MS, rangeOf, scaleRows, tabStop, type GanttLink, type GanttScale, type GanttTask } from '../packages/core/src/components/gantt'
+import { connect, createGanttMachine, datesFor, linksOf, NUDGE_SETTLE_MS, rangeOf, scaleRows, tabStop, type GanttGroup, type GanttLink, type GanttScale, type GanttTask } from '../packages/core/src/components/gantt'
 import { daysBetween } from '../packages/core/src/utils/calendar'
 import { plan, planRange } from './conformance/plan'
 
@@ -61,7 +61,7 @@ describe('gantt', () => {
     const machine = createGanttMachine({ id: 'g', tasks: plan, range: planRange })
     const api = connect(machine.getState(), machine.send, same, { label: 'Launch plan' })
     expect(api.rootProps).toMatchObject({ role: 'grid', 'aria-label': 'Launch plan', 'aria-rowcount': 5 })
-    expect(api.getRowProps(plan[0], 0)).toMatchObject({ role: 'row', 'aria-rowindex': 2 })
+    expect(api.getRowProps(plan[0])).toMatchObject({ role: 'row', 'aria-rowindex': 2 })
     expect(api.getTitleProps(plan[0])).toMatchObject({ role: 'rowheader' })
     const cells = plan.map((task) => api.getScheduleProps(task) as Record<string, unknown>)
     expect(cells.map((cell) => cell.tabIndex)).toEqual([0, -1, -1, -1])
@@ -220,5 +220,121 @@ describe('gantt: dependencies', () => {
     expect(segments).toHaveLength(5)
     expect(api().getSegmentProps(segments[0])).toMatchObject({ 'data-axis': 'x', style: { '--gg-gantt-x1': 9, '--gg-gantt-x2-gap': 1, '--gg-gantt-y1': 0.5 } })
     expect(api().getSegmentProps(segments[1])).toMatchObject({ 'data-axis': 'y' })
+  })
+})
+
+describe('gantt: groups', () => {
+  const groups: GanttGroup[] = [
+    { id: 'discovery', title: 'Discovery' },
+    { id: 'delivery', title: 'Delivery' },
+    { id: 'empty', title: 'Later' },
+  ]
+  const tasks: GanttTask[] = [
+    { ...plan[0], group: 'discovery' },
+    { ...plan[1], group: 'discovery', dependsOn: ['brief'] },
+    { ...plan[2], dependsOn: ['discovery'] },
+    { ...plan[3], group: 'delivery', dependsOn: ['review'] },
+    { id: 'qa', title: 'Test the import', start: '2026-10-05', end: '2026-10-12', group: 'delivery', dependsOn: ['build'] },
+  ]
+  const make = (config: Partial<Parameters<typeof createGanttMachine>[0]> = {}) => {
+    const collapses: string[][] = []
+    const machine = createGanttMachine({ id: 'g', tasks, groups, range: planRange, locale: 'en-GB', onCollapsedChange: (next) => void collapses.push(next), ...config })
+    const api = () => connect(machine.getState(), machine.send, same)
+    const ids = () => api().rows.map((row) => (row.kind === 'group' ? `[${row.id}]` : row.id))
+    return { machine, send: machine.send, api, ids, collapses }
+  }
+
+  it('lists the rows in the tasks’ order, a group’s heading where its first task is and all its tasks under it; a treegrid with levels', () => {
+    const { api, ids } = make({ tasks: [tasks[0], tasks[2], tasks[3], tasks[1], tasks[4]] })
+    expect(ids()).toEqual(['[discovery]', 'brief', 'design', 'review', '[delivery]', 'build', 'qa', '[empty]'])
+    expect(api().rootProps).toMatchObject({ role: 'treegrid', 'aria-rowcount': 9 })
+    expect(api().getGroupRowProps(groups[0])).toMatchObject({ role: 'row', 'aria-rowindex': 2, 'aria-level': 1, 'aria-expanded': 'true' })
+    expect(api().getRowProps(tasks[0])).toMatchObject({ 'aria-rowindex': 3, 'aria-level': 2, 'data-level': 2 })
+    expect(api().getRowProps(tasks[2])).toMatchObject({ 'aria-level': 1 })
+    // Without groups, a grid as before: no levels.
+    const plain = createGanttMachine({ id: 'g', tasks: plan })
+    expect(connect(plain.getState(), plain.send, same).getRowProps(plan[0])).toMatchObject({ 'aria-level': undefined })
+  })
+
+  it('a group’s summary runs from its first task’s start to its last one’s end, each task weighed by its days, and follows a change', () => {
+    const { api, send } = make({ onChange: () => undefined, tasks: tasks.map((task) => (task.id === 'qa' ? { ...task, progress: 0.5 } : task)) })
+    expect(api().getSummaryProps(groups[1])).toMatchObject({ style: { '--gg-gantt-start': 20, '--gg-gantt-span': 22 } })
+    // 19 days at none, 8 at half.
+    expect(api().describeGroup(groups[1])).toBe('2 tasks, 21 Sept – 12 Oct 2026, 22 days, 15% done')
+    // 3 days done, 9 at 40%: 6.6 of 12.
+    expect(api().describeGroup(groups[0])).toBe('2 tasks, 7 Sept – 18 Sept 2026, 12 days, 55% done')
+    expect(api().getSummaryProps(groups[2])).toBeNull()
+    expect(api().describeGroup(groups[2])).toBe('No tasks')
+    send({ type: 'DRAG', task: 'qa', edge: 'end', offset: 2 })
+    expect(api().getSummaryProps(groups[1])).toMatchObject({ style: { '--gg-gantt-span': 24 } })
+  })
+
+  it('closes and opens: its tasks go from the rows and the walk; the owner hears it; controlled, it waits to be told', () => {
+    const { api, ids, send, collapses } = make()
+    send({ type: 'TOGGLE', group: 'discovery' })
+    expect(ids()).toEqual(['[discovery]', 'review', '[delivery]', 'build', 'qa', '[empty]'])
+    expect(api().getGroupToggleProps(groups[0])).toMatchObject({ 'data-state': 'closed', 'data-icon': 'chevron-right' })
+    expect(collapses).toEqual([['discovery']])
+    send({ type: 'FOCUS', task: 'discovery' })
+    send({ type: 'WALK', step: 1 })
+    expect(api().focusTask).toBe('review') // not its hidden brief
+    send({ type: 'TOGGLE', group: 'discovery', open: true })
+    expect(collapses).toEqual([['discovery'], []])
+    const controlled = make({ collapsed: [] })
+    controlled.send({ type: 'TOGGLE', group: 'delivery' })
+    expect(controlled.collapses).toEqual([['delivery']])
+    expect(controlled.ids()).toContain('build')
+    controlled.send({ type: 'SYNC_COLLAPSED', collapsed: ['delivery'] })
+    expect(controlled.ids()).not.toContain('build')
+  })
+
+  it('closing the group the keyboard is in takes the keyboard to its heading, and keeps a change being made', () => {
+    const changes: string[] = []
+    const { api, send, machine } = make({ onChange: (change) => void changes.push(change.task.id) })
+    send({ type: 'FOCUS', task: 'design' })
+    send({ type: 'NUDGE', edge: 'move', days: 1 })
+    send({ type: 'TOGGLE', group: 'discovery' })
+    expect(api().focusTask).toBe('discovery')
+    expect(machine.getState().draft).toBeNull()
+    expect(machine.getState().pending.map((change) => change.task)).toEqual(['design'])
+    // Told from outside, the tab stop goes there too — without taking the page's focus.
+    const other = make({ collapsed: [] })
+    other.send({ type: 'FOCUS', task: 'qa' })
+    const nonce = other.api().focusNonce
+    other.send({ type: 'SYNC_COLLAPSED', collapsed: ['delivery'] })
+    expect([other.api().focusTask, other.api().focusNonce]).toEqual(['delivery', nonce])
+  })
+
+  it('on a heading, Right opens, Left closes, Enter does either and opens nothing; Left from a task goes up when bars stay put', () => {
+    const opened: string[] = []
+    const { api, ids } = make({ onOpen: (task) => void opened.push(task.id) })
+    const key = (target: string, key: string) => {
+      const group = groups.find((candidate) => candidate.id === target)
+      const props = (group ? api().getGroupScheduleProps(group) : api().getScheduleProps(tasks.find((task) => task.id === target)!)) as unknown as { onKeyDown: (event: unknown) => void }
+      props.onKeyDown({ key, shiftKey: false, altKey: false, metaKey: false, ctrlKey: false, preventDefault() {}, currentTarget: { dataset: { task: target }, closest: () => null } })
+    }
+    key('delivery', 'ArrowLeft')
+    expect(ids()).not.toContain('build')
+    key('delivery', 'ArrowRight')
+    expect(ids()).toContain('build')
+    key('delivery', 'Enter')
+    expect(ids()).not.toContain('build')
+    expect(opened).toEqual([])
+    key('design', 'ArrowLeft')
+    expect(api().focusTask).toBe('discovery')
+    key('review', 'Enter')
+    expect(opened).toEqual(['review'])
+  })
+
+  it('an arrow may start at a group’s summary; a hidden task’s arrows go from its group’s row, and none between two it hides', () => {
+    const { api, send } = make()
+    const fromGroup = api().links.find((link) => link.from === 'discovery')!
+    // Out of the summary's end (18 Sept, day 18) on its row (0), into the milestone below its tasks.
+    expect(fromGroup.points[0]).toEqual({ x: 18, gap: 0, y: 0.5 })
+    expect(fromGroup.points.at(-1)).toEqual({ x: 20.5, gap: -1, y: 3.5 })
+    send({ type: 'TOGGLE', group: 'delivery' })
+    const links = api().links
+    expect(links.map((link) => `${link.from}>${link.to}`)).toEqual(['brief>design', 'discovery>review', 'review>build'])
+    expect(links[2].points.at(-1)).toEqual({ x: 20, gap: 0, y: 4.5 })
   })
 })

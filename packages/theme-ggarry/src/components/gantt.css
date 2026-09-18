@@ -263,6 +263,72 @@
   opacity: 0.6;
 }
 
+/* Groups. The heading's row is a shade sunken, its name set in semibold with
+   a chevron; the tasks under it stepped in by the chevron's room. Its summary
+   is a slim bar in the text's own colour with a tab turned down at each end,
+   filled in the accent as far as its tasks have got. */
+[data-scope='gantt'][data-part='row'][data-group] :is([data-part='title'], [data-part='schedule']) {
+  background-color: var(--ggarry-bg-subtle);
+}
+[data-scope='gantt'][data-part='row'][data-group]:has([data-part='schedule']:focus-visible) :is([data-part='title'], [data-part='schedule']) {
+  background-color: var(--ggarry-bg-accent-subtle);
+}
+[data-scope='gantt'][data-part='title'][data-group] {
+  padding-inline-start: var(--ggarry-space-2);
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+[data-scope='gantt'][data-part='group-toggle'] {
+  inline-size: 12px;
+  block-size: 12px;
+  padding: 2px;
+  color: var(--ggarry-text-muted);
+  transition: rotate var(--ggarry-duration-fast) ease;
+}
+[data-scope='gantt'][data-part='title'][data-group]:hover [data-part='group-toggle'] {
+  color: var(--ggarry-text-default);
+}
+[data-scope='gantt'][data-part='row'][data-level='2'] [data-part='title'] {
+  padding-inline-start: calc(var(--ggarry-space-2) + 20px);
+}
+[data-scope='gantt'][data-part='summary'] {
+  inset-block-start: calc(50% - 4px);
+  inset-inline-start: calc(var(--gg-gantt-start) * var(--gantt-day));
+  inline-size: calc(var(--gg-gantt-span) * var(--gantt-day));
+  block-size: 6px;
+  border-radius: 1px;
+  background: color-mix(in srgb, var(--ggarry-text-default) 55%, transparent);
+}
+[data-scope='gantt'][data-part='summary']:not([data-before])::before,
+[data-scope='gantt'][data-part='summary']:not([data-after])::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 100%;
+  inline-size: 6px;
+  block-size: 5px;
+  background: var(--ggarry-text-default);
+}
+[data-scope='gantt'][data-part='summary']::before {
+  inset-inline-start: 0;
+  clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+[data-scope='gantt'][data-part='summary']::after {
+  inset-inline-end: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+}
+[data-scope='gantt'][data-part='summary-progress'] {
+  background: var(--ggarry-bg-accent);
+}
+[data-scope='gantt'][data-part='summary'][data-done] [data-part='summary-progress'] {
+  background: var(--ggarry-text-success);
+}
+[data-scope='gantt'][data-part='schedule'][data-group]:focus-visible [data-part='summary'] {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='gantt'][data-part='group-toggle'] { transition: none; }
+}
+
 [data-scope='gantt'][data-part='empty'] {
   padding: var(--ggarry-space-6);
   color: var(--ggarry-text-muted);

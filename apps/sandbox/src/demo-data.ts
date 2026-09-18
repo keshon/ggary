@@ -561,16 +561,23 @@ export const HINT_FORM =
   'Press Create deal with nothing filled in: the form stops, each field says what is wrong — the browser’s own checks for the title and the email, the form’s rules for the company, stage and date, whose hidden inputs the browser does not check — and the summary at the top lists every error as a link and takes the focus. Fix a field and its error leaves as you type; set the stage to Offer sent and the amount becomes required. Fill it in with the title “Annual licence” and the pretend server refuses it after half a second: the error comes back to the title, and the summary says why.'
 
 /** The Gantt's plan: a CRM rollout, dated around today so today's line always crosses it. */
+/** The rollout's phases; the kickoff, the rollout itself and the launch stand on their own. */
+export const rolloutGroups = [
+  { id: 'phase-prep', title: 'Preparation' },
+  { id: 'phase-setup', title: 'Setup' },
+  { id: 'phase-pilot', title: 'Pilot' },
+]
+
 export const rolloutPlan = [
   { id: 'kickoff', title: 'Kickoff with sales', start: inDays(-21), end: inDays(-21), milestone: true, locked: true },
-  { id: 'audit', title: 'Audit the old pipeline', start: inDays(-20), end: inDays(-12), progress: 1, locked: true, dependsOn: ['kickoff'] },
-  { id: 'fields', title: 'Agree the deal fields', start: inDays(-11), end: inDays(-4), progress: 1, locked: true, dependsOn: ['audit'] },
-  { id: 'import', title: 'Import 700,000 leads', start: inDays(-5), end: inDays(6), progress: 0.55, dependsOn: ['fields'] },
-  { id: 'boards', title: 'Set up the boards', start: inDays(-2), end: inDays(9), progress: 0.2, dependsOn: ['fields'] },
-  { id: 'training', title: 'Train the team', start: inDays(8), end: inDays(14), progress: 0, dependsOn: ['import'] },
-  { id: 'pilot', title: 'Pilot in Kazan', start: inDays(12), end: inDays(26), progress: 0, dependsOn: ['boards'] },
-  { id: 'review', title: 'Review the pilot', start: inDays(27), end: inDays(27), milestone: true, dependsOn: ['pilot', 'training'] },
-  { id: 'rollout', title: 'Roll out to every office', start: inDays(28), end: inDays(55), progress: 0, dependsOn: ['review'] },
+  { id: 'audit', title: 'Audit the old pipeline', start: inDays(-20), end: inDays(-12), progress: 1, locked: true, dependsOn: ['kickoff'], group: 'phase-prep' },
+  { id: 'fields', title: 'Agree the deal fields', start: inDays(-11), end: inDays(-4), progress: 1, locked: true, dependsOn: ['audit'], group: 'phase-prep' },
+  { id: 'import', title: 'Import 700,000 leads', start: inDays(-5), end: inDays(6), progress: 0.55, dependsOn: ['fields'], group: 'phase-setup' },
+  { id: 'boards', title: 'Set up the boards', start: inDays(-2), end: inDays(9), progress: 0.2, dependsOn: ['fields'], group: 'phase-setup' },
+  { id: 'training', title: 'Train the team', start: inDays(8), end: inDays(14), progress: 0, dependsOn: ['import'], group: 'phase-setup' },
+  { id: 'pilot', title: 'Pilot in Kazan', start: inDays(12), end: inDays(26), progress: 0, dependsOn: ['boards'], group: 'phase-pilot' },
+  { id: 'review', title: 'Review the pilot', start: inDays(27), end: inDays(27), milestone: true, dependsOn: ['pilot', 'training'], group: 'phase-pilot' },
+  { id: 'rollout', title: 'Roll out to every office', start: inDays(28), end: inDays(55), progress: 0, dependsOn: ['phase-pilot'] },
   { id: 'launch', title: 'Launch', start: inDays(56), end: inDays(56), milestone: true, dependsOn: ['rollout'] },
 ]
 
@@ -587,4 +594,4 @@ export const ganttScales = [
 ]
 
 export const HINT_GANTT =
-  'The chart opens on today, a third of the way in. Tab to it: one stop, on a task. Up and Down walk the tasks — the row is tinted, the bar ringed, and a bar out of sight is brought into view clear of the list — Home and End, PageUp and PageDown; Enter or a double press opens one. A screen reader hears a grid: the task’s name as the row’s header, then its dates in words, how many days, how far along, and what it waits for. Switch the scale: days, weeks, months — the core counts in days and the theme says how wide a day is. Drag a bar to move it, or either end to resize it; or with its task focused, Left and Right move it a day (Shift, a week) and Alt with them moves its end — the change is said as it is made, and kept when the keys pause, on Enter, or on moving to another task; Escape puts it back. The pretend server takes a moment and refuses anything that would end after the launch: the bar goes back and the reason is read out. The done tasks are locked. An arrow runs from each task to the ones that wait for it, and turns red where one starts before the other ends — as the import does now; move it and the arrows follow.'
+  'The chart opens on today, a third of the way in. Tab to it: one stop, on a task. Up and Down walk the tasks — the row is tinted, the bar ringed, and a bar out of sight is brought into view clear of the list — Home and End, PageUp and PageDown; Enter or a double press opens one. A screen reader hears a grid: the task’s name as the row’s header, then its dates in words, how many days, how far along, and what it waits for. Switch the scale: days, weeks, months — the core counts in days and the theme says how wide a day is. Drag a bar to move it, or either end to resize it; or with its task focused, Left and Right move it a day (Shift, a week) and Alt with them moves its end — the change is said as it is made, and kept when the keys pause, on Enter, or on moving to another task; Escape puts it back. The pretend server takes a moment and refuses anything that would end after the launch: the bar goes back and the reason is read out. The done tasks are locked. An arrow runs from each task to the ones that wait for it, and turns red where one starts before the other ends — as the import does now; move it and the arrows follow. The tasks are grouped in phases: a phase’s bar runs from its first task’s start to its last one’s end, filled as far as they have got, and a press on its name — or Left and Right on its row — closes and opens it; the rollout waits for the whole pilot phase, its arrow from the phase’s bar. With a phase closed, its tasks’ arrows go from its row.'

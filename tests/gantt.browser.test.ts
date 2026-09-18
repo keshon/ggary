@@ -181,4 +181,29 @@ describe('gantt by pointer', () => {
     expect(link('design', 'build').hasAttribute('data-conflict')).toBe(true)
     expect(colour(link('design', 'build'))).not.toBe(colour(link('brief', 'design')))
   })
+
+  it('a group’s summary spans its tasks to the pixel; a press on its name closes it, the chevron turned, and the arrows move to its row', async () => {
+    const groups = [{ id: 'discovery', title: 'Discovery' }]
+    const tasks = [{ ...plan[0], group: 'discovery' }, { ...plan[1], group: 'discovery' }, { ...plan[2], dependsOn: ['design'] }]
+    const { host, schedule } = await mount({ tasks, groups, range: planRange }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const origin = schedule('brief').getBoundingClientRect().left
+    const summary = host.querySelector<HTMLElement>('[data-part="summary"]')!.getBoundingClientRect()
+    expect(summary.left - origin).toBeCloseTo(6 * 32, 0)
+    expect(summary.width).toBeCloseTo(12 * 32, 0)
+    const heading = host.querySelector<HTMLElement>('[data-part="row"][data-group="discovery"]')!
+    const row = heading.getBoundingClientRect()
+    expect(summary.top + summary.height / 2).toBeGreaterThan(row.top)
+    expect(summary.bottom).toBeLessThan(row.bottom)
+    const toggle = host.querySelector<HTMLElement>('[data-part="group-toggle"]')!
+    expect(getComputedStyle(toggle).rotate).toBe('90deg')
+    host.querySelector<HTMLElement>('[data-part="title"][data-group="discovery"] > span:last-child')!.click()
+    await wait(30)
+    expect(host.querySelector('[data-part="row"][data-task="brief"]')).toBeNull()
+    await wait(300) // the chevron turns back
+    expect(getComputedStyle(toggle).rotate).toBe('none')
+    // The arrow from the hidden design now leaves the heading's row, from design's own end.
+    const out = host.querySelector<HTMLElement>('[data-part="link"][data-from="design"] [data-part="link-segment"]')!.getBoundingClientRect()
+    expect(Math.abs(out.top - (row.top + row.height / 2))).toBeLessThanOrEqual(1)
+    expect(Math.abs(out.left - (origin + 18 * 32))).toBeLessThanOrEqual(1)
+  })
 })

@@ -153,3 +153,38 @@
 [data-scope='gantt']:is([data-part='link-segment'], [data-part='link-head']) {
   position: absolute;
 }
+
+/* A group's heading: its name opens and closes it, the chevron turned as it is. */
+[data-scope='gantt'][data-part='title'][data-group] {
+  gap: 4px;
+  cursor: pointer;
+  user-select: none;
+}
+[data-scope='gantt'][data-part='title'][data-group] > span:last-child {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+[data-scope='gantt'][data-part='group-toggle'] {
+  flex: none;
+}
+[data-scope='gantt'][data-part='group-toggle'][data-state='open'] {
+  rotate: 90deg;
+}
+[data-scope='gantt'][data-part='group-toggle'][data-state='closed']:dir(rtl) {
+  scale: -1 1;
+}
+/* Its summary: a bar from its first task's start to its last one's end. */
+[data-scope='gantt'][data-part='summary'] {
+  position: absolute;
+  z-index: 1;
+}
+[data-scope='gantt'][data-part='summary-progress'] {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 100%;
+  border-radius: inherit;
+  transform-origin: left center;
+  scale: var(--gg-progress, 0) 1;
+}

@@ -1,3 +1,4 @@
+import type { IconName } from '@ggary/icons'
 import { createMachine, withEffects, type Machine } from '../../machine'
 import { createAnatomy, type Dict, type Normalizer } from '../../types'
 export { attachGanttDrag } from './drag'
@@ -17,6 +18,10 @@ import { addDays, addMonths, daysBetween, formatDate, startOfMonth, startOfWeek,
  * its schedule a cell that says the dates in words ("18 Sep – 25 Sep 2026,
  * 8 days, 40% done") while the bar shows them to the eye. One tab stop; Up
  * and Down walk the tasks, Home and End, PageUp and PageDown; Enter opens one.
+ *
+ * Tasks may be grouped under headings: a group's row shows a summary bar from
+ * its first task's start to its last one's end, and closes to hide its tasks.
+ * With groups the grid is a treegrid.
  */
 
 export interface GanttTask {
@@ -32,9 +37,22 @@ export interface GanttTask {
   milestone?: boolean
   /** Not to be moved or resized: its bar has no grips, and the keys leave it. */
   locked?: boolean
-  /** The tasks that must finish before this one starts: an arrow from each. */
+  /** The tasks — or groups — that must finish before this one starts: an arrow from each. */
   dependsOn?: string[]
+  /** The id of the group it is listed under. */
+  group?: string
 }
+
+/** A heading tasks are listed under. Its dates are its tasks': it has none of its own. Ids are shared with the tasks', so none may be both. */
+export interface GanttGroup {
+  id: string
+  title: string
+}
+
+/** A row of the chart: a task, or a group's heading. Only the rows of open groups' tasks are listed. */
+export type GanttRow<T extends GanttTask = GanttTask> =
+  | { kind: 'task'; id: string; task: T; level: 1 | 2; group: string | null }
+  | { kind: 'group'; id: string; group: GanttGroup; tasks: T[]; open: boolean; level: 1 }
 
 export interface GanttDates {
   start: ISODate
@@ -83,10 +101,16 @@ export interface GanttRange {
 export interface GanttState<T extends GanttTask = GanttTask> {
   id: string
   tasks: T[]
+  groups: GanttGroup[]
+  /** The ids of the closed groups. */
+  collapsed: string[]
+  collapsedControlled: boolean
+  collapseIntent: { value: string[]; nonce: number }
   scale: GanttScale
   /** Fixed by the owner, or null to fit the tasks. */
   range: GanttRange | null
   locale: string | undefined
+  /** The row the keyboard is on: a task's id, or a group's. */
   focus: { task: string | null; nonce: number }
   openIntent: { value: string | null; nonce: number }
   scaleIntent: { value: GanttScale; nonce: number }
@@ -106,6 +130,12 @@ export type GanttEvent =
   | { type: 'OPEN'; task?: string }
   | { type: 'SCALE'; scale: GanttScale }
   | { type: 'SYNC_TASKS'; tasks: GanttTask[] }
+  | { type: 'SYNC_GROUPS'; groups: GanttGroup[] }
+  | { type: 'SYNC_COLLAPSED'; collapsed: string[] }
+  /** Open or close a group; without `open`, the other way. */
+  | { type: 'TOGGLE'; group: string; open?: boolean }
+  /** From a task to the heading of its group. */
+  | { type: 'PARENT' }
   | { type: 'SYNC_SCALE'; scale: GanttScale }
   | { type: 'SYNC_OPTIONS'; range?: GanttRange | null; locale?: string; editable?: boolean }
   /** The keyboard: move the focused task, or its end, by some days more. */
@@ -136,6 +166,9 @@ export const ganttAnatomy = createAnatomy('gantt', [
   'bar-start',
   'bar-end',
   'milestone',
+  'group-toggle',
+  'summary',
+  'summary-progress',
   'links',
   'link',
   'link-segment',
@@ -233,12 +266,44 @@ export function scaleRows(range: GanttRange, scale: GanttScale, locale?: string)
   ]
 }
 
-const indexOf = (state: GanttState, id: string | null) => (id === null ? -1 : state.tasks.findIndex((task) => task.id === id))
-
-/** The tab stop: the focused task while it is there, or the first. */
-export function tabStop(state: GanttState): string | null {
-  return indexOf(state, state.focus.task) !== -1 ? state.focus.task : (state.tasks[0]?.id ?? null)
+/**
+ * The rows, top to bottom, in the tasks' order: a group's heading where its
+ * first task would be, then — while it is open — all its tasks; a group with
+ * no tasks at the end.
+ */
+export function rowsOf<T extends GanttTask>(state: GanttState<T>): GanttRow<T>[] {
+  if (state.groups.length === 0) return state.tasks.map((task) => ({ kind: 'task', id: task.id, task, level: 1, group: null }))
+  const members = new Map<string, T[]>(state.groups.map((group) => [group.id, []]))
+  for (const task of state.tasks) if (task.group !== undefined) members.get(task.group)?.push(task)
+  const rows: GanttRow<T>[] = []
+  const placed = new Set<string>()
+  const place = (group: GanttGroup) => {
+    placed.add(group.id)
+    const tasks = members.get(group.id)!
+    const open = !state.collapsed.includes(group.id)
+    rows.push({ kind: 'group', id: group.id, group, tasks, open, level: 1 })
+    if (open) for (const task of tasks) rows.push({ kind: 'task', id: task.id, task, level: 2, group: group.id })
+  }
+  const byId = new Map(state.groups.map((group) => [group.id, group]))
+  for (const task of state.tasks) {
+    const group = task.group === undefined ? undefined : byId.get(task.group)
+    if (!group) rows.push({ kind: 'task', id: task.id, task, level: 1, group: null })
+    else if (!placed.has(group.id)) place(group)
+  }
+  for (const group of state.groups) if (!placed.has(group.id)) place(group)
+  return rows
 }
+
+const indexOf = (state: GanttState, id: string | null) => (id === null ? -1 : rowsOf(state).findIndex((row) => row.id === id))
+
+/** The tab stop: the row the keyboard is on while it is shown, or the first. */
+export function tabStop(state: GanttState): string | null {
+  return indexOf(state, state.focus.task) !== -1 ? state.focus.task : (rowsOf(state)[0]?.id ?? null)
+}
+
+/** The group a task is listed under, when there is one. */
+const groupOf = (state: GanttState, task: GanttTask | undefined) =>
+  task?.group !== undefined && state.groups.some((group) => group.id === task.group) ? task.group : null
 
 const PAGE = 10
 
@@ -264,6 +329,31 @@ export function datesFor(state: GanttState, task: GanttTask): GanttDates {
   if (state.draft && state.draft.task === task.id) return datesOf(state.draft.origin, state.draft.edge, state.draft.offset, task.milestone)
   const out = [...state.pending].reverse().find((change) => change.task === task.id)
   return out ? out.to : { start: task.start, end: task.end }
+}
+
+/**
+ * A group's summary: its first task's start to its last one's end — as they
+ * show, a change being made included — and how far along, each task weighed
+ * by its days. Null for a group with no tasks.
+ */
+export function summaryOf(state: GanttState, tasks: GanttTask[]): (GanttDates & { progress: number | undefined }) | null {
+  if (tasks.length === 0) return null
+  let start = ''
+  let end = ''
+  let done = 0
+  let total = 0
+  let measured = false
+  for (const task of tasks) {
+    const dates = datesFor(state, task)
+    if (!start || dates.start < start) start = dates.start
+    if (!end || dates.end > end) end = dates.end
+    if (task.milestone) continue
+    const days = daysBetween(dates.start, dates.end) + 1
+    total += days
+    done += days * Math.max(0, Math.min(1, task.progress ?? 0))
+    if (task.progress !== undefined) measured = true
+  }
+  return { start, end, progress: measured && total > 0 ? done / total : undefined }
 }
 
 /**
@@ -295,29 +385,47 @@ const ROOM: Record<GanttScale, number> = { day: 1, week: 2, month: 5 }
  * in; with none — or when the task starts before the other ends — it steps
  * out, runs between the rows, and comes back in, so it never cuts a bar.
  */
-export function linksOf(state: GanttState, range: GanttRange): GanttLink[] {
-  const index = new Map(state.tasks.map((task, i) => [task.id, i]))
+export function linksOf(state: GanttState, range: GanttRange, rows: GanttRow[] = rowsOf(state)): GanttLink[] {
+  const rowAt = new Map(rows.map((row, i) => [row.id, i]))
+  const byId = new Map(state.tasks.map((task) => [task.id, task]))
+  // Where an end of an arrow is: a task's own row — or, in a closed group, its
+  // group's, at the task's own days — or a group's row, at its summary's.
+  const place = (id: string) => {
+    const task = byId.get(id)
+    if (task) {
+      const group = groupOf(state, task)
+      const row = rowAt.get(id) ?? (group === null ? undefined : rowAt.get(group))
+      return row === undefined ? null : { row, dates: datesFor(state, task), milestone: !!task.milestone }
+    }
+    const row = rows[rowAt.get(id) ?? -1]
+    const summary = row?.kind === 'group' ? summaryOf(state, row.tasks) : null
+    return summary ? { row: rowAt.get(id)!, dates: summary, milestone: false } : null
+  }
   const links: GanttLink[] = []
   for (const task of state.tasks) {
     for (const id of task.dependsOn ?? []) {
-      const before = state.tasks[index.get(id) ?? -1]
-      if (!before || before.id === task.id) continue
-      const a = datesFor(state, before)
-      const b = datesFor(state, task)
-      const rowA = index.get(before.id)!
-      const rowB = index.get(task.id)!
+      if (id === task.id) continue
+      const before = place(id)
+      const after = place(task.id)
+      // Both in one closed group: nothing to draw between a row and itself.
+      if (!before || !after || before.row === after.row) continue
+      const a = before.dates
+      const b = after.dates
+      const rowA = before.row
+      const rowB = after.row
       const yA = rowA + 0.5
       const yB = rowB + 0.5
       // A bar is left and entered at its edges; a milestone at its tips, a
       // gap either side of its middle.
       const fromX = before.milestone ? daysBetween(range.start, a.start) + 0.5 : daysBetween(range.start, a.end) + 1
-      const toX = daysBetween(range.start, b.start) + (task.milestone ? 0.5 : 0)
+      const toX = daysBetween(range.start, b.start) + (after.milestone ? 0.5 : 0)
       const out = before.milestone ? 1 : 0
-      const into = task.milestone ? -1 : 0
+      const into = after.milestone ? -1 : 0
       // A bar must start after the day the other ends; a milestone is a point in
       // time, so a task may start on its day, and a milestone fall on a bar's last.
-      const conflict = before.milestone ? b.start < a.start : task.milestone ? b.start < a.end : b.start <= a.end
+      const conflict = before.milestone ? b.start < a.start : after.milestone ? b.start < a.end : b.start <= a.end
       const roomy = toX - fromX >= ROOM[state.scale]
+      const seam = rowB > rowA ? rowB : rowB + 1
       const points: LinkPoint[] = roomy
         ? [
             { x: fromX, gap: out, y: yA },
@@ -328,12 +436,12 @@ export function linksOf(state: GanttState, range: GanttRange): GanttLink[] {
         : [
             { x: fromX, gap: out, y: yA },
             { x: fromX, gap: out + 1, y: yA },
-            { x: fromX, gap: out + 1, y: rowB > rowA ? rowB : rowB + 1 },
-            { x: toX, gap: into - 1, y: rowB > rowA ? rowB : rowB + 1 },
+            { x: fromX, gap: out + 1, y: seam },
+            { x: toX, gap: into - 1, y: seam },
             { x: toX, gap: into - 1, y: yB },
             { x: toX, gap: into, y: yB },
           ]
-      links.push({ from: before.id, to: task.id, conflict, points })
+      links.push({ from: id, to: task.id, conflict, points })
     }
   }
   return links
@@ -361,8 +469,29 @@ function commit<T extends GanttTask>(state: GanttState<T>): GanttState<T> {
 
 /** The focus on the task at `index`, clamped to the list; real focus moves there. */
 function focusAt<T extends GanttTask>(state: GanttState<T>, index: number): GanttState<T> {
-  const task = state.tasks[Math.max(0, Math.min(state.tasks.length - 1, index))]
-  return !task || task.id === state.focus.task ? state : { ...state, focus: { task: task.id, nonce: state.focus.nonce + 1 } }
+  const rows = rowsOf(state)
+  const row = rows[Math.max(0, Math.min(rows.length - 1, index))]
+  return !row || row.id === state.focus.task ? state : { ...state, focus: { task: row.id, nonce: state.focus.nonce + 1 } }
+}
+
+/** The ids shown as closed: the owner's, or a group's own. */
+function toggle<T extends GanttTask>(state: GanttState<T>, group: string, open?: boolean): GanttState<T> {
+  if (!state.groups.some((candidate) => candidate.id === group)) return state
+  const isOpen = !state.collapsed.includes(group)
+  const next = open ?? !isOpen
+  if (next === isOpen) return state
+  const collapsed = next ? state.collapsed.filter((id) => id !== group) : [...state.collapsed, group]
+  // A change being made to a task it hides is kept.
+  const kept = !next && state.draft && groupOf(state, state.tasks.find((task) => task.id === state.draft!.task)) === group ? commit(state) : state
+  const focused = kept.tasks.find((task) => task.id === kept.focus.task)
+  // The keyboard was on a task it hides: it goes to the heading.
+  const focus = !next && groupOf(kept, focused) === group ? { task: group, nonce: kept.focus.nonce + 1 } : kept.focus
+  return {
+    ...kept,
+    collapsed: kept.collapsedControlled ? kept.collapsed : collapsed,
+    collapseIntent: { value: collapsed, nonce: kept.collapseIntent.nonce + 1 },
+    focus,
+  }
 }
 
 export function reducer<T extends GanttTask>(state: GanttState<T>, event: GanttEvent): GanttState<T> {
@@ -379,12 +508,20 @@ export function reducer<T extends GanttTask>(state: GanttState<T>, event: GanttE
     }
     case 'EDGE': {
       const kept = commit(state)
-      return focusAt(kept, event.edge === 'first' ? 0 : kept.tasks.length - 1)
+      return focusAt(kept, event.edge === 'first' ? 0 : rowsOf(kept).length - 1)
     }
     case 'OPEN': {
       const task = event.task ?? tabStop(state)
+      // A group's heading is not opened: it opens, or closes.
+      if (task !== null && state.groups.some((group) => group.id === task)) return toggle(state, task)
       const kept = commit(state)
       return task ? { ...kept, openIntent: { value: task, nonce: kept.openIntent.nonce + 1 } } : kept
+    }
+    case 'TOGGLE':
+      return toggle(state, event.group, event.open)
+    case 'PARENT': {
+      const group = groupOf(state, state.tasks.find((task) => task.id === tabStop(state)))
+      return group === null ? state : focusAt(commit(state), indexOf(state, group))
     }
 
     case 'NUDGE': {
@@ -443,6 +580,17 @@ export function reducer<T extends GanttTask>(state: GanttState<T>, event: GanttE
       return event.scale === state.scale ? state : { ...state, scale: event.scale }
     case 'SYNC_TASKS':
       return event.tasks === state.tasks ? state : { ...state, tasks: event.tasks as T[], pending: state.pending.filter((change) => !change.settled) }
+    case 'SYNC_GROUPS':
+      return event.groups === state.groups ? state : { ...state, groups: event.groups }
+    case 'SYNC_COLLAPSED': {
+      const same = event.collapsed.length === state.collapsed.length && event.collapsed.every((id) => state.collapsed.includes(id))
+      if (same) return state
+      // The tab stop stays where the keyboard can find it: on the heading of the group that hid it.
+      const focused = state.tasks.find((task) => task.id === state.focus.task)
+      const group = groupOf(state, focused)
+      const hidden = group !== null && event.collapsed.includes(group)
+      return { ...state, collapsed: event.collapsed, focus: hidden ? { ...state.focus, task: group } : state.focus }
+    }
     case 'SYNC_OPTIONS': {
       const range = event.range === undefined ? state.range : event.range
       const locale = event.locale === undefined ? state.locale : event.locale
@@ -472,6 +620,12 @@ export interface GanttConfig<T extends GanttTask> {
   onChange?: (change: GanttChange<T>) => Promise<unknown> | unknown
   /** Whether bars may change. Default: when there is an `onChange`. */
   editable?: boolean
+  /** Headings to list tasks under; a task names its own in `group`. */
+  groups?: GanttGroup[]
+  /** The ids of the closed groups. Controlled; `defaultCollapsed` for uncontrolled. */
+  collapsed?: string[]
+  defaultCollapsed?: string[]
+  onCollapsedChange?: (collapsed: string[]) => void
 }
 
 export function initialState<T extends GanttTask>(config: GanttConfig<T>): GanttState<T> {
@@ -479,6 +633,10 @@ export function initialState<T extends GanttTask>(config: GanttConfig<T>): Gantt
   return {
     id: config.id,
     tasks: config.tasks,
+    groups: config.groups ?? [],
+    collapsed: config.collapsed ?? config.defaultCollapsed ?? [],
+    collapsedControlled: config.collapsed !== undefined,
+    collapseIntent: { value: config.collapsed ?? config.defaultCollapsed ?? [], nonce: 0 },
     scale,
     range: config.range ?? null,
     locale: config.locale,
@@ -520,6 +678,7 @@ export function createGanttMachine<T extends GanttTask>(config: GanttConfig<T>):
       }
     }
     if (next.scaleIntent.nonce !== previous.scaleIntent.nonce) config.onScaleChange?.(next.scaleIntent.value)
+    if (next.collapseIntent.nonce !== previous.collapseIntent.nonce) config.onCollapsedChange?.(next.collapseIntent.value)
     if (next.openIntent.nonce !== previous.openIntent.nonce && next.openIntent.value) {
       const task = next.tasks.find((candidate) => candidate.id === next.openIntent.value)
       if (task) config.onOpen?.(task)
@@ -550,6 +709,8 @@ export interface GanttWords {
   after: (titles: string[]) => string
   /** A task that starts before one it waits for ends. */
   conflict: (titles: string[]) => string
+  /** A group's summary in words: how many tasks, their days, how far along. */
+  group: (count: number, dates: string | null, days: number, progress: number | undefined) => string
 }
 
 export const GANTT_WORDS: GanttWords = {
@@ -567,6 +728,10 @@ export const GANTT_WORDS: GanttWords = {
   failed: (title, message) => (message ? `${title} was not changed: ${message}` : `${title} was not changed.`),
   after: (titles) => `after ${titles.join(', ')}`,
   conflict: (titles) => `starts before ${titles.join(', ')} ${titles.length === 1 ? 'ends' : 'end'}`,
+  group: (count, dates, days, progress) =>
+    count === 0
+      ? 'No tasks'
+      : `${count === 1 ? '1 task' : `${count} tasks`}, ${dates}, ${days === 1 ? '1 day' : `${days} days`}${progress === undefined ? '' : `, ${Math.round(progress * 100)}% done`}`,
 }
 
 const idPart = (value: string) => value.replace(/[^\w-]/g, (char) => `_${char.charCodeAt(0).toString(16)}`)
@@ -599,7 +764,10 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
   // The first Saturday's place from the range's start: the weekend's stripes line up on it.
   const weekendAt = (6 - weekday(range.start) + 7) % 7
 
-  const titleOf = (id: string) => state.tasks.find((task) => task.id === id)?.title ?? id
+  const rows = rowsOf(state)
+  const rowIndex = new Map(rows.map((row, i) => [row.id, i]))
+  const grouped = state.groups.length > 0
+  const titleOf = (id: string) => state.tasks.find((task) => task.id === id)?.title ?? state.groups.find((group) => group.id === id)?.title ?? id
   const said = state.announcement.value
   const announcement = !said
     ? ''
@@ -607,8 +775,18 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
       ? w.failed(titleOf(said.task), said.message)
       : (said.kind === 'cancelled' ? w.cancelled : w.changed)(titleOf(said.task), formatRange(said.dates.start, said.dates.end, state.locale))
   const pendingTasks = new Set(state.pending.map((change) => change.task))
-  const links = linksOf(state, range)
-  const focused = tabStop(state)
+  const links = linksOf(state, range, rows)
+  const focused = stop
+  const place = (dates: GanttDates) => {
+    const start = daysBetween(range.start, dates.start)
+    const span = Math.max(1, daysBetween(dates.start, dates.end) + 1)
+    return {
+      // Cut at the chart's edges: a bar that runs on past them says so.
+      'data-before': start < 0 ? '' : undefined,
+      'data-after': start + span > days ? '' : undefined,
+      style: { '--gg-gantt-start': Math.max(0, start), '--gg-gantt-span': Math.max(0, Math.min(days, start + span) - Math.max(0, start)) },
+    }
+  }
 
   const onKeyDown = (event: KeyboardEvent) => {
     const rtl = (event.currentTarget as Element | null)?.closest?.('[dir]')?.getAttribute('dir') === 'rtl'
@@ -631,13 +809,23 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
       send({ type: 'CANCEL' })
       return
     }
+    const own = (event.currentTarget as HTMLElement | null)?.dataset?.task ?? stop
+    const row = rows[rowIndex.get(own ?? '') ?? -1]
+    // On a group's heading the arrows across open and close it, and Enter does either.
+    if (row?.kind === 'group') {
+      keys[later] = { type: 'TOGGLE', group: row.id, open: true }
+      keys[earlier] = row.open ? { type: 'TOGGLE', group: row.id, open: false } : { type: 'WALK', step: 0 }
+      keys.Enter = { type: 'TOGGLE', group: row.id }
+    } else if (!state.editable && row?.group) {
+      // A chart whose bars stay put: back from a task to its group's heading.
+      keys[earlier] = { type: 'PARENT' }
+    }
     const sent = keys[event.key]
     const arrow = event.key === later || event.key === earlier
     if (!sent || event.metaKey || event.ctrlKey || (event.altKey && !arrow)) return
-    if (arrow && !state.editable) return
+    if (arrow && sent.type === 'NUDGE' && !state.editable) return
     event.preventDefault()
-    // A key comes from the task that has the focus, whatever the chart last heard.
-    const own = (event.currentTarget as HTMLElement | null)?.dataset?.task
+    // A key comes from the row that has the focus, whatever the chart last heard.
     if (own && own !== state.focus.task) send({ type: 'FOCUS', task: own })
     send(sent)
   }
@@ -649,6 +837,8 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
     days,
     scale: state.scale,
     tasks: state.tasks,
+    /** What to draw, top to bottom: tasks, and groups' headings. */
+    rows,
     top,
     bottom,
     todayInRange: todayAt >= 0 && todayAt < days,
@@ -664,9 +854,9 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
     rootProps: normalize({
       ...ganttAnatomy.attrs('root'),
       id: ids.root,
-      role: 'grid',
+      role: grouped ? 'treegrid' : 'grid',
       'aria-label': w.label,
-      'aria-rowcount': state.tasks.length + 1,
+      'aria-rowcount': rows.length + 1,
       'data-scale': state.scale,
       style: { '--gg-gantt-days': days, '--gg-gantt-weekend': weekendAt },
     }),
@@ -688,8 +878,17 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
         style: { '--gg-gantt-start': cell.start, '--gg-gantt-span': cell.span },
       }),
     bodyProps: normalize({ ...ganttAnatomy.attrs('body'), role: 'rowgroup' }),
-    getRowProps: (task: T, index: number) =>
-      normalize({ ...ganttAnatomy.attrs('row'), role: 'row', 'aria-rowindex': index + 2, 'data-task': task.id }),
+    getRowProps: (task: T) => {
+      const row = rows[rowIndex.get(task.id) ?? -1]
+      return normalize({
+        ...ganttAnatomy.attrs('row'),
+        role: 'row',
+        'aria-rowindex': (rowIndex.get(task.id) ?? 0) + 2,
+        'aria-level': grouped ? (row?.level ?? 1) : undefined,
+        'data-task': task.id,
+        'data-level': grouped ? (row?.level ?? 1) : undefined,
+      })
+    },
     getTitleProps: (task: T) => normalize({ ...ganttAnatomy.attrs('title'), id: ids.title(task.id), role: 'rowheader' }),
     getScheduleProps: (task: T) =>
       normalize({
@@ -739,24 +938,89 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
       return normalize({ ...ganttAnatomy.attrs('link-head'), style: { '--gg-gantt-x1': end.x, '--gg-gantt-x1-gap': end.gap, '--gg-gantt-y1': end.y } })
     },
     scheduleTextProps: normalize({ ...ganttAnatomy.attrs('schedule-text') }),
-    getBarProps: (task: T) => {
-      const dates = datesFor(state, task)
-      const start = daysBetween(range.start, dates.start)
-      const span = Math.max(1, daysBetween(dates.start, dates.end) + 1)
+
+    /** A group's heading row: its title, then its summary. */
+    getGroupRowProps: (group: GanttGroup) => {
+      const row = rows[rowIndex.get(group.id) ?? -1]
+      const open = row?.kind === 'group' ? row.open : true
       return normalize({
+        ...ganttAnatomy.attrs('row'),
+        role: 'row',
+        'aria-rowindex': (rowIndex.get(group.id) ?? 0) + 2,
+        'aria-level': 1,
+        'aria-expanded': open ? 'true' : 'false',
+        'data-group': group.id,
+        'data-level': 1,
+        'data-state': open ? 'open' : 'closed',
+      })
+    },
+    getGroupTitleProps: (group: GanttGroup) =>
+      normalize({
+        ...ganttAnatomy.attrs('title'),
+        id: ids.title(group.id),
+        role: 'rowheader',
+        'data-group': group.id,
+        // The heading's name opens and closes it, as the keys do.
+        onClick: () => send({ type: 'TOGGLE', group: group.id }),
+      }),
+    getGroupToggleProps: (group: GanttGroup) =>
+      normalize({
+        ...ganttAnatomy.attrs('group-toggle'),
+        'aria-hidden': 'true',
+        'data-icon': 'chevron-right' satisfies IconName,
+        'data-state': state.collapsed.includes(group.id) ? 'closed' : 'open',
+      }),
+    getGroupScheduleProps: (group: GanttGroup) =>
+      normalize({
+        ...ganttAnatomy.attrs('schedule'),
+        id: ids.schedule(group.id),
+        role: 'gridcell',
+        tabIndex: group.id === stop ? 0 : -1,
+        'aria-expanded': state.collapsed.includes(group.id) ? 'false' : 'true',
+        'data-task': group.id,
+        'data-group': group.id,
+        onKeyDown,
+        onFocusIn: (event: FocusEvent) => {
+          if (event.target === event.currentTarget) send({ type: 'FOCUS', task: group.id })
+        },
+        onDoubleClick: () => send({ type: 'TOGGLE', group: group.id }),
+      }),
+    /** A group's summary in words, for a screen reader; its bar shows it to the eye. */
+    describeGroup: (group: GanttGroup) => {
+      const row = rows[rowIndex.get(group.id) ?? -1]
+      const tasks = row?.kind === 'group' ? row.tasks : []
+      const summary = summaryOf(state, tasks)
+      return w.group(tasks.length, summary && formatRange(summary.start, summary.end, state.locale), summary ? daysBetween(summary.start, summary.end) + 1 : 0, summary?.progress)
+    },
+    /** The group's summary bar, or null when it has no tasks. */
+    getSummaryProps: (group: GanttGroup) => {
+      const row = rows[rowIndex.get(group.id) ?? -1]
+      const summary = row?.kind === 'group' ? summaryOf(state, row.tasks) : null
+      if (!summary) return null
+      return normalize({
+        ...ganttAnatomy.attrs('summary'),
+        'aria-hidden': 'true',
+        'data-group': group.id,
+        'data-done': summary.progress !== undefined && summary.progress >= 1 ? '' : undefined,
+        ...place(summary),
+      })
+    },
+    getSummaryProgressProps: (group: GanttGroup) => {
+      const row = rows[rowIndex.get(group.id) ?? -1]
+      const summary = row?.kind === 'group' ? summaryOf(state, row.tasks) : null
+      return normalize({ ...ganttAnatomy.attrs('summary-progress'), style: { '--gg-progress': Math.round((summary?.progress ?? 0) * 1000) / 1000 } })
+    },
+    getBarProps: (task: T) =>
+      normalize({
         ...ganttAnatomy.attrs(task.milestone ? 'milestone' : 'bar'),
         'aria-hidden': 'true',
         'data-task': task.id,
         'data-editable': state.editable && !task.locked ? '' : undefined,
         'data-drafting': state.draft?.task === task.id ? '' : undefined,
         'data-pending': pendingTasks.has(task.id) ? '' : undefined,
-        // Cut at the chart's edges: a bar that runs on past them says so.
-        'data-before': start < 0 ? '' : undefined,
-        'data-after': start + span > days ? '' : undefined,
         'data-done': task.progress !== undefined && task.progress >= 1 ? '' : undefined,
-        style: { '--gg-gantt-start': Math.max(0, start), '--gg-gantt-span': Math.max(0, Math.min(days, start + span) - Math.max(0, start)) },
-      })
-    },
+        ...place(datesFor(state, task)),
+      }),
     getBarProgressProps: (task: T) =>
       normalize({ ...ganttAnatomy.attrs('bar-progress'), style: { '--gg-progress': Math.max(0, Math.min(1, task.progress ?? 0)) } }),
     barLabelProps: normalize({ ...ganttAnatomy.attrs('bar-label') }),
@@ -781,7 +1045,7 @@ export function focusGanttTask(doc: Document, scheduleId: string): void {
   const cell = doc.getElementById(scheduleId)
   if (!cell) return
   if (doc.activeElement !== cell) cell.focus({ preventScroll: true })
-  const bar = cell.querySelector<HTMLElement>('[data-part="bar"], [data-part="milestone"]') ?? cell
+  const bar = cell.querySelector<HTMLElement>('[data-part="bar"], [data-part="milestone"], [data-part="summary"]') ?? cell
   if (typeof bar.scrollIntoView === 'function') bar.scrollIntoView({ block: 'nearest', inline: 'nearest' })
 }
 
