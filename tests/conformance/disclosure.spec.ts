@@ -114,7 +114,16 @@ export function disclosureConformance(adapter: Adapter) {
       expect(opened).toEqual([['src'], []])
     })
 
-    it('a press on a row chooses it; a press on its chevron only opens it', async () => {
+    it('a press on a branch’s row chooses it and opens it; again, closes it', async () => {
+      const { item, texts, changes } = await setup()
+      await adapter.act(() => click(item('src')))
+      expect(texts()).toContain('app')
+      expect(changes).toEqual([['src']])
+      await adapter.act(() => click(item('src')))
+      expect(texts()).not.toContain('app')
+    })
+
+    it('a press on a leaf chooses it; a press on a chevron only opens its branch', async () => {
       const { item, texts, changes } = await setup()
       await adapter.act(() => click(part(item('tests'), 'tree', 'toggle')!))
       expect(texts()).toContain('app.test.ts')

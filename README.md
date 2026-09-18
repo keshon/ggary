@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 3058 tests, 1212 of them in headless Chrome
+npm test         # 3064 tests, 1215 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1774,9 +1774,12 @@ indent is one number the core sets on each row, `--gg-tree-level`, and the theme
 multiplies it. The keys are the APG's: Up and Down walk the visible rows, Right
 opens a branch and then steps onto its first child, Left steps up and then
 closes, Home and End, `*` opens every sibling, typing jumps to a name. One tab
-stop. A press on a row chooses it; a press on its chevron only opens it — a
-target of its own, so a branch opens on a touch screen without being chosen,
-which the cascader cannot do yet. A double press opens a branch too.
+stop. A press anywhere on a branch's row opens or closes it, as a file tree's
+does, and chooses it; Enter does the same. The chevron is a target of its own
+that only opens and closes, so a branch can be opened without being chosen —
+on a touch screen too, which the cascader cannot do yet. In a multiple tree a
+press on a row only adds or takes it back: opening the branch on each press
+would fight the choice, so there the chevron opens it.
 `selectionMode` is `single`, `multiple` (each row then says whether it is
 chosen, and the tree that it takes several) or `none`, a tree to walk and open.
 Closing a branch with the focus inside it brings the focus up to the branch,
@@ -1802,6 +1805,10 @@ Found on the way:
   content, the label and the description ran together without a space in
   React; Svelte's whitespace happened to part them. The label now names the
   button and the description describes it, in both.
+- **A branch opened only from its chevron.** The first tree chose a branch on a
+  press and opened it only from the chevron or a double press — a small target
+  for the common case. A press on the row now opens it, as in a file tree; the
+  double press is gone, since each of its presses already toggles.
 - **The progress track vanished on white.** The first fill of the room, the
   subtle background, was all but invisible in light mode, so a bar at 42% did
   not say how far there was to go. It is the default border now, the same
@@ -2085,10 +2092,10 @@ one needs JS anyway; the children themselves stay the author's.
 | contract | node | `icons.contract.test.ts` | 326 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1110 tests, 64 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1113 tests, 65 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 34 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 1110 tests, 55 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1113 tests, 56 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |

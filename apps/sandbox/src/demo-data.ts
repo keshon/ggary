@@ -422,4 +422,4 @@ export const projectTree = [
 ]
 
 export const HINT_DISCLOSURE =
-  'The accordion: one section at a time, a press or Enter opens it, Up and Down walk the buttons. A closed section is still in the page: press Ctrl+F and search for "Innoprom" — the browser opens History to show it. The tree: Up and Down walk the rows, Right opens a branch and steps in, Left steps out and closes it, Home and End, * opens every sibling, typing jumps to a name. A press on a row chooses it, a press on its chevron only opens it. Progress: run the import to watch a bar and a ring move; a failed sync stays red.'
+  'The accordion: one section at a time, a press or Enter opens it, Up and Down walk the buttons. A closed section is still in the page: press Ctrl+F and search for "Innoprom" — the browser opens History to show it. The tree: Up and Down walk the rows, Right opens a branch and steps in, Left steps out and closes it, Home and End, * opens every sibling, typing jumps to a name. A press on a row chooses it and opens or closes a branch; a press on the chevron only opens or closes. Progress: run the import to watch a bar and a ring move; a failed sync stays red.'

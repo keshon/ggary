@@ -90,12 +90,18 @@ describe('tree', () => {
     single.send({ type: 'SELECT', value: 'readme' })
     single.send({ type: 'SELECT', value: 'tests' })
     expect(single.changes).toEqual([['readme'], ['tests']])
+    // A press on a branch's row opens it, and a second closes it, choosing it all the while.
+    expect(single.opened).toEqual([['tests']])
+    single.send({ type: 'SELECT', value: 'tests' })
+    expect(single.opened).toEqual([['tests'], []])
+    expect(single.changes).toEqual([['readme'], ['tests']])
 
     const multiple = tree({ selectionMode: 'multiple' })
     multiple.send({ type: 'SELECT', value: 'readme' })
     multiple.send({ type: 'SELECT', value: 'tests' })
     multiple.send({ type: 'SELECT', value: 'readme' })
     expect(multiple.changes).toEqual([['readme'], ['readme', 'tests'], ['tests']])
+    expect(multiple.opened).toEqual([])
 
     const none = tree({ selectionMode: 'none' })
     none.send({ type: 'SELECT', value: 'src' })

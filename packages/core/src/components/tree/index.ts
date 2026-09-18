@@ -200,11 +200,13 @@ export function reducer(state: TreeState, event: TreeEvent): TreeState {
       if (!node || isDisabled(state, node)) return state
       // A press has already put the focus on the row: the tab stop follows it, and nothing moves.
       const moved = { ...state, focus: { value, nonce: state.focus.nonce } }
-      if (state.selectionMode === 'none') return hasChildren(node) ? reducer(moved, { type: 'TOGGLE_EXPANDED', value }) : moved
       if (state.selectionMode === 'multiple') {
+        // Each press adds or takes back: opening the branch as well would fight the choice. The chevron opens it.
         return commit(moved, state.value.includes(value) ? state.value.filter((v) => v !== value) : [...state.value, value])
       }
-      return state.value.length === 1 && state.value[0] === value ? moved : commit(moved, [value])
+      // A press anywhere on a branch's row opens or closes it, as a file tree's does; single choice chooses it too.
+      const chosen = state.selectionMode === 'none' || (state.value.length === 1 && state.value[0] === value) ? moved : commit(moved, [value])
+      return hasChildren(node) ? reducer(chosen, { type: 'TOGGLE_EXPANDED', value }) : chosen
     }
 
     case 'TYPE': {
@@ -377,10 +379,6 @@ export function connect<T = Dict>(state: TreeState, send: (event: TreeEvent) => 
         'data-chosen': chosen ? '' : undefined,
         'data-disabled': disabled ? '' : undefined,
         onClick: () => send({ type: 'SELECT', value: node.value }),
-        // A double press opens or closes a branch, as a file tree's does.
-        onDoubleClick: () => {
-          if (branch && state.selectionMode !== 'none') send({ type: 'TOGGLE_EXPANDED', value: node.value })
-        },
         onFocusIn: (event: FocusEvent) => {
           if (event.target === event.currentTarget) send({ type: 'FOCUS', value: node.value })
         },
