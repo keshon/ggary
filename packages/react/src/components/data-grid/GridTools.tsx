@@ -17,6 +17,7 @@ import {
 import { mergeProps, reactNormalizer } from '@ggary/core'
 import { Button } from '../button'
 import { CheckboxGroup } from '../checkbox-group'
+import { DatePicker } from '../date-picker'
 import { Field } from '../field'
 import { Input } from '../input'
 import { Menu } from '../menu'
@@ -27,6 +28,8 @@ import { Select } from '../select'
 const useGrid = <Row,>(grid: DataGridController<Row>) => useSyncExternalStore(grid.subscribe, grid.getSnapshot, grid.getSnapshot)
 
 export interface FilterEditorWords {
+  /** The locale the date filter reads and writes days in. */
+  locale?: string
   apply?: string
   clear?: string
   column?: string
@@ -101,12 +104,21 @@ function FilterEditor({ columns, column: fixed, filter, onApply, words = {}, pro
         )}
         {column && current?.kind === 'date' && (
           <>
-            <Field label={`${column.header}, ${words.from ?? 'from'}`}>
-              <Input type="date" value={current.from} onValueChange={(from) => change({ from })} />
-            </Field>
-            <Field label={`${column.header}, ${words.to ?? 'to'}`}>
-              <Input type="date" value={current.to} onValueChange={(to) => change({ to })} />
-            </Field>
+            {/* Two days, not one range: either end may stay open — "from 1 Sep", "up to 30 Sep". */}
+            <DatePicker
+              label={`${column.header}, ${words.from ?? 'from'}`}
+              locale={words.locale}
+              value={current.from || null}
+              max={current.to || null}
+              onValueChange={(value) => change({ from: value.start ?? '' })}
+            />
+            <DatePicker
+              label={`${column.header}, ${words.to ?? 'to'}`}
+              locale={words.locale}
+              value={current.to || null}
+              min={current.from || null}
+              onValueChange={(value) => change({ to: value.start ?? '' })}
+            />
           </>
         )}
       </div>

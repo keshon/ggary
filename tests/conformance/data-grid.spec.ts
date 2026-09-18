@@ -258,6 +258,40 @@ export function gridToolsConformance(adapter: Adapter) {
       expect(visible()).toBe(false)
     })
 
+    // The custom elements are frozen with the browser's own date input; React and Svelte use the date picker.
+    const pickerAdapter = adapter.name === 'elements' ? it.skip : it
+    pickerAdapter('a date filter is edited with the kit’s date picker, and the grid follows', async () => {
+      const dated = many.map((lead, i) => ({ ...lead, registered: `2026-09-${String(i + 1).padStart(2, '0')}` }))
+      const withDate = [...columns, { id: 'registered', header: 'Registered', type: 'date' as const }]
+      const { m, chips, rowCount } = await setup({
+        columns: withDate,
+        rows: dated,
+        views: [{ id: 'sept', label: 'September', query: { filters: [{ column: 'registered', kind: 'date', from: '2026-09-01' }] } }],
+      })
+      // A view puts the filter in force; its chip opens the editor on it.
+      const viewButton = [...m.root.querySelectorAll<HTMLButtonElement>('button')].find((b) => b.textContent?.trim() === 'Views')!
+      await adapter.act(() => click(viewButton))
+      await adapter.wait(0)
+      const item = [...document.querySelectorAll<HTMLElement>('[data-scope="menu"][data-part="item"]')].find((row) => row.textContent?.includes('September'))!
+      await adapter.act(() => click(item))
+      await adapter.wait(0)
+      expect(rowCount()).toBe('13')
+      await adapter.act(() => click(part(chips()[0], 'grid-filters', 'chip-button')!))
+      await adapter.wait(0)
+      const forms = [...document.querySelectorAll<HTMLFormElement>('[data-scope="grid-filters"][data-part="editor"]')]
+      const form = forms[forms.length - 1]
+      const pickers = [...form.querySelectorAll<HTMLElement>('[data-scope="date-picker"][data-part="root"]')]
+      expect(pickers).toHaveLength(2)
+      const [from, to] = pickers.map((picker) => part(picker, 'date-picker', 'input') as HTMLInputElement)
+      expect(from.value).toBe('Sep 1, 2026')
+      await adapter.act(() => setInputValue(to, '9/5/2026'))
+      await adapter.act(() => void to.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })))
+      await adapter.act(() => form.requestSubmit())
+      await adapter.wait(0)
+      expect(rowCount()).toBe('6')
+      expect(part(chips()[0], 'grid-filters', 'chip-value')!.textContent).toBe('Sep 1, 2026 – Sep 5, 2026')
+    })
+
     it('the column picker hides a column and brings every one back', async () => {
       const { m, button } = await setup()
       const headers = () => [...m.root.querySelectorAll('[data-scope="data-grid"][data-part="header-cell"]:not([data-select])')].map((cell) => cell.textContent?.trim())

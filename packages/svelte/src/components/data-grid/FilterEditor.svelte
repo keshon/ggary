@@ -2,13 +2,14 @@
   import { draftFor, filterKindOf, setOptions, type ColumnDef, type Filter, type FilterDraft } from '@ggary/core/data-grid'
   import Button from '../button/Button.svelte'
   import CheckboxGroup from '../checkbox-group/CheckboxGroup.svelte'
+  import DatePicker from '../date-picker/DatePicker.svelte'
   import Field from '../field/Field.svelte'
   import Input from '../input/Input.svelte'
   import NumberField from '../number-field/NumberField.svelte'
   import Select from '../select/Select.svelte'
   import { untrack } from 'svelte'
 
-  type Words = { apply?: string; clear?: string; column?: string; from?: string; to?: string; contains?: string }
+  type Words = { locale?: string; apply?: string; clear?: string; column?: string; from?: string; to?: string; contains?: string }
   type Props = {
     columns: ColumnDef[]
     /** The column being edited; absent, the editor starts by asking which. */
@@ -70,12 +71,21 @@
         <NumberField value={current.max} onValueChange={(max: number | null) => change({ max })} />
       </Field>
     {:else if column && current?.kind === 'date'}
-      <Field label={`${column.header}, ${words.from ?? 'from'}`}>
-        <Input type="date" value={current.from} onValueChange={(from: string) => change({ from })} />
-      </Field>
-      <Field label={`${column.header}, ${words.to ?? 'to'}`}>
-        <Input type="date" value={current.to} onValueChange={(to: string) => change({ to })} />
-      </Field>
+      <!-- Two days, not one range: either end may stay open — "from 1 Sep", "up to 30 Sep". -->
+      <DatePicker
+        label={`${column.header}, ${words.from ?? 'from'}`}
+        locale={words.locale}
+        value={current.from || null}
+        max={current.to || null}
+        onValueChange={(value) => change({ from: value.start ?? '' })}
+      />
+      <DatePicker
+        label={`${column.header}, ${words.to ?? 'to'}`}
+        locale={words.locale}
+        value={current.to || null}
+        min={current.from || null}
+        onValueChange={(value) => change({ to: value.start ?? '' })}
+      />
     {/if}
   </div>
   <div {...parts.editorActionsProps}>

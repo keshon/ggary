@@ -36,3 +36,64 @@
 [data-scope='select'][data-part='content']:focus-visible {
   outline: none;
 }
+
+/* The cascader: a trigger like Select's, and a row of columns in the top layer. */
+[data-scope='cascader'][data-part='root'] {
+  display: inline-flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='cascader'][data-part='trigger'] {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  cursor: pointer;
+}
+[data-scope='cascader'][data-part='value'] {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+[data-scope='cascader'][data-part='positioner'] {
+  position: fixed;
+  inset: 0 auto auto 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  overflow: visible;
+}
+[data-scope='cascader'][data-part='positioner'][data-state='closed'] {
+  display: none;
+}
+[data-scope='cascader'][data-part='content'] {
+  display: flex;
+  max-inline-size: calc(100vw - 16px);
+  overflow-x: auto;
+}
+[data-scope='cascader'][data-part='column'] {
+  flex: none;
+  max-block-size: var(--gg-available-height, 320px);
+  margin: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+[data-scope='cascader'][data-part='item'] {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+[data-scope='cascader'][data-part='item-text'] {
+  flex: 1;
+  min-inline-size: 0;
+}
+[data-scope='cascader'][data-part='item-branch']:dir(rtl) {
+  scale: -1 1;
+}

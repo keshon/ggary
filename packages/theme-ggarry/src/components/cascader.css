@@ -1,0 +1,149 @@
+/* ==========================================================================
+   GGarry — cascader
+
+   Select's trigger, with the chosen path in it: the levels parted by a small
+   chevron, the last one in the default ink and the ones above it muted. The
+   dialog is Select's card with its columns side by side, parted by hairlines.
+   The path through the columns is a quiet tint; only the item the keyboard is
+   on takes the accent's fill.
+   ========================================================================== */
+
+[data-scope='cascader'][data-part='root'] {
+  gap: var(--ggarry-space-1);
+  min-inline-size: 240px;
+  font-family: var(--ggarry-font-family-sans);
+}
+[data-scope='cascader'][data-part='label'] {
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='cascader'][data-part='trigger'] {
+  gap: var(--ggarry-space-2);
+  block-size: var(--ggarry-size-control-md);
+  padding-inline: var(--ggarry-space-3);
+  border: 1px solid var(--ggarry-border-control);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  font: inherit;
+  font-size: var(--ggarry-font-size-md);
+  text-align: start;
+  transition: border-color var(--ggarry-duration-fast) ease;
+}
+[data-scope='cascader'][data-part='trigger']:hover:not(:disabled),
+[data-scope='cascader'][data-part='trigger'][data-state='open'] {
+  border-color: var(--ggarry-border-accent);
+}
+[data-scope='cascader'][data-part='trigger']:focus-visible {
+  border-color: var(--ggarry-border-accent);
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+[data-scope='cascader'][data-part='trigger']:disabled {
+  opacity: 0.55;
+  background: var(--ggarry-bg-subtle);
+  cursor: not-allowed;
+}
+[data-scope='cascader'][data-part='trigger'][data-placeholder] [data-part='value'] {
+  color: var(--ggarry-text-muted);
+}
+[data-scope='cascader'][data-part='value'] {
+  gap: var(--ggarry-space-1);
+}
+/* The levels above the last are the way there, not the answer. */
+[data-scope='cascader'][data-part='value'] > span:not(:last-child):not([data-part='separator']) {
+  color: var(--ggarry-text-muted);
+}
+[data-scope='cascader'][data-part='separator'] {
+  inline-size: 10px;
+  block-size: 10px;
+  color: var(--ggarry-text-subtle);
+}
+[data-scope='cascader'][data-part='indicator'] {
+  inline-size: 14px;
+  block-size: 14px;
+  color: var(--ggarry-text-muted);
+  transition: rotate var(--ggarry-duration-fast) ease;
+}
+[data-scope='cascader'][data-part='indicator'][data-state='open'] {
+  rotate: 180deg;
+}
+
+[data-scope='cascader'][data-part='content'] {
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-surface);
+  box-shadow: var(--ggarry-shadow-popover);
+  font-family: var(--ggarry-font-family-sans);
+}
+[data-scope='cascader'][data-part='column'] {
+  min-inline-size: 180px;
+  padding: var(--ggarry-space-1);
+}
+[data-scope='cascader'][data-part='column'] + [data-part='column'] {
+  border-inline-start: 1px solid var(--ggarry-border-default);
+}
+
+[data-scope='cascader'][data-part='item'] {
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-2);
+  border-radius: var(--ggarry-radius-md);
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-md);
+}
+[data-scope='cascader'][data-part='item']:hover:not([data-disabled]):not([data-highlighted]) {
+  background: var(--ggarry-bg-subtle);
+}
+/* The path through the columns: a tint. */
+[data-scope='cascader'][data-part='item'][data-highlighted] {
+  background: var(--ggarry-bg-accent-subtle);
+  color: var(--ggarry-text-accent);
+}
+/* Where the keyboard is: the accent's fill, and no ring over it — the card
+   clips a ring at its edge, and the fill says it already. */
+[data-scope='cascader'][data-part='item']:focus-visible {
+  outline: none;
+}
+[data-scope='cascader'][data-part='item'][data-highlighted]:focus-visible {
+  background: var(--ggarry-bg-accent);
+  color: var(--ggarry-text-on-accent);
+}
+[data-scope='cascader'][data-part='item'][data-chosen] {
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+[data-scope='cascader'][data-part='item'][data-disabled] {
+  color: var(--ggarry-text-subtle);
+  cursor: not-allowed;
+}
+[data-scope='cascader']:is([data-part='item-branch'], [data-part='item-indicator']) {
+  inline-size: 12px;
+  block-size: 12px;
+  flex: none;
+}
+[data-scope='cascader'][data-part='item-branch'] {
+  color: var(--ggarry-text-muted);
+}
+[data-scope='cascader'][data-part='item'][data-highlighted] > [data-part='item-branch'] {
+  color: inherit;
+}
+[data-scope='cascader'][data-part='item-indicator'] {
+  opacity: 0;
+}
+[data-scope='cascader'][data-part='item'][data-chosen]:not([data-branch]) > [data-part='item-indicator'] {
+  opacity: 1;
+}
+
+@media (forced-colors: active) {
+  [data-scope='cascader'][data-part='item'][data-highlighted] {
+    outline: 1px solid Highlight;
+  }
+  [data-scope='cascader'][data-part='item']:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='cascader']:is([data-part='trigger'], [data-part='indicator']) { transition: none; }
+}

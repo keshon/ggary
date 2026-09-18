@@ -320,3 +320,66 @@ export const isWeekend = (date: string) => {
 
 export const HINT_DATES =
   'Type a day the way your locale writes it — 18.09.2026, 9/18/2026, 18 Sep 2026 — and press Enter or move on; the field shows it back in the locale\'s words and submits it as 2026-09-18. Or open the calendar: arrows walk the days and cross into the next month, Home and End go to the ends of the week, PageUp and PageDown a month (with Shift, a year), Enter chooses. A range is two presses in either order, drawn under the pointer before the second; it submits as one ISO interval, 2026-09-01/2026-09-18. The week starts where the locale\'s does.'
+
+/** Where a lead is: country, region, city — the cascader's tree. */
+export const regions = [
+  {
+    value: 'ru',
+    label: 'Russia',
+    children: [
+      { value: 'msk', label: 'Moscow' },
+      { value: 'spb', label: 'Saint Petersburg' },
+      {
+        value: 'tat',
+        label: 'Tatarstan',
+        children: [
+          { value: 'kzn', label: 'Kazan' },
+          { value: 'chelny', label: 'Naberezhnye Chelny' },
+          { value: 'alm', label: 'Almetyevsk' },
+        ],
+      },
+      {
+        value: 'sam',
+        label: 'Samara Oblast',
+        children: [
+          { value: 'samara', label: 'Samara' },
+          { value: 'tlt', label: 'Tolyatti' },
+        ],
+      },
+    ],
+  },
+  {
+    value: 'kz',
+    label: 'Kazakhstan',
+    children: [
+      { value: 'ala', label: 'Almaty' },
+      { value: 'ast', label: 'Astana' },
+      { value: 'shy', label: 'Shymkent', disabled: true },
+    ],
+  },
+  {
+    value: 'rs',
+    label: 'Serbia',
+    children: [
+      { value: 'beg', label: 'Belgrade' },
+      { value: 'ns', label: 'Novi Sad' },
+    ],
+  },
+]
+
+/** A team is a place of its own: any level may be chosen. */
+export const teams = [
+  {
+    value: 'sales',
+    label: 'Sales',
+    children: [
+      { value: 'smb', label: 'Small business', children: [{ value: 'smb-east', label: 'East' }, { value: 'smb-west', label: 'West' }] },
+      { value: 'ent', label: 'Enterprise' },
+    ],
+  },
+  { value: 'support', label: 'Support', children: [{ value: 'l1', label: 'First line' }, { value: 'l2', label: 'Second line' }] },
+  { value: 'product', label: 'Product' },
+]
+
+export const HINT_CASCADER =
+  'A choice from a tree, one level to a column. Open it with a press or ArrowDown; Up and Down walk a column, Right goes into the children and Left back out, Enter chooses. A press on a branch opens it, a press on a leaf chooses. The button reads the whole path; the form gets the leaf. The team picker may stop at any level. Where the columns outrun the screen, the card scrolls sideways to the one the keyboard is on.'

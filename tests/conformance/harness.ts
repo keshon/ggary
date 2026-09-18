@@ -399,6 +399,15 @@ export interface DatePickerProps extends CalendarProps {
   name?: string
 }
 
+export interface CascaderProps {
+  label: string
+  items: import('../../packages/core/src/components/cascader').CascaderNode[]
+  defaultValue?: string[] | null
+  selectParents?: boolean
+  name?: string
+  onValueChange?: (value: string[]) => void
+}
+
 export interface CheckboxGroupProps {
   items: RadioItem[]
   name?: string
@@ -696,6 +705,7 @@ export interface Adapter {
   /** Optional: an adapter without it skips the combobox spec (the custom elements, while vanilla is undecided). */
   combobox?(props: ComboboxProps, target: HTMLElement): Promise<Mounted<ComboboxProps>>
   calendar?(props: CalendarProps, target: HTMLElement): Promise<Mounted<CalendarProps>>
+  cascader?(props: CascaderProps, target: HTMLElement): Promise<Mounted<CascaderProps>>
   datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>

@@ -44,6 +44,7 @@ import {
   Calendar,
   Combobox,
   DatePicker,
+  Cascader,
   Grid,
   PageHeader,
   Section,
@@ -95,7 +96,7 @@ import {
   ToolbarSpacer,
   Tooltip,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -114,6 +115,7 @@ function App() {
   const [leadLog, setLeadLog] = useState('—')
   const [comboLog, setComboLog] = useState('—')
   const [dateLog, setDateLog] = useState('—')
+  const [placeLog, setPlaceLog] = useState('—')
   const searchLeads = useMemo(() => debounce((text: string) => leadGrid?.send({ type: 'SET_SEARCH', search: text })), [leadGrid])
   useEffect(() => {
     if (!leadGrid) return
@@ -1085,6 +1087,16 @@ function App() {
         </div>
         <pre className="state">{dateLog}</pre>
         <p className="hint">{HINT_DATES}</p>
+      </section>
+
+      <section id="cascader">
+        <h2>Cascader</h2>
+        <div className="fields">
+          <Cascader label="City" items={regions} defaultValue={['ru', 'tat', 'kzn']} name="city" onValueChange={(value) => setPlaceLog(`city: ${value.join(' / ')}`)} />
+          <Cascader label="Team" items={teams} selectParents placeholder="Any team" onValueChange={(value) => setPlaceLog(`team: ${value.join(' / ')}`)} />
+        </div>
+        <pre className="state">{placeLog}</pre>
+        <p className="hint">{HINT_CASCADER}</p>
       </section>
 
       <section id="fields">

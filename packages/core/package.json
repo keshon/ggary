@@ -216,6 +216,10 @@
     "./date-picker": {
       "types": "./src/components/date-picker/index.ts",
       "default": "./src/components/date-picker/index.ts"
+    },
+    "./cascader": {
+      "types": "./src/components/cascader/index.ts",
+      "default": "./src/components/cascader/index.ts"
     }
   },
   "dependencies": {

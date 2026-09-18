@@ -58,3 +58,4 @@ export { Cluster, ClusterSpacer, Container, Grid, PageHeader, Section, Stack } f
 export { default as Combobox } from './components/combobox/Combobox.svelte'
 export { default as Calendar } from './components/date-picker/Calendar.svelte'
 export { default as DatePicker } from './components/date-picker/DatePicker.svelte'
+export { default as Cascader } from './components/cascader/Cascader.svelte'

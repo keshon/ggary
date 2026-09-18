@@ -32,6 +32,7 @@
     Calendar,
     Combobox,
     DatePicker,
+    Cascader,
     Grid,
     PageHeader,
     Section,
@@ -91,7 +92,7 @@
     type Lead,
   } from './leads'
   import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -109,6 +110,7 @@
   let leadLog = $state('—')
   let comboLog = $state('—')
   let dateLog = $state('—')
+  let placeLog = $state('—')
   const searchLeads = debounce((text: string) => leadGrid?.send({ type: 'SET_SEARCH', search: text }))
   $effect(() => {
     if (!leadGrid) return
@@ -968,6 +970,16 @@ invalid  ${taken}`}</pre>
   </div>
   <pre class="state">{dateLog}</pre>
   <p class="hint">{HINT_DATES}</p>
+</section>
+
+<section id="cascader">
+  <h2>Cascader</h2>
+  <div class="fields">
+    <Cascader label="City" items={regions} defaultValue={['ru', 'tat', 'kzn']} name="city" onValueChange={(value) => (placeLog = `city: ${value.join(' / ')}`)} />
+    <Cascader label="Team" items={teams} selectParents placeholder="Any team" onValueChange={(value) => (placeLog = `team: ${value.join(' / ')}`)} />
+  </div>
+  <pre class="state">{placeLog}</pre>
+  <p class="hint">{HINT_CASCADER}</p>
 </section>
 
 <section id="fields">
