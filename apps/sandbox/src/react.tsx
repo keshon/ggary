@@ -107,7 +107,7 @@ import {
   ToolbarSpacer,
   Tooltip,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, ganttScales, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -135,6 +135,7 @@ function App() {
   const [dealFormLog, setDealFormLog] = useState('idle')
   const [ganttScale, setGanttScale] = useState<'day' | 'week' | 'month'>('day')
   const [ganttLog, setGanttLog] = useState('—')
+  const [rolloutTasks, setRolloutTasks] = useState(rolloutPlan)
   // The sections are read from the page once it is drawn.
   useEffect(() => setPaletteCommands(sandboxCommands((text) => toast({ tone: 'neutral', title: text }))), [])
   const searchLeadCommands = async (query: string, signal: AbortSignal): Promise<PaletteCommand[]> =>
@@ -1229,7 +1230,19 @@ function App() {
           <SegmentedControl items={ganttScales} label="Scale" size="sm" value={ganttScale} onValueChange={(value) => setGanttScale(value as 'day' | 'week' | 'month')} />
         </div>
         <div className="gantt-frame">
-          <Gantt tasks={rolloutPlan} scale={ganttScale} onScaleChange={setGanttScale} locale="en-GB" onOpen={(task) => setGanttLog(`open: ${task.title}`)} words={{ label: 'CRM rollout' }} />
+          <Gantt
+            tasks={rolloutTasks}
+            scale={ganttScale}
+            onScaleChange={setGanttScale}
+            locale="en-GB"
+            onOpen={(task) => setGanttLog(`open: ${task.title}`)}
+            onChange={async ({ task, to }) => {
+              await saveTaskDates(task.id, to)
+              setRolloutTasks((current) => current.map((item) => (item.id === task.id ? { ...item, ...to } : item)))
+              setGanttLog(`changed: ${task.title} → ${to.start} – ${to.end}`)
+            }}
+            words={{ label: 'CRM rollout' }}
+          />
         </div>
         <pre className="state">{ganttLog}</pre>
         <p className="hint">{HINT_GANTT}</p>

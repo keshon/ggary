@@ -187,6 +187,35 @@
   inline-size: 2px;
   background: var(--ggarry-bg-accent);
 }
+/* A bar's ends, 8 pixels to take hold of, shown as a short line on the bar the pointer is over. */
+[data-scope='gantt']:is([data-part='bar-start'], [data-part='bar-end']) {
+  inline-size: 8px;
+}
+[data-scope='gantt']:is([data-part='bar-start'], [data-part='bar-end'])::after {
+  content: '';
+  position: absolute;
+  inset-block: 5px;
+  inset-inline-start: 3px;
+  inline-size: 2px;
+  border-radius: 1px;
+  background: var(--ggarry-border-accent);
+  opacity: 0;
+  transition: opacity var(--ggarry-duration-fast) ease;
+}
+[data-scope='gantt'][data-part='bar']:hover :is([data-part='bar-start'], [data-part='bar-end'])::after,
+[data-scope='gantt'][data-part='bar'][data-drafting] :is([data-part='bar-start'], [data-part='bar-end'])::after {
+  opacity: 1;
+}
+/* Being changed: the accent's edge doubled and lifted a little, as a held card is. */
+[data-scope='gantt']:is([data-part='bar'], [data-part='milestone'])[data-drafting] {
+  z-index: 2;
+  box-shadow: 0 0 0 1px var(--ggarry-border-accent), var(--ggarry-shadow-popover);
+}
+/* Waiting for its answer: a little faded. */
+[data-scope='gantt']:is([data-part='bar'], [data-part='milestone'])[data-pending]:not([data-drafting]) {
+  opacity: 0.6;
+}
+
 [data-scope='gantt'][data-part='empty'] {
   padding: var(--ggarry-space-6);
   color: var(--ggarry-text-muted);

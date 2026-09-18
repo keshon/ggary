@@ -67,6 +67,41 @@ export function ganttConformance(adapter: Adapter) {
       expect(schedule('review').tabIndex).toBe(0)
     })
 
+    it('with onChange, the arrows move the focused bar and say where; Enter hands the change over, Escape puts one back', async () => {
+      const changes: unknown[] = []
+      const { m, schedule, press } = await setup({ onChange: (change) => void changes.push([change.task.id, change.to]) })
+      const design = schedule('design')
+      expect(document.getElementById(design.getAttribute('aria-describedby')!)!.textContent).toContain('Left and Right move the task')
+      const bar = () => part(schedule('design'), 'gantt', 'bar')!
+      expect(bar().hasAttribute('data-editable')).toBe(true)
+      expect(parts(bar(), 'gantt', 'bar-end')).toHaveLength(1)
+      design.focus()
+      await adapter.act(() => {})
+      await press('ArrowRight')
+      await press('ArrowRight')
+      expect(bar().style.getPropertyValue('--gg-gantt-start')).toBe('11')
+      expect(bar().hasAttribute('data-drafting')).toBe(true)
+      expect(part(m.root, 'gantt', 'live')!.textContent).toBe('Design the flow: 12 Sept – 20 Sept 2026')
+      expect(part(design, 'gantt', 'schedule-text')!.textContent).toBe('12 Sept – 20 Sept 2026, 9 days, 40% done')
+      await press('Enter')
+      await adapter.wait(10)
+      expect(changes).toEqual([['design', { start: '2026-09-12', end: '2026-09-20' }]])
+      await adapter.act(() => void design.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', altKey: true, bubbles: true, cancelable: true })))
+      expect(bar().style.getPropertyValue('--gg-gantt-span')).toBe('10')
+      await press('Escape')
+      expect(bar().style.getPropertyValue('--gg-gantt-span')).toBe('9')
+      expect(part(m.root, 'gantt', 'live')!.textContent).toBe('Design the flow put back: 12 Sept – 20 Sept 2026')
+    })
+
+    it('without onChange the bars stay put and say nothing of moving', async () => {
+      const { schedule, press } = await setup()
+      expect(schedule('design').hasAttribute('aria-describedby')).toBe(false)
+      schedule('design').focus()
+      await adapter.act(() => {})
+      await press('ArrowRight')
+      expect(part(schedule('design'), 'gantt', 'bar')!.style.getPropertyValue('--gg-gantt-start')).toBe('9')
+    })
+
     it('a new scale redraws the header in its own units', async () => {
       const { m, root } = await setup({ scale: 'week' })
       expect(root().getAttribute('data-scale')).toBe('week')

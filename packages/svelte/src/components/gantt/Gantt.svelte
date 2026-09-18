@@ -1,5 +1,5 @@
 <script lang="ts" generics="T extends GanttTask">
-  import { connect, createGanttMachine, focusGanttTask, revealGanttDay, type GanttRange, type GanttScale, type GanttTask, type GanttWords } from '@ggary/core/gantt'
+  import { attachGanttDrag, connect, createGanttMachine, focusGanttTask, revealGanttDay, type GanttChange, type GanttRange, type GanttScale, type GanttTask, type GanttWords } from '@ggary/core/gantt'
   import { svelteNormalizer, uid } from '@ggary/core'
   import { untrack, type Snippet } from 'svelte'
 
@@ -14,13 +14,15 @@
     locale?: string
     /** Enter on a task, or a double press on its row. */
     onOpen?: (task: T) => void
+    /** A task was moved or resized: it stands at its new dates at once; a rejection puts it back. Without it, bars stay put. */
+    onChange?: (change: GanttChange<T>) => Promise<unknown> | unknown
     /** What the list shows for a task. Default: its title. */
     title?: Snippet<[T]>
     words?: Partial<GanttWords>
   }
 
   /** Tasks as bars on a time scale, their names beside them. */
-  let { tasks, scale = $bindable(), defaultScale, onScaleChange, range, locale, onOpen, title, words }: Props = $props()
+  let { tasks, scale = $bindable(), defaultScale, onScaleChange, range, locale, onOpen, onChange, title, words }: Props = $props()
 
   const machine = untrack(() =>
     createGanttMachine<T>({
@@ -34,6 +36,8 @@
         onScaleChange?.(next)
       },
       onOpen: (task) => onOpen?.(task),
+      editable: onChange !== undefined,
+      onChange: (change) => onChange?.(change),
     })
   )
   let snapshot = $state.raw(machine.getState())
@@ -45,7 +49,7 @@
   $effect(() => {
     if (scale !== undefined) machine.send({ type: 'SYNC_SCALE', scale })
   })
-  $effect(() => machine.send({ type: 'SYNC_OPTIONS', range: range ?? null, locale }))
+  $effect(() => machine.send({ type: 'SYNC_OPTIONS', range: range ?? null, locale, editable: onChange !== undefined }))
 
   let lastFocus = 0
   $effect(() => {
@@ -57,6 +61,11 @@
 
   // Opened, and at each new scale, on today — or on the first task when today is not in the chart.
   let rootEl = $state<HTMLDivElement | null>(null)
+  $effect(() => {
+    if (!rootEl) return
+    const root = rootEl
+    return untrack(() => attachGanttDrag(root, machine.send))
+  })
   $effect(() => {
     void shownScale
     const root = rootEl
@@ -86,10 +95,13 @@
           <div {...api.getBarProps(task)}>
             {#if !task.milestone}<div {...api.getBarProgressProps(task)}></div>{/if}
             <span {...api.barLabelProps}>{task.title}</span>
+            {#if api.showGrips(task)}<span {...api.getGripProps('start')}></span><span {...api.getGripProps('end')}></span>{/if}
           </div>
         </div>
       </div>
     {/each}
     {#if api.tasks.length === 0}<div {...api.emptyProps}>{api.words.empty}</div>{/if}
   </div>
+  <div {...api.liveProps}>{api.announcement}</div>
+  {#if api.editable}<div {...api.instructionsProps}>{api.words.instructions}</div>{/if}
 </div>

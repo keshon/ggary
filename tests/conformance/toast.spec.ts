@@ -68,12 +68,15 @@ export function toastConformance(adapter: Adapter) {
       const { toaster, toasts, show, settle } = await setup()
       await show({ title: 'Saved', duration: 60 })
       // In a real browser the mouse stays where an earlier test left it, and a
-      // toast drawn under it is paused, as it should be. This test is about the
-      // clock, not the pointer (the next one is): let it run.
-      if (toaster.getState().paused) await adapter.act(() => toaster.resume())
-      // Timers run late on a busy machine: wait for each state, not for a margin.
+      // toast drawn under it is paused, as it should be — a frame after it is
+      // drawn, when the browser notices what is under the pointer. This test is
+      // about the clock, not the pointer (the next one is): let it run.
+      // Timers run late on a busy machine too: wait for each state, not for a margin.
       const until = async (done: () => boolean) => {
-        for (let waited = 0; waited < 1000 && !done(); waited += 20) await settle(20)
+        for (let waited = 0; waited < 1000 && !done(); waited += 20) {
+          if (toaster.getState().paused) toaster.resume()
+          await settle(20)
+        }
       }
       await until(() => toasts()[0]?.dataset.state !== 'open')
       expect(toasts()[0].dataset.state).toBe('leaving')

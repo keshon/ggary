@@ -1,5 +1,5 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
-import { connect, createGanttMachine, focusGanttTask, revealGanttDay, type GanttRange, type GanttScale, type GanttTask, type GanttWords } from '@ggary/core/gantt'
+import { attachGanttDrag, connect, createGanttMachine, focusGanttTask, revealGanttDay, type GanttChange, type GanttRange, type GanttScale, type GanttTask, type GanttWords } from '@ggary/core/gantt'
 import { reactNormalizer } from '@ggary/core'
 
 export interface GanttProps<T extends GanttTask> {
@@ -13,6 +13,12 @@ export interface GanttProps<T extends GanttTask> {
   locale?: string
   /** Enter on a task, or a double press on its row. */
   onOpen?: (task: T) => void
+  /**
+   * A task was moved or resized — dragged, or with the arrow keys. It stands
+   * at its new dates at once; return a promise to say whether it holds, and
+   * apply it to `tasks` when it does. Without it, bars stay put.
+   */
+  onChange?: (change: GanttChange<T>) => Promise<unknown> | unknown
   /** What the list shows for a task. Default: its title. */
   children?: (task: T) => ReactNode
   words?: Partial<GanttWords>
@@ -20,10 +26,10 @@ export interface GanttProps<T extends GanttTask> {
 
 /** Tasks as bars on a time scale, their names beside them. */
 export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
-  const { tasks, scale, defaultScale, onScaleChange, range, locale, onOpen, children, words } = props
+  const { tasks, scale, defaultScale, onScaleChange, range, locale, onOpen, onChange, children, words } = props
   const id = `gg-gantt-${useId().replace(/:/g, '')}`
-  const callbacks = useRef({ onScaleChange, onOpen })
-  callbacks.current = { onScaleChange, onOpen }
+  const callbacks = useRef({ onScaleChange, onOpen, onChange })
+  callbacks.current = { onScaleChange, onOpen, onChange }
   const [machine] = useState(() =>
     createGanttMachine<T>({
       id,
@@ -34,6 +40,8 @@ export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
       locale,
       onScaleChange: (next) => callbacks.current.onScaleChange?.(next),
       onOpen: (task) => callbacks.current.onOpen?.(task),
+      editable: onChange !== undefined,
+      onChange: (change) => callbacks.current.onChange?.(change),
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
@@ -43,7 +51,8 @@ export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
   useEffect(() => {
     if (scale !== undefined) machine.send({ type: 'SYNC_SCALE', scale })
   }, [machine, scale])
-  useEffect(() => machine.send({ type: 'SYNC_OPTIONS', range: range ?? null, locale }), [machine, range, locale])
+  const editable = onChange !== undefined
+  useEffect(() => machine.send({ type: 'SYNC_OPTIONS', range: range ?? null, locale, editable }), [machine, range, locale, editable])
 
   const lastFocus = useRef(0)
   useLayoutEffect(() => {
@@ -55,6 +64,7 @@ export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
   // Opened, and at each new scale, on today — or on the first task when today is not in the chart.
   const rootRef = useRef<HTMLDivElement>(null)
   useLayoutEffect(() => revealGanttDay(rootRef.current), [state.scale])
+  useEffect(() => (rootRef.current ? attachGanttDrag(rootRef.current, machine.send) : undefined), [machine])
 
   return (
     <div ref={rootRef} {...api.rootProps}>
@@ -87,12 +97,20 @@ export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
               <div {...api.getBarProps(task)}>
                 {!task.milestone && <div {...api.getBarProgressProps(task)} />}
                 <span {...api.barLabelProps}>{task.title}</span>
+                {api.showGrips(task) && (
+                  <>
+                    <span {...api.getGripProps('start')} />
+                    <span {...api.getGripProps('end')} />
+                  </>
+                )}
               </div>
             </div>
           </div>
         ))}
         {api.tasks.length === 0 && <div {...api.emptyProps}>{api.words.empty}</div>}
       </div>
+      <div {...api.liveProps}>{api.announcement}</div>
+      {api.editable && <div {...api.instructionsProps}>{api.words.instructions}</div>}
     </div>
   )
 }

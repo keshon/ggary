@@ -101,3 +101,40 @@
   inset-block: 0;
   pointer-events: none;
 }
+
+/* A bar that may change: its body is taken to move it, its ends to resize it. */
+[data-scope='gantt']:is([data-part='bar'], [data-part='milestone'])[data-editable] {
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+[data-scope='gantt']:is([data-part='bar-start'], [data-part='bar-end']) {
+  position: absolute;
+  z-index: 1;
+  inset-block: 0;
+  cursor: ew-resize;
+}
+[data-scope='gantt'][data-part='bar-start'] {
+  inset-inline-start: 0;
+}
+[data-scope='gantt'][data-part='bar-end'] {
+  inset-inline-end: 0;
+}
+[data-scope='gantt'][data-part='root'][data-dragging='move'],
+[data-scope='gantt'][data-part='root'][data-dragging='move'] * {
+  cursor: grabbing;
+}
+[data-scope='gantt'][data-part='root']:is([data-dragging='start'], [data-dragging='end']),
+[data-scope='gantt'][data-part='root']:is([data-dragging='start'], [data-dragging='end']) * {
+  cursor: ew-resize;
+}
+
+/* Spoken, not shown: a change as it is made, and how to make one. */
+[data-scope='gantt']:is([data-part='live'], [data-part='instructions']) {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

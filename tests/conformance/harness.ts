@@ -446,6 +446,7 @@ export interface GanttProps {
   range?: import('../../packages/core/src/components/gantt').GanttRange
   locale?: string
   onOpen?: (task: import('../../packages/core/src/components/gantt').GanttTask) => void
+  onChange?: (change: import('../../packages/core/src/components/gantt').GanttChange) => unknown
 }
 
 export interface CommandPaletteProps {

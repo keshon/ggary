@@ -1,5 +1,6 @@
 import { createMachine, withEffects, type Machine } from '../../machine'
 import { createAnatomy, type Dict, type Normalizer } from '../../types'
+export { attachGanttDrag } from './drag'
 import { addDays, addMonths, daysBetween, formatDate, startOfMonth, startOfWeek, todayISO, weekday, weekStartOf, type ISODate } from '../../utils/calendar'
 
 /**
@@ -29,7 +30,46 @@ export interface GanttTask {
   progress?: number
   /** A point in time, not a stretch of it: drawn as a diamond on its day. */
   milestone?: boolean
+  /** Not to be moved or resized: its bar has no grips, and the keys leave it. */
+  locked?: boolean
 }
+
+export interface GanttDates {
+  start: ISODate
+  end: ISODate
+}
+
+/** What a change takes hold of: the whole bar, or one of its ends. */
+export type GanttEdge = 'move' | 'start' | 'end'
+
+export interface GanttChange<T extends GanttTask = GanttTask> {
+  task: T
+  from: GanttDates
+  to: GanttDates
+}
+
+/** A change being made: shown at once, handed over when it is done. */
+interface Draft {
+  task: string
+  edge: GanttEdge
+  offset: number
+  origin: GanttDates
+  by: 'keyboard' | 'pointer'
+  nonce: number
+}
+
+interface PendingChange {
+  id: number
+  task: string
+  from: GanttDates
+  to: GanttDates
+  /** Answered, and waiting for the owner's new tasks to show it. */
+  settled: boolean
+}
+
+export type GanttAnnouncement =
+  | { kind: 'draft' | 'changed' | 'cancelled'; task: string; dates: GanttDates }
+  | { kind: 'failed'; task: string; message: string }
 
 export type GanttScale = 'day' | 'week' | 'month'
 
@@ -49,6 +89,12 @@ export interface GanttState<T extends GanttTask = GanttTask> {
   openIntent: { value: string | null; nonce: number }
   scaleIntent: { value: GanttScale; nonce: number }
   scaleControlled: boolean
+  /** Whether bars may be moved and resized: there is someone to hand a change to. */
+  editable: boolean
+  draft: Draft | null
+  pending: PendingChange[]
+  changeIntent: { value: PendingChange | null; nonce: number }
+  announcement: { value: GanttAnnouncement | null; nonce: number }
 }
 
 export type GanttEvent =
@@ -59,7 +105,16 @@ export type GanttEvent =
   | { type: 'SCALE'; scale: GanttScale }
   | { type: 'SYNC_TASKS'; tasks: GanttTask[] }
   | { type: 'SYNC_SCALE'; scale: GanttScale }
-  | { type: 'SYNC_OPTIONS'; range?: GanttRange | null; locale?: string }
+  | { type: 'SYNC_OPTIONS'; range?: GanttRange | null; locale?: string; editable?: boolean }
+  /** The keyboard: move the focused task, or its end, by some days more. */
+  | { type: 'NUDGE'; edge: GanttEdge; days: number }
+  /** A pointer: the task, or one of its ends, is this many days from where the drag began. */
+  | { type: 'DRAG'; task: string; edge: GanttEdge; offset: number }
+  /** Keep the change being made. */
+  | { type: 'COMMIT' }
+  /** Put the change being made back. */
+  | { type: 'CANCEL' }
+  | { type: 'SETTLE'; change: number; ok: boolean; message?: string }
 
 export const ganttAnatomy = createAnatomy('gantt', [
   'root',
@@ -76,7 +131,11 @@ export const ganttAnatomy = createAnatomy('gantt', [
   'bar',
   'bar-progress',
   'bar-label',
+  'bar-start',
+  'bar-end',
   'milestone',
+  'live',
+  'instructions',
   'today',
   'empty',
 ] as const)
@@ -180,23 +239,121 @@ const PAGE = 10
 /** A header cell of fewer days than this cannot hold its name at the scale. */
 const NARROW: Record<GanttScale, number> = { day: 3, week: 8, month: 25 }
 
-export function reducer<T extends GanttTask>(state: GanttState<T>, event: GanttEvent): GanttState<T> {
-  const moveTo = (index: number): GanttState<T> => {
-    const task = state.tasks[Math.max(0, Math.min(state.tasks.length - 1, index))]
-    return !task || task.id === state.focus.task ? state : { ...state, focus: { task: task.id, nonce: state.focus.nonce + 1 } }
+/** The dates a change comes to: the whole bar moved, or one end, never past the other. */
+export function datesOf(origin: GanttDates, edge: GanttEdge, offset: number, milestone = false): GanttDates {
+  if (milestone || edge === 'move') {
+    const start = addDays(origin.start, offset)
+    return { start, end: milestone ? start : addDays(origin.end, offset) }
   }
+  if (edge === 'start') {
+    const start = addDays(origin.start, offset)
+    return { start: start > origin.end ? origin.end : start, end: origin.end }
+  }
+  const end = addDays(origin.end, offset)
+  return { start: origin.start, end: end < origin.start ? origin.start : end }
+}
+
+/** The dates a task shows: the change being made to it, else a change still out, else its own. */
+export function datesFor(state: GanttState, task: GanttTask): GanttDates {
+  if (state.draft && state.draft.task === task.id) return datesOf(state.draft.origin, state.draft.edge, state.draft.offset, task.milestone)
+  const out = [...state.pending].reverse().find((change) => change.task === task.id)
+  return out ? out.to : { start: task.start, end: task.end }
+}
+
+const editableTask = (state: GanttState, task: GanttTask | undefined) => !!task && state.editable && !task.locked
+
+/** Keep the change being made: hand it over when it moved anything, and say so. */
+function commit<T extends GanttTask>(state: GanttState<T>): GanttState<T> {
+  const draft = state.draft
+  if (!draft) return state
+  const task = state.tasks.find((candidate) => candidate.id === draft.task)
+  const done = { ...state, draft: null }
+  if (!task) return done
+  const to = datesOf(draft.origin, draft.edge, draft.offset, task.milestone)
+  if (to.start === draft.origin.start && to.end === draft.origin.end) return done
+  const change: PendingChange = { id: state.changeIntent.nonce + 1, task: task.id, from: draft.origin, to, settled: false }
+  return {
+    ...done,
+    pending: [...state.pending, change],
+    changeIntent: { value: change, nonce: change.id },
+    announcement: { value: { kind: 'changed', task: task.id, dates: to }, nonce: state.announcement.nonce + 1 },
+  }
+}
+
+/** The focus on the task at `index`, clamped to the list; real focus moves there. */
+function focusAt<T extends GanttTask>(state: GanttState<T>, index: number): GanttState<T> {
+  const task = state.tasks[Math.max(0, Math.min(state.tasks.length - 1, index))]
+  return !task || task.id === state.focus.task ? state : { ...state, focus: { task: task.id, nonce: state.focus.nonce + 1 } }
+}
+
+export function reducer<T extends GanttTask>(state: GanttState<T>, event: GanttEvent): GanttState<T> {
   switch (event.type) {
-    case 'FOCUS':
-      return event.task === state.focus.task ? state : { ...state, focus: { task: event.task, nonce: state.focus.nonce } }
-    case 'WALK': {
-      const at = indexOf(state, tabStop(state))
-      return moveTo(at + event.step)
+    case 'FOCUS': {
+      if (event.task === state.focus.task) return state
+      // The focus went to another task: the change being made to this one is kept.
+      const kept = state.draft && state.draft.task !== event.task ? commit(state) : state
+      return { ...kept, focus: { task: event.task, nonce: kept.focus.nonce } }
     }
-    case 'EDGE':
-      return moveTo(event.edge === 'first' ? 0 : state.tasks.length - 1)
+    case 'WALK': {
+      const kept = commit(state)
+      return focusAt(kept, indexOf(kept, tabStop(kept)) + event.step)
+    }
+    case 'EDGE': {
+      const kept = commit(state)
+      return focusAt(kept, event.edge === 'first' ? 0 : kept.tasks.length - 1)
+    }
     case 'OPEN': {
       const task = event.task ?? tabStop(state)
-      return task ? { ...state, openIntent: { value: task, nonce: state.openIntent.nonce + 1 } } : state
+      const kept = commit(state)
+      return task ? { ...kept, openIntent: { value: task, nonce: kept.openIntent.nonce + 1 } } : kept
+    }
+
+    case 'NUDGE': {
+      const id = tabStop(state)
+      const task = state.tasks.find((candidate) => candidate.id === id)
+      if (!task || !editableTask(state, task)) return state
+      const edge = task.milestone ? 'move' : event.edge
+      // Nudges of the same end add up; another end starts a change of its own.
+      const base = state.draft && (state.draft.task !== task.id || state.draft.edge !== edge) ? commit(state) : state
+      const same = base.draft && base.draft.task === task.id && base.draft.edge === edge ? base.draft : null
+      const draft: Draft = same
+        ? { ...same, offset: same.offset + event.days, nonce: same.nonce + 1 }
+        : { task: task.id, edge, offset: event.days, origin: datesFor(base, task), by: 'keyboard', nonce: (base.draft?.nonce ?? 0) + 1 }
+      const dates = datesOf(draft.origin, draft.edge, draft.offset, task.milestone)
+      return { ...base, draft, announcement: { value: { kind: 'draft', task: task.id, dates }, nonce: base.announcement.nonce + 1 } }
+    }
+
+    case 'DRAG': {
+      const task = state.tasks.find((candidate) => candidate.id === event.task)
+      if (!task || !editableTask(state, task)) return state
+      const edge = task.milestone ? 'move' : event.edge
+      const base = state.draft && (state.draft.task !== task.id || state.draft.edge !== edge || state.draft.by !== 'pointer') ? commit(state) : state
+      const origin = base.draft?.task === task.id ? base.draft.origin : datesFor(base, task)
+      if (base.draft && base.draft.offset === event.offset && base.draft.task === task.id) return base
+      return { ...base, draft: { task: task.id, edge, offset: event.offset, origin, by: 'pointer', nonce: (base.draft?.nonce ?? 0) + 1 } }
+    }
+
+    case 'COMMIT':
+      return commit(state)
+
+    case 'CANCEL': {
+      const draft = state.draft
+      if (!draft) return state
+      return { ...state, draft: null, announcement: { value: { kind: 'cancelled', task: draft.task, dates: draft.origin }, nonce: state.announcement.nonce + 1 } }
+    }
+
+    case 'SETTLE': {
+      const change = state.pending.find((candidate) => candidate.id === event.change)
+      if (!change) return state
+      const rest = state.pending.filter((candidate) => candidate !== change)
+      if (!event.ok) {
+        // That change only goes back; a later one of the same task stands.
+        return { ...state, pending: rest, announcement: { value: { kind: 'failed', task: change.task, message: event.message ?? '' }, nonce: state.announcement.nonce + 1 } }
+      }
+      const task = state.tasks.find((candidate) => candidate.id === change.task)
+      // The owner's tasks show it already: the change goes. Not yet: it waits for them.
+      const shown = task && task.start === change.to.start && task.end === change.to.end
+      return { ...state, pending: shown ? rest : state.pending.map((candidate) => (candidate === change ? { ...change, settled: true } : candidate)) }
     }
     case 'SCALE': {
       if (event.scale === state.scale) return state
@@ -206,11 +363,12 @@ export function reducer<T extends GanttTask>(state: GanttState<T>, event: GanttE
     case 'SYNC_SCALE':
       return event.scale === state.scale ? state : { ...state, scale: event.scale }
     case 'SYNC_TASKS':
-      return event.tasks === state.tasks ? state : { ...state, tasks: event.tasks as T[] }
+      return event.tasks === state.tasks ? state : { ...state, tasks: event.tasks as T[], pending: state.pending.filter((change) => !change.settled) }
     case 'SYNC_OPTIONS': {
       const range = event.range === undefined ? state.range : event.range
       const locale = event.locale === undefined ? state.locale : event.locale
-      return range === state.range && locale === state.locale ? state : { ...state, range, locale }
+      const editable = event.editable === undefined ? state.editable : event.editable
+      return range === state.range && locale === state.locale && editable === state.editable ? state : { ...state, range, locale, editable }
     }
   }
 }
@@ -227,6 +385,14 @@ export interface GanttConfig<T extends GanttTask> {
   locale?: string
   /** Enter on a task, or a double press on its bar. */
   onOpen?: (task: T) => void
+  /**
+   * A task was moved or resized: it stands at its new dates at once. Return
+   * a promise to say whether it holds — a rejection puts it back and reads
+   * out why. Apply it to your tasks when it holds. Without it, bars stay put.
+   */
+  onChange?: (change: GanttChange<T>) => Promise<unknown> | unknown
+  /** Whether bars may change. Default: when there is an `onChange`. */
+  editable?: boolean
 }
 
 export function initialState<T extends GanttTask>(config: GanttConfig<T>): GanttState<T> {
@@ -241,18 +407,46 @@ export function initialState<T extends GanttTask>(config: GanttConfig<T>): Gantt
     openIntent: { value: null, nonce: 0 },
     scaleIntent: { value: scale, nonce: 0 },
     scaleControlled: config.scale !== undefined,
+    editable: config.editable ?? config.onChange !== undefined,
+    draft: null,
+    pending: [],
+    changeIntent: { value: null, nonce: 0 },
+    announcement: { value: null, nonce: 0 },
   }
 }
 
+/** How long the keys must rest before a change made with them is handed over. */
+export const NUDGE_SETTLE_MS = 700
+
 export function createGanttMachine<T extends GanttTask>(config: GanttConfig<T>): Machine<GanttState<T>, GanttEvent> {
   const machine = createMachine(initialState(config), reducer as (state: GanttState<T>, event: GanttEvent) => GanttState<T>)
-  return withEffects(machine, (previous, next) => {
+  let rest: ReturnType<typeof setTimeout> | undefined
+  // Answers go to the machine with its effects, so what they change is heard too.
+  const wrapped: Machine<GanttState<T>, GanttEvent> = withEffects(machine, (previous, next) => {
+    // Keys that pause keep their change; a new key starts the wait over.
+    if (next.draft !== previous.draft) {
+      clearTimeout(rest)
+      if (next.draft?.by === 'keyboard') rest = setTimeout(() => wrapped.send({ type: 'COMMIT' }), NUDGE_SETTLE_MS)
+    }
+    if (next.changeIntent.nonce !== previous.changeIntent.nonce && next.changeIntent.value) {
+      const change = next.changeIntent.value
+      const task = next.tasks.find((candidate) => candidate.id === change.task)
+      if (task) {
+        Promise.resolve()
+          .then(() => config.onChange?.({ task, from: change.from, to: change.to }))
+          .then(
+            () => wrapped.send({ type: 'SETTLE', change: change.id, ok: true }),
+            (error) => wrapped.send({ type: 'SETTLE', change: change.id, ok: false, message: error instanceof Error ? error.message : String(error ?? '') })
+          )
+      }
+    }
     if (next.scaleIntent.nonce !== previous.scaleIntent.nonce) config.onScaleChange?.(next.scaleIntent.value)
     if (next.openIntent.nonce !== previous.openIntent.nonce && next.openIntent.value) {
       const task = next.tasks.find((candidate) => candidate.id === next.openIntent.value)
       if (task) config.onOpen?.(task)
     }
   })
+  return wrapped
 }
 
 export interface GanttWords {
@@ -267,6 +461,12 @@ export interface GanttWords {
   milestone: (date: string) => string
   empty: string
   today: string
+  /** How to move a task with the keyboard: the schedule cell's description. */
+  instructions: string
+  /** Said as a change is made, and when it is kept: "Design the flow: 11 Sept – 19 Sept 2026". */
+  changed: (title: string, dates: string) => string
+  cancelled: (title: string, dates: string) => string
+  failed: (title: string, message: string) => string
 }
 
 export const GANTT_WORDS: GanttWords = {
@@ -278,6 +478,10 @@ export const GANTT_WORDS: GanttWords = {
   milestone: (date) => `Milestone, ${date}`,
   empty: 'No tasks',
   today: 'Today',
+  instructions: 'Left and Right move the task a day, with Shift a week; with Alt they move its end. Enter or a pause keeps the change, Escape puts it back.',
+  changed: (title, dates) => `${title}: ${dates}`,
+  cancelled: (title, dates) => `${title} put back: ${dates}`,
+  failed: (title, message) => (message ? `${title} was not changed: ${message}` : `${title} was not changed.`),
 }
 
 const idPart = (value: string) => value.replace(/[^\w-]/g, (char) => `_${char.charCodeAt(0).toString(16)}`)
@@ -286,6 +490,7 @@ export const ganttIds = (id: string) => ({
   root: id,
   schedule: (task: string) => `${id}-schedule-${idPart(task)}`,
   title: (task: string) => `${id}-title-${idPart(task)}`,
+  instructions: `${id}-instructions`,
 })
 
 /** A range in the locale's words: "18 Sep – 25 Sep 2026", or one day when it starts and ends on it. */
@@ -309,7 +514,20 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
   // The first Saturday's place from the range's start: the weekend's stripes line up on it.
   const weekendAt = (6 - weekday(range.start) + 7) % 7
 
+  const titleOf = (id: string) => state.tasks.find((task) => task.id === id)?.title ?? id
+  const said = state.announcement.value
+  const announcement = !said
+    ? ''
+    : said.kind === 'failed'
+      ? w.failed(titleOf(said.task), said.message)
+      : (said.kind === 'cancelled' ? w.cancelled : w.changed)(titleOf(said.task), formatRange(said.dates.start, said.dates.end, state.locale))
+  const pendingTasks = new Set(state.pending.map((change) => change.task))
+
   const onKeyDown = (event: KeyboardEvent) => {
+    const rtl = (event.currentTarget as Element | null)?.closest?.('[dir]')?.getAttribute('dir') === 'rtl'
+    const step = event.shiftKey ? 7 : 1
+    const later = rtl ? 'ArrowLeft' : 'ArrowRight'
+    const earlier = rtl ? 'ArrowRight' : 'ArrowLeft'
     const keys: Record<string, GanttEvent> = {
       ArrowDown: { type: 'WALK', step: 1 },
       ArrowUp: { type: 'WALK', step: -1 },
@@ -317,10 +535,19 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
       PageUp: { type: 'WALK', step: -PAGE },
       Home: { type: 'EDGE', edge: 'first' },
       End: { type: 'EDGE', edge: 'last' },
-      Enter: { type: 'OPEN' },
+      Enter: state.draft ? { type: 'COMMIT' } : { type: 'OPEN' },
+      [later]: { type: 'NUDGE', edge: event.altKey ? 'end' : 'move', days: step },
+      [earlier]: { type: 'NUDGE', edge: event.altKey ? 'end' : 'move', days: -step },
+    }
+    if (event.key === 'Escape' && state.draft) {
+      event.preventDefault()
+      send({ type: 'CANCEL' })
+      return
     }
     const sent = keys[event.key]
-    if (!sent || event.altKey || event.metaKey) return
+    const arrow = event.key === later || event.key === earlier
+    if (!sent || event.metaKey || event.ctrlKey || (event.altKey && !arrow)) return
+    if (arrow && !state.editable) return
     event.preventDefault()
     // A key comes from the task that has the focus, whatever the chart last heard.
     const own = (event.currentTarget as HTMLElement | null)?.dataset?.task
@@ -338,6 +565,10 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
     top,
     bottom,
     todayInRange: todayAt >= 0 && todayAt < days,
+    editable: state.editable,
+    announcement,
+    /** The dates a task shows: a change being made to it, or still out, over its own. */
+    datesOf: (task: T) => datesFor(state, task),
     /** Watch this: when it changes, move real focus to `focusTask`'s schedule cell. */
     focusNonce: state.focus.nonce,
     focusTask: state.focus.task,
@@ -379,6 +610,7 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
         id: ids.schedule(task.id),
         role: 'gridcell',
         tabIndex: task.id === stop ? 0 : -1,
+        'aria-describedby': state.editable && !task.locked ? ids.instructions : undefined,
         'data-task': task.id,
         onKeyDown,
         onFocusIn: (event: FocusEvent) => {
@@ -387,18 +619,22 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
         onDoubleClick: () => send({ type: 'OPEN', task: task.id }),
       }),
     /** The schedule in words, for a screen reader; the bar shows it to the eye. */
-    describe: (task: T) =>
-      task.milestone
-        ? w.milestone(formatDate(task.start, state.locale))
-        : w.describe(task, formatRange(task.start, task.end, state.locale), daysBetween(task.start, task.end) + 1),
+    describe: (task: T) => {
+      const { start, end } = datesFor(state, task)
+      return task.milestone ? w.milestone(formatDate(start, state.locale)) : w.describe(task, formatRange(start, end, state.locale), daysBetween(start, end) + 1)
+    },
     scheduleTextProps: normalize({ ...ganttAnatomy.attrs('schedule-text') }),
     getBarProps: (task: T) => {
-      const start = daysBetween(range.start, task.start)
-      const span = Math.max(1, daysBetween(task.start, task.end) + 1)
+      const dates = datesFor(state, task)
+      const start = daysBetween(range.start, dates.start)
+      const span = Math.max(1, daysBetween(dates.start, dates.end) + 1)
       return normalize({
         ...ganttAnatomy.attrs(task.milestone ? 'milestone' : 'bar'),
         'aria-hidden': 'true',
         'data-task': task.id,
+        'data-editable': state.editable && !task.locked ? '' : undefined,
+        'data-drafting': state.draft?.task === task.id ? '' : undefined,
+        'data-pending': pendingTasks.has(task.id) ? '' : undefined,
         // Cut at the chart's edges: a bar that runs on past them says so.
         'data-before': start < 0 ? '' : undefined,
         'data-after': start + span > days ? '' : undefined,
@@ -409,6 +645,11 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
     getBarProgressProps: (task: T) =>
       normalize({ ...ganttAnatomy.attrs('bar-progress'), style: { '--gg-progress': Math.max(0, Math.min(1, task.progress ?? 0)) } }),
     barLabelProps: normalize({ ...ganttAnatomy.attrs('bar-label') }),
+    /** A bar's ends, to take hold of with a pointer and resize it. Drawn only on a bar that may change. */
+    showGrips: (task: T) => state.editable && !task.locked && !task.milestone,
+    getGripProps: (edge: 'start' | 'end') => normalize({ ...ganttAnatomy.attrs(edge === 'start' ? 'bar-start' : 'bar-end'), 'aria-hidden': 'true' }),
+    liveProps: normalize({ ...ganttAnatomy.attrs('live'), 'aria-live': 'assertive', 'aria-atomic': 'true' }),
+    instructionsProps: normalize({ ...ganttAnatomy.attrs('instructions'), id: ids.instructions }),
     todayProps: normalize({ ...ganttAnatomy.attrs('today'), 'aria-hidden': 'true', title: w.today, style: { '--gg-gantt-start': todayAt } }),
     emptyProps: normalize({ ...ganttAnatomy.attrs('empty') }),
   }

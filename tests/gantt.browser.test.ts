@@ -29,7 +29,7 @@ async function mount(props: Record<string, unknown>, style = 'inline-size: 700px
   host.style.cssText = style
   document.body.append(host)
   root = createRoot(host)
-  root.render(h(Gantt, { locale: 'en-GB', ...props }))
+  root.render(h(Gantt as never, { locale: 'en-GB', ...props }))
   await wait(80)
   const chart = host.querySelector<HTMLElement>('[data-scope="gantt"][data-part="root"]')!
   chart.style.flex = '1'
@@ -89,5 +89,60 @@ describe('gantt', () => {
     const room = box.width - 240
     expect(line.left - box.left - 240).toBeGreaterThan(room * 0.2)
     expect(line.left - box.left - 240).toBeLessThan(room * 0.5)
+  })
+})
+
+describe('gantt by pointer', () => {
+  const pointer = (type: string, x: number, y: number) =>
+    (document.elementFromPoint(x, y) ?? document.body).dispatchEvent(new PointerEvent(type, { clientX: x, clientY: y, pointerId: 3, pointerType: 'mouse', isPrimary: true, button: 0, bubbles: true, cancelable: true }))
+  const start = (bar: Element) => Number((bar as HTMLElement).style.getPropertyValue('--gg-gantt-start'))
+  const span = (bar: Element) => Number((bar as HTMLElement).style.getPropertyValue('--gg-gantt-span'))
+
+  it('a bar dragged three days’ worth moves three days, and the owner hears it on release', async () => {
+    const changes: unknown[] = []
+    const { schedule } = await mount({ tasks: plan, range: planRange, onChange: (change: { task: { id: string }; to: unknown }) => void changes.push([change.task.id, change.to]) }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const bar = schedule('design').querySelector<HTMLElement>('[data-part="bar"]')!
+    const box = bar.getBoundingClientRect()
+    const y = box.top + box.height / 2
+    pointer('pointerdown', box.left + 60, y)
+    pointer('pointermove', box.left + 60 + 3 * 32 + 5, y)
+    await wait(20)
+    expect(start(bar)).toBe(12)
+    expect(bar.hasAttribute('data-drafting')).toBe(true)
+    pointer('pointerup', box.left + 60 + 3 * 32 + 5, y)
+    await wait(30)
+    expect(changes).toEqual([['design', { start: '2026-09-13', end: '2026-09-21' }]])
+    expect(document.activeElement).toBe(schedule('design'))
+  })
+
+  it('its end, taken by the grip, resizes it; Escape in the middle puts it back', async () => {
+    const changes: unknown[] = []
+    const { schedule } = await mount({ tasks: plan, range: planRange, onChange: (change: unknown) => void changes.push(change) }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const bar = schedule('design').querySelector<HTMLElement>('[data-part="bar"]')!
+    const grip = bar.querySelector<HTMLElement>('[data-part="bar-end"]')!.getBoundingClientRect()
+    const x = grip.left + grip.width / 2
+    const y = grip.top + grip.height / 2
+    pointer('pointerdown', x, y)
+    pointer('pointermove', x + 2 * 32, y)
+    await wait(20)
+    expect([start(bar), span(bar)]).toEqual([9, 11])
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    await wait(20)
+    expect([start(bar), span(bar)]).toEqual([9, 9])
+    pointer('pointerup', x + 2 * 32, y)
+    await wait(20)
+    expect(changes).toEqual([])
+  })
+
+  it('a refused move springs back', async () => {
+    const { schedule } = await mount({ tasks: plan, range: planRange, onChange: () => Promise.reject(new Error('locked by the client')) }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const bar = schedule('build').querySelector<HTMLElement>('[data-part="bar"]')!
+    const box = bar.getBoundingClientRect()
+    pointer('pointerdown', box.left + 40, box.top + 5)
+    pointer('pointermove', box.left + 40 + 64, box.top + 5)
+    pointer('pointerup', box.left + 40 + 64, box.top + 5)
+    await wait(40)
+    expect(start(bar)).toBe(20)
+    expect(bar.hasAttribute('data-pending')).toBe(false)
   })
 })
