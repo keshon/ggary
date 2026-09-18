@@ -244,6 +244,10 @@
     "./form": {
       "types": "./src/components/form/index.ts",
       "default": "./src/components/form/index.ts"
+    },
+    "./gantt": {
+      "types": "./src/components/gantt/index.ts",
+      "default": "./src/components/gantt/index.ts"
     }
   },
   "dependencies": {

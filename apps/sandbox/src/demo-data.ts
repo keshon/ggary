@@ -559,3 +559,26 @@ export async function saveDealForm(data: FormData) {
 
 export const HINT_FORM =
   'Press Create deal with nothing filled in: the form stops, each field says what is wrong — the browser’s own checks for the title and the email, the form’s rules for the company, stage and date, whose hidden inputs the browser does not check — and the summary at the top lists every error as a link and takes the focus. Fix a field and its error leaves as you type; set the stage to Offer sent and the amount becomes required. Fill it in with the title “Annual licence” and the pretend server refuses it after half a second: the error comes back to the title, and the summary says why.'
+
+/** The Gantt's plan: a CRM rollout, dated around today so today's line always crosses it. */
+export const rolloutPlan = [
+  { id: 'kickoff', title: 'Kickoff with sales', start: inDays(-21), end: inDays(-21), milestone: true },
+  { id: 'audit', title: 'Audit the old pipeline', start: inDays(-20), end: inDays(-12), progress: 1 },
+  { id: 'fields', title: 'Agree the deal fields', start: inDays(-11), end: inDays(-4), progress: 1 },
+  { id: 'import', title: 'Import 700,000 leads', start: inDays(-5), end: inDays(6), progress: 0.55 },
+  { id: 'boards', title: 'Set up the boards', start: inDays(-2), end: inDays(9), progress: 0.2 },
+  { id: 'training', title: 'Train the team', start: inDays(8), end: inDays(14), progress: 0 },
+  { id: 'pilot', title: 'Pilot in Kazan', start: inDays(12), end: inDays(26), progress: 0 },
+  { id: 'review', title: 'Review the pilot', start: inDays(27), end: inDays(27), milestone: true },
+  { id: 'rollout', title: 'Roll out to every office', start: inDays(28), end: inDays(55), progress: 0 },
+  { id: 'launch', title: 'Launch', start: inDays(56), end: inDays(56), milestone: true },
+]
+
+export const ganttScales = [
+  { value: 'day', label: 'Days' },
+  { value: 'week', label: 'Weeks' },
+  { value: 'month', label: 'Months' },
+]
+
+export const HINT_GANTT =
+  'The chart opens on today, a third of the way in. Tab to it: one stop, on a task. Up and Down walk the tasks — the row is tinted, the bar ringed, and a bar out of sight is brought into view clear of the list — Home and End, PageUp and PageDown; Enter or a double press opens one. A screen reader hears a grid: the task’s name as the row’s header, then its dates in words, how many days, how far along. Switch the scale: days, weeks, months — the core counts in days and the theme says how wide a day is. Moving and resizing bars, and arrows between tasks, are the next steps.'

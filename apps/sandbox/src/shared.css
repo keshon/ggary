@@ -224,3 +224,14 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
   font: inherit;
   font-size: 12px;
 }
+
+/* The Gantt demo: a chart held to a height, so it scrolls both ways. */
+.gantt-frame {
+  display: flex;
+  block-size: 420px;
+  margin-block-start: 12px;
+}
+.gantt-frame > * {
+  flex: 1;
+  min-inline-size: 0;
+}

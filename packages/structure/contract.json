@@ -29,6 +29,10 @@
     "--gg-split-rest-min": "written by core onto a split's frame: the least the other pane keeps",
     "--gg-tree-level": "set by core on each tree row: its depth, from 1, for the indent",
     "--gg-progress": "set by core on a progress track: how far along, from 0 to 1",
+    "--gg-gantt-days": "set by core on a gantt's root: how many days the chart shows",
+    "--gg-gantt-start": "set by core on a gantt's bar, scale cell and today line: its first day, counted from the chart's",
+    "--gg-gantt-span": "set by core on a gantt's bar and scale cell: how many days it spans",
+    "--gg-gantt-weekend": "set by core on a gantt's root: the first Saturday, counted from the chart's first day",
     "--gg-flow-self": "set by a stack or a section on each child: how a component sized by its content stands in the column (it reads it, with auto outside one)",
     "--gg-icon": "mapped from data-icon by @ggary/icons; a theme never declares it on the root"
   },

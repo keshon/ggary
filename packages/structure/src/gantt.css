@@ -1,0 +1,103 @@
+/* The Gantt chart: one scroller, the task list stuck to its left edge and the
+   scale to its top, bars placed in days. Positioning only: how wide a day is,
+   how tall a row, is the theme's. */
+
+[data-scope='gantt'][data-part='root'] {
+  position: relative;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+[data-scope='gantt'][data-part='header'] {
+  position: sticky;
+  z-index: 3;
+  inset-block-start: 0;
+  display: flex;
+}
+[data-scope='gantt'][data-part='corner'] {
+  position: sticky;
+  z-index: 4;
+  inset-inline-start: 0;
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+}
+[data-scope='gantt'][data-part='scale'] {
+  position: relative;
+  flex: none;
+}
+[data-scope='gantt'][data-part='scale-row'] {
+  position: relative;
+}
+/* Clipped, not hidden: `overflow: hidden` would make the cell a scroll
+   container, and a month's name meant to stick in the chart's view would
+   stick inside its own cell instead. */
+[data-scope='gantt'][data-part='scale-cell'] {
+  position: absolute;
+  inset-block: 0;
+  display: flex;
+  align-items: center;
+  overflow: clip;
+  white-space: nowrap;
+}
+[data-scope='gantt'][data-part='body'] {
+  position: relative;
+}
+[data-scope='gantt'][data-part='row'] {
+  display: flex;
+}
+[data-scope='gantt'][data-part='title'] {
+  position: sticky;
+  z-index: 2;
+  inset-inline-start: 0;
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+[data-scope='gantt'][data-part='schedule'] {
+  position: relative;
+  flex: none;
+}
+/* Spoken, not shown: the schedule in words, which the bar shows to the eye. */
+[data-scope='gantt'][data-part='schedule-text'] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+[data-scope='gantt']:is([data-part='bar'], [data-part='milestone']) {
+  position: absolute;
+}
+[data-scope='gantt'][data-part='bar'] {
+  display: flex;
+  align-items: center;
+  /* Not clipped: a focus ring outside it must show. Its label ellipsizes itself,
+     and its progress takes its corners. */
+}
+[data-scope='gantt'][data-part='bar-progress'] {
+  position: absolute;
+  border-radius: inherit;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 100%;
+  transform-origin: left center;
+  scale: var(--gg-progress, 0) 1;
+}
+[data-scope='gantt'][data-part='bar-label'] {
+  position: relative;
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+[data-scope='gantt'][data-part='today'] {
+  position: absolute;
+  z-index: 1;
+  inset-block: 0;
+  pointer-events: none;
+}

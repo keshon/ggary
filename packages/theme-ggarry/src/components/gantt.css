@@ -1,0 +1,203 @@
+/* ==========================================================================
+   GGarry — gantt
+
+   A card holding a table: names on the left, a hairline grid of days on the
+   right, the weekends a quiet tint at the day scale. A bar is a tinted strip
+   with a hairline edge in the accent, its progress the accent filling it from
+   the start; a milestone is a small diamond on its day; today is one thin
+   accent line through every row. The task the keyboard is on has its row
+   tinted, name and all, and its bar ringed.
+
+   A day is 32 pixels at the day scale, 14 at the week scale and 4 at the
+   month scale: the core counts in days and this says how wide one is.
+   ========================================================================== */
+
+[data-scope='gantt'][data-part='root'] {
+  --gantt-list: 240px;
+  --gantt-row: 36px;
+  --gantt-day: 32px;
+  --gantt-timeline: calc(var(--gg-gantt-days) * var(--gantt-day));
+  --gantt-line: var(--ggarry-border-default);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  /* A bar scrolled into view is not left under the sticky list. */
+  scroll-padding-inline-start: var(--gantt-list);
+  scroll-padding-block-start: 52px;
+}
+[data-scope='gantt'][data-part='root'][data-scale='week'] { --gantt-day: 14px; }
+[data-scope='gantt'][data-part='root'][data-scale='month'] { --gantt-day: 4px; }
+
+[data-scope='gantt']:is([data-part='header'], [data-part='body']) {
+  inline-size: calc(var(--gantt-list) + var(--gantt-timeline));
+}
+[data-scope='gantt'][data-part='header'] {
+  border-block-end: 1px solid var(--ggarry-border-default);
+  background: var(--ggarry-bg-surface);
+}
+[data-scope='gantt'][data-part='corner'] {
+  inline-size: var(--gantt-list);
+  box-sizing: border-box;
+  padding: 0 var(--ggarry-space-3) var(--ggarry-space-2);
+  border-inline-end: 1px solid var(--ggarry-border-default);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+[data-scope='gantt'][data-part='scale'] {
+  inline-size: var(--gantt-timeline);
+}
+[data-scope='gantt'][data-part='scale-row'] {
+  block-size: 26px;
+}
+[data-scope='gantt'][data-part='scale-row'][data-row='top'] {
+  border-block-end: 1px solid var(--gantt-line);
+}
+[data-scope='gantt'][data-part='scale-cell'] {
+  inset-inline-start: calc(var(--gg-gantt-start) * var(--gantt-day));
+  inline-size: calc(var(--gg-gantt-span) * var(--gantt-day));
+  box-sizing: border-box;
+  padding-inline: var(--ggarry-space-2);
+  border-inline-start: 1px solid var(--gantt-line);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+}
+/* A month's or a year's name stays in view while its long cell scrolls past. */
+[data-scope='gantt'][data-part='scale-row'][data-row='top'] [data-part='scale-cell'] > span {
+  position: sticky;
+  inset-inline-start: calc(var(--gantt-list) + var(--ggarry-space-2));
+  color: var(--ggarry-text-default);
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+[data-scope='gantt'][data-part='root'][data-scale='day'] [data-part='scale-row'][data-row='bottom'] [data-part='scale-cell'] {
+  justify-content: center;
+  padding-inline: 0;
+}
+[data-scope='gantt'][data-part='scale-cell'][data-narrow] > span {
+  visibility: hidden;
+}
+[data-scope='gantt'][data-part='scale-cell'][data-weekend] {
+  background: var(--ggarry-bg-subtle);
+}
+[data-scope='gantt'][data-part='scale-cell'][data-today] {
+  color: var(--ggarry-text-accent);
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+
+[data-scope='gantt'][data-part='row'] {
+  block-size: var(--gantt-row);
+  border-block-end: 1px solid var(--gantt-line);
+}
+[data-scope='gantt'][data-part='row']:last-child {
+  border-block-end: 0;
+}
+[data-scope='gantt'][data-part='title'] {
+  inline-size: var(--gantt-list);
+  box-sizing: border-box;
+  padding-inline: var(--ggarry-space-3);
+  border-inline-end: 1px solid var(--ggarry-border-default);
+  background: var(--ggarry-bg-surface);
+}
+[data-scope='gantt'][data-part='schedule'] {
+  inline-size: var(--gantt-timeline);
+  outline: none;
+}
+/* The grid: a hairline a day, and the weekends' tint, at the day scale; a hairline a week at the week scale. */
+[data-scope='gantt'][data-part='root'][data-scale='day'] [data-part='schedule'] {
+  background-image:
+    linear-gradient(to right, var(--gantt-line) 1px, transparent 1px),
+    repeating-linear-gradient(to right, var(--ggarry-bg-subtle) 0 calc(2 * var(--gantt-day)), transparent calc(2 * var(--gantt-day)) calc(7 * var(--gantt-day)));
+  background-size: var(--gantt-day) 100%, auto;
+  background-position: 0 0, calc(var(--gg-gantt-weekend) * var(--gantt-day)) 0;
+}
+[data-scope='gantt'][data-part='root'][data-scale='week'] [data-part='schedule'] {
+  background-image: linear-gradient(to right, var(--gantt-line) 1px, transparent 1px);
+  background-size: calc(7 * var(--gantt-day)) 100%;
+}
+/* The task the keyboard is on: its row tinted, name and all, and its bar ringed. */
+[data-scope='gantt'][data-part='row']:has([data-part='schedule']:focus-visible) :is([data-part='title'], [data-part='schedule']) {
+  background-color: var(--ggarry-bg-accent-subtle);
+}
+[data-scope='gantt'][data-part='schedule']:focus-visible :is([data-part='bar'], [data-part='milestone']) {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+
+[data-scope='gantt'][data-part='bar'] {
+  inset-block: 7px;
+  inset-inline-start: calc(var(--gg-gantt-start) * var(--gantt-day) + 1px);
+  inline-size: calc(var(--gg-gantt-span) * var(--gantt-day) - 2px);
+  box-sizing: border-box;
+  border: 1px solid var(--ggarry-border-accent);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-accent-subtle);
+}
+/* A bar that runs on past the chart's edge is cut square there. */
+[data-scope='gantt'][data-part='bar'][data-before] {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+  border-inline-start-style: dashed;
+}
+[data-scope='gantt'][data-part='bar'][data-after] {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+  border-inline-end-style: dashed;
+}
+[data-scope='gantt'][data-part='bar-progress'] {
+  background: color-mix(in srgb, var(--ggarry-bg-accent) 35%, transparent);
+}
+[data-scope='gantt'][data-part='bar'][data-done] {
+  border-color: var(--ggarry-text-success);
+  background: var(--ggarry-bg-success-subtle);
+}
+[data-scope='gantt'][data-part='bar'][data-done] [data-part='bar-progress'] {
+  background: transparent;
+}
+[data-scope='gantt'][data-part='bar-label'] {
+  padding-inline: var(--ggarry-space-2);
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+/* At the month scale a bar is too thin to name itself: the list does. */
+[data-scope='gantt'][data-part='root'][data-scale='month'] [data-part='bar-label'] {
+  display: none;
+}
+[data-scope='gantt'][data-part='milestone'] {
+  inset-block-start: 50%;
+  inset-inline-start: calc((var(--gg-gantt-start) + 0.5) * var(--gantt-day));
+  inline-size: 12px;
+  block-size: 12px;
+  border-radius: 2px;
+  background: var(--ggarry-bg-accent);
+  translate: -50% -50%;
+  rotate: 45deg;
+}
+[data-scope='gantt'][data-part='milestone'] [data-part='bar-label'] {
+  display: none;
+}
+[data-scope='gantt'][data-part='today'] {
+  inset-inline-start: calc(var(--gantt-list) + (var(--gg-gantt-start) + 0.5) * var(--gantt-day) - 1px);
+  inline-size: 2px;
+  background: var(--ggarry-bg-accent);
+}
+[data-scope='gantt'][data-part='empty'] {
+  padding: var(--ggarry-space-6);
+  color: var(--ggarry-text-muted);
+  text-align: center;
+}
+
+@media (forced-colors: active) {
+  [data-scope='gantt']:is([data-part='bar'], [data-part='milestone'], [data-part='today']) {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+  }
+  [data-scope='gantt']:is([data-part='milestone'], [data-part='today']) { background: Highlight; }
+  [data-scope='gantt'][data-part='schedule']:focus-visible { outline: 2px solid Highlight; outline-offset: -2px; }
+}

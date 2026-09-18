@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two design languages on top of it.
-Sixty-five components — DataGrid, Kanban, CommandPalette, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Sixty-six components — DataGrid, Kanban, Gantt, CommandPalette, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 3290 tests, 1311 of them in headless Chrome
+npm test         # 3327 tests, 1327 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -2127,6 +2127,63 @@ Found on the way:
 - **`Form.svelte` and `form.svelte.ts` are one file on Windows.** The helper
   module is `context.svelte.ts`.
 
+## Gantt
+
+Tasks as bars on a time scale, their names beside them. This is its first
+step: the chart, its scales, and the keyboard. Moving and resizing bars, and
+arrows between tasks, are the next.
+
+```tsx
+const [scale, setScale] = useState<GanttScale>('day')
+
+<SegmentedControl items={scales} label="Scale" value={scale} onValueChange={setScale} />
+<Gantt tasks={plan} scale={scale} onScaleChange={setScale} onOpen={(task) => openTask(task)} />
+```
+
+A task is an id, a title, its first and last day (`YYYY-MM-DD`, the last
+included), how far along it is, and whether it is a `milestone` — a point in
+time, drawn as a diamond on its day.
+
+**Everything is counted in days.** Where a bar starts, how many days it spans,
+how many the chart shows, where today falls: the core hands them to CSS as
+`--gg-gantt-start`, `--gg-gantt-span`, `--gg-gantt-days`, and the theme says
+how wide a day is — GGarry's is 32 pixels at the day scale, 14 at the week
+scale, 4 at the month scale. The core never knows a pixel, and a theme can
+make the same chart a fortnight on a laptop or a year on a wall. The chart
+fits its days to the tasks with room around them, lined up on the scale's
+own unit — a week's first day, the locale's — or shows the `range` it is
+given. Its header is two rows: months over days, months over weeks, years
+over months; a month's name stays in view while its cell scrolls past, and
+a month cut to a day at the chart's edge keeps its name to itself.
+
+**One scroller**, the task list stuck to its left edge and the scale to its
+top, so the rows of the list and of the timeline can never drift apart. It
+opens on today, a third of the way into the timeline — or on the first task,
+when today is not in the chart — and again at each new scale.
+
+**To a screen reader it is a grid**: a header row, then a row per task, its
+name the row's header, its schedule a cell that says the dates in words —
+"10 Sept – 18 Sept 2026, 9 days, 40% done", "Milestone, 21 Sept 2026" — while
+the bar shows them to the eye and is hidden from it. One tab stop, on a
+schedule cell; Up and Down walk the tasks, Home and End, PageUp and PageDown;
+Enter or a double press opens one. The row the keyboard is on is tinted,
+name and all, its bar ringed, and a bar out of sight is scrolled into view
+clear of the list — the theme's scroll padding keeps it from landing under.
+
+Found on the way:
+
+- **A month's name stuck inside its own cell.** The header cells clipped their
+  text with `overflow: hidden`, which makes an element a scroll container —
+  so a name meant to stick at the chart's left edge stuck at the list's width
+  inside its cell instead, and October's was pushed out of sight. The cells
+  clip with `overflow: clip`, which is not a scroll container.
+- **A focus ring as wide as the chart.** The schedule cell spans the whole
+  timeline, and ringing it drew two lines across it. The bar is ringed
+  instead, and the row tinted.
+- **The weeks lost their names.** "Too narrow to name" was measured on both
+  header rows, and a week, at seven days, was under the week scale's limit.
+  Only the top row is cut short at the chart's edges.
+
 ## PageHeader, Section, Container, Stack, Cluster and Grid
 
 What goes inside the work area: the top of a screen, the stretches under it,
@@ -2401,14 +2458,14 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 359 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes. |
+| machine | node | `*.machine.test.ts` | 364 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk. |
 | contract | node | `icons.contract.test.ts` | 338 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1188 tests, 90 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1200 tests, 94 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 34 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 1188 tests, 81 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1200 tests, 85 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
@@ -2417,6 +2474,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
 | browser | Chrome | `date-picker.browser.test.ts` | 4 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. |
+| browser | Chrome | `gantt.browser.test.ts` | 4 tests. Bars measured to the pixel at the day and the week scale, a milestone on its day; the list at the left edge and the scale at the top as the chart scrolls; a task reached by the keyboard brought into view clear of the list; the chart opening on today, a third of the way in. |
 | browser | Chrome | `form.browser.test.ts` | 4 tests. The real keyboard submitting and walking the summary to a field; a valid form going on to its action natively; a rule that asks a server holding the form, then letting it go; a second press while a submission is out sending nothing. |
 | browser | Chrome | `command-palette.browser.test.ts` | 4 tests. The real Ctrl+K opening it modal, high in the viewport, and closing it back to the element before; the list scrolling to keep the highlight in view; a server's records under their heading after the typing pauses; a command that opens a dialog of its own keeping the focus. |
 | browser | Chrome | `kanban.browser.test.ts` | 13 tests. The column's thin themed bar following a dark island; a board given a height holding its columns and a column scrolling to the focus; a drag at a column's edge scrolling it; a real right click opening the card's menu at the pointer and Move to › Done moving it; a card typed with real keys standing faded and giving way to the owner's card with no double. Also A real mouse dragging a card into an empty column, the owner hearing it and the card not opening; a short press still a press; mid-drag, the slot where the card would land and a copy under the pointer, and Escape putting it back; the board scrolling at its edge; a finger that moves scrolling and one held still picking the card up; real keys carrying a card across a board narrower than its columns, the board scrolling to keep it in sight and the card drawn held; Tab out with a card up putting it back and the focus going on; a press on a control inside a card left to the control. |
@@ -2560,6 +2618,11 @@ Real, and deliberately left open:
   Tree or Slider does not yet show a form's error by name. Nor is there a
   submit button that shows the form is busy by itself: the form is
   `aria-busy`, and `onStatusChange` says so.
+- **The Gantt does not move or resize its bars yet, or draw dependencies.**
+  Dragging a bar or its ends, the keyboard doing the same, arrows from one
+  task to the next, and groups of tasks under a heading are the next steps;
+  so is windowing for a plan of thousands of rows. The weekend is Saturday
+  and Sunday wherever the chart is read.
 - **The palette keeps no history.** Recent commands, frecency and a
   "did you mean" are yours to put in `commands`; nothing is remembered
   between openings. A level's children are given up front, not loaded.

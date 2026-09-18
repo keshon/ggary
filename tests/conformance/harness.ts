@@ -440,6 +440,14 @@ export interface FormProps {
   onSubmit?: (data: FormData) => unknown
 }
 
+export interface GanttProps {
+  tasks: import('../../packages/core/src/components/gantt').GanttTask[]
+  scale?: import('../../packages/core/src/components/gantt').GanttScale
+  range?: import('../../packages/core/src/components/gantt').GanttRange
+  locale?: string
+  onOpen?: (task: import('../../packages/core/src/components/gantt').GanttTask) => void
+}
+
 export interface CommandPaletteProps {
   commands: import('../../packages/core/src/components/command-palette').PaletteCommand[]
   defaultOpen?: boolean
@@ -769,6 +777,7 @@ export interface Adapter {
   kanban?(props: KanbanProps, target: HTMLElement): Promise<Mounted<KanbanProps>>
   commandPalette?(props: CommandPaletteProps, target: HTMLElement): Promise<Mounted<CommandPaletteProps>>
   form?(props: FormProps, target: HTMLElement): Promise<Mounted<FormProps>>
+  gantt?(props: GanttProps, target: HTMLElement): Promise<Mounted<GanttProps>>
   datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>

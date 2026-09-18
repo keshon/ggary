@@ -65,8 +65,12 @@ export function toastConformance(adapter: Adapter) {
     })
 
     it('leaves after its duration and is removed after its exit', async () => {
-      const { toasts, show, settle } = await setup()
+      const { toaster, toasts, show, settle } = await setup()
       await show({ title: 'Saved', duration: 60 })
+      // In a real browser the mouse stays where an earlier test left it, and a
+      // toast drawn under it is paused, as it should be. This test is about the
+      // clock, not the pointer (the next one is): let it run.
+      if (toaster.getState().paused) await adapter.act(() => toaster.resume())
       // Timers run late on a busy machine: wait for each state, not for a margin.
       const until = async (done: () => boolean) => {
         for (let waited = 0; waited < 1000 && !done(); waited += 20) await settle(20)

@@ -44,6 +44,11 @@ export function addDays(iso: ISODate, days: number): ISODate {
   return fromUTC(date)
 }
 
+/** Days from `a` to `b`: 1 from the 18th to the 19th, negative backwards. */
+export function daysBetween(a: ISODate, b: ISODate): number {
+  return Math.round((toUTC(b).getTime() - toUTC(a).getTime()) / 86_400_000)
+}
+
 /** A month on, keeping the day where it can: 31 January plus a month is 28 or 29 February, not 3 March. */
 export function addMonths(iso: ISODate, months: number): ISODate {
   const { year, month, day } = parseISO(iso)!

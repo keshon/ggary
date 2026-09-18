@@ -41,6 +41,7 @@
 @import './components/file-drop.css' layer(gg.components);
 @import './components/fieldset.css' layer(gg.components);
 @import './components/form.css' layer(gg.components);
+@import './components/gantt.css' layer(gg.components);
 @import './components/input.css' layer(gg.components);
 @import './components/input-group.css' layer(gg.components);
 @import './components/menu.css' layer(gg.components);

@@ -40,6 +40,7 @@
     CommandPalette,
     Form,
     FormSummary,
+    Gantt,
     Grid,
     PageHeader,
     Section,
@@ -102,7 +103,7 @@
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
   import { rangePresets } from '@ggary/core/date-picker'
   import type { PaletteCommand } from '@ggary/core/command-palette'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, ganttScales, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -127,6 +128,8 @@
   let paletteLog = $state('—')
   let tagList = $state.raw(tagOptions)
   let dealFormLog = $state('idle')
+  let ganttScale = $state<'day' | 'week' | 'month'>('day')
+  let ganttLog = $state('—')
   // The sections are read from the page once it is drawn.
   $effect(() => {
     paletteCommands = sandboxCommands((text) => toast({ tone: 'neutral', title: text }))
@@ -1095,6 +1098,18 @@ invalid  ${taken}`}</pre>
   </div>
   <pre class="state">{dealLog}</pre>
   <p class="hint">{HINT_KANBAN}</p>
+</section>
+
+<section id="gantt">
+  <h2>Gantt</h2>
+  <div class="row">
+    <SegmentedControl items={ganttScales} label="Scale" size="sm" bind:value={ganttScale} />
+  </div>
+  <div class="gantt-frame">
+    <Gantt tasks={rolloutPlan} bind:scale={ganttScale} locale="en-GB" onOpen={(task) => (ganttLog = `open: ${task.title}`)} words={{ label: 'CRM rollout' }} />
+  </div>
+  <pre class="state">{ganttLog}</pre>
+  <p class="hint">{HINT_GANTT}</p>
 </section>
 
 <section id="form">

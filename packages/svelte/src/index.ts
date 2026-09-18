@@ -67,3 +67,4 @@ export { default as CommandPalette } from './components/command-palette/CommandP
 export { default as Form } from './components/form/Form.svelte'
 export { default as FormSummary } from './components/form/FormSummary.svelte'
 export { useFormField, useFormState } from './components/form/context.svelte'
+export { default as Gantt } from './components/gantt/Gantt.svelte'

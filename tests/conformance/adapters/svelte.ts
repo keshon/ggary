@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, Button, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, Button, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
@@ -102,6 +102,7 @@ export const svelte: Adapter = {
   accordion: (props, target) => mountSvelte(AccordionWithPanels as Component<any>, props, target),
   tree: (props, target) => mountSvelte(Tree as Component<any>, props, target),
   form: (props, target) => mountSvelte(FormWithFields as Component<any>, props, target),
+  gantt: (props, target) => mountSvelte(Gantt as Component<any>, props, target),
   commandPalette: (props, target) => mountSvelte(CommandPalette as Component<any>, props, target),
   kanban: (props, target) => mountSvelte(Kanban as Component<any>, props, target),
   progress: (props, target) => mountSvelte(Progress as Component<any>, props, target),
