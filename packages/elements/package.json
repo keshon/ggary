@@ -6,7 +6,8 @@
   "sideEffects": ["./src/index.ts", "./src/components/**/*.element.ts"],
   "exports": {
     ".":        { "types": "./src/index.ts", "default": "./src/index.ts" },
-    "./spread": { "types": "./src/spread.ts", "default": "./src/spread.ts" }
+    "./spread": { "types": "./src/spread.ts", "default": "./src/spread.ts" },
+    "./components/*": { "types": "./src/components/*.ts", "default": "./src/components/*.ts" }
   },
   "dependencies": { "@ggary/core": "*" }
 }

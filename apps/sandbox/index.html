@@ -4,21 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>ggary-ui — vanilla</title>
-    <link rel="icon" href="data:," />
+    <link rel="icon" href="/favicon.svg" />
   </head>
   <body>
-    <!-- Static page chrome, identical on all three pages, so any visual
-         difference below is the components' doing and not the sandbox's. -->
-    <header class="bar">
-      <h1>ggary-ui sandbox</h1>
-      <span class="target">vanilla</span>
-      <nav>
-        <a href="/index.html" aria-current="page">vanilla</a>
-        <a href="/react.html">react</a>
-        <a href="/svelte.html">svelte</a>
-      </nav>
-      <div class="theme-controls" id="theme-controls"></div>
-    </header>
+    <!-- The chrome, the same on all three pages, is drawn by src/chrome.ts
+         from the kit's own elements. -->
+    <header class="bar" id="chrome"></header>
     <div class="page"><div id="app"></div></div>
     <script type="module" src="/src/vanilla.ts"></script>
   </body>

@@ -1,5 +1,6 @@
 import './theme'
 import './shared.css'
+import './chrome'
 
 import { StrictMode, useEffect, useMemo, useState, type FormEvent } from 'react'
 import type { DataGridController } from '@ggary/core/data-grid'

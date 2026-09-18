@@ -14,41 +14,119 @@ body {
   background: var(--gg-page);
   color: var(--gg-text);
   transition: background-color 150ms ease;
+  /* The dividers run the page's full width: nothing may scroll it sideways. */
+  overflow-x: clip;
 }
+
+:root { --chrome-height: 57px; }
 
 .page { max-width: 880px; margin: 0 auto; padding: 0 24px; }
 
+.visually-hidden {
+  position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+/* The bar: the mark and the name, the framework, the theme. It stays at the top. */
 header.bar {
-  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
-  padding: 12px 24px; margin-bottom: 32px;
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  min-block-size: var(--chrome-height); box-sizing: border-box;
+  padding: 8px 24px;
   border-bottom: 1px solid var(--gg-border);
-  background: var(--gg-surface);
+  background: color-mix(in srgb, var(--gg-surface) 88%, transparent);
+  backdrop-filter: blur(8px);
 }
-header.bar h1 { font-size: 15px; font-weight: 600; margin: 0; }
-header.bar .target {
-  padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600;
-  background: var(--gg-accent-bg); color: var(--gg-accent-text);
+header.bar .brand {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--gg-text); text-decoration: none;
+  border-radius: 6px;
 }
-header.bar nav { display: flex; gap: 4px; }
-header.bar nav a {
-  padding: 4px 10px; border-radius: 6px; font-size: 13px; text-decoration: none;
-  color: var(--gg-text-muted);
-}
-header.bar nav a[aria-current] { background: var(--gg-surface-sunken); color: var(--gg-text); }
+header.bar .brand svg { inline-size: 26px; block-size: 26px; color: var(--gg-accent); flex: none; }
+header.bar .wordmark { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; }
+header.bar .wordmark span { margin-inline-start: 5px; font-weight: 500; color: var(--gg-text-faint); }
 
-.theme-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-left: auto; }
-.theme-controls .control { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gg-text-muted); }
-.theme-controls select {
-  font: inherit; font-size: 12px; color: var(--gg-text);
-  background: var(--gg-page); border: 1px solid var(--gg-border-strong); border-radius: 6px;
-  padding: 3px 6px;
+.theme-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-left: auto; }
+/* A select's label beside it, small, rather than over it: the bar is one line. */
+.theme-controls [data-scope='select'][data-part='root'] { display: flex; flex-direction: row; align-items: center; gap: 6px; }
+.theme-controls [data-scope='select'][data-part='label'] { font-size: 12px; color: var(--gg-text-muted); margin: 0; }
+.theme-controls [data-scope='select'][data-part='trigger'] { min-inline-size: 112px; block-size: 30px; min-block-size: 0; padding-block: 0; font-size: 13px; }
+/* Narrow: the labels are still there for a screen reader, and the bar may take two lines. */
+@media (max-width: 760px) {
+  header.bar { gap: 8px 16px; padding-inline: 16px; }
+  .theme-controls { margin-left: 0; }
+  .theme-controls [data-scope='select'][data-part='label'] {
+    position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+  }
+  .theme-controls [data-scope='select'][data-part='trigger'] { min-inline-size: 104px; }
 }
 
-section { margin-bottom: 40px; }
+/* Sections: numbered, and parted by a dashed line the page's full width. */
+#app { counter-reset: section; }
+section { margin: 0; }
+section:not(section section) {
+  position: relative;
+  padding-block: 32px 36px;
+  scroll-margin-top: var(--chrome-height);
+  counter-increment: section;
+}
+section:not(section section):first-of-type { padding-block-start: 28px; }
+section:not(section section) + section:not(section section)::before {
+  content: '';
+  position: absolute; inset-block-start: 0; inset-inline-start: 50%;
+  inline-size: 100vw; translate: -50% 0;
+  border-block-start: 1px dashed var(--gg-border-strong);
+}
 section > h2 {
   font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
   color: var(--gg-text-faint); margin: 0 0 12px;
 }
+section:not(section section) > h2:first-child {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-block-end: 16px;
+  font-size: 13px; color: var(--gg-text);
+}
+section:not(section section) > h2:first-child::before {
+  content: counter(section, decimal-leading-zero);
+  color: var(--gg-accent-text); font-variant-numeric: tabular-nums;
+}
+
+/* The navigator. One element: a popover on a narrow screen, opened from the
+   button at the corner; beside the page where there is room, always shown. */
+.toc {
+  position: fixed; inset: auto 16px 76px auto; margin: 0;
+  inline-size: min(300px, calc(100vw - 32px)); max-block-size: min(60vh, 520px);
+  box-sizing: border-box; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin;
+  padding: 8px;
+  border: 1px solid var(--gg-border); border-radius: var(--gg-radius);
+  background: var(--gg-surface); color: var(--gg-text);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.18);
+}
+.toc-title {
+  margin: 4px 12px 8px;
+  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--gg-text-faint);
+}
+.toc [data-scope='nav'][data-part='item'] { min-block-size: 28px; font-size: 13px; }
+.toc [data-scope='nav'][data-part='group'] { gap: 1px; }
+.toc-number { font-variant-numeric: tabular-nums; color: var(--gg-text-faint); font-size: 12px; }
+.toc [data-current] .toc-number { color: inherit; }
+
+.toc-button { position: fixed; inset: auto 16px 16px auto; z-index: 20; }
+.toc-button button { max-inline-size: min(320px, calc(100vw - 32px)); box-shadow: 0 8px 24px rgb(0 0 0 / 0.2); }
+.toc-button [data-icon] { inline-size: 16px; block-size: 16px; flex: none; }
+.toc-current { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (min-width: 1360px) {
+  .toc {
+    display: block;
+    inset: calc(var(--chrome-height) + 24px) auto auto max(16px, calc(50% - 440px - 272px));
+    inline-size: 232px; max-block-size: calc(100vh - var(--chrome-height) - 48px);
+    padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none;
+  }
+  .toc-button { display: none; }
+}
+
 .row { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
 
 pre.state {

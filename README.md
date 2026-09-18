@@ -186,6 +186,17 @@ The sandbox is the one place that swaps whole languages at runtime, purely so a
 page can be compared across them. It mounts one theme stylesheet at a time —
 two loaded at once would fight over the same selectors.
 
+Its chrome is the kit's own, drawn by `apps/sandbox/src/chrome.ts` the same
+way on all three pages from four custom elements — a SegmentedControl for the
+framework, a Select per theme axis, a Nav for the sections and a Button to
+open it — imported one by one (`@ggary/elements/components/…`), so the React
+and Svelte pages carry those four and no others: about 5 KB gzipped, in the
+chunk the pages share. The bar sticks to the top with the mark, two G's
+sharing a crossbar; the sections are numbered and parted by a dashed line the
+page's width; the navigator lists them with the one being read marked,
+beside the page where there is room and behind a button at the corner where
+there is not.
+
 ### `@ggary/structure`
 
 The CSS a component needs to function in every theme: the positioner's absolute

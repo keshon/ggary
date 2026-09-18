@@ -100,58 +100,34 @@ function apply(): void {
   }
 }
 
-function select(label: string, options: [string, string][], current: string, onChange: (v: string) => void) {
-  const wrap = document.createElement('label')
-  wrap.className = 'control'
-  const caption = document.createElement('span')
-  caption.textContent = label
-  const input = document.createElement('select')
-  for (const [value, text] of options) {
-    const option = document.createElement('option')
-    option.value = value
-    option.textContent = text
-    option.selected = value === current
-    input.append(option)
+const listeners = new Set<() => void>()
+
+/** The themes, the current one, and its axes with their values: the chrome draws its controls from these. */
+export function themeChoices() {
+  const theme = THEMES[settings.theme]
+  return {
+    themes: Object.entries(THEMES).map(([id, t]) => ({ value: id, label: t.label })),
+    theme: settings.theme,
+    axes: theme.axes.map((axis) => ({ attr: axis.attr, label: axis.label, values: axis.values, value: settings.axes[`${settings.theme}:${axis.attr}`] ?? axis.fallback })),
   }
-  input.addEventListener('change', () => onChange(input.value))
-  wrap.append(caption, input)
-  return wrap
 }
 
-function renderControls(): void {
-  const host = document.getElementById('theme-controls')
-  if (!host) return
-  const theme = THEMES[settings.theme]
-
-  const controls = [
-    select(
-      'theme',
-      Object.entries(THEMES).map(([id, t]) => [id, t.label]),
-      settings.theme,
-      (next) => {
-        settings = { ...settings, theme: next }
-        commit()
-      }
-    ),
-    ...theme.axes.map((axis) =>
-      select(
-        axis.label,
-        axis.values.map((v) => [v, v]),
-        settings.axes[`${settings.theme}:${axis.attr}`] ?? axis.fallback,
-        (next) => {
-          settings = { ...settings, axes: { ...settings.axes, [`${settings.theme}:${axis.attr}`]: next } }
-          commit()
-        }
-      )
-    ),
-  ]
-  host.replaceChildren(...controls)
+/** Called after every change of theme or axis. */
+export function onThemeChange(listener: () => void): () => void {
+  listeners.add(listener)
+  return () => listeners.delete(listener)
 }
 
 function commit(): void {
   save(settings)
   apply()
-  renderControls()
+  for (const listener of listeners) listener()
+}
+
+export function setTheme(id: string): void {
+  if (!(id in THEMES) || id === settings.theme) return
+  settings = { ...settings, theme: id }
+  commit()
 }
 
 /** Set one of the current theme's axes — the command palette's "Colour mode" does. */
@@ -161,5 +137,3 @@ export function setAxis(attr: string, value: string): void {
 }
 
 apply()
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', renderControls)
-else renderControls()

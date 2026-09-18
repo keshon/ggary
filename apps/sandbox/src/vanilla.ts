@@ -1,5 +1,6 @@
 import './theme'
 import './shared.css'
+import './chrome'
 import '@ggary/elements'
 import { toast } from '@ggary/elements'
 import {
