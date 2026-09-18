@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import type { ColumnDef, GridSource } from '../../packages/core/src/components/data-grid'
-import { type Adapter, type DataGridProps, click, freshTarget, part } from './harness'
+import { setInputValue } from '../../packages/core/src/index'
+import { type Adapter, type DataGridProps, type GridToolsProps, click, freshTarget, part } from './harness'
 
 interface Lead {
   id: number
@@ -167,6 +168,107 @@ export function dataGridConformance(adapter: Adapter) {
       await adapter.wait(0)
       expect(part(broken.m.root, 'data-grid', 'overlay')).toBeNull()
       expect(broken.rows()).toHaveLength(3)
+    })
+  })
+}
+
+/**
+ * The working surface: a filter bar, a column picker and a bulk bar sharing
+ * one grid. Driven as a person would — open the editor, type, apply; select,
+ * take the offer; untick a column.
+ */
+export function gridToolsConformance(adapter: Adapter) {
+  describe('grid tools', () => {
+    const many: Lead[] = Array.from({ length: 12 }, (_, i) => ({
+      id: i + 1,
+      name: i % 3 === 0 ? `Acme ${i}` : `Borealis ${i}`,
+      sum: i * 100,
+      status: i % 2 ? 'won' : 'new',
+    }))
+
+    const setup = async (props: Partial<GridToolsProps> = {}) => {
+      const m = await adapter.gridTools({ columns, rows: many, locale: 'en-US', ...props }, freshTarget())
+      await adapter.wait(0)
+      await adapter.wait(0)
+      const q = (selector: string) => m.root.querySelector<HTMLElement>(selector)
+      const chips = () => [...m.root.querySelectorAll<HTMLElement>('[data-scope="grid-filters"][data-part="chip"]')]
+      const chipText = () =>
+        chips().map((chip) => `${part(chip, 'grid-filters', 'chip-name')!.textContent} ${part(chip, 'grid-filters', 'chip-value')!.textContent}`)
+      const rowCount = () => part(m.root, 'data-grid', 'root')!.getAttribute('aria-rowcount')
+      const button = (text: string) =>
+        [...m.root.querySelectorAll<HTMLButtonElement>('button')].find((candidate) => candidate.textContent?.trim() === text)!
+      return { m, q, chips, chipText, rowCount, button }
+    }
+
+    it('adds a filter from the editor, shows it as a chip, and the grid follows', async () => {
+      const { m, chipText, rowCount, button } = await setup()
+      expect(part(m.root, 'grid-filters', 'root')!.getAttribute('role')).toBe('group')
+      expect(rowCount()).toBe('13')
+
+      await adapter.act(() => click(button('Add a filter')))
+      const forms = [...document.querySelectorAll<HTMLFormElement>('[data-scope="grid-filters"][data-part="editor"]')]
+      const form = forms[forms.length - 1]
+      // The field, not the column picker's hidden form input.
+      const input = form.querySelector<HTMLInputElement>('input:not([type="hidden"])')!
+      await adapter.act(() => setInputValue(input, 'acme'))
+      await adapter.act(() => form.requestSubmit())
+      await adapter.wait(0)
+
+      expect(chipText()).toEqual(['Company contains “acme”'])
+      expect(rowCount()).toBe('5')
+    })
+
+    it('a chip’s × removes its filter, and Clear all removes every one', async () => {
+      const { m, chips, rowCount, button } = await setup()
+      // A filter set on the grid shows as a chip, whoever set it.
+      await adapter.act(() => click(button('Add a filter')))
+      const forms = [...document.querySelectorAll<HTMLFormElement>('[data-scope="grid-filters"][data-part="editor"]')]
+      const form = forms[forms.length - 1]
+      await adapter.act(() => setInputValue(form.querySelector<HTMLInputElement>('input:not([type="hidden"])')!, 'borealis'))
+      await adapter.act(() => form.requestSubmit())
+      await adapter.wait(0)
+      expect(chips()).toHaveLength(1)
+      const remove = part(chips()[0], 'grid-filters', 'chip-remove')!
+      expect(remove.getAttribute('aria-label')).toContain('Company')
+      await adapter.act(() => click(remove))
+      await adapter.wait(0)
+      expect(chips()).toHaveLength(0)
+      expect(rowCount()).toBe('13')
+      expect(button('Clear all')).toBeUndefined()
+      expect(m.root.querySelector('[class]')).toBeNull()
+    })
+
+    it('the bulk bar appears with a selection and offers everything the query matches', async () => {
+      const { m, q, button } = await setup()
+      const bar = () => part(m.root, 'grid-bulk', 'root')
+      const visible = () => Boolean(bar()) && !bar()!.hidden
+      expect(visible()).toBe(false)
+
+      const box = m.root.querySelectorAll<HTMLInputElement>('[data-part="row"] [data-part="checkbox"]')[0]
+      await adapter.act(() => click(box))
+      expect(visible()).toBe(true)
+      expect(part(bar()!, 'grid-bulk', 'count')!.textContent).toBe('1 selected')
+      expect(bar()!.getAttribute('aria-label')).toBe('Selection')
+      expect(q('[data-scope="grid-bulk"][data-part="actions"] button')!.textContent).toBe('Assign')
+
+      await adapter.act(() => click(button('Select all 12')))
+      expect(part(bar()!, 'grid-bulk', 'count')!.textContent).toBe('All 12 selected')
+
+      await adapter.act(() => click(part(bar()!, 'grid-bulk', 'clear')!))
+      expect(visible()).toBe(false)
+    })
+
+    it('the column picker hides a column and brings every one back', async () => {
+      const { m, button } = await setup()
+      const headers = () => [...m.root.querySelectorAll('[data-scope="data-grid"][data-part="header-cell"]:not([data-select])')].map((cell) => cell.textContent?.trim())
+      expect(headers()).toEqual(['Company', 'Sum', 'Status'])
+      await adapter.act(() => click(button('Columns')))
+      const picker = [...document.querySelectorAll<HTMLElement>('[data-scope="grid-columns"][data-part="root"]')].pop()!
+      const sum = [...picker.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')].find((box) => box.value === 'sum')!
+      await adapter.act(() => click(sum))
+      expect(headers()).toEqual(['Company', 'Status'])
+      await adapter.act(() => click([...picker.querySelectorAll<HTMLButtonElement>('button')].find((b) => b.textContent?.trim() === 'Reset columns')!))
+      expect(headers()).toEqual(['Company', 'Sum', 'Status'])
     })
   })
 }

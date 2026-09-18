@@ -519,6 +519,14 @@ export interface DataGridProps {
   onQueryChange?: (query: import('../../packages/core/src/components/data-grid').GridQuery) => void
 }
 
+/** A grid with its filter bar, column picker and bulk bar (with one action, "Assign"). */
+export interface GridToolsProps {
+  columns: import('../../packages/core/src/components/data-grid').ColumnDef<any>[]
+  rows: any[]
+  views?: import('../../packages/core/src/components/data-grid').GridView[]
+  locale?: string
+}
+
 export interface CheckboxGroupProps {
   items: RadioItem[]
   name?: string
@@ -804,6 +812,7 @@ export interface Adapter {
   toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
   /** Updates are not supported: a grid's props are read at mount. */
   dataGrid(props: DataGridProps, target: HTMLElement): Promise<Mounted<DataGridProps>>
+  gridTools(props: GridToolsProps, target: HTMLElement): Promise<Mounted<GridToolsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
   /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */
   fieldset(props: FieldsetProps, target: HTMLElement): Promise<Mounted<FieldsetProps>>

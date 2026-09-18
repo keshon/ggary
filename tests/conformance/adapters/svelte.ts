@@ -3,6 +3,7 @@ import { Avatar, AvatarGroup, Badge, Button, Checkbox, CheckboxGroup, ChipGroup,
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
+import GridWithTools from './GridWithTools.svelte'
 import DialogWithContent from './DialogWithContent.svelte'
 import PopoverWithContent from './PopoverWithContent.svelte'
 import TooltipWithTrigger from './TooltipWithTrigger.svelte'
@@ -88,6 +89,7 @@ export const svelte: Adapter = {
   fileDrop: (props, target) => mountSvelte(FileDrop as Component<any>, props, target),
   buttonGroup: (props, target) => mountSvelte(GroupWithControl as Component<any>, props, target, (p) => ({ ...p, group: 'buttons' })),
   breadcrumbs: (props, target) => mountSvelte(Breadcrumbs as Component<any>, props, target),
+  gridTools: (props, target) => mountSvelte(GridWithTools as Component<any>, props, target),
   dataGrid: (props, target) =>
     mountSvelte(DataGrid as Component<any>, props, target, (p) => ({ rowKey: (row: { id: unknown }) => row.id, ...p })),
   nav: (props, target) => mountSvelte(Nav as Component<any>, props, target),

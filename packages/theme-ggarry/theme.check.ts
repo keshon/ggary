@@ -58,6 +58,10 @@ const pairs: Pair[] = [
   // The arc against the surface, not the track: the arc says busy, the track only draws the circle.
   { label: 'spinner: arc on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'skeleton: bar off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'grid filters: the column on its chip', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'grid bulk: the count on the band', fg: '--ggarry-text-default', bg: ['--ggarry-bg-accent-subtle'], min: TEXT },
+  { label: 'grid bulk: the offer of everything', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-accent-subtle'], min: TEXT },
+  { label: 'grid bulk: the band edge', fg: '--ggarry-border-accent', bg: ['--ggarry-bg-surface'], min: STEP },
   { label: 'grid: a header on its band', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
   { label: 'grid: a cell on a hovered row', fg: '--ggarry-text-default', bg: ['--ggarry-bg-subtle'], min: TEXT },
   { label: 'grid: a cell on a selected row', fg: '--ggarry-text-default', bg: ['--ggarry-bg-accent-subtle'], min: TEXT },

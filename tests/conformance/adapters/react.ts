@@ -1,4 +1,5 @@
-import { act, createElement, type ComponentType, type ReactNode } from 'react'
+import { Fragment, act, createElement, useState, type ComponentType, type ReactNode } from 'react'
+import type { DataGridController } from '../../../packages/core/src/components/data-grid'
 import { createRoot } from 'react-dom/client'
 import {
   Button,
@@ -17,6 +18,9 @@ import {
   Breadcrumbs,
   ButtonGroup,
   DataGrid,
+  GridBulkBar,
+  GridColumns,
+  GridFilters,
   ChoiceCardGroup,
   FileDrop,
   InputGroup,
@@ -50,6 +54,7 @@ import {
 import {
   type Adapter,
   type ButtonGroupProps,
+  type GridToolsProps,
   type ToolbarProps,
   type ButtonProps,
   type InputGroupProps,
@@ -103,6 +108,28 @@ async function mount<P extends object>(
   })
 }
 
+/** The grid and its tools, sharing one controller the way a page would. */
+function ReactGridWithTools(props: GridToolsProps) {
+  const [grid, setGrid] = useState<DataGridController<any>>()
+  const words = { locale: props.locale }
+  return createElement(
+    Fragment,
+    null,
+    grid ? createElement(GridFilters, { grid, views: props.views, words }) : null,
+    grid ? createElement(GridColumns, { grid }) : null,
+    grid ? createElement(GridBulkBar, { grid, words }, createElement('button', { type: 'button' }, 'Assign')) : null,
+    createElement(DataGrid as ComponentType<any>, {
+      columns: props.columns,
+      rows: props.rows,
+      rowKey: (row: { id: number }) => row.id,
+      label: 'Leads',
+      selectable: true,
+      locale: props.locale,
+      controllerRef: setGrid,
+    })
+  )
+}
+
 export const react: Adapter = {
   name: 'react',
   supports: { controlled: true, refusal: true, linkRoot: true },
@@ -135,6 +162,7 @@ export const react: Adapter = {
     mount(InputGroup, props, target, ({ input, ...rest }: InputGroupProps) => [rest, createElement(Input, input ?? {})]),
   fileDrop: (props, target) => mount(FileDrop, props, target),
   breadcrumbs: (props, target) => mount(Breadcrumbs, props, target),
+  gridTools: (props, target) => mount(ReactGridWithTools as ComponentType<any>, props, target),
   dataGrid: (props, target) => mount(DataGrid as ComponentType<any>, { rowKey: (row: { id: unknown }) => row.id, ...props }, target),
   nav: (props, target) => mount(Nav, props, target),
   pagination: (props, target) => mount(Pagination, props, target),

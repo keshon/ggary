@@ -1,5 +1,5 @@
 import '../../../packages/elements/src/index'
-import type { GgAvatarGroupElement, GgChoiceCardsElement, GgDataGridElement, GgNumberFieldElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
+import type { GgAvatarGroupElement, GgChoiceCardsElement, GgDataGridElement, GgGridFiltersElement, GgNumberFieldElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgSelectElement, GgTabsElement, GgToasterElement } from '../../../packages/elements/src/index'
 import {
   type Adapter,
   type ButtonProps,
@@ -14,6 +14,7 @@ import {
   type RadioGroupProps,
   type BreadcrumbsProps,
   type DataGridProps,
+  type GridToolsProps,
   type ButtonGroupProps,
   type ChoiceCardGroupProps,
   type NavProps,
@@ -586,6 +587,37 @@ export const elements: Adapter = {
       update: async (patch) => apply(patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<ButtonGroupProps>)
+  },
+
+  async gridTools(props, target) {
+    const box = document.createElement('div')
+    const id = `grid-${Math.random().toString(36).slice(2)}`
+    const filters = document.createElement('gg-grid-filters') as GgGridFiltersElement
+    filters.setAttribute('for', id)
+    if (props.views) filters.views = props.views
+    const columns = document.createElement('gg-grid-columns')
+    columns.setAttribute('for', id)
+    const bulk = document.createElement('gg-grid-bulk')
+    bulk.setAttribute('for', id)
+    const assign = document.createElement('button')
+    assign.type = 'button'
+    assign.textContent = 'Assign'
+    bulk.append(assign)
+    const grid = document.createElement('gg-data-grid') as GgDataGridElement
+    grid.id = id
+    grid.setAttribute('label', 'Leads')
+    grid.setAttribute('selectable', '')
+    setAttr(grid, 'locale', props.locale)
+    box.append(filters, columns, bulk, grid)
+    target.append(box)
+    grid.rowKey = (row: { id: number }) => row.id
+    grid.columns = props.columns
+    grid.rows = props.rows
+    return track({
+      root: box,
+      update: async () => {},
+      unmount: async () => box.remove(),
+    } satisfies Mounted<GridToolsProps>)
   },
 
   async dataGrid(props, target) {

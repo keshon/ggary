@@ -67,7 +67,11 @@ export function createFormatter(column: ColumnDef, options: FormatOptions = {}):
     }
     case 'enum': {
       const labels = new Map((column.options ?? []).map((option) => [String(option.value), option.label]))
-      return guard((value) => labels.get(String(value)) ?? String(value))
+      // An option for no value ("Unassigned") names the empty cell too, so the
+      // cell says what its filter chip says.
+      const none = column.options?.find((option) => option.value === null)?.label
+      const write = guard((value) => labels.get(String(value)) ?? String(value))
+      return none === undefined ? write : (value) => (value === null || value === undefined ? none : write(value))
     }
     case 'boolean':
       return (value) => (value === null || value === undefined ? EMPTY_CELL : value ? yes : no)

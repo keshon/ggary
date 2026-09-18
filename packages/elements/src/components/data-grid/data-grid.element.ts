@@ -24,7 +24,7 @@ type Line = { element: HTMLDivElement; cells: Cell[] }
  *
  * Attributes: label, selectable, locale (else the page's lang). Properties: columns, rows, source, rowKey,
  * renderCell (row, column, text) => Node | string, initialQuery, controller.
- * Events: querychange { query }, selectionchange { selection }, rowactivate { row, index }.
+ * Events: gridready, querychange { query }, selectionchange { selection }, rowactivate { row, index }.
  *
  * Rows are drawn from a pool that is reused as they scroll: the elements stay,
  * their contents change, so scrolling 700k rows creates no new nodes.
@@ -132,6 +132,8 @@ export class GgDataGridElement<Row = any> extends HTMLElement {
       })
       this.#build()
       this.#stopSubscribe = this.#controller.subscribe(() => this.#render())
+      // The filter bar, the column picker and the bulk bar wait for this.
+      queueMicrotask(() => this.dispatchEvent(new CustomEvent('gridready', { bubbles: true })))
     } else {
       this.#controller.update({ columns: this.#columns, source })
     }

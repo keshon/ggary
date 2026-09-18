@@ -29,6 +29,18 @@ function filterToParam(filter: Filter): string {
   }
 }
 
+/**
+ * Search params as text a person can read: the separators this format uses
+ * (`:` `,` `|` `~`) stay as they are instead of becoming %3A and friends.
+ */
+export const readableSearch = (params: URLSearchParams): string =>
+  params
+    .toString()
+    .replace(/%3A/gi, ':')
+    .replace(/%2C/gi, ',')
+    .replace(/%7C/gi, '|')
+    .replace(/%7E/gi, '~')
+
 /** The query as search params. Only non-empty parts are written. */
 export function queryToParams(query: GridQuery, params = new URLSearchParams()): URLSearchParams {
   for (const key of [...params.keys()]) {

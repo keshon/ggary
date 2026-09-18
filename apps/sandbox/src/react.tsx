@@ -1,9 +1,10 @@
 import './theme'
 import './shared.css'
 
-import { StrictMode, useMemo, useState, type FormEvent } from 'react'
+import { StrictMode, useEffect, useMemo, useState, type FormEvent } from 'react'
 import type { DataGridController } from '@ggary/core/data-grid'
-import { debounce, leadColumns, leadSource, statusTone, type Lead } from './leads'
+import { assignLeads, debounce, exportLeads, leadColumns, leadSource, leadViews, managerItems, statusTone, type Lead } from './leads'
+import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
 import { createRoot } from 'react-dom/client'
 import {
   Avatar,
@@ -14,6 +15,9 @@ import {
   Breadcrumbs,
   ButtonGroup,
   DataGrid,
+  GridBulkBar,
+  GridColumns,
+  GridFilters,
   Card,
   Checkbox,
   CheckboxGroup,
@@ -73,6 +77,21 @@ function App() {
   const [leadGrid, setLeadGrid] = useState<DataGridController<Lead>>()
   const [leadLog, setLeadLog] = useState('—')
   const searchLeads = useMemo(() => debounce((text: string) => leadGrid?.send({ type: 'SET_SEARCH', search: text })), [leadGrid])
+  useEffect(() => {
+    if (!leadGrid) return
+    const stopUrl = attachQueryToUrl(leadGrid)
+    const stopColumns = attachColumnStorage(leadGrid, 'gg-sandbox-leads-columns')
+    return () => {
+      stopUrl()
+      stopColumns()
+    }
+  }, [leadGrid])
+  const exportAll = async () => {
+    if (!leadGrid) return
+    const id = toast({ tone: 'running', title: 'Exporting…', duration: 0 })
+    const count = await exportLeads(leadGrid, (done, total) => toast({ id, tone: 'running', title: `Exporting… ${Math.round((done / total) * 100)}%` }))
+    toast({ id, tone: 'ok', title: `Exported ${count.toLocaleString('en-US')} leads` })
+  }
   const [items, setItems] = useState(tags)
   const [selection, setSelection] = useState<string[]>(['design'])
   const [formOutput, setFormOutput] = useState('submit to see the FormData the hidden input contributes')
@@ -789,7 +808,33 @@ function App() {
           <div style={{ flex: '1 1 18rem' }}>
             <Search label="Search the leads" placeholder="Company, contact or email" onValueChange={searchLeads} />
           </div>
+          {leadGrid && <GridColumns grid={leadGrid} />}
+          <Button size="sm" emphasis="low" onClick={exportAll}>
+            Export CSV
+          </Button>
         </div>
+        {leadGrid && (
+          <div className="grid-tools">
+            <GridFilters grid={leadGrid} views={leadViews} words={{ locale: 'en-US' }} />
+            <GridBulkBar grid={leadGrid} words={{ locale: 'en-US' }}>
+              <Menu
+                items={managerItems}
+                onSelect={async (manager) => {
+                  const count = await assignLeads(leadGrid, manager)
+                  toast({ tone: 'ok', title: `Assigned ${count.toLocaleString('en-US')} leads to ${manager}` })
+                }}
+                trigger={(props) => (
+                  <Button {...props} size="sm" emphasis="medium">
+                    Assign to…
+                  </Button>
+                )}
+              />
+              <Button size="sm" emphasis="low" onClick={exportAll}>
+                Export selected
+              </Button>
+            </GridBulkBar>
+          </div>
+        )}
         <DataGrid
           columns={leadColumns}
           source={leadSource}
@@ -808,6 +853,7 @@ function App() {
           }
         />
         <pre className="state">{leadLog}</pre>
+        <p className="hint">Filters are chips: press one to change it, × to remove it; Views applies a named query, and the whole query lives in the address bar. Columns hides and shows columns and remembers the layout. Select rows and the bar offers every lead the query matches; Assign really reassigns them and the grid reloads, Export writes the query or the selection.</p>
         <p className="hint">700,000 leads, answered after a 120 ms delay as a server would. Only a screenful of rows exists at a time; the scrollbar covers the whole list, and the last row is reachable. Sort by a header (Shift adds a second key), drag a header edge to resize, scroll sideways and the company stays pinned. The grid is one Tab stop: arrows move the active cell, Space selects, Shift+arrows extend, Ctrl+A selects all matching, Enter opens a lead.</p>
       </section>
 

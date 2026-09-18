@@ -135,3 +135,82 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* --- the working surface around a grid ---------------------------------------- */
+
+[data-scope='grid-filters'][data-part='root'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+[data-scope='grid-filters'][data-part='chip'] {
+  display: inline-flex;
+  align-items: center;
+  max-inline-size: 100%;
+}
+[data-scope='grid-filters']:is([data-part='chip-button'], [data-part='chip-remove']) {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+[data-scope='grid-filters'][data-part='chip-button'] {
+  display: inline-flex;
+  align-items: center;
+  min-inline-size: 0;
+}
+[data-scope='grid-filters'][data-part='chip-value'] {
+  max-inline-size: 18rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-scope='grid-filters'][data-part='chip-remove'] {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+}
+[data-scope='grid-filters'][data-part='editor'],
+[data-scope='grid-filters'][data-part='editor-fields'] {
+  display: grid;
+}
+[data-scope='grid-filters'][data-part='editor'] {
+  min-inline-size: 16rem;
+}
+[data-scope='grid-filters'][data-part='editor-actions'] {
+  display: flex;
+  justify-content: flex-end;
+}
+
+[data-scope='grid-bulk'][data-part='root'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+[data-scope='grid-bulk'][data-part='root'][hidden] {
+  display: none;
+}
+[data-scope='grid-bulk']:is([data-part='select-all'], [data-part='clear']) {
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+[data-scope='grid-bulk'][data-part='actions'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+[data-scope='grid-columns'][data-part='root'] {
+  display: grid;
+  justify-items: start;
+  overflow: auto;
+}

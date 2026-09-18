@@ -1,4 +1,13 @@
-import { createArraySource, type ColumnDef } from '@ggary/core/data-grid'
+import {
+  collectRows,
+  createArraySource,
+  downloadText,
+  selectedCount,
+  toCsv,
+  type ColumnDef,
+  type DataGridController,
+  type GridView,
+} from '@ggary/core/data-grid'
 
 /**
  * A leads registry the size of the one that prompted the data grid: 700,000
@@ -87,7 +96,13 @@ export const leadColumns: ColumnDef<Lead>[] = [
       { value: 'lost', label: 'Lost' },
     ],
   },
-  { id: 'manager', header: 'Manager', type: 'enum', width: 150 },
+  {
+    id: 'manager',
+    header: 'Manager',
+    type: 'enum',
+    width: 150,
+    options: [...MANAGERS.map((name) => ({ value: name, label: name })), { value: null, label: 'Unassigned' }],
+  },
   { id: 'users', header: 'Users', type: 'number', width: 100, description: 'People in the account' },
   { id: 'sum', header: 'Paid', type: 'money', currency: 'RUB', width: 140, description: 'Paid in all, in roubles' },
   { id: 'quality', header: 'Quality', type: 'percent', width: 100, description: 'How likely the lead is to buy' },
@@ -110,6 +125,60 @@ export const leads = makeLeads(LEAD_COUNT)
 
 /** The registry as a server would answer it: the same query, after a delay. */
 export const leadSource = createArraySource(leads, leadColumns, { latency: 120, locale: 'en' })
+
+/** Queries a person picks by name — the registry's "portraits", as views. */
+export const leadViews: GridView[] = [
+  { id: 'unassigned', label: 'Unassigned', query: { filters: [{ column: 'manager', kind: 'set', values: [null] }] } },
+  {
+    id: 'won-2026',
+    label: 'Won in 2026, biggest first',
+    query: {
+      filters: [
+        { column: 'status', kind: 'set', values: ['won'] },
+        { column: 'registered', kind: 'date', from: '2026-01-01' },
+      ],
+      sort: [{ column: 'sum', direction: 'desc' }],
+    },
+  },
+  {
+    id: 'big',
+    label: 'Accounts of 100+ people',
+    query: { filters: [{ column: 'users', kind: 'range', min: 100 }], sort: [{ column: 'users', direction: 'desc' }] },
+  },
+  { id: 'box', label: 'Box leads', query: { filters: [{ column: 'source', kind: 'set', values: ['box'] }] } },
+]
+
+export const managerItems = MANAGERS.map((name) => ({ value: name, label: name }))
+
+/** The same data with no delay, for actions that read many rows at once. */
+const bulkSource = createArraySource(leads, leadColumns, { locale: 'en' })
+
+/** The selection when there is one, otherwise everything the query matches. */
+function scope(grid: DataGridController<Lead>) {
+  const { grid: state, data } = grid.getSnapshot()
+  const selected = (selectedCount(state.selection, data.total) ?? 0) > 0
+  return { query: state.query, selection: selected ? state.selection : undefined }
+}
+
+/** A bulk action as a server would run it: on the query or the keys, then the grid reloads what it shows. */
+export async function assignLeads(grid: DataGridController<Lead>, manager: string): Promise<number> {
+  const { query, selection } = scope(grid)
+  const targets = await collectRows(bulkSource, query, { selection, rowKey: (lead) => lead.id, blockSize: 100_000 })
+  for (const lead of targets) lead.manager = manager
+  leadSource.invalidate()
+  bulkSource.invalidate()
+  grid.data.refresh()
+  grid.send({ type: 'CLEAR_SELECTION' })
+  return targets.length
+}
+
+/** Everything the query matches, or the selection, as a CSV a Russian Excel opens (`;`, UTF-8 with a BOM). */
+export async function exportLeads(grid: DataGridController<Lead>, onProgress?: (done: number, total: number) => void): Promise<number> {
+  const { query, selection } = scope(grid)
+  const rows = await collectRows(bulkSource, query, { selection, rowKey: (lead) => lead.id, blockSize: 50_000, onProgress })
+  downloadText(toCsv(rows, leadColumns, { separator: ';' }), 'leads.csv')
+  return rows.length
+}
 
 /** Waits for the typing to stop before asking. */
 export function debounce<A extends unknown[]>(run: (...args: A) => void, ms = 200) {

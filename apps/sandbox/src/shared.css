@@ -74,6 +74,9 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
 .nav-demo > nav, .nav-demo > gg-nav { padding: 8px; border-radius: 10px; background: var(--gg-surface-sunken); }
 .panel-demo { margin-top: 16px; max-inline-size: 520px; }
 
+/* The data grid's tools: filters on one line, the bulk bar under them when something is selected. */
+.grid-tools { display: grid; gap: 10px; margin-bottom: 12px; }
+
 .form-column { display: grid; gap: 20px; max-inline-size: 520px; margin-top: 16px; }
 
 /* A vector of number fields: equal shares, so a six-digit number does not skew it. */

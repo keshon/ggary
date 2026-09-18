@@ -1265,9 +1265,75 @@ grid. Column layout is personal and stays out of links: `columnLayout` and
 `applyColumnLayout` store it and lay it over today's columns, new ones joining
 and removed ones dropping.
 
+### Around the grid
+
+Four pieces share the grid's controller, and none of them holds any state of its own.
+
+```tsx
+const [grid, setGrid] = useState<DataGridController<Lead>>()
+
+{grid && <GridFilters grid={grid} views={views} />}
+{grid && <GridColumns grid={grid} />}
+{grid && (
+  <GridBulkBar grid={grid}>
+    <Button onClick={() => {
+      const { grid: state } = grid.getSnapshot()
+      assign(selectionPayload(state.selection, state.query)) // keys, or the query and its exceptions
+    }}>Assign to…</Button>
+  </GridBulkBar>
+)}
+<DataGrid controllerRef={setGrid} … />
+```
+
+```svelte
+<GridFilters {grid} {views} />
+<DataGrid bind:controller={grid} … />
+```
+
+```html
+<gg-grid-filters for="leads"></gg-grid-filters>
+<gg-grid-bulk for="leads"><gg-button>Assign to…</gg-button></gg-grid-bulk>
+<gg-data-grid id="leads"></gg-data-grid>
+```
+
+**Filters are chips you can read.** Each filter in force is a chip that says it in
+words — "Status: New, Won", "Paid: $100.00 – $500.00", "Manager: Unassigned" —
+with × to remove it. Pressing a chip opens its editor; "Add a filter" picks a
+column first. The editor follows the column's type: a checkbox list for enums
+and booleans, two number fields for a range, two dates, or text. An emptied
+editor removes its filter, and a range typed backwards is turned round rather
+than matching nothing. A column can refuse (`filter: false`) or ask for a
+different editor (`filter: 'text'`). An option with the value `null` names the
+empty value, and the cell and the chip both use that name.
+
+**Views are saved queries.** A view is `{ id, label, query }`; picking one replaces
+the whole query (sort, filters, search) and goes through the same URL as
+everything else.
+
+**The column picker** is a checkbox group over the columns: the last visible one
+cannot be unchecked, and "Reset" brings back the defaults.
+
+**The bulk bar appears with a selection** and says what it covers: "2 selected",
+then "Select all 126" when more rows match, then "All 126 selected". Your actions
+go in its slot and send `selectionPayload` — keys, or the query with its exceptions —
+so an action on 104,802 rows is one request.
+
+**Export follows the query, not the page.** `collectRows(source, query)` reads
+the source in blocks of 5,000, with progress and an abort signal, and only the
+selection when one is given; `toCsv` writes formatted or raw values, with a
+choice of separator (`;` for Excel in much of Europe) and a BOM so Excel reads
+UTF-8.
+
+**The address and the layout are kept.** `attachQueryToUrl(grid)` puts the query
+in the address and follows the back button; `attachColumnStorage(grid, key)` keeps
+widths, order and hidden columns in `localStorage`, and a page with storage
+blocked still works.
+
 In the sandbox, each page carries the registry: 700,000 generated leads, answered
-after 120ms as a server would, with a search field, status badges in cells and
-Enter to open a lead.
+after 120ms as a server would. It has a search field, status badges in cells,
+Enter to open a lead, filters with four views, a column picker, "Assign to…" on
+any selection including all matching, and CSV export of the query or the
+selection.
 
 Found on the way:
 
@@ -1288,6 +1354,15 @@ Found on the way:
 - **A plain click on a tie-breaker column** used to flip its direction as a
   tie-breaker; it now starts it afresh as the only key, which is what "sort by
   this" means.
+- **The "Unassigned" view showed "Manager: empty".** The chip named a `null`
+  value by the fallback word before looking for an option that names it, and the
+  cells showed a dash. Both now use the column's own word.
+- **Links were written in percent codes.** `URLSearchParams` escapes `:`, `|` and
+  `~`, so `?f.manager=in:~` reached the address bar as `in%3A%7E`. The address is
+  now written with those left as they are; they are legal in a query string.
+- **A test typed into a hidden input.** gg-select carries a hidden input for its
+  form value, and "the first input in the editor" found it. The tests now skip
+  hidden inputs.
 
 ## Layering inside core
 
@@ -1493,14 +1568,14 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 227 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers. |
-| contract | node | `icons.contract.test.ts` | 251 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 239 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage. |
+| contract | node | `icons.contract.test.ts` | 258 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
-| contract | node | `checks.contract.test.ts` | 23 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 903 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
+| dom | jsdom | `conformance.dom.test.ts` | 915 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 32 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 903 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 915 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
@@ -1616,12 +1691,15 @@ Real, and deliberately left open:
   prose, the rest of forms (number field, slider, choice cards), tables,
   the agent components (including the composer, a textarea with a toolbar in one
   frame) and print styles.
-- **The grid's second half is still to come.** Built: the engine, the grid,
-  virtual scrolling, sorting, selection with "all matching", pinning, resizing,
-  keyboard, URL views. Not yet: a filter bar with removable chips and per-column
-  filter menus, a column picker, a bulk-action bar, export by query, inline
-  editing with rollback, a detail sheet and a context menu. The state for all of
-  them is in core already; what is missing is their UI.
+- **The grid does not edit yet.** Built: the engine, the grid, virtual
+  scrolling, sorting, selection with "all matching", pinning, resizing,
+  keyboard, URL views, the filter bar, views, the column picker, the bulk bar
+  and export. Not yet: inline editing with rollback, a detail sheet and a
+  context menu.
+- **Columns are reordered only through the state.** The picker hides and shows;
+  there is no dragging of headers yet.
+- **Export is CSV.** No XLSX: that would add a dependency for a format Excel
+  already opens.
 - **Instrument does not style the data grid.** It is frozen; with Instrument
   selected, the sandbox's grid shows the structure layer only.
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.

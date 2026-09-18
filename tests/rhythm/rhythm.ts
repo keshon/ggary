@@ -112,8 +112,10 @@ export async function expectSheetLayout() {
     sheet.innerHTML = '<p>Body</p><footer><button type="button">Close</button></footer>'
     document.body.append(sheet)
     sheet.show()
-    await new Promise((resolve) => setTimeout(resolve, 250))
     const content = sheet.querySelector('[data-part="content"]')!
+    // Measure where the sheet comes to rest, however long its entrance takes on a busy machine.
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    await Promise.all(sheet.getAnimations({ subtree: true }).map((animation) => animation.finished.catch(() => {})))
     const rect = box(content)
     near(rect.top, 0)
     near(rect.height, window.innerHeight)

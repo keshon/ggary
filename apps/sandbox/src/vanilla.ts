@@ -2,7 +2,8 @@ import './theme'
 import './shared.css'
 import '@ggary/elements'
 import { toast } from '@ggary/elements'
-import { debounce, leadColumns, leadSource, statusTone, type Lead } from './leads'
+import { assignLeads, debounce, exportLeads, leadColumns, leadSource, leadViews, managerItems, statusTone, type Lead } from './leads'
+import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
 import type { GgDataGridElement, GgAvatarGroupElement, GgCheckboxElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
 import { agentsText, badgeTones, crumbs, densities, importSteps, navGroups, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
@@ -477,9 +478,19 @@ app.innerHTML = `
     <div class="row" style="align-items: center; margin-bottom: 12px">
       <gg-search label="Search the leads" style="flex: 1 1 18rem"><input type="search" id="lead-search" placeholder="Company, contact or email"></gg-search>
       <span class="hint" id="lead-count" style="margin: 0">Loading…</span>
+      <gg-grid-columns for="leads"></gg-grid-columns>
+      <gg-button size="sm" emphasis="low"><button id="lead-export">Export CSV</button></gg-button>
+    </div>
+    <div class="grid-tools">
+      <gg-grid-filters for="leads" id="lead-filters"></gg-grid-filters>
+      <gg-grid-bulk for="leads">
+        <gg-menu id="lead-assign"><gg-button slot="trigger" size="sm"><button>Assign to…</button></gg-button></gg-menu>
+        <gg-button size="sm" emphasis="low"><button id="lead-export-selected">Export selected</button></gg-button>
+      </gg-grid-bulk>
     </div>
     <gg-data-grid id="leads" label="Leads" selectable locale="en-US" style="block-size: 520px"></gg-data-grid>
     <pre class="state" id="lead-state">—</pre>
+    <p class="hint">Filters are chips: press one to change it, × to remove it; Views applies a named query, and the whole query lives in the address bar. Columns hides and shows columns and remembers the layout. Select rows and the bar offers every lead the query matches; Assign really reassigns them and the grid reloads, Export writes the query or the selection.</p>
     <p class="hint">700,000 leads, answered after a 120 ms delay as a server would. Only a screenful of rows exists at a time; the scrollbar covers the whole list, and the last row is reachable. Sort by a header (Shift adds a second key), drag a header edge to resize, scroll sideways and the company stays pinned. The grid is one Tab stop: arrows move the active cell, Space selects, Shift+arrows extend, Ctrl+A selects all matching, Enter opens a lead.</p>
   </section>
 
@@ -971,3 +982,27 @@ document.getElementById('lead-search')!.addEventListener(
   'input',
   debounce((event: Event) => leadGrid.controller?.send({ type: 'SET_SEARCH', search: (event.target as HTMLInputElement).value }))
 )
+
+// The grid's tools: views, the address bar, remembered columns, the bulk actions.
+;(document.getElementById('lead-filters') as HTMLElement & { views: unknown }).views = leadViews
+const leadAssign = document.getElementById('lead-assign') as HTMLElement & { items: unknown }
+leadAssign.items = managerItems
+const whenGrid = (run: () => void) => (leadGrid.controller ? run() : leadGrid.addEventListener('gridready', run, { once: true }))
+whenGrid(() => {
+  attachQueryToUrl(leadGrid.controller!)
+  attachColumnStorage(leadGrid.controller!, 'gg-sandbox-leads-columns')
+})
+leadAssign.addEventListener('itemselect', async (event) => {
+  const manager = (event as CustomEvent).detail.value as string
+  const count = await assignLeads(leadGrid.controller!, manager)
+  toast({ tone: 'ok', title: `Assigned ${count.toLocaleString('en-US')} leads to ${manager}` })
+})
+const exportAllLeads = async () => {
+  const id = toast({ tone: 'running', title: 'Exporting…', duration: 0 })
+  const count = await exportLeads(leadGrid.controller!, (done, total) =>
+    toast({ id, tone: 'running', title: `Exporting… ${Math.round((done / total) * 100)}%` })
+  )
+  toast({ id, tone: 'ok', title: `Exported ${count.toLocaleString('en-US')} leads` })
+}
+document.getElementById('lead-export')!.addEventListener('click', exportAllLeads)
+document.getElementById('lead-export-selected')!.addEventListener('click', exportAllLeads)
