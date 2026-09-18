@@ -65,5 +65,8 @@
 @import './components/split.css' layer(gg.components);
 @import './components/rail.css' layer(gg.components);
 @import './components/status-bar.css' layer(gg.components);
+@import './components/flow.css' layer(gg.components);
+@import './components/page-header.css' layer(gg.components);
+@import './components/section.css' layer(gg.components);
 @import './components/textarea.css' layer(gg.components);
 @import './components/tooltip.css' layer(gg.components);

@@ -27,6 +27,7 @@
     "--gg-grid-header-height": "written by core onto a data grid's frame: the measured height of its header row",
     "--gg-split-size": "written by core onto a split's frame: the primary pane's size",
     "--gg-split-rest-min": "written by core onto a split's frame: the least the other pane keeps",
+    "--gg-flow-self": "set by a stack or a section on each child: how a component sized by its content stands in the column (it reads it, with auto outside one)",
     "--gg-icon": "mapped from data-icon by @ggary/icons; a theme never declares it on the root"
   },
   "$pairs": "What every theme promises through the public names, whatever its language. Deliberately small: only what the token descriptions above promise, and nothing about how a theme builds depth — GGarry divides same-white surfaces with borders, Instrument separates them by lightness, and both are legitimate. min: text 4.5:1, large 3:1, step ΔL 0.022.",

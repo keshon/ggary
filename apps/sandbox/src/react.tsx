@@ -36,6 +36,10 @@ import {
   GridDetail,
   GridFilters,
   GridRowMenu,
+  Grid,
+  PageHeader,
+  Section,
+  Stack,
   Rail,
   Shell,
   Split,
@@ -83,7 +87,7 @@ import {
   ToolbarSpacer,
   Tooltip,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, layoutLeads, navGroups, railItems, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, layoutLeads, navGroups, railItems, weekTiles, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -1008,6 +1012,39 @@ function App() {
           </div>
         </div>
         <p className="hint">{HINT_RAIL}</p>
+
+        <h2 style={{ marginTop: 32 }}>Page header, sections and flow</h2>
+        <div className="flow-demo">
+          <PageHeader
+            context={<Breadcrumbs items={crumbs} />}
+            title="Leads"
+            description="Everyone the sales team is talking to, from the first call to the last invoice."
+            actions={
+              <>
+                <Button emphasis="low">Import</Button>
+                <Button emphasis="high">New lead</Button>
+              </>
+            }
+          />
+          <Section title="This week" actions={<Button size="sm" emphasis="minimal">All weeks</Button>}>
+            <Grid columns="tight">
+              {weekTiles.map((tile) => (
+                <Card key={tile.title} title={tile.title}>
+                  {tile.value}
+                </Card>
+              ))}
+            </Grid>
+          </Section>
+          <Section title="Your details" rank="support" description="Shown to the leads you write to.">
+            <Stack>
+              <Field label="Signature">
+                <Input defaultValue="Daria M., sales" />
+              </Field>
+              <Button emphasis="high">Save</Button>
+            </Stack>
+          </Section>
+        </div>
+        <p className="hint">{HINT_FLOW}</p>
       </section>
 
       <section id="fields">

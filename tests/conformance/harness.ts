@@ -342,6 +342,36 @@ export interface StatusBarProps {
   end?: { text: string }[]
 }
 
+/** One flow primitive around paragraphs of `items`; a spacer after `spacerAfter` items (cluster only). */
+export interface FlowProps {
+  kind: 'stack' | 'cluster' | 'grid' | 'container'
+  gap?: 'tight' | 'default' | 'loose'
+  justify?: 'start' | 'end' | 'between'
+  columns?: 'tight' | 'default' | 'wide'
+  size?: 'default' | 'narrow' | 'prose' | 'full'
+  items: string[]
+  spacerAfter?: number
+}
+
+/** A page header; `context` is a paragraph above the title, `actions` are buttons. */
+export interface PageHeaderProps {
+  title: string
+  description?: string
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
+  context?: string
+  actions?: string[]
+}
+
+export interface SectionProps {
+  title?: string
+  description?: string
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
+  rank?: 'lead' | 'default' | 'support'
+  region?: boolean
+  actions?: string[]
+  body: string
+}
+
 export interface CheckboxGroupProps {
   items: RadioItem[]
   name?: string
@@ -633,6 +663,9 @@ export interface Adapter {
   split(props: SplitProps, target: HTMLElement): Promise<Mounted<SplitProps>>
   rail(props: RailProps, target: HTMLElement): Promise<Mounted<RailProps>>
   statusBar(props: StatusBarProps, target: HTMLElement): Promise<Mounted<StatusBarProps>>
+  flow(props: FlowProps, target: HTMLElement): Promise<Mounted<FlowProps>>
+  pageHeader(props: PageHeaderProps, target: HTMLElement): Promise<Mounted<PageHeaderProps>>
+  section(props: SectionProps, target: HTMLElement): Promise<Mounted<SectionProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
   /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */

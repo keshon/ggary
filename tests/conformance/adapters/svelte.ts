@@ -6,6 +6,9 @@ import ToolbarWithTools from './ToolbarWithTools.svelte'
 import GridWithTools from './GridWithTools.svelte'
 import GridWithRows from './GridWithRows.svelte'
 import ShellWith from './ShellWith.svelte'
+import FlowWith from './FlowWith.svelte'
+import PageHeaderWith from './PageHeaderWith.svelte'
+import SectionWith from './SectionWith.svelte'
 import SplitWith from './SplitWith.svelte'
 import StatusBarWith from './StatusBarWith.svelte'
 import DialogWithContent from './DialogWithContent.svelte'
@@ -94,6 +97,9 @@ export const svelte: Adapter = {
   buttonGroup: (props, target) => mountSvelte(GroupWithControl as Component<any>, props, target, (p) => ({ ...p, group: 'buttons' })),
   breadcrumbs: (props, target) => mountSvelte(Breadcrumbs as Component<any>, props, target),
   gridRows: (props, target) => mountSvelte(GridWithRows as Component<any>, props, target),
+  flow: (props, target) => mountSvelte(FlowWith as Component<any>, props, target),
+  pageHeader: (props, target) => mountSvelte(PageHeaderWith as Component<any>, props, target),
+  section: (props, target) => mountSvelte(SectionWith as Component<any>, props, target),
   shell: (props, target) => mountSvelte(ShellWith as Component<any>, props, target),
   split: (props, target) => mountSvelte(SplitWith as Component<any>, props, target),
   rail: (props, target) => mountSvelte(Rail as Component<any>, props, target),

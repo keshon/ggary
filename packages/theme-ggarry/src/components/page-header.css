@@ -1,0 +1,44 @@
+/* ==========================================================================
+   GGarry — page header
+
+   The screen's one title, the loudest type on it and still not loud: a step
+   above a lead panel's name, in the same weight. The description is a line in
+   the muted ink, kept to a readable measure. The actions stand at the far edge
+   and fall under the title when the screen is narrow.
+   ========================================================================== */
+
+[data-scope='page-header'][data-part='root'] {
+  gap: var(--ggarry-space-3) var(--ggarry-space-6);
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='page-header'][data-part='context'] {
+  margin-block-end: calc(var(--ggarry-space-1) * -1);
+}
+
+[data-scope='page-header'][data-part='main'] {
+  gap: var(--ggarry-space-1);
+}
+
+[data-scope='page-header'][data-part='title'] {
+  margin: 0;
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-xl);
+  font-weight: var(--ggarry-font-weight-semibold);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+[data-scope='page-header'][data-part='description'] {
+  margin: 0;
+  max-inline-size: 68ch;
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-md);
+  line-height: 1.5;
+}
+
+/* Pushed to the far edge by a margin in the theme, not the structure layer. */
+[data-scope='page-header'][data-part='actions'] {
+  gap: var(--ggarry-space-2);
+  margin-inline-start: auto;
+}

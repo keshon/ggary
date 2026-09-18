@@ -222,3 +222,100 @@ export function layoutConformance(adapter: Adapter) {
     })
   })
 }
+
+/**
+ * The flow primitives, the page header and the section: prop bags, so the
+ * question is the same markup and the same names in every framework.
+ */
+export function flowConformance(adapter: Adapter) {
+  describe('flow primitives', () => {
+    it('each is one element around what it holds, saying its gap and its option', async () => {
+      const cases = [
+        { kind: 'stack', gap: 'loose', attr: 'gap', value: 'loose' },
+        { kind: 'cluster', justify: 'between', attr: 'justify', value: 'between' },
+        { kind: 'grid', columns: 'wide', attr: 'columns', value: 'wide' },
+        { kind: 'container', size: 'prose', attr: 'size', value: 'prose' },
+      ] as const
+      for (const { attr, value, ...props } of cases) {
+        const m = await adapter.flow({ items: ['One', 'Two'], ...props }, freshTarget())
+        const root = part(m.root, props.kind, 'root')!
+        expect(root.getAttribute(`data-${attr}`)).toBe(value)
+        expect([...root.children].map((child) => child.textContent)).toEqual(['One', 'Two'])
+        expect(m.root.querySelector('[class]')).toBeNull()
+      }
+    })
+
+    it('the defaults are named, not absent: a theme styles every step', async () => {
+      const m = await adapter.flow({ kind: 'stack', items: ['One'] }, freshTarget())
+      expect(part(m.root, 'stack', 'root')!.getAttribute('data-gap')).toBe('default')
+    })
+
+    it('a cluster’s spacer stands where it was put, hidden from a screen reader', async () => {
+      const m = await adapter.flow({ kind: 'cluster', items: ['One', 'Two', 'Three'], spacerAfter: 2 }, freshTarget())
+      const spacer = part(m.root, 'cluster', 'spacer')!
+      expect(spacer.getAttribute('aria-hidden')).toBe('true')
+      expect(spacer.previousElementSibling!.textContent).toBe('Two')
+      expect(spacer.nextElementSibling!.textContent).toBe('Three')
+    })
+  })
+
+  describe('page header', () => {
+    it('is the screen’s one title, described by its line, with context above and actions beside', async () => {
+      const m = await adapter.pageHeader(
+        { title: 'Leads', description: 'Everyone the sales team is talking to.', context: 'Sales', actions: ['Import', 'New lead'] },
+        freshTarget()
+      )
+      const title = part(m.root, 'page-header', 'title')!
+      expect(title.tagName).toBe('H1')
+      expect(title.textContent).toBe('Leads')
+      const description = part(m.root, 'page-header', 'description')!
+      expect(description.textContent).toBe('Everyone the sales team is talking to.')
+      expect(title.getAttribute('aria-describedby')).toBe(description.id)
+      expect(part(m.root, 'page-header', 'context')!.textContent).toBe('Sales')
+      expect([...part(m.root, 'page-header', 'actions')!.querySelectorAll('button')].map((button) => button.textContent)).toEqual(['Import', 'New lead'])
+      // Not a banner: the page's banner is the shell's header.
+      expect(part(m.root, 'page-header', 'root')!.tagName).not.toBe('HEADER')
+      expect(m.root.querySelector('[class]')).toBeNull()
+    })
+
+    it('takes another level when it is not the page’s own, and draws nothing it was not given', async () => {
+      const m = await adapter.pageHeader({ title: 'Lead 4127', headingLevel: 2 }, freshTarget())
+      expect(part(m.root, 'page-header', 'title')!.tagName).toBe('H2')
+      expect(part(m.root, 'page-header', 'title')!.hasAttribute('aria-describedby')).toBe(false)
+      const shown = (name: string) => {
+        const element = part(m.root, 'page-header', name)
+        return Boolean(element && !element.hidden)
+      }
+      expect(shown('description')).toBe(false)
+      expect(shown('actions')).toBe(false)
+      expect(shown('context')).toBe(false)
+    })
+  })
+
+  describe('section', () => {
+    it('is a heading over its body, with its actions and its line', async () => {
+      const m = await adapter.section({ title: 'Notifications', description: 'Where we reach you.', actions: ['Reset'], body: 'Email and push.', rank: 'support' }, freshTarget())
+      const root = part(m.root, 'section', 'root')!
+      const title = part(m.root, 'section', 'title')!
+      expect(title.tagName).toBe('H2')
+      expect(title.textContent).toBe('Notifications')
+      expect(part(m.root, 'section', 'description')!.textContent).toBe('Where we reach you.')
+      expect(part(m.root, 'section', 'actions')!.textContent).toBe('Reset')
+      expect(part(m.root, 'section', 'body')!.textContent).toBe('Email and push.')
+      expect(root.dataset.rank).toBe('support')
+      // Not a landmark unless asked: a screen of ten sections is not ten regions.
+      expect(root.hasAttribute('role')).toBe(false)
+      expect(m.root.querySelector('[class]')).toBeNull()
+    })
+
+    it('as a region it is named by its heading and described by its line', async () => {
+      const m = await adapter.section({ title: 'Danger zone', description: 'Cannot be undone.', region: true, headingLevel: 3, body: 'Delete' }, freshTarget())
+      const root = part(m.root, 'section', 'root')!
+      const title = part(m.root, 'section', 'title')!
+      expect(title.tagName).toBe('H3')
+      expect(root.getAttribute('role')).toBe('region')
+      expect(root.getAttribute('aria-labelledby')).toBe(title.id)
+      expect(root.getAttribute('aria-describedby')).toBe(part(m.root, 'section', 'description')!.id)
+    })
+  })
+}

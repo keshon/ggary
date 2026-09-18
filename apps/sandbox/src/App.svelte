@@ -29,6 +29,10 @@
     Menu,
     Menubar,
     Nav,
+    Grid,
+    PageHeader,
+    Section,
+    Stack,
     Rail,
     Shell,
     Split,
@@ -79,7 +83,7 @@
     type Lead,
   } from './leads'
   import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, layoutLeads, navGroups, railItems, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, layoutLeads, navGroups, railItems, weekTiles, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -900,6 +904,30 @@ invalid  ${taken}`}</pre>
     <div><p>The section's content.</p></div>
   </div>
   <p class="hint">{HINT_RAIL}</p>
+
+  <h2 style="margin-top: 32px">Page header, sections and flow</h2>
+  <div class="flow-demo">
+    <PageHeader title="Leads" description="Everyone the sales team is talking to, from the first call to the last invoice.">
+      {#snippet context()}<Breadcrumbs items={crumbs} />{/snippet}
+      {#snippet actions()}
+        <Button emphasis="low">Import</Button>
+        <Button emphasis="high">New lead</Button>
+      {/snippet}
+    </PageHeader>
+    <Section title="This week">
+      {#snippet actions()}<Button size="sm" emphasis="minimal">All weeks</Button>{/snippet}
+      <Grid columns="tight">
+        {#each weekTiles as tile (tile.title)}<Card title={tile.title}>{tile.value}</Card>{/each}
+      </Grid>
+    </Section>
+    <Section title="Your details" rank="support" description="Shown to the leads you write to.">
+      <Stack>
+        <Field label="Signature"><Input value="Daria M., sales" /></Field>
+        <Button emphasis="high">Save</Button>
+      </Stack>
+    </Section>
+  </div>
+  <p class="hint">{HINT_FLOW}</p>
 </section>
 
 <section id="fields">

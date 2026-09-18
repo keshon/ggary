@@ -221,3 +221,96 @@ describe('buttons inside the frame', () => {
     expect(Math.abs(b.left - a.right)).toBeLessThan(1)
   })
 })
+
+describe('flow', () => {
+  it('a stack stretches a field to its width and leaves a button, a badge and a group at their own', async () => {
+    const stack = document.createElement('gg-stack')
+    stack.style.inlineSize = '480px'
+    stack.innerHTML = `
+      <gg-field label="Name"><input></gg-field>
+      <gg-button><button>Save</button></gg-button>
+      <gg-badge tone="ok">Done</gg-badge>
+      <gg-button-group label="Align"><gg-button><button>Left</button></gg-button><gg-button><button>Right</button></gg-button></gg-button-group>`
+    document.body.append(stack)
+    await frames()
+    const width = (selector: string) => stack.querySelector<HTMLElement>(selector)!.getBoundingClientRect().width
+    expect(width('gg-field')).toBeCloseTo(480, 0)
+    expect(width('gg-button')).toBeLessThan(120)
+    expect(width('gg-badge')).toBeLessThan(120)
+    expect(width('gg-button-group')).toBeLessThan(200)
+    // The channel stops at the column's children: a button inside the group is not sent to its start.
+    expect(getComputedStyle(stack.querySelector('gg-button-group button')!).alignSelf).not.toBe('start')
+  })
+
+  it('a grid falls to fewer columns as its frame narrows, with no breakpoint', async () => {
+    const grid = document.createElement('gg-grid')
+    grid.innerHTML = '<div>1</div><div>2</div><div>3</div><div>4</div>'
+    document.body.append(grid)
+    const columns = () => new Set([...grid.children].map((cell) => Math.round(cell.getBoundingClientRect().left))).size
+    grid.style.inlineSize = '1100px'
+    await frames()
+    expect(columns()).toBe(4)
+    grid.style.inlineSize = '560px'
+    await frames()
+    expect(columns()).toBe(2)
+    grid.style.inlineSize = '240px'
+    await frames()
+    expect(columns()).toBe(1)
+    expect(grid.firstElementChild!.getBoundingClientRect().width).toBeLessThanOrEqual(240)
+  })
+
+  it('a container keeps its ceiling and stands in the middle', async () => {
+    const container = document.createElement('gg-container')
+    container.setAttribute('size', 'narrow')
+    container.innerHTML = '<p>Text</p>'
+    document.body.append(container)
+    await frames()
+    const box = container.getBoundingClientRect()
+    expect(box.width).toBeCloseTo(44 * 16, 0)
+    expect(Math.abs(box.left - (document.documentElement.clientWidth - box.right))).toBeLessThan(1)
+  })
+
+  it('a page header puts its actions at the far edge, and under the title when there is no room', async () => {
+    const header = document.createElement('gg-page-header')
+    header.setAttribute('heading', 'Leads')
+    header.setAttribute('description', 'Everyone the sales team is talking to.')
+    header.innerHTML = '<gg-button slot="actions"><button>New lead</button></gg-button>'
+    header.style.inlineSize = '900px'
+    document.body.append(header)
+    await frames()
+    const actions = () => header.querySelector<HTMLElement>('[data-part="actions"]')!.getBoundingClientRect()
+    const title = () => header.querySelector<HTMLElement>('[data-part="title"]')!.getBoundingClientRect()
+    expect(Math.abs(actions().right - header.getBoundingClientRect().right)).toBeLessThan(1)
+    expect(actions().top).toBeLessThan(title().bottom)
+    header.style.inlineSize = '320px'
+    await frames()
+    expect(actions().top).toBeGreaterThan(title().bottom)
+  })
+
+  it('a section’s line stands under its heading, whatever the width', async () => {
+    const section = document.createElement('gg-section')
+    section.setAttribute('heading', 'Your details')
+    section.setAttribute('description', 'Shown to the leads you write to.')
+    section.style.inlineSize = '1000px'
+    section.innerHTML = '<p>Body</p>'
+    document.body.append(section)
+    await frames()
+    const title = section.querySelector('[data-part="title"]')!.getBoundingClientRect()
+    const line = section.querySelector('[data-part="description"]')!.getBoundingClientRect()
+    expect(line.top).toBeGreaterThanOrEqual(title.bottom - 1)
+  })
+
+  it('two sections stand farther apart than the rows inside one', async () => {
+    const stackOf = (name: string) =>
+      `<gg-section heading="${name}"><p style="margin:0">Row one</p><p style="margin:0">Row two</p></gg-section>`
+    const box = document.createElement('div')
+    box.innerHTML = stackOf('First') + stackOf('Second')
+    document.body.append(box)
+    await frames()
+    const [first, second] = [...box.querySelectorAll('gg-section')]
+    const rows = [...first.querySelectorAll('p')].map((row) => row.getBoundingClientRect())
+    const inside = rows[1].top - rows[0].bottom
+    const between = second.getBoundingClientRect().top - first.getBoundingClientRect().bottom
+    expect(between).toBeGreaterThan(inside * 2)
+  })
+})

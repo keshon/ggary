@@ -1,0 +1,57 @@
+/* ==========================================================================
+   GGarry — section
+
+   A stretch of the page under its heading, with no box. The heading reads
+   the region channel a panel reads — lead a step louder, support a step
+   quieter in the muted ink — so a section and a panel of the same rank sound
+   alike. Sections stand a full loose step apart: the gap between them is
+   larger than any gap inside one, or the boundary would not read.
+   ========================================================================== */
+
+[data-scope='section'][data-part='root'] {
+  --section-title-size: var(--ggarry-font-size-md);
+  --section-title-ink: var(--ggarry-text-default);
+  gap: var(--ggarry-space-3);
+  font-family: var(--ggarry-font-family-sans);
+}
+[data-scope='section'][data-part='root'][data-rank='lead'] {
+  --section-title-size: var(--ggarry-font-size-lg);
+}
+[data-scope='section'][data-part='root'][data-rank='support'] {
+  --section-title-size: var(--ggarry-font-size-sm);
+  --section-title-ink: var(--ggarry-text-muted);
+}
+
+[data-scope='section'][data-part='root'] + [data-scope='section'][data-part='root'] {
+  margin-block-start: var(--ggarry-space-8);
+}
+
+[data-scope='section'][data-part='header'] {
+  gap: var(--ggarry-space-1) var(--ggarry-space-3);
+}
+
+[data-scope='section'][data-part='title'] {
+  margin: 0;
+  color: var(--section-title-ink);
+  font-size: var(--section-title-size);
+  font-weight: var(--ggarry-font-weight-semibold);
+  line-height: 1.4;
+}
+
+/* No reading cap here: a capped line fits beside the title and stops being the
+   line under it. A section is only as wide as the column it stands in. */
+[data-scope='section'][data-part='description'] {
+  margin: 0;
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-sm);
+  line-height: 1.5;
+}
+
+[data-scope='section'][data-part='actions'] {
+  gap: var(--ggarry-space-2);
+  margin-inline-start: auto;
+}
+
+[data-scope='section'][data-part='body'] {
+  gap: var(--ggarry-space-3);
+}

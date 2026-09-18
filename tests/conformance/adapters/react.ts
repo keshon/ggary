@@ -23,6 +23,13 @@ import {
   GridDetail,
   GridFilters,
   GridRowMenu,
+  Cluster,
+  ClusterSpacer,
+  Container,
+  Grid,
+  PageHeader,
+  Section,
+  Stack,
   Rail,
   Shell,
   Split,
@@ -63,6 +70,9 @@ import {
   type Adapter,
   type ButtonGroupProps,
   type GridRowsProps,
+  type FlowProps,
+  type PageHeaderProps,
+  type SectionProps,
   type ShellProps,
   type SplitProps,
   type StatusBarProps,
@@ -201,6 +211,37 @@ function ReactStatusBar(props: StatusBarProps) {
   )
 }
 
+function ReactFlow(props: FlowProps) {
+  const { kind, items, spacerAfter, ...options } = props
+  const Component = ({ stack: Stack, cluster: Cluster, grid: Grid, container: Container } as const)[kind] as ComponentType<any>
+  const children = items.flatMap((item, i) => [
+    createElement('p', { key: item }, item),
+    ...(spacerAfter === i + 1 ? [createElement(ClusterSpacer, { key: 'spacer' })] : []),
+  ])
+  return createElement(Component, options, ...children)
+}
+
+function ReactPageHeader(props: PageHeaderProps) {
+  const { context, actions, ...rest } = props
+  return createElement(PageHeader as ComponentType<any>, {
+    ...rest,
+    context: context ? createElement('p', null, context) : undefined,
+    actions: actions ? createElement(Fragment, null, ...actions.map((label) => createElement('button', { key: label, type: 'button' }, label))) : undefined,
+  })
+}
+
+function ReactSection(props: SectionProps) {
+  const { actions, body, ...rest } = props
+  return createElement(
+    Section as ComponentType<any>,
+    {
+      ...rest,
+      actions: actions ? createElement(Fragment, null, ...actions.map((label) => createElement('button', { key: label, type: 'button' }, label))) : undefined,
+    },
+    createElement('p', null, body)
+  )
+}
+
 export const react: Adapter = {
   name: 'react',
   supports: { controlled: true, refusal: true, linkRoot: true },
@@ -234,6 +275,9 @@ export const react: Adapter = {
   fileDrop: (props, target) => mount(FileDrop, props, target),
   breadcrumbs: (props, target) => mount(Breadcrumbs, props, target),
   gridRows: (props, target) => mount(ReactGridWithRows as ComponentType<any>, props, target),
+  flow: (props, target) => mount(ReactFlow as ComponentType<any>, props, target),
+  pageHeader: (props, target) => mount(ReactPageHeader as ComponentType<any>, props, target),
+  section: (props, target) => mount(ReactSection as ComponentType<any>, props, target),
   shell: (props, target) => mount(ReactShell as ComponentType<any>, props, target),
   split: (props, target) => mount(ReactSplit as ComponentType<any>, props, target),
   rail: (props, target) => mount(Rail as ComponentType<any>, props, target),

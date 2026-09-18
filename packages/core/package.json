@@ -192,6 +192,18 @@
     "./status-bar": {
       "types": "./src/components/status-bar/index.ts",
       "default": "./src/components/status-bar/index.ts"
+    },
+    "./page-header": {
+      "types": "./src/components/page-header/index.ts",
+      "default": "./src/components/page-header/index.ts"
+    },
+    "./section": {
+      "types": "./src/components/section/index.ts",
+      "default": "./src/components/section/index.ts"
+    },
+    "./flow": {
+      "types": "./src/components/flow/index.ts",
+      "default": "./src/components/flow/index.ts"
     }
   },
   "dependencies": {

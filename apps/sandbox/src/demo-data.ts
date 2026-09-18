@@ -301,3 +301,13 @@ export const HINT_SHELL =
 
 export const HINT_RAIL =
   'The sections as a narrow column: a glyph over a short name, so nobody has to learn the pictures. The current one has a fill and a mark at its edge; the ones marked end stand at the bottom.'
+
+export const HINT_FLOW =
+  'The top of a screen and the stretches under it. The page header says where you are (breadcrumbs above), what this is, and what can be done with it; its actions fall under the title when there is no room. A section is a heading with no box, and sections stand farther apart than the rows inside one. The grid of cards falls to fewer columns as the window narrows, with no breakpoint; the stack stretches the field to its width and leaves the button at its own.'
+
+export const weekTiles = [
+  { title: 'New leads', value: '1,284' },
+  { title: 'Won', value: '96' },
+  { title: 'Paid', value: 'RUB 4.2M' },
+  { title: 'Unassigned', value: '104,802' },
+]

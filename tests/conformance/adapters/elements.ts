@@ -15,6 +15,9 @@ import {
   type BreadcrumbsProps,
   type DataGridProps,
   type GridRowsProps,
+  type FlowProps,
+  type PageHeaderProps,
+  type SectionProps,
   type RailProps,
   type ShellProps,
   type SplitProps,
@@ -592,6 +595,69 @@ export const elements: Adapter = {
       update: async (patch) => apply(patch),
       unmount: async () => host.remove(),
     } satisfies Mounted<ButtonGroupProps>)
+  },
+
+  async flow(props, target) {
+    const host = document.createElement(`gg-${props.kind}`)
+    setAttr(host, 'gap', props.gap)
+    setAttr(host, 'justify', props.justify)
+    setAttr(host, 'columns', props.columns)
+    setAttr(host, 'size', props.size)
+    props.items.forEach((item, i) => {
+      const paragraph = document.createElement('p')
+      paragraph.textContent = item
+      host.append(paragraph)
+      if (props.spacerAfter === i + 1) {
+        const spacer = document.createElement('span')
+        spacer.toggleAttribute('data-spacer', true)
+        host.append(spacer)
+      }
+    })
+    target.append(host)
+    return track({ root: host, update: async () => {}, unmount: async () => host.remove() } satisfies Mounted<FlowProps>)
+  },
+
+  async pageHeader(props, target) {
+    const host = document.createElement('gg-page-header')
+    setAttr(host, 'heading', props.title)
+    setAttr(host, 'description', props.description)
+    if (props.headingLevel) host.setAttribute('heading-level', String(props.headingLevel))
+    if (props.context) {
+      const context = document.createElement('p')
+      context.slot = 'context'
+      context.textContent = props.context
+      host.append(context)
+    }
+    for (const label of props.actions ?? []) {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.slot = 'actions'
+      button.textContent = label
+      host.append(button)
+    }
+    target.append(host)
+    return track({ root: host, update: async () => {}, unmount: async () => host.remove() } satisfies Mounted<PageHeaderProps>)
+  },
+
+  async section(props, target) {
+    const host = document.createElement('gg-section')
+    setAttr(host, 'heading', props.title)
+    setAttr(host, 'description', props.description)
+    setAttr(host, 'rank', props.rank)
+    if (props.region) host.setAttribute('region', '')
+    if (props.headingLevel) host.setAttribute('heading-level', String(props.headingLevel))
+    for (const label of props.actions ?? []) {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.slot = 'actions'
+      button.textContent = label
+      host.append(button)
+    }
+    const body = document.createElement('p')
+    body.textContent = props.body
+    host.append(body)
+    target.append(host)
+    return track({ root: host, update: async () => {}, unmount: async () => host.remove() } satisfies Mounted<SectionProps>)
   },
 
   async shell(props, target) {

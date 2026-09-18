@@ -54,3 +54,4 @@ export { default as EmptyState } from './components/empty-state/EmptyState.svelt
 export { default as Note } from './components/note/Note.svelte'
 export { default as Panel } from './components/panel/Panel.svelte'
 export { Rail, Shell, Split, StatusBar, StatusBarItem, StatusBarSpacer } from './components/layout'
+export { Cluster, ClusterSpacer, Container, Grid, PageHeader, Section, Stack } from './components/layout'

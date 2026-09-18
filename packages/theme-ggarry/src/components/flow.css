@@ -1,0 +1,43 @@
+/* ==========================================================================
+   GGarry — flow
+
+   Three steps of gap for each primitive, and nothing between them: "a bit
+   more" is not an available decision. A stack's loose step is the distance
+   between sections of a screen; its default is the distance between the
+   panels or fields of one.
+   ========================================================================== */
+
+[data-scope='stack'][data-part='root'] { gap: var(--ggarry-space-4); }
+[data-scope='stack'][data-part='root'][data-gap='tight'] { gap: var(--ggarry-space-2); }
+[data-scope='stack'][data-part='root'][data-gap='loose'] { gap: var(--ggarry-space-8); }
+
+[data-scope='cluster'][data-part='root'] { gap: var(--ggarry-space-3); }
+[data-scope='cluster'][data-part='root'][data-gap='tight'] { gap: var(--ggarry-space-2); }
+[data-scope='cluster'][data-part='root'][data-gap='loose'] { gap: var(--ggarry-space-5); }
+
+/* The column never gets narrower than it can be read at, nor wider than the
+   frame: min() keeps a single column inside a narrow screen. */
+[data-scope='grid'][data-part='root'] {
+  --grid-min: 260px;
+  gap: var(--ggarry-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(min(var(--grid-min), 100%), 1fr));
+}
+[data-scope='grid'][data-part='root'][data-columns='tight'] { --grid-min: 180px; }
+[data-scope='grid'][data-part='root'][data-columns='wide'] { --grid-min: 380px; }
+[data-scope='grid'][data-part='root'][data-gap='tight'] { gap: var(--ggarry-space-2); }
+[data-scope='grid'][data-part='root'][data-gap='loose'] { gap: var(--ggarry-space-6); }
+
+/* The auto margins that centre a container live here, not in the structure
+   layer: a theme's reset stands above it and would zero them. */
+[data-scope='container'][data-part='root'] {
+  max-inline-size: 72rem;
+  margin-inline: auto;
+  padding-inline: var(--ggarry-space-6);
+}
+[data-scope='container'][data-part='root'][data-size='narrow'] { max-inline-size: 44rem; }
+[data-scope='container'][data-part='root'][data-size='prose'] { max-inline-size: calc(68ch + 2 * var(--ggarry-space-6)); }
+[data-scope='container'][data-part='root'][data-size='full'] { max-inline-size: none; }
+
+@media (width < 40rem) {
+  [data-scope='container'][data-part='root'] { padding-inline: var(--ggarry-space-4); }
+}

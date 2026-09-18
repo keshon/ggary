@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two design languages on top of it.
-Forty-eight components — DataGrid, Shell, Split, Rail, StatusBar, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Fifty-four components — DataGrid, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 2660 tests, 1055 of them in headless Chrome
+npm test         # 2717 tests, 1082 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1554,6 +1554,76 @@ Found on the way:
   merges identical interface declarations, so nothing complained. Thirty-two
   duplicates are gone.
 
+## PageHeader, Section, Container, Stack, Cluster and Grid
+
+What goes inside the work area: the top of a screen, the stretches under it,
+and the four primitives a screen is laid out with.
+
+```tsx
+<Container>
+  <PageHeader
+    context={<Breadcrumbs items={crumbs} />}
+    title="Leads"
+    description="Everyone the sales team is talking to."
+    actions={<Button emphasis="high">New lead</Button>}
+  />
+  <Section title="This week" actions={<Button size="sm" emphasis="minimal">All weeks</Button>}>
+    <Grid columns="tight">{tiles}</Grid>
+  </Section>
+  <Section title="Your details" rank="support" description="Shown to the leads you write to.">
+    <Stack>
+      <Field label="Signature"><Input /></Field>
+      <Button emphasis="high">Save</Button>
+    </Stack>
+  </Section>
+</Container>
+```
+
+**PageHeader** says where you are (breadcrumbs in `context`, above), what this
+is (the title — an `h1` by default — and a line the title is described by), and
+what can be done with it (`actions`, at the far edge). When the screen is too
+narrow for both, the actions fall under the title rather than squeezing it. It is
+a `div`, not a `header`: outside a `main` a `header` would be the page's banner,
+and the shell's header already is.
+
+**Section** is a stretch of the page under a heading, with no box — where a
+Panel is a place with an edge. Its heading reads rank as a panel's does, so a
+section and a panel of the same rank sound alike. Two sections stand a full loose
+step apart, farther than any rows inside one, or the boundary between them would
+not read. It is a landmark only when asked (`region`): a screen of ten sections
+is not ten regions.
+
+**Stack**, **Cluster**, **Grid** and **Container** hold no state. Each has three
+steps of gap named by intent — tight, default, loose — and nothing between:
+Instrument's refusal of spacing utilities, kept. A stack is a column; a cluster a
+row that wraps, with a `ClusterSpacer` to send the rest to the far end; a grid
+fills the width with columns no narrower than `tight`, `default` or `wide` allows,
+and falls to fewer as it narrows, with no breakpoint; a container keeps the
+content's width under a ceiling (`narrow` for a form, `prose` for reading, `full`
+for a board) and is the region the components inside answer to with container
+queries.
+
+A stack stretches what it holds to its width — fields, panels and cards want
+exactly that — except what is sized by its content: a button, a badge, a chip,
+a button group keeps its own width. The column says so on a channel, not a list:
+it sets `--gg-flow-self: start` on each child, a custom property registered as
+not inheriting, so it reaches the child and not the child's insides, and the
+components sized by their content read it for their `align-self`. A button in a
+row inside a stack is centred in its row, not sent to the row's top. Outside a
+column the channel is unset and nothing changes.
+
+Found on the way:
+
+- **A container had no width to cap.** A custom element is inline until a
+  stylesheet says otherwise, and `max-inline-size` does nothing to an inline box:
+  `<gg-container size="narrow">` was as wide as the window. The structure layer
+  now makes it a block; a browser test measures it.
+- **A section's line stood beside its heading.** The description was given the
+  whole row to force a line break, and also a reading cap of 68 characters, which
+  made it narrow enough to fit next to the title after all. A section is only as
+  wide as its column; the cap is gone, and a browser test checks the line is
+  under the heading.
+
 ## Layering inside core
 
 ```
@@ -1762,10 +1832,10 @@ one needs JS anyway; the children themselves stay the author's.
 | contract | node | `icons.contract.test.ts` | 258 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 975 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 996 tests, 26 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 34 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 975 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 996 tests, 17 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
@@ -1773,7 +1843,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
-| browser | Chrome | `layout.browser.test.ts` | 10 tests. The column beside the work on a wide screen with only the work scrolling, the drawer out of the tab order until opened and then over an inert page, the window growing past the breakpoint closing it, a bar lying down under the header, a separator dragged by a pointer with its line under it and stopping for the other pane, the keyboard moving it, a status strip staying one line with air around a button in it, and a button group of custom elements standing flush. |
+| browser | Chrome | `layout.browser.test.ts` | 16 tests. The column beside the work on a wide screen with only the work scrolling, the drawer out of the tab order until opened and then over an inert page, the window growing past the breakpoint closing it, a bar lying down under the header, a separator dragged by a pointer with its line under it and stopping for the other pane, the keyboard moving it, a status strip staying one line with air around a button in it, a button group of custom elements standing flush; a stack stretching a field and not a button, a grid falling to fewer columns, a container centred under its ceiling, a page header's actions falling under its title, a section's line under its heading, and sections farther apart than their rows. |
 | browser | Chrome | `data-grid-rows.browser.test.ts` | 6 tests. A double click and a click elsewhere saving, Tab walking the editable cells, an edit surviving its row scrolled out of view (elements, and React under StrictMode), the row menu standing at the pointer and handing the focus back, a press on another row while the sheet is open. |
 | dom | jsdom | `react-strict.dom.test.ts` | 1 test. The grid under React StrictMode, which unmounts and remounts once, still loads. |
 | browser | Chrome | `navigation.browser.test.ts` | 8 tests. A toolbar under the real Tab and arrow keys — wrapping, skipping what is disabled, returning to the tool last used — a field inside it keeping its own arrows, the spacer measured against the strip's inset, the drawn chevron that is in no text, and a step's bar spanning its item. |
@@ -1900,8 +1970,12 @@ Real, and deliberately left open:
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that is Instrument's position, and it stays available.
-- **No page header, section or container yet**, nor the flow primitives (stack,
-  cluster, grid) Instrument has. They are the second half of the layout wave.
+- **The flow channel knows eight components.** Button, badge, chip, button group,
+  avatar, avatar group, spinner and segmented control read `--gg-flow-self`; a
+  component of your own sized by its content should read it too, or a stack will
+  stretch it.
+- **A grid's column widths are three steps.** No arbitrary minimum: a width that
+  is not a step is a decision the kit does not offer.
 - **The drawer's breakpoint is fixed at 60rem.** A media query cannot read a
   custom property, so a theme cannot move it; change `SHELL_NARROW` and the
   structure layer's `@media` together.

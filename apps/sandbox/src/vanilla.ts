@@ -21,7 +21,7 @@ import {
 } from './leads'
 import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
 import type { GgDataGridElement, GgGridDetailElement, GgGridMenuElement, GgAvatarGroupElement, GgCheckboxElement, GgSliderElement, GgChipGroupElement, GgMenuElement, GgMenubarElement, GgRadioGroupElement, GgSelectElement } from '@ggary/elements'
-import { agentsText, badgeTones, crumbs, densities, importSteps, layoutLeads, navGroups, railItems, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, layoutLeads, navGroups, railItems, weekTiles, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 const app = document.getElementById('app')!
 
@@ -625,6 +625,30 @@ app.innerHTML = `
       <div><p>The section's content.</p></div>
     </div>
     <p class="hint">${HINT_RAIL}</p>
+
+    <h2 style="margin-top: 32px">Page header, sections and flow</h2>
+    <div class="flow-demo">
+      <gg-page-header heading="Leads" description="Everyone the sales team is talking to, from the first call to the last invoice.">
+        <gg-breadcrumbs slot="context" label="Breadcrumbs">
+          ${crumbs.map((crumb) => (crumb.href ? `<a href="${crumb.href}">${crumb.label}</a>` : `<span>${crumb.label}</span>`)).join('')}
+        </gg-breadcrumbs>
+        <gg-button slot="actions" emphasis="low"><button>Import</button></gg-button>
+        <gg-button slot="actions" emphasis="high"><button>New lead</button></gg-button>
+      </gg-page-header>
+      <gg-section heading="This week">
+        <gg-button slot="actions" size="sm" emphasis="minimal"><button>All weeks</button></gg-button>
+        <gg-grid columns="tight">
+          ${weekTiles.map((tile) => `<gg-card heading="${tile.title}">${tile.value}</gg-card>`).join('')}
+        </gg-grid>
+      </gg-section>
+      <gg-section heading="Your details" rank="support" description="Shown to the leads you write to.">
+        <gg-stack>
+          <gg-field label="Signature"><input value="Daria M., sales"></gg-field>
+          <gg-button emphasis="high"><button>Save</button></gg-button>
+        </gg-stack>
+      </gg-section>
+    </div>
+    <p class="hint">${HINT_FLOW}</p>
   </section>
 
   <section id="fields">

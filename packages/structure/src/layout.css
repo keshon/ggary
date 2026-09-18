@@ -244,3 +244,119 @@
 [data-scope='status-bar'][data-part='spacer'] {
   flex: 1 1 auto;
 }
+
+/* --- flow ----------------------------------------------------------------- */
+
+/* The channel a column speaks on to what it holds. It does not inherit, so it
+   reaches exactly the column's children and not their insides: a button in a
+   row inside a stack is centred in its row, not sent to the row's top. */
+@property --gg-flow-self {
+  syntax: '*';
+  inherits: false;
+}
+
+[data-scope='stack'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+:is([data-scope='stack'][data-part='root'], [data-scope='section'][data-part='body']) > * {
+  --gg-flow-self: start;
+}
+/* Sized by their content: they keep their width in a column that stretches the
+   rest. The components read the channel; the column never lists them. */
+:is(
+    [data-scope='button'],
+    [data-scope='badge'],
+    [data-scope='chip'],
+    [data-scope='button-group'],
+    [data-scope='avatar'],
+    [data-scope='avatar-group'],
+    [data-scope='spinner'],
+    [data-scope='segmented-control']
+  )[data-part='root'],
+:is(gg-button, gg-badge, gg-chip, gg-button-group, gg-avatar, gg-avatar-group, gg-spinner, gg-segmented-control) {
+  align-self: var(--gg-flow-self, auto);
+}
+
+[data-scope='cluster'][data-part='root'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  min-inline-size: 0;
+}
+[data-scope='cluster'][data-part='root'][data-justify='end'] {
+  justify-content: flex-end;
+}
+[data-scope='cluster'][data-part='root'][data-justify='between'] {
+  justify-content: space-between;
+}
+[data-scope='cluster'][data-part='spacer'] {
+  flex: 1 1 0;
+}
+
+/* The columns are the theme's: how narrow a card may get is a matter of look. */
+[data-scope='grid'][data-part='root'] {
+  display: grid;
+  min-inline-size: 0;
+}
+
+[data-scope='container'][data-part='root'] {
+  /* A custom element is inline until told otherwise, and an inline box has no width to cap. */
+  display: block;
+  box-sizing: border-box;
+  inline-size: 100%;
+  container: content / inline-size;
+}
+[data-scope='container'][data-part='root'][data-size='full'] {
+  max-inline-size: none;
+}
+
+/* --- page header ---------------------------------------------------------- */
+
+[data-scope='page-header'][data-part='root'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+[data-scope='page-header'][data-part='context'] {
+  flex: 1 0 100%;
+  min-inline-size: 0;
+}
+[data-scope='page-header'][data-part='main'] {
+  flex: 1 1 20rem;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='page-header'][data-part='actions'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* --- section -------------------------------------------------------------- */
+
+[data-scope='section'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='section'][data-part='header'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+[data-scope='section'][data-part='description'] {
+  flex: 1 0 100%;
+}
+[data-scope='section'][data-part='actions'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+[data-scope='section'][data-part='body'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
