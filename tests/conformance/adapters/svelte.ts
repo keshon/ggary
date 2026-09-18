@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, Button, Calendar, Cascader, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, Button, Calendar, Cascader, Tree, Progress, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
@@ -16,6 +16,7 @@ import PopoverWithContent from './PopoverWithContent.svelte'
 import TooltipWithTrigger from './TooltipWithTrigger.svelte'
 import MenuWithTrigger from './MenuWithTrigger.svelte'
 import TabsWithPanels from './TabsWithPanels.svelte'
+import AccordionWithPanels from './AccordionWithPanels.svelte'
 import DisplayWithContent from './DisplayWithContent.svelte'
 import FieldsetWithGroup from './FieldsetWithGroup.svelte'
 import { type Adapter, type ButtonProps, type CheckboxProps, type Mounted, track } from '../harness'
@@ -97,6 +98,9 @@ export const svelte: Adapter = {
   buttonGroup: (props, target) => mountSvelte(GroupWithControl as Component<any>, props, target, (p) => ({ ...p, group: 'buttons' })),
   breadcrumbs: (props, target) => mountSvelte(Breadcrumbs as Component<any>, props, target),
   gridRows: (props, target) => mountSvelte(GridWithRows as Component<any>, props, target),
+  accordion: (props, target) => mountSvelte(AccordionWithPanels as Component<any>, props, target),
+  tree: (props, target) => mountSvelte(Tree as Component<any>, props, target),
+  progress: (props, target) => mountSvelte(Progress as Component<any>, props, target),
   cascader: (props, target) => mountSvelte(Cascader as Component<any>, props, target),
   calendar: (props, target) => mountSvelte(Calendar as Component<any>, props, target),
   datePicker: (props, target) => mountSvelte(DatePicker as Component<any>, props, target),

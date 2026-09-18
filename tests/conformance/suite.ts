@@ -17,6 +17,7 @@ import { dataGridConformance, gridRowsConformance, gridToolsConformance } from '
 import { flowConformance, layoutConformance } from './layout.spec'
 import { comboboxConformance } from './combobox.spec'
 import { cascaderConformance } from './cascader.spec'
+import { disclosureConformance } from './disclosure.spec'
 import { calendarConformance, datePickerConformance } from './date-picker.spec'
 import { breadcrumbsConformance, navConformance, paginationConformance, stepsConformance, toolbarConformance } from './navigation.spec'
 import { menubarConformance } from './menubar.spec'
@@ -70,6 +71,7 @@ export function runConformance() {
       flowConformance(adapter)
       comboboxConformance(adapter)
       cascaderConformance(adapter)
+      disclosureConformance(adapter)
       calendarConformance(adapter)
       datePickerConformance(adapter)
       checkboxGroupConformance(adapter)

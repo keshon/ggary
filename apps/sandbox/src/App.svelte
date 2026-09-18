@@ -33,6 +33,9 @@
     Combobox,
     DatePicker,
     Cascader,
+    Accordion,
+    Tree,
+    Progress,
     Grid,
     PageHeader,
     Section,
@@ -92,7 +95,7 @@
     type Lead,
   } from './leads'
   import { attachColumnStorage, attachQueryToUrl } from '@ggary/core/data-grid'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -111,6 +114,17 @@
   let comboLog = $state('—')
   let dateLog = $state('—')
   let placeLog = $state('—')
+  let boardLog = $state('—')
+  let imported = $state<number | null>(0)
+  const runImport = () => {
+    imported = null
+    let done = 0
+    const timer = setInterval(() => {
+      done += 7
+      imported = Math.min(done, 120)
+      if (done >= 120) clearInterval(timer)
+    }, 250)
+  }
   const searchLeads = debounce((text: string) => leadGrid?.send({ type: 'SET_SEARCH', search: text }))
   $effect(() => {
     if (!leadGrid) return
@@ -980,6 +994,29 @@ invalid  ${taken}`}</pre>
   </div>
   <pre class="state">{placeLog}</pre>
   <p class="hint">{HINT_CASCADER}</p>
+</section>
+
+<section id="disclosure">
+  <h2>Accordion, tree and progress</h2>
+  <div class="disclosure-demo">
+    <Accordion items={leadSections} defaultValue={['contact']}>
+      {#snippet panel(item)}{leadSectionText[item.value]}{/snippet}
+    </Accordion>
+    <div class="tree-frame">
+      <Tree items={projectTree} label="Boards" defaultExpanded={['sales']} defaultValue={['sales/leads/new']} onValueChange={(value) => (boardLog = `board: ${value.join(', ')}`)} />
+    </div>
+    <div class="progress-stack">
+      <Progress label="Importing leads" value={imported} max={120} valueText={(value) => `${value} of 120`} tone={imported === 120 ? 'ok' : 'running'} />
+      <Progress label="Sync with 1C" value={64} tone="error" valueText="Failed at 64%" />
+      <div class="progress-rings">
+        <Progress shape="ring" size="lg" value={73} label="Storage" />
+        <Progress shape="ring" value={imported} max={120} label="Import" hideLabel />
+        <Button onclick={runImport}>Run import</Button>
+      </div>
+    </div>
+  </div>
+  <pre class="state">{boardLog}</pre>
+  <p class="hint">{HINT_DISCLOSURE}</p>
 </section>
 
 <section id="fields">

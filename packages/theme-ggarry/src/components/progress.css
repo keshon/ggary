@@ -1,0 +1,86 @@
+/* ==========================================================================
+   GGarry — progress
+
+   A thin rounded bar, or a ring: the amount in the tone's fill over a quiet
+   track. A job running is the accent; one done, stalled or failed says so in
+   the status colours. The fill owes 3:1 against the surface — it is the
+   message — and the track only draws the room out.
+   ========================================================================== */
+
+[data-scope='progress'][data-part='root'] {
+  --progress-fill: var(--ggarry-bg-accent);
+  --progress-room: var(--ggarry-border-default);
+  --progress-thickness: 6px;
+  --progress-ring: 24px;
+  gap: var(--ggarry-space-2);
+  font-family: var(--ggarry-font-family-sans);
+  color: var(--ggarry-text-default);
+}
+[data-scope='progress'][data-part='root'][data-size='sm'] { --progress-thickness: 4px; --progress-ring: 16px; }
+[data-scope='progress'][data-part='root'][data-size='lg'] { --progress-thickness: 8px; --progress-ring: 48px; }
+[data-scope='progress'][data-part='root'][data-shape='ring'][data-size='sm'] { --progress-thickness: 2px; }
+[data-scope='progress'][data-part='root'][data-shape='ring'][data-size='md'] { --progress-thickness: 3px; }
+[data-scope='progress'][data-part='root'][data-shape='ring'][data-size='lg'] { --progress-thickness: 4px; }
+
+[data-scope='progress'][data-part='root'][data-tone='ok'] { --progress-fill: var(--ggarry-text-success); }
+[data-scope='progress'][data-part='root'][data-tone='warn'] { --progress-fill: var(--ggarry-text-warning); }
+[data-scope='progress'][data-part='root'][data-tone='error'] { --progress-fill: var(--ggarry-bg-danger); }
+
+[data-scope='progress'][data-part='header'] {
+  gap: var(--ggarry-space-3);
+  font-size: var(--ggarry-font-size-sm);
+}
+[data-scope='progress'][data-part='label'] {
+  font-weight: var(--ggarry-font-weight-medium);
+}
+[data-scope='progress'][data-part='root'][data-shape='ring'] [data-part='label'] {
+  font-size: var(--ggarry-font-size-sm);
+}
+[data-scope='progress'][data-part='value-text'] {
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-sm);
+}
+
+/* The bar. */
+[data-scope='progress'][data-part='root'][data-shape='bar'] [data-part='track'] {
+  block-size: var(--progress-thickness);
+  border-radius: var(--ggarry-radius-full);
+  background: var(--progress-room);
+}
+[data-scope='progress'][data-part='root'][data-shape='bar'] [data-part='range'] {
+  border-radius: inherit;
+  background: var(--progress-fill);
+  transition: scale var(--ggarry-duration-normal) ease;
+}
+
+/* The ring: a border draws the room, and the range's conic sweep is cut to the
+   same band by a mask, so the value text in the middle is left alone. */
+[data-scope='progress'][data-part='root'][data-shape='ring'] [data-part='track'] {
+  inline-size: var(--progress-ring);
+}
+[data-scope='progress'][data-part='root'][data-shape='ring'] [data-part='track']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: var(--progress-thickness) solid var(--progress-room);
+  border-radius: 50%;
+}
+[data-scope='progress'][data-part='root'][data-shape='ring'] [data-part='range'] {
+  background: conic-gradient(var(--progress-fill) calc(var(--gg-progress, 0.25) * 1turn), transparent 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - var(--progress-thickness) - 0.5px), #000 calc(100% - var(--progress-thickness)));
+}
+[data-scope='progress'][data-part='root'][data-shape='ring'] [data-part='value-text'] {
+  position: relative;
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+
+@media (forced-colors: active) {
+  [data-scope='progress'][data-part='root'] { --progress-fill: Highlight; --progress-room: GrayText; }
+  [data-scope='progress'][data-part='range'] { forced-color-adjust: none; }
+  [data-scope='progress'][data-part='root'][data-shape='ring'] [data-part='track'] { forced-color-adjust: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='progress'][data-part='range'] { transition: none; }
+}

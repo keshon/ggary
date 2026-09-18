@@ -27,6 +27,8 @@
     "--gg-grid-header-height": "written by core onto a data grid's frame: the measured height of its header row",
     "--gg-split-size": "written by core onto a split's frame: the primary pane's size",
     "--gg-split-rest-min": "written by core onto a split's frame: the least the other pane keeps",
+    "--gg-tree-level": "set by core on each tree row: its depth, from 1, for the indent",
+    "--gg-progress": "set by core on a progress track: how far along, from 0 to 1",
     "--gg-flow-self": "set by a stack or a section on each child: how a component sized by its content stands in the column (it reads it, with auto outside one)",
     "--gg-icon": "mapped from data-icon by @ggary/icons; a theme never declares it on the root"
   },

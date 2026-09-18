@@ -383,3 +383,43 @@ export const teams = [
 
 export const HINT_CASCADER =
   'A choice from a tree, one level to a column. Open it with a press or ArrowDown; Up and Down walk a column, Right goes into the children and Left back out, Enter chooses. A press on a branch opens it, a press on a leaf chooses. The button reads the whole path; the form gets the leaf. The team picker may stop at any level. Where the columns outrun the screen, the card scrolls sideways to the one the keyboard is on.'
+
+/** The accordion's sections: a lead's card, as a sales rep reads it. */
+export const leadSections = [
+  { value: 'contact', label: 'Contact', description: 'Who to call, and when' },
+  { value: 'deal', label: 'Deal', description: 'Stage, amount, next step' },
+  { value: 'history', label: 'History' },
+  { value: 'archive', label: 'Archived notes', disabled: true },
+]
+
+export const leadSectionText: Record<string, string> = {
+  contact: 'Aigul Safina, head of procurement. Mornings, Kazan time; she prefers a call to an email.',
+  deal: 'Negotiation, 1.2M ₽. The next step is the revised offer, due Friday.',
+  history: 'First contact at the Innoprom fair in July; two demos since, the second with their IT lead.',
+  archive: '',
+}
+
+/** The tree: a project's boards and columns, as a sidebar shows them. */
+export const projectTree = [
+  {
+    value: 'sales',
+    label: 'Sales',
+    children: [
+      { value: 'sales/leads', label: 'Leads', children: [{ value: 'sales/leads/new', label: 'New' }, { value: 'sales/leads/qualified', label: 'Qualified' }, { value: 'sales/leads/lost', label: 'Lost' }] },
+      { value: 'sales/deals', label: 'Deals' },
+    ],
+  },
+  {
+    value: 'product',
+    label: 'Product',
+    children: [
+      { value: 'product/roadmap', label: 'Roadmap' },
+      { value: 'product/bugs', label: 'Bugs', children: [{ value: 'product/bugs/triage', label: 'Triage' }, { value: 'product/bugs/fixed', label: 'Fixed' }] },
+    ],
+  },
+  { value: 'hr', label: 'HR', disabled: true, children: [{ value: 'hr/hiring', label: 'Hiring' }] },
+  { value: 'wiki', label: 'Wiki' },
+]
+
+export const HINT_DISCLOSURE =
+  'The accordion: one section at a time, a press or Enter opens it, Up and Down walk the buttons. A closed section is still in the page: press Ctrl+F and search for "Innoprom" — the browser opens History to show it. The tree: Up and Down walk the rows, Right opens a branch and steps in, Left steps out and closes it, Home and End, * opens every sibling, typing jumps to a name. A press on a row chooses it, a press on its chevron only opens it. Progress: run the import to watch a bar and a ring move; a failed sync stays red.'

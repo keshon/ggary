@@ -74,10 +74,72 @@
 [data-scope='skeleton'][data-part='bar'][data-shape='line'] { inline-size: 100%; }
 [data-scope='skeleton'][data-part='bar'][data-shape='short'] { inline-size: 62%; }
 
+/* Progress: the amount is one number on the track, --gg-progress, 0 to 1. A
+   bar's range scales by it from the start edge; a ring's range is a conic
+   sweep of it. Unknown, a bar sends a piece of the range across, a ring turns. */
+[data-scope='progress'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='progress'][data-part='root'][data-shape='ring'] {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  vertical-align: middle;
+}
+[data-scope='progress'][data-part='header'] {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+[data-scope='progress'][data-part='value-text'] {
+  font-variant-numeric: tabular-nums;
+}
+[data-scope='progress'][data-part='track'] {
+  position: relative;
+  overflow: hidden;
+}
+[data-scope='progress'][data-part='root'][data-shape='bar'] [data-part='range'] {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  scale: var(--gg-progress, 0) 1;
+}
+[data-scope='progress'][data-part='root'][data-shape='bar'] [data-part='range']:dir(rtl) {
+  transform-origin: right center;
+}
+[data-scope='progress'][data-part='root'][data-shape='bar'] [data-part='range'][data-state='indeterminate'] {
+  inline-size: 40%;
+  scale: 1;
+  animation: gg-progress-slide 1.4s ease-in-out infinite;
+}
+[data-scope='progress'][data-part='root'][data-shape='ring'] [data-part='track'] {
+  display: grid;
+  flex: none;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+[data-scope='progress'][data-part='root'][data-shape='ring'] [data-part='range'] {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(currentColor calc(var(--gg-progress, 0.25) * 1turn), transparent 0);
+}
+[data-scope='progress'][data-part='root'][data-shape='ring'] [data-part='range'][data-state='indeterminate'] {
+  animation: gg-spin 0.9s linear infinite;
+}
+@keyframes gg-progress-slide {
+  from { translate: -100% 0; }
+  to { translate: 250% 0; }
+}
+
 /* Endless activity is slowed under reduced motion, never stopped: a stopped
    spinner says the work has halted. Every theme's motion rules may override. */
 @media (prefers-reduced-motion: reduce) {
   [data-scope='spinner'][data-part='arc'] { animation-duration: 2.4s; }
+  [data-scope='progress'][data-part='range'][data-state='indeterminate'] { animation-duration: 3.2s; }
 }
 
 @media print {

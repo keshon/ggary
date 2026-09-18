@@ -220,6 +220,18 @@
     "./cascader": {
       "types": "./src/components/cascader/index.ts",
       "default": "./src/components/cascader/index.ts"
+    },
+    "./accordion": {
+      "types": "./src/components/accordion/index.ts",
+      "default": "./src/components/accordion/index.ts"
+    },
+    "./tree": {
+      "types": "./src/components/tree/index.ts",
+      "default": "./src/components/tree/index.ts"
+    },
+    "./progress": {
+      "types": "./src/components/progress/index.ts",
+      "default": "./src/components/progress/index.ts"
     }
   },
   "dependencies": {

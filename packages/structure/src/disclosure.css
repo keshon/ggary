@@ -1,0 +1,84 @@
+/* Things that open in place: the accordion's sections and the tree's branches. Geometry only. */
+
+[data-scope='accordion'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='accordion'][data-part='heading'] {
+  margin: 0;
+}
+/* The label and its description stack in the first column; the chevron stands in the second, across both. */
+[data-scope='accordion'][data-part='trigger'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  inline-size: 100%;
+  margin: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+[data-scope='accordion'][data-part='trigger'][aria-disabled='true'] {
+  cursor: default;
+}
+[data-scope='accordion']:is([data-part='label'], [data-part='description']) {
+  grid-column: 1;
+}
+[data-scope='accordion'][data-part='indicator'] {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  flex: none;
+}
+/* The content carries no box of its own: a section hidden `until-found` is laid
+   out, only not painted, and a padding here would stand open under a closed
+   button. The body carries the room. */
+[data-scope='accordion'][data-part='content'][hidden]:not([hidden='until-found']) {
+  display: none;
+}
+
+/* A tree scrolls in itself when it is given a height; a row is measured
+   against it to stay in view. */
+[data-scope='tree'][data-part='root'] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  overflow: auto;
+}
+[data-scope='tree'][data-part='item'] {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  cursor: pointer;
+  user-select: none;
+}
+[data-scope='tree'][data-part='item'][data-disabled] {
+  cursor: default;
+}
+[data-scope='tree'][data-part='toggle'] {
+  flex: none;
+}
+/* A leaf keeps the chevron's room, so its text lines up with a branch's. */
+[data-scope='tree'][data-part='toggle'][data-leaf] {
+  visibility: hidden;
+}
+[data-scope='tree'][data-part='toggle'][data-state='open'] {
+  rotate: 90deg;
+}
+[data-scope='tree'][data-part='toggle'][data-state='closed']:dir(rtl) {
+  scale: -1 1;
+}
+[data-scope='tree'][data-part='item-text'] {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+[data-scope='tree'][data-part='item-indicator'] {
+  flex: none;
+}

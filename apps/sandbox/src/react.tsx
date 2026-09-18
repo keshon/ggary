@@ -45,6 +45,9 @@ import {
   Combobox,
   DatePicker,
   Cascader,
+  Accordion,
+  Tree,
+  Progress,
   Grid,
   PageHeader,
   Section,
@@ -96,7 +99,7 @@ import {
   ToolbarSpacer,
   Tooltip,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -116,6 +119,17 @@ function App() {
   const [comboLog, setComboLog] = useState('—')
   const [dateLog, setDateLog] = useState('—')
   const [placeLog, setPlaceLog] = useState('—')
+  const [boardLog, setBoardLog] = useState('—')
+  const [imported, setImported] = useState<number | null>(0)
+  const runImport = () => {
+    setImported(null)
+    let done = 0
+    const timer = setInterval(() => {
+      done += 7
+      setImported(Math.min(done, 120))
+      if (done >= 120) clearInterval(timer)
+    }, 250)
+  }
   const searchLeads = useMemo(() => debounce((text: string) => leadGrid?.send({ type: 'SET_SEARCH', search: text })), [leadGrid])
   useEffect(() => {
     if (!leadGrid) return
@@ -1097,6 +1111,29 @@ function App() {
         </div>
         <pre className="state">{placeLog}</pre>
         <p className="hint">{HINT_CASCADER}</p>
+      </section>
+
+      <section id="disclosure">
+        <h2>Accordion, tree and progress</h2>
+        <div className="disclosure-demo">
+          <Accordion items={leadSections} defaultValue={['contact']}>
+            {(item) => leadSectionText[item.value]}
+          </Accordion>
+          <div className="tree-frame">
+            <Tree items={projectTree} label="Boards" defaultExpanded={['sales']} defaultValue={['sales/leads/new']} onValueChange={(value) => setBoardLog(`board: ${value.join(', ')}`)} />
+          </div>
+          <div className="progress-stack">
+            <Progress label="Importing leads" value={imported} max={120} valueText={(value) => `${value} of 120`} tone={imported === 120 ? 'ok' : 'running'} />
+            <Progress label="Sync with 1C" value={64} tone="error" valueText="Failed at 64%" />
+            <div className="progress-rings">
+              <Progress shape="ring" size="lg" value={73} label="Storage" />
+              <Progress shape="ring" value={imported} max={120} label="Import" hideLabel />
+              <Button onClick={runImport}>Run import</Button>
+            </div>
+          </div>
+        </div>
+        <pre className="state">{boardLog}</pre>
+        <p className="hint">{HINT_DISCLOSURE}</p>
       </section>
 
       <section id="fields">

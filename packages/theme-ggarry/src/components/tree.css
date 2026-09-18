@@ -1,0 +1,79 @@
+/* ==========================================================================
+   GGarry — tree
+
+   Compact rows, each level stepped in by 16 pixels, the chevron in the step
+   so the text of a branch and of its children's leaves line up with each
+   other. The chosen row takes the accent's tint, as the cascader's path does;
+   the focus ring is inset, so a tree that scrolls does not clip it.
+   ========================================================================== */
+
+[data-scope='tree'][data-part='root'] {
+  --tree-indent: 16px;
+  gap: 1px;
+  padding: 2px;
+  font-family: var(--ggarry-font-family-sans);
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='tree'][data-part='item'] {
+  gap: var(--ggarry-space-1);
+  min-block-size: 30px;
+  padding-inline: calc(var(--ggarry-space-1) + (var(--gg-tree-level, 1) - 1) * var(--tree-indent)) var(--ggarry-space-2);
+  border-radius: var(--ggarry-radius-md);
+  font-size: var(--ggarry-font-size-md);
+  outline: none;
+}
+[data-scope='tree'][data-part='item']:hover:not([data-disabled]):not([data-chosen]) {
+  background: var(--ggarry-bg-subtle);
+}
+[data-scope='tree'][data-part='item'][data-chosen] {
+  background: var(--ggarry-bg-accent-subtle);
+  color: var(--ggarry-text-accent);
+}
+[data-scope='tree'][data-part='item']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: calc(-1 * var(--ggarry-focus-ring-width));
+}
+[data-scope='tree'][data-part='item'][data-disabled] {
+  color: var(--ggarry-text-subtle);
+}
+
+/* The chevron is a press target of its own: a little wider than it looks. */
+[data-scope='tree'][data-part='toggle'] {
+  inline-size: 12px;
+  block-size: 12px;
+  padding: 4px;
+  box-sizing: content-box;
+  border-radius: var(--ggarry-radius-sm);
+  color: var(--ggarry-text-muted);
+  transition: rotate var(--ggarry-duration-fast) ease;
+}
+[data-scope='tree'][data-part='toggle']:hover:not([data-leaf]) {
+  color: var(--ggarry-text-default);
+}
+[data-scope='tree'][data-part='item'][data-chosen] > [data-part='toggle'] {
+  color: inherit;
+}
+
+[data-scope='tree'][data-part='item-indicator'] {
+  inline-size: 12px;
+  block-size: 12px;
+  opacity: 0;
+}
+[data-scope='tree'][data-part='item'][data-chosen] > [data-part='item-indicator'] {
+  opacity: 1;
+}
+
+@media (forced-colors: active) {
+  [data-scope='tree'][data-part='item'][data-chosen] {
+    outline: 1px solid Highlight;
+    outline-offset: -1px;
+  }
+  [data-scope='tree'][data-part='item']:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='tree'][data-part='toggle'] { transition: none; }
+}

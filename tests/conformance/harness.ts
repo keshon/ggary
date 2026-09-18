@@ -399,6 +399,38 @@ export interface DatePickerProps extends CalendarProps {
   name?: string
 }
 
+export interface AccordionProps {
+  items: import('../../packages/core/src/components/accordion').AccordionItem[]
+  defaultValue?: string[]
+  multiple?: boolean
+  collapsible?: boolean
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
+  onValueChange?: (value: string[]) => void
+}
+
+export interface TreeProps {
+  items: import('../../packages/core/src/components/tree').TreeNode[]
+  label: string
+  defaultValue?: string[]
+  defaultExpanded?: string[]
+  selectionMode?: import('../../packages/core/src/components/tree').TreeSelectionMode
+  onValueChange?: (value: string[]) => void
+  onExpandedChange?: (expanded: string[]) => void
+}
+
+export interface ProgressProps {
+  value?: number | null
+  min?: number
+  max?: number
+  label?: string
+  hideLabel?: boolean
+  shape?: 'bar' | 'ring'
+  size?: 'sm' | 'md' | 'lg'
+  tone?: 'running' | 'ok' | 'warn' | 'error'
+  locale?: string
+  showValue?: boolean
+}
+
 export interface CascaderProps {
   label: string
   items: import('../../packages/core/src/components/cascader').CascaderNode[]
@@ -706,6 +738,9 @@ export interface Adapter {
   combobox?(props: ComboboxProps, target: HTMLElement): Promise<Mounted<ComboboxProps>>
   calendar?(props: CalendarProps, target: HTMLElement): Promise<Mounted<CalendarProps>>
   cascader?(props: CascaderProps, target: HTMLElement): Promise<Mounted<CascaderProps>>
+  accordion?(props: AccordionProps, target: HTMLElement): Promise<Mounted<AccordionProps>>
+  tree?(props: TreeProps, target: HTMLElement): Promise<Mounted<TreeProps>>
+  progress?(props: ProgressProps, target: HTMLElement): Promise<Mounted<ProgressProps>>
   datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>

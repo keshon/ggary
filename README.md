@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, three sibling renderers (vanilla
 custom elements, React, Svelte 5), and two design languages on top of it.
-Fifty-eight components — DataGrid, Combobox, DatePicker, Calendar, Cascader, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Sixty-one components — DataGrid, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -24,7 +24,7 @@ reset, a `display` rule that showed a closed menu).
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — three pages, same demo
-npm test         # 2948 tests, 1170 of them in headless Chrome
+npm test         # 3058 tests, 1212 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1742,6 +1742,71 @@ Found on the way:
 - **`spellCheck` reached Svelte as a camel-cased attribute.** It joins the
   normalizers' table of DOM names beside `autoComplete` and `inputMode`.
 
+## Accordion, Tree and Progress
+
+```tsx
+<Accordion items={sections} defaultValue={['contact']}>{(item) => body[item.value]}</Accordion>
+<Tree items={boards} label="Boards" defaultExpanded={['sales']} onValueChange={([board]) => open(board)} />
+<Progress label="Importing leads" value={done} max={120} valueText={(n) => `${n} of 120`} />
+```
+
+**The accordion** is the APG's: each section's button stands in a heading
+(`headingLevel`, default 3), says whether it is open, and controls its section.
+One section at a time; `multiple` lets several stand open, `collapsible: false`
+keeps one always open — and then its button says `aria-disabled`, as the APG
+asks, rather than doing nothing silently. Up and Down move between the buttons,
+passing over a disabled one; every button is still a tab stop. A section is a
+`region` named by its button, unless there are more than six: a page of
+landmarks is as hard to move through as none. A description under a label is
+the button's description (`aria-describedby`), not part of its name.
+
+**A closed section can still be found.** Where the browser supports it, a closed
+section is `hidden="until-found"`: find-in-page searches it, and a match opens
+it (`beforematch`). So the content of a closed section is kept in the page by
+default (`keepMounted`), and the section's own box carries no padding — a
+section hidden until found is laid out, only not painted, and a padding would
+stand open under a closed button. The body inside it carries the room.
+
+**The tree** is drawn flat: one row per visible node, and `aria-level`,
+`aria-posinset` and `aria-setsize` say where each stands, so a framework renders
+a list and a long tree could one day be windowed like the grid's rows. The
+indent is one number the core sets on each row, `--gg-tree-level`, and the theme
+multiplies it. The keys are the APG's: Up and Down walk the visible rows, Right
+opens a branch and then steps onto its first child, Left steps up and then
+closes, Home and End, `*` opens every sibling, typing jumps to a name. One tab
+stop. A press on a row chooses it; a press on its chevron only opens it — a
+target of its own, so a branch opens on a touch screen without being chosen,
+which the cascader cannot do yet. A double press opens a branch too.
+`selectionMode` is `single`, `multiple` (each row then says whether it is
+chosen, and the tree that it takes several) or `none`, a tree to walk and open.
+Closing a branch with the focus inside it brings the focus up to the branch,
+rather than dropping it on the page.
+
+**Progress** is a `progressbar` with its range, value and a spoken text — a
+percentage in the locale's form by default, or your own words ("35 of 120").
+With no value it is indeterminate and says no amount: a bar sends a piece of
+its fill across, a ring turns. The drawn amount is one number, `--gg-progress`
+from 0 to 1, on the track: the bar's fill scales by it from the start edge (the
+right one, right to left), the ring's is a conic sweep of it cut to a band by a
+mask, so the value in the middle is untouched. `tone` says how a job ended —
+`ok`, `warn`, `error` — beside the running accent. `hideLabel` names it without
+drawing the name, for a ring in a button or a bar in a table row.
+
+Found on the way:
+
+- **React cannot say `until-found`.** React 19.3 writes a `hidden` of any value
+  as the bare attribute. The core gives `hidden`, and a small helper,
+  `findableContent`, raises it to `until-found` after each render and listens
+  for the match — in both frameworks, for the same behaviour.
+- **The accordion's button read "ShippingWhere and how fast".** Named by its
+  content, the label and the description ran together without a space in
+  React; Svelte's whitespace happened to part them. The label now names the
+  button and the description describes it, in both.
+- **The progress track vanished on white.** The first fill of the room, the
+  subtle background, was all but invisible in light mode, so a bar at 42% did
+  not say how far there was to go. It is the default border now, the same
+  weight as the accordion's hairlines.
+
 ## PageHeader, Section, Container, Stack, Cluster and Grid
 
 What goes inside the work area: the top of a screen, the stretches under it,
@@ -2016,14 +2081,14 @@ one needs JS anyway; the children themselves stay the author's.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 305 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch. |
-| contract | node | `icons.contract.test.ts` | 311 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 322 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words. |
+| contract | node | `icons.contract.test.ts` | 326 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 7 tests. Every discovered theme: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1074 tests, 52 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1110 tests, 64 of them skipped where an adapter or the environment cannot express the case. One contract × three adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | dom | jsdom | `elements.dom.test.ts` | 34 tests. What only custom elements have: properties, events, attribute fallbacks, enhancement. |
-| browser | Chrome | `conformance.browser.test.ts` | 1074 tests, 43 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1110 tests, 55 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts`, `rhythm.instrument.browser.test.ts` | 5 tests. The form rhythm — Field's label and hint included — the listbox and menu corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, per theme, mode and density. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
@@ -2032,6 +2097,7 @@ one needs JS anyway; the children themselves stay the author's.
 | browser | Chrome | `data-grid.browser.test.ts` | 9 tests. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
 | browser | Chrome | `date-picker.browser.test.ts` | 4 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. |
+| browser | Chrome | `disclosure.browser.test.ts` | 6 tests. A closed section hidden until found, taking no room, and opened by the page's search; a real Space and Enter, the chevron turned; a tree given a height scrolling to the focus under the real keyboard, each level stepped in by 16 pixels with a leaf lined up; a bar's fill measured to the pixel from the start edge in both directions; a ring's sweep and turn. |
 | browser | Chrome | `cascader.browser.test.ts` | 2 tests. The columns side by side under the button over an ancestor that clips, the card keeping to a phone's screen with the focused item scrolled into view; the real keyboard walking down and across, Enter choosing and the focus back on the button. |
 | browser | Chrome | `combobox.browser.test.ts` | 4 tests. Real typing; the list under the field, lined up with it, over an ancestor that clips; Enter choosing and Tab moving on with the list gone; a press outside putting the field back; chips wrapping in the box with room left to type. |
 | browser | Chrome | `layout.browser.test.ts` | 16 tests. The column beside the work on a wide screen with only the work scrolling, the drawer out of the tab order until opened and then over an inert page, the window growing past the breakpoint closing it, a bar lying down under the header, a separator dragged by a pointer with its line under it and stopping for the other pane, the keyboard moving it, a status strip staying one line with air around a button in it, a button group of custom elements standing flush; a stack stretching a field and not a button, a grid falling to fewer columns, a container centred under its ceiling, a page header's actions falling under its title, a section's line under its heading, and sections farther apart than their rows. |
@@ -2161,11 +2227,17 @@ Real, and deliberately left open:
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that is Instrument's position, and it stays available.
-- **No custom elements for Combobox, DatePicker, Calendar or Cascader.** The vanilla
+- **No custom elements for Combobox, DatePicker, Calendar, Cascader, Accordion, Tree or Progress.** The vanilla
   adapter is frozen (see its section); their specs skip it.
 - **The date picker has no time.** A day or a range of days; a time of day, and
   the time zone that comes with it, are not built. Nor are presets ("last 7
   days") for a range, or two months side by side.
+- **A tree does not load its children on demand, drag, or rename.** The whole
+  tree is given up front; moving a node by dragging and renaming it in place
+  are not built. Nor is a range chosen with Shift in a multiple tree.
+- **The accordion does not animate its height.** A section opens at once; the
+  chevron turns. Animating to `auto` needs `interpolate-size`, which only
+  Chromium has.
 - **A cascader does not search.** Typing jumps within a column; a search across
   every level, answering with whole paths, is not built. Nor are children loaded
   on demand: the whole tree is given up front.

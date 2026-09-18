@@ -154,3 +154,20 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
 .flow-demo > * + * {
   margin-block-start: 32px;
 }
+
+/* Accordion, tree and progress side by side, falling under each other on a narrow screen. */
+.disclosure-demo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 32px;
+  align-items: start;
+}
+.tree-frame {
+  display: flex;
+  block-size: 280px;
+  border: 1px solid var(--gg-border);
+  border-radius: var(--gg-radius);
+}
+.tree-frame > * { flex: 1; }
+.progress-stack { display: flex; flex-direction: column; gap: 20px; }
+.progress-rings { display: flex; gap: 16px; align-items: center; }
