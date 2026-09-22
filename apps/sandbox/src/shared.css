@@ -98,8 +98,11 @@ section:not(section section) > h3:first-child { margin-block-end: 16px; font-siz
 /* The column is dense: a component's row a little lower than the Nav's own. */
 .toc [data-scope='nav'][data-part='item'][data-level='1'] { min-block-size: 30px; padding-block: 5px; font-size: 13px; }
 .toc [data-scope='nav'][data-part='toggle'] { margin-block: 1px; }
-.toc [data-scope='nav'][data-part='group'] + [data-part='group'] { margin-block-start: 16px; }
-.toc [data-scope='nav'][data-part='group-label'] { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gg-text-faint); }
+/* Each category carries its number, in the accent, as its heading on the page does. Drawn, so it is not in the group's name. */
+.toc [data-scope='nav'][data-part='root'] { counter-reset: category; }
+.toc [data-scope='nav'][data-part='group'] { counter-increment: category; }
+.toc [data-scope='nav'][data-part='group-label'] { display: flex; gap: 8px; align-items: baseline; color: var(--gg-text); }
+.toc [data-scope='nav'][data-part='group-label']::before { content: counter(category, decimal-leading-zero); color: var(--gg-accent-text); font-variant-numeric: tabular-nums; }
 
 .toc-button { position: fixed; inset: auto 16px 16px auto; z-index: 5; }
 .toc-button button { max-inline-size: min(320px, calc(100vw - 32px)); box-shadow: 0 8px 24px rgb(0 0 0 / 0.2); }

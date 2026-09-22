@@ -14,17 +14,26 @@
 [data-scope='nav'][data-part='group'] {
   gap: var(--ggarry-space-1);
 }
-/* The gap goes BETWEEN groups, not around each: around, the first group would
-   stand twice as far from the top of the column as from its sides. */
+/* Groups are told apart by where they stand, not by how loud their names are:
+   a hairline and air above each, and the name close to its own items — nearer
+   them than the item above it is. The gap goes BETWEEN groups, not around
+   each: around, the first would stand twice as far from the column's top as
+   from its sides. */
 [data-scope='nav'][data-part='group'] + [data-part='group'] {
-  margin-block-start: var(--ggarry-space-5);
+  margin-block-start: var(--ggarry-space-3);
+  padding-block-start: var(--ggarry-space-3);
+  border-block-start: 1px solid var(--ggarry-border-default);
 }
 
+/* No capitals: a label has no right to sound louder than what it labels. It
+   is set apart from the items by weight and place — semibold in the subtle
+   ink, a little space below — while the items keep the column's voice. */
 [data-scope='nav'][data-part='group-label'] {
+  padding-block: var(--ggarry-space-1) var(--ggarry-space-1);
   padding-inline: var(--ggarry-space-3);
   font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-semibold);
   color: var(--ggarry-text-muted);
-  /* No capitals: a label has no right to sound louder than what it labels. */
   line-height: 1.6;
 }
 

@@ -1181,6 +1181,11 @@ the markup is supposed to carry and usually does not.
   current item is `aria-current="page"` in the markup — the component never
   decides which page it is on — and the theme marks it with a bar at its inner
   edge as well as a surface. A group is a `group` only when it has a name.
+  Groups are told apart by where they stand, not by how loud their names are:
+  a hairline and air above each, the name semibold and close to its own
+  items, and never in capitals — a label has no right to sound louder than
+  what it labels. (The sandbox adds each category's number in the accent, as
+  its heading on the page has.)
   An item may have `items` of its own, one level down — a component's
   variants, a settings page's panes. It stands in a branch beside a real
   button (`aria-expanded`, named "Button, sections") that opens them, and the
