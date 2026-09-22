@@ -97,10 +97,18 @@ describe('gantt by pointer', () => {
     (document.elementFromPoint(x, y) ?? document.body).dispatchEvent(new PointerEvent(type, { clientX: x, clientY: y, pointerId: 3, pointerType: 'mouse', isPrimary: true, button: 0, bubbles: true, cancelable: true }))
   const start = (bar: Element) => Number((bar as HTMLElement).style.getPropertyValue('--gg-gantt-start'))
   const span = (bar: Element) => Number((bar as HTMLElement).style.getPropertyValue('--gg-gantt-span'))
+  // The chart opens on today, and today moves: from the chart's start, so the
+  // bars are where the pointer is sent whatever the date the test runs on.
+  const mountAtStart = async (...args: Parameters<typeof mount>) => {
+    const mounted = await mount(...args)
+    mounted.chart.scrollLeft = 0
+    await wait(20)
+    return mounted
+  }
 
   it('a bar dragged three days’ worth moves three days, and the owner hears it on release', async () => {
     const changes: unknown[] = []
-    const { schedule } = await mount({ tasks: plan, range: planRange, onChange: (change: { task: { id: string }; to: unknown }) => void changes.push([change.task.id, change.to]) }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const { schedule } = await mountAtStart({ tasks: plan, range: planRange, onChange: (change: { task: { id: string }; to: unknown }) => void changes.push([change.task.id, change.to]) }, 'inline-size: 1200px; block-size: 260px; display: flex')
     const bar = schedule('design').querySelector<HTMLElement>('[data-part="bar"]')!
     const box = bar.getBoundingClientRect()
     const y = box.top + box.height / 2
@@ -117,7 +125,7 @@ describe('gantt by pointer', () => {
 
   it('its end, taken by the grip, resizes it; Escape in the middle puts it back', async () => {
     const changes: unknown[] = []
-    const { schedule } = await mount({ tasks: plan, range: planRange, onChange: (change: unknown) => void changes.push(change) }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const { schedule } = await mountAtStart({ tasks: plan, range: planRange, onChange: (change: unknown) => void changes.push(change) }, 'inline-size: 1200px; block-size: 260px; display: flex')
     const bar = schedule('design').querySelector<HTMLElement>('[data-part="bar"]')!
     const grip = bar.querySelector<HTMLElement>('[data-part="bar-end"]')!.getBoundingClientRect()
     const x = grip.left + grip.width / 2
@@ -135,7 +143,7 @@ describe('gantt by pointer', () => {
   })
 
   it('a refused move springs back', async () => {
-    const { schedule } = await mount({ tasks: plan, range: planRange, onChange: () => Promise.reject(new Error('locked by the client')) }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const { schedule } = await mountAtStart({ tasks: plan, range: planRange, onChange: () => Promise.reject(new Error('locked by the client')) }, 'inline-size: 1200px; block-size: 260px; display: flex')
     const bar = schedule('build').querySelector<HTMLElement>('[data-part="bar"]')!
     const box = bar.getBoundingClientRect()
     pointer('pointerdown', box.left + 40, box.top + 5)
@@ -148,7 +156,7 @@ describe('gantt by pointer', () => {
 
   it('draws an arrow from a bar’s end to the next one’s start, to a milestone’s tip, under the bars; a conflict in another colour', async () => {
     const tasks = [plan[0], { ...plan[1], dependsOn: ['brief'] }, { ...plan[2], dependsOn: ['design'] }, { ...plan[3], start: '2026-09-18', dependsOn: ['design'] }, { id: 'docs', title: 'Write the docs', start: '2026-09-14', end: '2026-09-22', dependsOn: ['brief'] }]
-    const { host, schedule } = await mount({ tasks, range: planRange }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const { host, schedule } = await mountAtStart({ tasks, range: planRange }, 'inline-size: 1200px; block-size: 260px; display: flex')
     const origin = schedule('brief').getBoundingClientRect().left
     const link = (from: string, to: string) => host.querySelector<HTMLElement>(`[data-part="link"][data-from="${from}"][data-to="${to}"]`)!
     const box = (el: Element) => el.getBoundingClientRect()
@@ -185,7 +193,7 @@ describe('gantt by pointer', () => {
   it('a group’s summary spans its tasks to the pixel; a press on its name closes it, the chevron turned, and the arrows move to its row', async () => {
     const groups = [{ id: 'discovery', title: 'Discovery' }]
     const tasks = [{ ...plan[0], group: 'discovery' }, { ...plan[1], group: 'discovery' }, { ...plan[2], dependsOn: ['design'] }]
-    const { host, schedule } = await mount({ tasks, groups, range: planRange }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const { host, schedule } = await mountAtStart({ tasks, groups, range: planRange }, 'inline-size: 1200px; block-size: 260px; display: flex')
     const origin = schedule('brief').getBoundingClientRect().left
     const summary = host.querySelector<HTMLElement>('[data-part="summary"]')!.getBoundingClientRect()
     expect(summary.left - origin).toBeCloseTo(6 * 32, 0)

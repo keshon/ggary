@@ -2585,7 +2585,6 @@ Real, and deliberately left open:
   text is ChoiceCards' alone.
 - **No character counter.** `maxLength` is enforced by the browser, silently; a
   "12 / 280" readout (with a polite live region) belongs to Field.
-- **No affixes.** No icon, prefix, suffix or clear button inside an input.
 - **`minlength` only applies after a real edit.** Browsers report `tooShort` for
   user edits, not for a value set from script — native behaviour, but it means a
   pre-filled short value passes until touched.
