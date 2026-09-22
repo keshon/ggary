@@ -54,6 +54,18 @@ const pairs: Pair[] = [
   { label: 'badge: error word on its plate', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-danger-subtle'], min: TEXT },
   { label: 'badge: count on its fill', fg: '--ggarry-text-on-accent', bg: ['--ggarry-bg-accent'], min: TEXT },
   { label: 'badge: plain dot on its plate', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: LARGE },
+  // The tone mark: a dot with no label of its own, so the non-text threshold, on the grounds a dot stands on.
+  { label: 'dot: neutral mark on the surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'dot: running mark on the surface', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'dot: ok mark on the surface', fg: '--ggarry-text-success', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'dot: warn mark on the surface', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'dot: error mark on the surface', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'dot: running mark on the canvas', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'dot: ok mark on the canvas', fg: '--ggarry-text-success', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'dot: warn mark on the canvas', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'caret: the cursor on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'timeline: the time and the detail on the surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'timeline: the thread off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
   { label: 'avatar: initials on the disc', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
   // The arc against the surface, not the track: the arc says busy, the track only draws the circle.
   { label: 'spinner: arc on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },

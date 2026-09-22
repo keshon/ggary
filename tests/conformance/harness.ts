@@ -594,6 +594,22 @@ export interface BadgeProps {
   dot?: boolean
 }
 
+/** `rich` renders each item's body through the adapter's render prop or snippet: the title in a <strong>. */
+export interface TimelineProps {
+  items: import('../../packages/core/src/components/timeline').TimelineItem[]
+  label?: string
+  locale?: string
+  timeFormat?: Intl.DateTimeFormatOptions
+  rich?: boolean
+}
+
+export interface StatusDotProps {
+  tone?: StatusTone
+}
+
+/** A caret after the text "Streaming". */
+export interface CaretProps {}
+
 export interface AvatarProps {
   name: string
   src?: string
@@ -791,6 +807,9 @@ export interface Adapter {
   tabs(props: TabsProps, target: HTMLElement): Promise<Mounted<TabsProps>>
   toaster(props: ToasterProps, target: HTMLElement): Promise<Mounted<ToasterProps>>
   badge(props: BadgeProps, target: HTMLElement): Promise<Mounted<BadgeProps>>
+  timeline?(props: TimelineProps, target: HTMLElement): Promise<Mounted<TimelineProps>>
+  statusDot?(props: StatusDotProps, target: HTMLElement): Promise<Mounted<StatusDotProps>>
+  caret?(props: CaretProps, target: HTMLElement): Promise<Mounted<CaretProps>>
   avatar(props: AvatarProps, target: HTMLElement): Promise<Mounted<AvatarProps>>
   avatarGroup(props: AvatarGroupProps, target: HTMLElement): Promise<Mounted<AvatarGroupProps>>
   spinner(props: SpinnerProps, target: HTMLElement): Promise<Mounted<SpinnerProps>>

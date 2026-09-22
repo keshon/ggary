@@ -1,0 +1,65 @@
+/* ==========================================================================
+   GGarry — timeline
+
+   A chronology read as a sequence, not a list: the dots are beads on one
+   thread. The thread runs from each dot's centre to the next one's, under the
+   dots, and the last bead ends it.
+
+   The dot's colour and pulse are the tone map's (states.css), read from the
+   item, so a StatusDot in a rich body agrees with the bead.
+   ========================================================================== */
+
+[data-scope='timeline'][data-part='item'] {
+  --timeline-gutter: 16px;
+  --timeline-pad: var(--ggarry-space-2);
+
+  grid-template-columns: var(--timeline-gutter) minmax(0, 1fr) auto;
+  column-gap: var(--ggarry-space-3);
+  padding-block: var(--timeline-pad);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  line-height: 20px;
+  color: var(--ggarry-text-default);
+}
+
+/* An item with no tone is neutral, whatever tone the page around it has. */
+[data-scope='timeline'][data-part='item']:not([data-tone]) {
+  --ggarry-tone-mark: initial;
+  --ggarry-tone-pulse: initial;
+}
+
+/* From this dot's centre, down through the padding, to the next dot's centre:
+   the items share one line height, so the next centre is a pad and half a
+   line below this item's end. */
+[data-scope='timeline'][data-part='item']::before {
+  inset-block-start: calc(var(--timeline-pad) + 1lh / 2);
+  inset-block-end: calc(-1 * (var(--timeline-pad) + 1lh / 2));
+  inset-inline-start: calc(var(--timeline-gutter) / 2 - 0.5px);
+  inline-size: 1px;
+  background: var(--ggarry-border-default);
+}
+
+/* Centred on the first line, as a glyph beside text is. */
+[data-scope='timeline'][data-part='dot'] {
+  margin-block-start: calc((1lh - 6px) / 2);
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--ggarry-tone-mark, var(--ggarry-text-muted));
+  animation: var(--ggarry-tone-pulse, none) 1.6s ease-in-out infinite;
+}
+
+[data-scope='timeline'][data-part='detail'] {
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 16px;
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='timeline'][data-part='time'] {
+  font-size: var(--ggarry-font-size-xs);
+  color: var(--ggarry-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='timeline'][data-part='dot'] { animation-duration: 3s; }
+}

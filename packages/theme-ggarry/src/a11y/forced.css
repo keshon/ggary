@@ -63,6 +63,20 @@
     color: HighlightText;
   }
 
+  /* A state dot is a fill and nothing else, and it carries meaning: it
+     survives the reset as Highlight. The tones collapse into one colour; the
+     word beside the dot still says which. */
+  [data-scope='dot'][data-part='root'],
+  [data-scope='timeline'][data-part='dot'] {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  /* The caret is a fill too; reset, it would vanish. It takes the text's colour, as a cursor does. */
+  [data-scope='caret'][data-part='root'] {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
   /* The busy button's ring: every border would turn CanvasText, the ring would
      be even, and the turning would not show at all. */
   [data-scope='button'][data-part='spinner'] {
