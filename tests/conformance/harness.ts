@@ -28,6 +28,8 @@ import type { BadgeVariant } from '../../packages/core/src/components/badge'
 import type { AvatarPerson, AvatarSize } from '../../packages/core/src/components/avatar'
 import type { StatusTone } from '../../packages/core/src/utils/tone'
 import type { HeadingLevel, LiveMode, RegionRank } from '../../packages/core/src/utils/region'
+import type { MetricDirection } from '../../packages/core/src/components/metric'
+import type { FileChangeKind, FileChangeWords } from '../../packages/core/src/components/file-change'
 
 export interface ButtonProps {
   label: string
@@ -610,6 +612,35 @@ export interface StatusDotProps {
 /** A caret after the text "Streaming". */
 export interface CaretProps {}
 
+export interface MetricProps {
+  label: string
+  value: string | number
+  unit?: string
+  delta?: string
+  direction?: MetricDirection
+  tone?: StatusTone
+  locale?: string
+}
+
+export interface MetricRowProps {
+  /** The metrics inside, mounted as the row's children. */
+  metrics: MetricProps[]
+  joined?: boolean
+  headline?: boolean
+}
+
+export interface KeyValueListProps {
+  items: { label: string; value?: string }[]
+  tight?: boolean
+  /** Render each value as a <strong>: a node in React, the value snippet in Svelte. */
+  rich?: boolean
+}
+
+export interface FileChangeProps {
+  change: FileChangeKind
+  words?: FileChangeWords
+}
+
 export interface AvatarProps {
   name: string
   src?: string
@@ -821,6 +852,10 @@ export interface Adapter {
   codeBlock?(props: CodeBlockProps, target: HTMLElement): Promise<Mounted<CodeBlockProps>>
   copyable?(props: CopyableProps, target: HTMLElement): Promise<Mounted<CopyableProps>>
   inserts?(props: InsertsProps, target: HTMLElement): Promise<Mounted<InsertsProps>>
+  metric?(props: MetricProps, target: HTMLElement): Promise<Mounted<MetricProps>>
+  metricRow?(props: MetricRowProps, target: HTMLElement): Promise<Mounted<MetricRowProps>>
+  keyValueList?(props: KeyValueListProps, target: HTMLElement): Promise<Mounted<KeyValueListProps>>
+  fileChange?(props: FileChangeProps, target: HTMLElement): Promise<Mounted<FileChangeProps>>
   datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>

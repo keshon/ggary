@@ -33,6 +33,7 @@ import { toastConformance } from './toast.spec'
 import { displayConformance } from './display.spec'
 import { codeConformance } from './code.spec'
 import { insertsConformance } from './inserts.spec'
+import { dataDisplayConformance } from './data-display.spec'
 import { textareaConformance } from './textarea.spec'
 import { timelineConformance } from './timeline.spec'
 
@@ -99,6 +100,7 @@ export function runConformance() {
       timelineConformance(adapter)
       codeConformance(adapter)
       insertsConformance(adapter)
+      dataDisplayConformance(adapter)
     })
   }
 }

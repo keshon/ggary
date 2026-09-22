@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, StatusDot, Timeline, Button, CodeBlock, Copyable, Inserts, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, StatusDot, Timeline, Button, CodeBlock, Copyable, Inserts, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster, Metric, FileChange } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
@@ -21,6 +21,7 @@ import FormWithFields from './FormWithFields.svelte'
 import DisplayWithContent from './DisplayWithContent.svelte'
 import CaretAfterText from './CaretAfterText.svelte'
 import type { TimelineItem } from '../../../packages/core/src/components/timeline'
+import DataDisplayWith from './DataDisplayWith.svelte'
 import FieldsetWithGroup from './FieldsetWithGroup.svelte'
 import { type Adapter, type ButtonProps, type CheckboxProps, type Mounted, track } from '../harness'
 import { reactiveProps } from './svelte-props.svelte'
@@ -108,6 +109,11 @@ export const svelte: Adapter = {
   codeBlock: (props, target) => mountSvelte(CodeBlock as Component<any>, props, target),
   copyable: (props, target) => mountSvelte(Copyable as Component<any>, props, target),
   inserts: (props, target) => mountSvelte(Inserts as Component<any>, props, target),
+  metric: (props, target) => mountSvelte(Metric as Component<any>, props, target),
+  // A row's children and a list's value snippet render components and markup, so a wrapper composes them.
+  metricRow: (props, target) => mountSvelte(DataDisplayWith as Component<any>, props, target, (p) => ({ ...p, component: 'metric-row' })),
+  keyValueList: (props, target) => mountSvelte(DataDisplayWith as Component<any>, props, target, (p) => ({ ...p, component: 'kv' })),
+  fileChange: (props, target) => mountSvelte(FileChange as Component<any>, props, target),
   commandPalette: (props, target) => mountSvelte(CommandPalette as Component<any>, props, target),
   kanban: (props, target) => mountSvelte(Kanban as Component<any>, props, target),
   progress: (props, target) => mountSvelte(Progress as Component<any>, props, target),

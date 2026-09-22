@@ -49,6 +49,18 @@
       "types": "./src/components/timeline/index.ts",
       "default": "./src/components/timeline/index.ts"
     },
+    "./metric": {
+      "types": "./src/components/metric/index.ts",
+      "default": "./src/components/metric/index.ts"
+    },
+    "./kv": {
+      "types": "./src/components/kv/index.ts",
+      "default": "./src/components/kv/index.ts"
+    },
+    "./file-change": {
+      "types": "./src/components/file-change/index.ts",
+      "default": "./src/components/file-change/index.ts"
+    },
     "./skeleton": {
       "types": "./src/components/skeleton/index.ts",
       "default": "./src/components/skeleton/index.ts"

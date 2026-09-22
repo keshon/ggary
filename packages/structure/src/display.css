@@ -188,6 +188,67 @@
   grid-column: 3;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+/* Metric: label, value, change, stacked. The figures are tabular, so a number
+   updating in place does not tug at its neighbours. A row is a grid that wraps
+   rather than squeezing a number below its own width. */
+[data-scope='metric'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='metric'][data-part='value'] {
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+[data-scope='metric'][data-part='delta'] {
+  display: flex;
+  align-items: center;
+}
+[data-scope='metric'][data-part='delta-icon'] {
+  flex: none;
+}
+[data-scope='metric-row'][data-part='root'] {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+}
+
+/* Key–value list: names in one column, values in the other, on the <dl> itself
+   so each pair stays a pair of siblings. By content here; a theme may give the
+   name column a shared width, which `data-tight` hands back to the content. */
+[data-scope='kv'][data-part='root'] {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: baseline;
+  margin: 0;
+}
+[data-scope='kv'][data-part='term'] {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+[data-scope='kv'][data-part='detail'] {
+  min-inline-size: 0;
+  margin: 0;
+}
+
+/* File change: a sign centred in a box, and the word said aloud but never
+   shown, in any theme. */
+[data-scope='file-change'][data-part='root'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  vertical-align: middle;
+  line-height: 1;
+}
+[data-scope='file-change'][data-part='label'] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* Endless activity is slowed under reduced motion, never stopped: a stopped

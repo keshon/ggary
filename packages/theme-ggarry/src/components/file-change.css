@@ -1,0 +1,36 @@
+/* ==========================================================================
+   GGarry — file change
+
+   An outline with a sign in it, at the end of a file's row: an outline rather
+   than a plate, which would outweigh the name the row is for.
+
+   Two carriers, two thresholds. The outline carries the category in colour
+   and is a mark, so 3:1; the sign is read, so it is text at 4.5:1 and stays in
+   the muted ink, the category being carried by its shape anyway. GGarry has no
+   categorical palette, so the outlines take its text colours, which clear the
+   mark threshold with room: added success, modified accent, deleted danger,
+   renamed muted. Conflict is the one value that is also a judgement — nobody
+   wanted it, and it asks for a hand — so it paints the sign in warning too.
+   ========================================================================== */
+
+[data-scope='file-change'][data-part='root'] {
+  --file-change-ink: var(--ggarry-border-control);
+  inline-size: 16px;
+  block-size: 16px;
+  box-sizing: border-box;
+  border: 1px solid var(--file-change-ink);
+  border-radius: var(--ggarry-radius-sm);
+  color: var(--ggarry-text-muted);
+  font-family: var(--ggarry-font-family-mono);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+
+[data-scope='file-change'][data-part='root'][data-change='added'] { --file-change-ink: var(--ggarry-text-success); }
+[data-scope='file-change'][data-part='root'][data-change='modified'] { --file-change-ink: var(--ggarry-text-accent); }
+[data-scope='file-change'][data-part='root'][data-change='deleted'] { --file-change-ink: var(--ggarry-text-danger); }
+[data-scope='file-change'][data-part='root'][data-change='renamed'] { --file-change-ink: var(--ggarry-text-muted); }
+[data-scope='file-change'][data-part='root'][data-change='conflict'] {
+  --file-change-ink: var(--ggarry-text-warning);
+  color: var(--ggarry-text-warning);
+}

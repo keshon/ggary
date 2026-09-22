@@ -36,6 +36,10 @@ import {
   Form,
   FormSummary,
   Gantt,
+  Metric,
+  MetricRow,
+  KeyValueList,
+  FileChange,
   DatePicker,
   Combobox,
   Cluster,
@@ -107,6 +111,8 @@ import {
   type PopoverProps,
   type TooltipProps,
   type TabsProps,
+  type MetricRowProps,
+  type KeyValueListProps,
   track,
 } from '../harness'
 
@@ -309,6 +315,17 @@ export const react: Adapter = {
   codeBlock: (props, target) => mount(CodeBlock as ComponentType<any>, props, target),
   copyable: (props, target) => mount(Copyable as ComponentType<any>, props, target),
   inserts: (props, target) => mount(Inserts as ComponentType<any>, props, target),
+  metric: (props, target) => mount(Metric, props, target),
+  metricRow: (props, target) =>
+    mount(MetricRow, props, target, ({ metrics, ...rest }: MetricRowProps) => [
+      rest,
+      ...metrics.map((metric, index) => createElement(Metric, { key: index, ...metric })),
+    ]),
+  keyValueList: (props, target) =>
+    mount(KeyValueList, props, target, ({ rich, items, ...rest }: KeyValueListProps) => [
+      { ...rest, items: rich ? items.map((item) => ({ ...item, value: createElement('strong', null, item.value) })) : items },
+    ]),
+  fileChange: (props, target) => mount(FileChange, props, target),
   commandPalette: (props, target) => mount(CommandPalette as ComponentType<any>, props, target),
   kanban: (props, target) => mount(Kanban as ComponentType<any>, props, target),
   progress: (props, target) => mount(Progress as ComponentType<any>, props, target),

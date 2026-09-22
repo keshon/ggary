@@ -1,0 +1,29 @@
+/* ==========================================================================
+   GGarry — key–value list
+
+   Names in the muted ink, values in the body's, one line apart. The name
+   column is one shared width, --ggarry-size-label-col, so lists on the same
+   screen — in a panel, a detail pane, a dialog — line up with each other; it
+   takes the longest of the usual names ("Last modified") at the small size.
+   Tight gives that promise up to the content, for a narrow card where the
+   shared column would eat the value's room.
+   ========================================================================== */
+
+[data-scope='kv'][data-part='root'] {
+  gap: var(--ggarry-space-2) var(--ggarry-space-3);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  line-height: 20px;
+}
+[data-scope='kv'][data-part='root']:not([data-tight]) {
+  grid-template-columns: minmax(0, var(--ggarry-size-label-col)) minmax(0, 1fr);
+}
+
+[data-scope='kv'][data-part='term'] {
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='kv'][data-part='detail'] {
+  font-variant-numeric: tabular-nums;
+}
