@@ -32,6 +32,7 @@ import { tabsConformance } from './tabs.spec'
 import { toastConformance } from './toast.spec'
 import { displayConformance } from './display.spec'
 import { textareaConformance } from './textarea.spec'
+import { timelineConformance } from './timeline.spec'
 
 /**
  * One contract, every adapter. A failure reads as `react > select > keyboard >
@@ -93,6 +94,7 @@ export function runConformance() {
       tabsConformance(adapter)
       toastConformance(adapter)
       displayConformance(adapter)
+      timelineConformance(adapter)
     })
   }
 }

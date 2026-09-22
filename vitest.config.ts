@@ -55,6 +55,11 @@ export default defineConfig({
                 if (ctx.provider.name !== 'playwright') throw new Error('forcedColors needs the playwright provider')
                 await (ctx as unknown as { page: { emulateMedia(options: { forcedColors: 'active' | 'none' }): Promise<void> } }).page.emulateMedia({ forcedColors: active ? 'active' : 'none' })
               },
+              // prefers-reduced-motion, emulated: endless indicators slow, the caret stops blinking.
+              async reducedMotion(ctx, reduce: boolean) {
+                if (ctx.provider.name !== 'playwright') throw new Error('reducedMotion needs the playwright provider')
+                await (ctx as unknown as { page: { emulateMedia(options: { reducedMotion: 'reduce' | 'no-preference' }): Promise<void> } }).page.emulateMedia({ reducedMotion: reduce ? 'reduce' : 'no-preference' })
+              },
             },
           },
         },

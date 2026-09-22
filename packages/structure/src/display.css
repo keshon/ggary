@@ -4,7 +4,8 @@
    Avatar: the image lies over the initials and shows only once loaded, so a
    slow or broken picture leaves the initials rather than a gap.
    Spinner: two stacked glyphs, the arc turning over the track.
-   Skeleton: bars one line tall, in the widths of the text they stand for. */
+   Skeleton: bars one line tall, in the widths of the text they stand for.
+   Dot, caret, timeline: below, after progress. */
 
 [data-scope='badge'][data-part='root'] {
   display: inline-flex;
@@ -135,6 +136,60 @@
   to { translate: 250% 0; }
 }
 
+/* The state dot and the caret: inline marks that sit in a line of text. The
+   caret is placed after the last character, so it keeps to the line's baseline
+   box rather than its own. */
+[data-scope='dot'][data-part='root'] {
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+[data-scope='caret'][data-part='root'] {
+  display: inline-block;
+  vertical-align: text-bottom;
+}
+
+/* Timeline: an ordered list whose items are three columns — the dot, the body,
+   the time at the far end. The line joining the dots is each item's ::before,
+   drawn under the dot and over into the next item; the last has none. Where
+   the line runs is the theme's, since it follows the theme's gutter. */
+[data-scope='timeline'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+[data-scope='timeline'][data-part='item'] {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+}
+[data-scope='timeline'][data-part='item']::before {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+[data-scope='timeline'][data-part='item']:last-child::before {
+  content: none;
+}
+[data-scope='timeline'][data-part='dot'] {
+  position: relative;
+  z-index: 1;
+  grid-column: 1;
+  justify-self: center;
+}
+[data-scope='timeline'][data-part='body'] {
+  grid-column: 2;
+  min-inline-size: 0;
+}
+[data-scope='timeline'][data-part='time'] {
+  grid-column: 3;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Endless activity is slowed under reduced motion, never stopped: a stopped
    spinner says the work has halted. Every theme's motion rules may override. */
 @media (prefers-reduced-motion: reduce) {
@@ -142,7 +197,9 @@
   [data-scope='progress'][data-part='range'][data-state='indeterminate'] { animation-duration: 3.2s; }
 }
 
+/* A blinking cursor on paper means nothing; the dot is printed, it carries the state. */
 @media print {
   [data-scope='spinner'][data-part='root'],
-  [data-scope='skeleton'][data-part='root'] { display: none; }
+  [data-scope='skeleton'][data-part='root'],
+  [data-scope='caret'][data-part='root'] { display: none; }
 }

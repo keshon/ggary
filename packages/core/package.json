@@ -41,6 +41,14 @@
       "types": "./src/components/badge/index.ts",
       "default": "./src/components/badge/index.ts"
     },
+    "./states": {
+      "types": "./src/components/states/index.ts",
+      "default": "./src/components/states/index.ts"
+    },
+    "./timeline": {
+      "types": "./src/components/timeline/index.ts",
+      "default": "./src/components/timeline/index.ts"
+    },
     "./skeleton": {
       "types": "./src/components/skeleton/index.ts",
       "default": "./src/components/skeleton/index.ts"

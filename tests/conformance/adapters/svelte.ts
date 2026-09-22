@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, Button, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, StatusDot, Timeline, Button, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
@@ -19,6 +19,8 @@ import TabsWithPanels from './TabsWithPanels.svelte'
 import AccordionWithPanels from './AccordionWithPanels.svelte'
 import FormWithFields from './FormWithFields.svelte'
 import DisplayWithContent from './DisplayWithContent.svelte'
+import CaretAfterText from './CaretAfterText.svelte'
+import type { TimelineItem } from '../../../packages/core/src/components/timeline'
 import FieldsetWithGroup from './FieldsetWithGroup.svelte'
 import { type Adapter, type ButtonProps, type CheckboxProps, type Mounted, track } from '../harness'
 import { reactiveProps } from './svelte-props.svelte'
@@ -136,6 +138,14 @@ export const svelte: Adapter = {
   toaster: (props, target) => mountSvelte(Toaster as Component<any>, props, target),
   badge: (props, target) =>
     mountSvelte(Badge as Component<any>, props, target, ({ label, ...rest }) => (label === undefined ? rest : { ...rest, children: text(label) })),
+  // The rich body is a snippet that takes the item, as an app writes `{#snippet item(entry)}`.
+  timeline: (props, target) =>
+    mountSvelte(Timeline as Component<any>, props, target, ({ rich, ...rest }) => ({
+      ...rest,
+      item: rich ? createRawSnippet((item: () => TimelineItem) => ({ render: () => `<strong>${item().title}</strong>` })) : undefined,
+    })),
+  statusDot: (props, target) => mountSvelte(StatusDot as Component<any>, props, target),
+  caret: (props, target) => mountSvelte(CaretAfterText as Component<any>, props, target),
   avatar: (props, target) => mountSvelte(Avatar as Component<any>, props, target),
   avatarGroup: (props, target) => mountSvelte(AvatarGroup as Component<any>, props, target),
   spinner: (props, target) => mountSvelte(Spinner as Component<any>, props, target),

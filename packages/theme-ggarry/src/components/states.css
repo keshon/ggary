@@ -1,0 +1,58 @@
+/* ==========================================================================
+   GGarry — state marks: the dot and the caret
+
+   The two smallest marks, and neither has a label of its own: a dot names a
+   state beside a word, a caret shows that text is still arriving.
+
+   The tone map is here, on any [data-tone], not on the dot: a dot reads the
+   nearest tone, so a tone is set once per group — a badge, a timeline item, a
+   row — and every mark inside it agrees. --ggarry-tone-mark is the colour;
+   --ggarry-tone-pulse is the animation, so a dot inside a running group
+   pulses and one inside a finished group nested in it does not.
+   ========================================================================== */
+
+[data-tone='neutral'] { --ggarry-tone-mark: var(--ggarry-text-muted); --ggarry-tone-pulse: none; }
+[data-tone='running'] { --ggarry-tone-mark: var(--ggarry-text-accent); --ggarry-tone-pulse: ggarry-tone-pulse; }
+[data-tone='ok'] { --ggarry-tone-mark: var(--ggarry-text-success); --ggarry-tone-pulse: none; }
+[data-tone='warn'] { --ggarry-tone-mark: var(--ggarry-text-warning); --ggarry-tone-pulse: none; }
+[data-tone='error'] { --ggarry-tone-mark: var(--ggarry-text-danger); --ggarry-tone-pulse: none; }
+
+/* 6px: a mark, not a target. What is pressed is the row it stands in. With
+   no tone anywhere above it, the neutral mark. */
+[data-scope='dot'][data-part='root'] {
+  inline-size: 6px;
+  block-size: 6px;
+  border-radius: 50%;
+  background: var(--ggarry-tone-mark, var(--ggarry-text-muted));
+  animation: var(--ggarry-tone-pulse, none) 1.6s ease-in-out infinite;
+}
+@keyframes ggarry-tone-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* A terminal cursor. Sized in em, so it follows the type of the line it
+   stands in; set off by a hairline of air so it does not fuse with the last
+   letter, and no more — a caret a space away points at the wrong place.
+   It blinks in steps: a smooth fade reads as a rendering artefact. */
+[data-scope='caret'][data-part='root'] {
+  /* The line's type, not the kit's base size every root part is given: the em
+     below is the em of the text it follows. */
+  font-size: inherit;
+  inline-size: 0.45em;
+  block-size: 1.05em;
+  margin-inline-start: 0.1em;
+  background: var(--ggarry-bg-accent);
+  animation: ggarry-caret-blink 1s steps(2, start) infinite;
+}
+@keyframes ggarry-caret-blink {
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* A busy mark slows rather than stops: a still dot says the work halted. */
+  [data-scope='dot'][data-part='root'] { animation-duration: 3s; }
+  /* The caret's blink says nothing the caret does not: the blink goes, the
+     caret stays. */
+  [data-scope='caret'][data-part='root'] { animation: none; opacity: 1; }
+}

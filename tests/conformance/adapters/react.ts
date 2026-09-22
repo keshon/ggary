@@ -71,6 +71,9 @@ import {
   Panel,
   AvatarGroup,
   Badge,
+  Caret,
+  StatusDot,
+  Timeline,
   Skeleton,
   Spinner,
   Textarea,
@@ -369,6 +372,12 @@ export const react: Adapter = {
   menubar: (props, target) => mount(Menubar, props, target),
   toaster: (props, target) => mount(Toaster, props, target),
   badge: (props, target) => mount(Badge, props, target, ({ label, ...rest }: { label: string }) => [rest, label]),
+  timeline: (props, target) =>
+    mount(Timeline as ComponentType<any>, props, target, ({ rich, ...rest }: { rich?: boolean }) => [
+      { ...rest, children: rich ? (item: { title: string }) => createElement('strong', null, item.title) : undefined },
+    ]),
+  statusDot: (props, target) => mount(StatusDot, props, target),
+  caret: (props, target) => mount(() => createElement('span', null, 'Streaming', createElement(Caret)), props, target),
   avatar: (props, target) => mount(Avatar, props, target),
   avatarGroup: (props, target) => mount(AvatarGroup, props, target),
   spinner: (props, target) => mount(Spinner, props, target),

@@ -2,14 +2,14 @@
    GGarry — badge
 
    A state as a word on a tinted plate, with a dot in the tone. The plate and
-   the ink come from one tone map, so a badge and its dot cannot disagree.
+   the ink come from one tone map; the dot reads the kit's tone mark
+   (states.css), so it agrees with every other dot in the same tone.
    ========================================================================== */
 
 [data-scope='badge'][data-part='root'] {
   --badge-ink: var(--ggarry-text-muted);
   /* subtle, not muted: a muted word on muted is 4.34:1 in light mode. */
   --badge-plate: var(--ggarry-bg-subtle);
-  --badge-dot: var(--ggarry-text-muted);
 
   gap: var(--ggarry-space-1);
   min-block-size: 20px;
@@ -24,17 +24,18 @@
   line-height: 1;
 }
 
-[data-scope='badge'][data-part='root'][data-tone='neutral'] { --badge-dot: var(--ggarry-text-muted); }
-[data-scope='badge'][data-part='root'][data-tone='running'] { --badge-ink: var(--ggarry-text-accent); --badge-plate: var(--ggarry-bg-accent-subtle); --badge-dot: var(--ggarry-text-accent); }
-[data-scope='badge'][data-part='root'][data-tone='ok'] { --badge-ink: var(--ggarry-text-success); --badge-plate: var(--ggarry-bg-success-subtle); --badge-dot: var(--ggarry-text-success); }
-[data-scope='badge'][data-part='root'][data-tone='warn'] { --badge-ink: var(--ggarry-text-warning); --badge-plate: var(--ggarry-bg-warning-subtle); --badge-dot: var(--ggarry-text-warning); }
-[data-scope='badge'][data-part='root'][data-tone='error'] { --badge-ink: var(--ggarry-text-danger); --badge-plate: var(--ggarry-bg-danger-subtle); --badge-dot: var(--ggarry-text-danger); }
+[data-scope='badge'][data-part='root'][data-tone='running'] { --badge-ink: var(--ggarry-text-accent); --badge-plate: var(--ggarry-bg-accent-subtle); }
+[data-scope='badge'][data-part='root'][data-tone='ok'] { --badge-ink: var(--ggarry-text-success); --badge-plate: var(--ggarry-bg-success-subtle); }
+[data-scope='badge'][data-part='root'][data-tone='warn'] { --badge-ink: var(--ggarry-text-warning); --badge-plate: var(--ggarry-bg-warning-subtle); }
+[data-scope='badge'][data-part='root'][data-tone='error'] { --badge-ink: var(--ggarry-text-danger); --badge-plate: var(--ggarry-bg-danger-subtle); }
+/* A plain badge is plain: its dot is neutral whatever tone is around it. */
+[data-scope='badge'][data-part='root']:not([data-tone]) { --ggarry-tone-mark: initial; }
 
 [data-scope='badge'][data-part='dot'] {
   inline-size: 6px;
   block-size: 6px;
   border-radius: 50%;
-  background: var(--badge-dot);
+  background: var(--ggarry-tone-mark, var(--ggarry-text-muted));
 }
 [data-scope='badge'][data-part='root'][data-tone='running'] > [data-part='dot'] {
   animation: ggarry-pulse 1.6s ease-in-out infinite;

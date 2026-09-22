@@ -15,6 +15,7 @@ const ATTRIBUTE_NAMES: Record<string, string> = {
   autoComplete: 'autocomplete',
   inputMode: 'inputmode',
   spellCheck: 'spellcheck',
+  dateTime: 'datetime',
 }
 
 /**

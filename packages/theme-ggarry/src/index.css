@@ -70,6 +70,7 @@
 @import './components/skeleton.css' layer(gg.components);
 @import './components/slider.css' layer(gg.components);
 @import './components/spinner.css' layer(gg.components);
+@import './components/states.css' layer(gg.components);
 @import './components/steps.css' layer(gg.components);
 @import './components/switch.css' layer(gg.components);
 @import './components/tabs.css' layer(gg.components);
@@ -83,6 +84,7 @@
 @import './components/page-header.css' layer(gg.components);
 @import './components/section.css' layer(gg.components);
 @import './components/textarea.css' layer(gg.components);
+@import './components/timeline.css' layer(gg.components);
 @import './components/tooltip.css' layer(gg.components);
 
 /* Forced colours: gg.forced, declared after the components above, so what it
