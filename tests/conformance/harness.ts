@@ -701,6 +701,30 @@ export interface FieldProps {
   switch?: SwitchProps
 }
 
+export interface CodeBlockProps {
+  code: string
+  numbered?: boolean
+  start?: number
+  label?: string
+  copyValue?: string
+  onCopy?: (text: string) => boolean | void
+  words?: Partial<import('../../packages/core/src/components/code').CodeBlockWords>
+}
+
+export interface CopyableProps {
+  value: string
+  copyValue?: string
+  onCopy?: (text: string) => boolean | void
+  words?: Partial<import('../../packages/core/src/components/code').CopyWords>
+}
+
+export interface InsertsProps {
+  items: import('../../packages/core/src/components/inserts').InsertItem[]
+  target: import('../../packages/core/src/components/inserts').InsertTarget
+  onInsert?: (value: string, field: HTMLInputElement | HTMLTextAreaElement) => boolean | void
+  label?: string
+}
+
 export interface Mounted<P> {
   /** The element the component was rendered into. Specs query inside it. */
   root: HTMLElement
@@ -778,6 +802,9 @@ export interface Adapter {
   commandPalette?(props: CommandPaletteProps, target: HTMLElement): Promise<Mounted<CommandPaletteProps>>
   form?(props: FormProps, target: HTMLElement): Promise<Mounted<FormProps>>
   gantt?(props: GanttProps, target: HTMLElement): Promise<Mounted<GanttProps>>
+  codeBlock?(props: CodeBlockProps, target: HTMLElement): Promise<Mounted<CodeBlockProps>>
+  copyable?(props: CopyableProps, target: HTMLElement): Promise<Mounted<CopyableProps>>
+  inserts?(props: InsertsProps, target: HTMLElement): Promise<Mounted<InsertsProps>>
   datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>

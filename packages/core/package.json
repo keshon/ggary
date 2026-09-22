@@ -248,6 +248,18 @@
     "./gantt": {
       "types": "./src/components/gantt/index.ts",
       "default": "./src/components/gantt/index.ts"
+    },
+    "./code": {
+      "types": "./src/components/code/index.ts",
+      "default": "./src/components/code/index.ts"
+    },
+    "./copyable": {
+      "types": "./src/components/copyable/index.ts",
+      "default": "./src/components/copyable/index.ts"
+    },
+    "./inserts": {
+      "types": "./src/components/inserts/index.ts",
+      "default": "./src/components/inserts/index.ts"
     }
   },
   "dependencies": {

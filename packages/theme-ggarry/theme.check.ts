@@ -188,6 +188,18 @@ const pairs: Pair[] = [
   // Tooltip: small text on the inverted plate, read at a glance.
   { label: 'tooltip: text on inverted plate', fg: '--ggarry-text-on-inverted', bg: ['--ggarry-bg-inverted'], min: TEXT },
 
+  // Code and copyable values. A line number is read, so the text threshold;
+  // the copy glyph is a control that is read too. Its answer is a coloured
+  // glyph beside words in the live region, so the glyph tier.
+  { label: 'code: line number on the block', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'code: copy glyph on the block', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'code: copy glyph on its hover', fg: '--ggarry-text-default', bg: ['--ggarry-bg-muted'], min: TEXT },
+  { label: 'code: copied glyph on the block', fg: '--ggarry-text-success', bg: ['--ggarry-bg-subtle'], min: LARGE },
+  { label: 'code: failed glyph on the block', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-subtle'], min: LARGE },
+  { label: 'copyable: copied glyph on surface', fg: '--ggarry-text-success', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'copyable: failed glyph on surface', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'inserts: label on its recessed plate', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
+
   // Focus ring against what it stands on.
   { label: 'focus: ring on surface', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'focus: ring on canvas', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-canvas'], min: LARGE },

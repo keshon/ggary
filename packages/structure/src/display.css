@@ -146,3 +146,78 @@
   [data-scope='spinner'][data-part='root'],
   [data-scope='skeleton'][data-part='root'] { display: none; }
 }
+
+/* Code block: the frame is positioned and does not scroll; the content does.
+   An absolute child of a scroller scrolls with it, so the copy button lives in
+   the frame and stays in its corner while a long line moves under it.
+   No wrapping: a wrap in a command changes its meaning. The gutter is
+   reserved so a scrollbar arriving does not shift the code. */
+[data-scope='code'][data-part='root'] {
+  position: relative;
+  min-inline-size: 0;
+}
+[data-scope='code'][data-part='content'] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-gutter: stable;
+  white-space: pre;
+  tab-size: 4;
+}
+/* A line is as wide as its longest neighbour needs, and never narrower than
+   the frame, so a row's hover reaches the far edge while it scrolls. The
+   number column is exactly 5ch: a column sized by content would shift the
+   code at line 100, and five digits occur in real files. */
+[data-scope='code'][data-part='line'] {
+  display: grid;
+  grid-template-columns: 5ch max-content;
+  min-inline-size: 100%;
+  inline-size: max-content;
+}
+/* Read by eye, not taken: a selection copies the code, not the page. */
+[data-scope='code'][data-part='line-number'] {
+  text-align: end;
+  user-select: none;
+}
+[data-scope='code'][data-part='copy'] {
+  position: absolute;
+}
+
+/* Copyable: the value and its button in one line, the button in the flow. The
+   button is the positioned box its invisible tap area is centred on. */
+[data-scope='copyable'][data-part='root'] {
+  display: inline-flex;
+  align-items: center;
+  max-inline-size: 100%;
+  vertical-align: middle;
+}
+[data-scope='copyable'][data-part='value'] {
+  min-inline-size: 0;
+  white-space: nowrap;
+}
+[data-scope='copyable'][data-part='copy'] {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+}
+
+/* Spoken, not shown: the result of a copy in words. */
+:is([data-scope='code'], [data-scope='copyable'])[data-part='live'] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Inserts: every one visible, so the row wraps rather than scrolls or folds. */
+[data-scope='inserts'][data-part='root'] {
+  display: flex;
+  flex-wrap: wrap;
+}
+[data-scope='inserts'][data-part='item'] {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
