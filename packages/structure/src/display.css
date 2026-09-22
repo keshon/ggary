@@ -188,6 +188,8 @@
   grid-column: 3;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+}
+
 /* Metric: label, value, change, stacked. The figures are tabular, so a number
    updating in place does not tug at its neighbours. A row is a grid that wraps
    rather than squeezing a number below its own width. */
