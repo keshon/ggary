@@ -31,6 +31,8 @@ import { selectConformance } from './select.spec'
 import { tabsConformance } from './tabs.spec'
 import { toastConformance } from './toast.spec'
 import { displayConformance } from './display.spec'
+import { codeConformance } from './code.spec'
+import { insertsConformance } from './inserts.spec'
 import { textareaConformance } from './textarea.spec'
 import { timelineConformance } from './timeline.spec'
 
@@ -95,6 +97,8 @@ export function runConformance() {
       toastConformance(adapter)
       displayConformance(adapter)
       timelineConformance(adapter)
+      codeConformance(adapter)
+      insertsConformance(adapter)
     })
   }
 }

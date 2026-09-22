@@ -1,0 +1,43 @@
+/* ==========================================================================
+   GGarry — inserts
+
+   Quieter than actions on purpose: a field can have a dozen inserts, and at
+   full voice they would shout louder than the text under them. Recessed, in
+   the monospace face — an insert is an identifier, not a word, and
+   `{{name}}` differs from `{{node}}` character by character.
+   ========================================================================== */
+
+[data-scope='inserts'][data-part='root'] {
+  gap: var(--ggarry-space-1) var(--ggarry-space-2);
+}
+
+[data-scope='inserts'][data-part='item'] {
+  /* The tap target's height: a control, if a quiet one. */
+  min-block-size: var(--ggarry-size-tap);
+  padding-inline: var(--ggarry-space-2);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-sm);
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-muted);
+  font-family: var(--ggarry-font-family-mono);
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--ggarry-duration-fast) ease, color var(--ggarry-duration-fast) ease;
+}
+[data-scope='inserts'][data-part='item']:hover {
+  background: var(--ggarry-bg-muted);
+  color: var(--ggarry-text-default);
+}
+[data-scope='inserts'][data-part='item']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='inserts'][data-part='item'] { transition: none; }
+}
+
+@media (forced-colors: active) {
+  [data-scope='inserts'][data-part='item'] { border-color: ButtonText; }
+}

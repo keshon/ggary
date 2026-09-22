@@ -1,0 +1,6 @@
+export { copyableAnatomy } from './copyable.anatomy'
+export type { CopyablePart } from './copyable.anatomy'
+export { connect } from './copyable.connect'
+export type { CopyableProps } from './copyable.types'
+export { COPY_IDLE, COPY_RESULT_MS, COPY_WORDS, createCopier, writeClipboard } from '../../utils/copy'
+export type { Copier, CopyRequest, CopyState, CopyStatus, CopyWords } from '../../utils/copy'

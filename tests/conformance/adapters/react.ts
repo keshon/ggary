@@ -3,6 +3,9 @@ import type { DataGridController } from '../../../packages/core/src/components/d
 import { createRoot } from 'react-dom/client'
 import {
   Button,
+  CodeBlock,
+  Copyable,
+  Inserts,
   Checkbox,
   CheckboxGroup,
   ChipGroup,
@@ -303,6 +306,9 @@ export const react: Adapter = {
       createElement(Button, { key: 'submit', type: 'submit' }, 'Create account'),
     ]),
   gantt: (props, target) => mount(Gantt as ComponentType<any>, props, target),
+  codeBlock: (props, target) => mount(CodeBlock as ComponentType<any>, props, target),
+  copyable: (props, target) => mount(Copyable as ComponentType<any>, props, target),
+  inserts: (props, target) => mount(Inserts as ComponentType<any>, props, target),
   commandPalette: (props, target) => mount(CommandPalette as ComponentType<any>, props, target),
   kanban: (props, target) => mount(Kanban as ComponentType<any>, props, target),
   progress: (props, target) => mount(Progress as ComponentType<any>, props, target),

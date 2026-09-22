@@ -1,0 +1,6 @@
+export { insertsAnatomy } from './inserts.anatomy'
+export type { InsertsPart } from './inserts.anatomy'
+export { connect, pressInsert, resolveInsertTarget } from './inserts.connect'
+export type { InsertItem, InsertsProps, InsertTarget } from './inserts.types'
+export { insertAtCaret, setFieldValue } from '../../utils/insert'
+export type { TextField } from '../../utils/insert'

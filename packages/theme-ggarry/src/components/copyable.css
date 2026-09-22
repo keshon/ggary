@@ -1,0 +1,62 @@
+/* ==========================================================================
+   GGarry — copyable value
+
+   A hash, a path, an identifier, and a button to take it. The button stands
+   in the flow with a gap and is always visible: in a row of identifiers on a
+   touchscreen there is no hover to reveal it. Muted rather than faint — a
+   control is read, so it is due 4.5:1 — and quieter than the value it serves
+   until the pointer reaches it.
+   ========================================================================== */
+
+[data-scope='copyable'][data-part='root'] {
+  gap: var(--ggarry-space-1);
+}
+
+[data-scope='copyable'][data-part='value'] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--ggarry-font-family-mono);
+  font-size: var(--ggarry-font-size-xs);
+}
+
+[data-scope='copyable'][data-part='copy'] {
+  inline-size: 18px;
+  block-size: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--ggarry-radius-sm);
+  background: transparent;
+  color: var(--ggarry-text-muted);
+  cursor: pointer;
+  transition: background-color var(--ggarry-duration-fast) ease, color var(--ggarry-duration-fast) ease;
+}
+/* The same device as the checkbox: the tap area grows to 24px, the glyph and
+   the line keep their size. On the button, not the glyph — a mask would clip it. */
+[data-scope='copyable'][data-part='copy']::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  inline-size: var(--ggarry-size-tap);
+  block-size: var(--ggarry-size-tap);
+}
+[data-scope='copyable'][data-part='copy']:hover {
+  background: var(--ggarry-bg-muted);
+  color: var(--ggarry-text-default);
+}
+[data-scope='copyable'][data-part='copy']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: 0;
+}
+[data-scope='copyable'][data-part='copy'][data-copied='true'] { color: var(--ggarry-text-success); }
+[data-scope='copyable'][data-part='copy'][data-copied='false'] { color: var(--ggarry-text-danger); }
+
+[data-scope='copyable'][data-part='copy-icon'] {
+  inline-size: 14px;
+  block-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='copyable'][data-part='copy'] { transition: none; }
+}
