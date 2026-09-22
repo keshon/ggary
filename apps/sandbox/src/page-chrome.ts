@@ -1,3 +1,6 @@
+import type { NavGroup } from '@ggary/core/nav'
+import { SITEMAP, type SiteCategory, type SiteComponent } from './sitemap'
+
 /**
  * What the sandbox's chrome knows before any framework draws it: the mark,
  * the pages, the sections a page has and which one is being read. Each page
@@ -26,68 +29,56 @@ export function goToPage(value: string): void {
   if (page && !location.pathname.endsWith(page.href)) location.href = page.href + location.hash
 }
 
-export interface PageSection {
-  id: string
-  title: string
+/** Where the reading is: the anchor being read, its component and its category. */
+export interface Reading {
+  anchor: string
+  component: SiteComponent
+  category: SiteCategory
+  /** The variant's name, when the component has several. */
+  variant: string | null
 }
 
-/** A section's name: its first heading. */
-const titleOf = (section: HTMLElement) => section.querySelector(':scope > h2')?.textContent?.trim() ?? ''
-const slug = (text: string) =>
-  text
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, '-')
-    .replace(/^-|-$/g, '')
+/** Every anchor on the page, in reading order, with what it belongs to. */
+export const READING_ORDER: Reading[] = SITEMAP.flatMap((category) =>
+  category.components.flatMap((component) =>
+    component.anchors.map((anchor) => ({ anchor: anchor.id, component, category, variant: component.anchors.length > 1 ? anchor.label : null }))
+  )
+)
 
-/** The sections the framework drew: the top-level ones with a heading, each given an id if it had none. */
-function sectionsOf(app: HTMLElement): PageSection[] {
-  const used = new Set<string>()
-  return [...app.querySelectorAll<HTMLElement>('section')]
-    .filter((section) => !section.parentElement?.closest('section') && section.querySelector(':scope > h2'))
-    .map((section) => {
-      if (!section.id) section.id = slug(titleOf(section)) || 'section'
-      let id = section.id
-      for (let n = 2; used.has(id); n += 1) id = `${section.id}-${n}`
-      section.id = id
-      used.add(id)
-      return { id, title: titleOf(section) }
-    })
+/** The navigator's groups for the kit's Nav: a category a group, a component an item, its variants its sections. */
+export function navGroups(current: string | null): NavGroup[] {
+  const link = (id: string) => `#${id}`
+  return SITEMAP.map((category) => ({
+    label: category.title,
+    items: category.components.map((component) =>
+      component.anchors.length === 1
+        ? { label: component.label, href: link(component.anchors[0].id), current: component.anchors[0].id === current }
+        : {
+            label: component.label,
+            href: link(component.anchors[0].id),
+            items: component.anchors.map((anchor) => ({ label: anchor.label ?? component.label, href: link(anchor.id), current: anchor.id === current })),
+          }
+    ),
+  }))
 }
 
-/**
- * The page's sections, now and whenever their number changes: the framework
- * draws the page after this starts. Looked at a moment after a change, not
- * after the last — a busy page never stops changing.
- */
-export function watchSections(app: HTMLElement, onChange: (sections: PageSection[]) => void): () => void {
-  let count = -1
-  let timer = 0
-  const check = () => {
-    const sections = sectionsOf(app)
-    if (sections.length === count) return
-    count = sections.length
-    onChange(sections)
-  }
-  const observer = new MutationObserver(() => {
-    if (!timer) timer = window.setTimeout(() => ((timer = 0), check()), 150)
-  })
-  observer.observe(app, { childList: true, subtree: true })
-  check()
-  return () => {
-    observer.disconnect()
-    clearTimeout(timer)
-  }
-}
+/** The corner button's words: "Actions · Button — Sizes and states". */
+export const readingLabel = (reading: Reading | undefined) =>
+  reading ? `${reading.category.title} · ${reading.component.label}${reading.variant ? ` — ${reading.variant}` : ''}` : ''
 
 /** The bar's height as drawn: it takes two lines on a narrow screen. */
 const barHeight = () => document.getElementById('chrome')?.getBoundingClientRect().height ?? 0
 
-/** The section being read, by index: the last whose top has passed a quarter of the way down, or the last at the very bottom. */
+/**
+ * The section being read, by index: the last whose top has reached the bar —
+ * a link lands its section just under it, so the one clicked is the one
+ * marked, however short — or the last at the very bottom.
+ */
 export function watchReading(ids: string[], onChange: (index: number) => void): () => void {
   let current = -1
   let frame = 0
   const mark = () => {
-    const line = Math.max(barHeight(), window.innerHeight / 4)
+    const line = barHeight() + 16
     let index = 0
     ids.forEach((id, i) => {
       const top = document.getElementById(id)?.getBoundingClientRect().top
@@ -122,8 +113,8 @@ export function watchBar(): () => void {
 }
 
 /** Keep the item being read in view in the navigator's own scroll, without moving the page. */
-export function revealInList(list: HTMLElement | null, index: number): void {
-  const item = list?.querySelectorAll<HTMLElement>('[data-part="item"]')[index]
+export function revealInList(list: HTMLElement | null): void {
+  const item = list?.querySelector<HTMLElement>('[aria-current="page"]')
   if (!list || !item || list.scrollHeight <= list.clientHeight) return
   list.scrollTo({ top: item.offsetTop - list.clientHeight / 2 + item.offsetHeight / 2 })
 }

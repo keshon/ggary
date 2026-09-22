@@ -1,12 +1,42 @@
-import { useId, type HTMLAttributes } from 'react'
-import { connect, type NavProps as CoreNavProps } from '@ggary/core/nav'
+import { useId, useState, type HTMLAttributes } from 'react'
+import { connect, type NavItem, type NavProps as CoreNavProps } from '@ggary/core/nav'
 import { reactNormalizer } from '@ggary/core'
 
 export interface NavProps extends Omit<CoreNavProps, 'id'>, Omit<HTMLAttributes<HTMLElement>, 'children'> {}
 
-export function Nav({ label, groups, ...rest }: NavProps) {
+/**
+ * The side column. An item with `items` has sections one level down, opened
+ * by the button beside it; which are open is kept here unless `open` is
+ * given, and follows the reading until the reader sets it.
+ */
+export function Nav({ label, groups, open, onOpenChange, words, ...rest }: NavProps) {
   const id = `gg-nav-${useId().replace(/:/g, '')}`
-  const api = connect({ id, label, groups }, reactNormalizer)
+  const [chosen, setChosen] = useState<Record<string, boolean>>({})
+  const api = connect(
+    {
+      id,
+      label,
+      groups,
+      words,
+      open: open ?? chosen,
+      onOpenChange: (href, next) => {
+        if (open === undefined) setChosen((current) => ({ ...current, [href]: next }))
+        onOpenChange?.(href, next)
+      },
+    },
+    reactNormalizer
+  )
+
+  const link = (item: NavItem, level: 1 | 2) => {
+    const parts = api.getItemProps(item, level)
+    return (
+      <a key={item.href} {...parts.itemProps}>
+        {parts.showIcon && <span {...parts.iconProps} />}
+        {item.label}
+        {parts.showCount && <span {...parts.countProps}>{item.count}</span>}
+      </a>
+    )
+  }
 
   return (
     <nav {...rest} {...api.rootProps}>
@@ -16,13 +46,16 @@ export function Nav({ label, groups, ...rest }: NavProps) {
           <div key={group.label ?? index} {...parts.groupProps}>
             {parts.showLabel && <span {...parts.groupLabelProps}>{group.label}</span>}
             {group.items.map((item) => {
-              const link = api.getItemProps(item)
+              const branch = api.getBranchProps(item)
+              if (!branch) return link(item, 1)
               return (
-                <a key={item.href} {...link.itemProps}>
-                  {link.showIcon && <span {...link.iconProps} />}
-                  {item.label}
-                  {link.showCount && <span {...link.countProps}>{item.count}</span>}
-                </a>
+                <div key={item.href} {...branch.branchProps}>
+                  {link(item, 1)}
+                  <button {...branch.toggleProps}>
+                    <span {...branch.toggleIconProps} />
+                  </button>
+                  <div {...branch.subitemsProps}>{branch.sections.map((section) => link(section, 2))}</div>
+                </div>
               )
             })}
           </div>

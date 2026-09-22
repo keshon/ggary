@@ -52,35 +52,37 @@ header.bar .wordmark { font-size: 17px; font-weight: 700; letter-spacing: -0.02e
   .theme-controls { margin-left: 0; }
 }
 
-/* Sections: numbered, and parted by a dashed line the page's full width. */
-#app { counter-reset: section; }
+/* The page: categories, each numbered under a heading of its own, and in each
+   the components' sections, parted by a dashed line the page's full width. */
+.category { padding-block-end: 24px; }
+.category-title {
+  display: flex; align-items: baseline; gap: 12px;
+  margin: 0; padding-block: 40px 4px;
+  scroll-margin-top: var(--chrome-height);
+  font-size: 22px; font-weight: 700; letter-spacing: -0.015em; color: var(--gg-text);
+}
+.category:first-child .category-title { padding-block-start: 28px; }
+.category-number { font-size: 13px; font-weight: 600; letter-spacing: 0; color: var(--gg-accent-text); font-variant-numeric: tabular-nums; }
 section { margin: 0; }
 section:not(section section) {
   position: relative;
-  padding-block: 32px 36px;
+  padding-block: 28px 32px;
   scroll-margin-top: var(--chrome-height);
-  counter-increment: section;
 }
-section:not(section section):first-of-type { padding-block-start: 28px; }
 section:not(section section) + section:not(section section)::before {
   content: '';
   position: absolute; inset-block-start: 0; inset-inline-start: 50%;
   inline-size: 100vw; translate: -50% 0;
   border-block-start: 1px dashed var(--gg-border-strong);
 }
-section > h2 {
+/* A component's title, and the titles of the other components that share its section. */
+section > h3 {
+  margin: 0 0 12px;
+  scroll-margin-top: var(--chrome-height);
   font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
-  color: var(--gg-text-faint); margin: 0 0 12px;
+  color: var(--gg-text-faint);
 }
-section:not(section section) > h2:first-child {
-  display: flex; align-items: baseline; gap: 10px;
-  margin-block-end: 16px;
-  font-size: 13px; color: var(--gg-text);
-}
-section:not(section section) > h2:first-child::before {
-  content: counter(section, decimal-leading-zero);
-  color: var(--gg-accent-text); font-variant-numeric: tabular-nums;
-}
+section:not(section section) > h3:first-child { margin-block-end: 16px; font-size: 13px; color: var(--gg-text); }
 
 /* The navigator. One element: a popover on a narrow screen, opened from the
    button at the corner; beside the page where there is room, always shown. */
@@ -93,19 +95,11 @@ section:not(section section) > h2:first-child::before {
   background: var(--gg-surface); color: var(--gg-text);
   box-shadow: 0 12px 32px rgb(0 0 0 / 0.18);
 }
-.toc-title {
-  margin: 4px 12px 8px;
-  font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
-  color: var(--gg-text-faint);
-}
-.toc [data-scope='nav'][data-part='item'] { min-block-size: 28px; font-size: 13px; }
-.toc [data-scope='nav'][data-part='group'] { gap: 1px; counter-reset: toc; }
-/* Each numbered as its section's heading is. Drawn, so the name a screen reader hears is the title alone. */
-.toc [data-scope='nav'][data-part='item']::before {
-  counter-increment: toc; content: counter(toc, decimal-leading-zero);
-  font-variant-numeric: tabular-nums; color: var(--gg-text-faint); font-size: 12px;
-}
-.toc [data-scope='nav'][data-part='item'][data-current]::before { color: inherit; }
+/* The column is dense: a component's row a little lower than the Nav's own. */
+.toc [data-scope='nav'][data-part='item'][data-level='1'] { min-block-size: 30px; padding-block: 5px; font-size: 13px; }
+.toc [data-scope='nav'][data-part='toggle'] { margin-block: 1px; }
+.toc [data-scope='nav'][data-part='group'] + [data-part='group'] { margin-block-start: 16px; }
+.toc [data-scope='nav'][data-part='group-label'] { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--gg-text-faint); }
 
 .toc-button { position: fixed; inset: auto 16px 16px auto; z-index: 5; }
 .toc-button button { max-inline-size: min(320px, calc(100vw - 32px)); box-shadow: 0 8px 24px rgb(0 0 0 / 0.2); }

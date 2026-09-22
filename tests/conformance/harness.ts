@@ -246,9 +246,20 @@ export interface BreadcrumbsProps {
   label?: string
 }
 
+export interface NavItemProps {
+  label: string
+  href: string
+  icon?: string
+  count?: number | string
+  current?: boolean
+  items?: NavItemProps[]
+}
+
 export interface NavProps {
   label: string
-  groups: { label?: string; items: { label: string; href: string; icon?: string; count?: number | string; current?: boolean }[] }[]
+  groups: { label?: string; items: NavItemProps[] }[]
+  open?: Record<string, boolean>
+  onOpenChange?: (href: string, open: boolean) => void
 }
 
 export interface PaginationProps {

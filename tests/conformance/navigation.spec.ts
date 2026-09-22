@@ -123,6 +123,63 @@ export function navConformance(adapter: Adapter) {
       expect(part(items()[0], 'nav', 'count')!.textContent).toBe('7')
       expect(part(items()[1], 'nav', 'count')).toBeNull()
     })
+
+    const nested: NavProps['groups'] = [
+      {
+        label: 'Actions',
+        items: [
+          { label: 'Button', href: '#button', items: [{ label: 'Emphasis', href: '#button-emphasis' }, { label: 'Sizes', href: '#button-sizes', current: true }] },
+          { label: 'Select', href: '#select', items: [{ label: 'Uncontrolled', href: '#select-a' }, { label: 'Controlled', href: '#select-b' }] },
+          { label: 'Chip', href: '#chip' },
+        ],
+      },
+    ]
+
+    it('an item with sections stands beside a button that opens them; they are open while the reading is inside it', async () => {
+      const { m } = await setup({ groups: nested })
+      const branches = [...m.root.querySelectorAll<HTMLElement>('[data-scope="nav"][data-part="branch"]')]
+      expect(branches).toHaveLength(2)
+      const [button, select] = branches.map((branch) => ({
+        link: part(branch, 'nav', 'item') as HTMLAnchorElement,
+        toggle: part(branch, 'nav', 'toggle') as HTMLButtonElement,
+        sections: part(branch, 'nav', 'subitems')!,
+      }))
+      // The item holding the current section is marked as such; only the section is current.
+      expect(button.link.hasAttribute('data-current-branch')).toBe(true)
+      expect(button.link.hasAttribute('aria-current')).toBe(false)
+      expect(part(button.sections, 'nav', 'item')!.nextElementSibling!.getAttribute('aria-current')).toBe('page')
+      expect([button.toggle.tagName, button.toggle.type, button.toggle.getAttribute('aria-expanded')]).toEqual(['BUTTON', 'button', 'true'])
+      expect(button.toggle.getAttribute('aria-controls')).toBe(button.sections.id)
+      expect(button.toggle.getAttribute('aria-label')).toBe('Button, sections')
+      expect(button.sections.getAttribute('role')).toBe('group')
+      expect(button.sections.getAttribute('aria-labelledby')).toBe(button.link.id)
+      expect(button.sections.hidden).toBe(false)
+      expect([...button.sections.querySelectorAll('a')].map((a) => a.getAttribute('href'))).toEqual(['#button-emphasis', '#button-sizes'])
+      // Not being read: closed.
+      expect(select.toggle.getAttribute('aria-expanded')).toBe('false')
+      expect(select.sections.hidden).toBe(true)
+      // An item without sections is a plain link, not a branch.
+      expect(m.root.querySelector('a[href="#chip"]')!.parentElement!.dataset.part).toBe('group')
+    })
+
+    it('the button opens and closes the sections; the owner hears it, and a controlled column waits to be told', async () => {
+      const told: [string, boolean][] = []
+      const { m } = await setup({ groups: nested, onOpenChange: (href, open) => void told.push([href, open]) })
+      const toggle = (href: string) => m.root.querySelector<HTMLButtonElement>(`[aria-controls="${m.root.querySelector(`a[href="${href}"]`)!.id.replace('-item-', '-sections-')}"]`)!
+      await adapter.act(() => click(toggle('#select')))
+      expect(toggle('#select').getAttribute('aria-expanded')).toBe('true')
+      await adapter.act(() => click(toggle('#button')))
+      expect(toggle('#button').getAttribute('aria-expanded')).toBe('false')
+      expect(told).toEqual([['#select', true], ['#button', false]])
+      if (adapter.supports.refusal) {
+        const controlled = await adapter.nav({ label: 'Sections', groups: nested, open: {} }, freshTarget())
+        const own = controlled.root.querySelectorAll<HTMLButtonElement>('[data-scope="nav"][data-part="toggle"]')[1]
+        await adapter.act(() => click(own))
+        expect(own.getAttribute('aria-expanded')).toBe('false')
+        await controlled.update({ open: { '#select': true } })
+        expect(own.getAttribute('aria-expanded')).toBe('true')
+      }
+    })
   })
 }
 

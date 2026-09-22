@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 2724 tests, 1035 of them in headless Chrome
+npm test         # 2736 tests, 1039 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -149,13 +149,21 @@ The sandbox imports GGarry once, as a project would, and sets nothing but
 components — `apps/sandbox/src/Chrome.tsx` on the React page, `Bar.svelte` and
 `Navigator.svelte` on the Svelte one, sharing what needs no framework in
 `page-chrome.ts`: a SegmentedControl for the framework, one for the colour mode
-(System, Light, Dark), a Nav for the sections and a Button to open it. The bar
+(System, Light, Dark), a Nav for the page and a Button to open it. The bar
 sticks to the top with the mark — two G's sharing a crossbar, wide open and cut
-square so they do not read as an "@" — and the name; the sections are numbered
-and parted by a dashed line the page's width; the navigator lists them with the
-one being read marked — a column at the page's left edge, under the bar, where
-there is room, and behind a button at the corner where there is not. The bar
-stands under the kit's own layers: a sheet beside the page covers it.
+square so they do not read as an "@" — and the name.
+
+The page is laid out from one map, `apps/sandbox/src/sitemap.ts`: seven
+numbered categories (Actions, Inputs, Overlays, Navigation, Layout, Data,
+Display and feedback), the components in each, and a component's variants
+where it has several. The page follows its order and the navigator is drawn
+from it, so the two cannot disagree: a category is a Nav group, a component an
+item, its variants the item's sections, opened while one is being read. The
+one being read is the last whose top has reached the bar — a link lands its
+section just under it, so the one clicked is the one marked. The navigator is
+a column at the page's left edge, under the bar, where there is room, and a
+popover from a button at the corner — "Data · Gantt" — where there is not. The
+bar stands under the kit's own layers: a sheet beside the page covers it.
 
 ### `@ggary/structure`
 
@@ -1173,6 +1181,17 @@ the markup is supposed to carry and usually does not.
   current item is `aria-current="page"` in the markup — the component never
   decides which page it is on — and the theme marks it with a bar at its inner
   edge as well as a surface. A group is a `group` only when it has a name.
+  An item may have `items` of its own, one level down — a component's
+  variants, a settings page's panes. It stands in a branch beside a real
+  button (`aria-expanded`, named "Button, sections") that opens them, and the
+  sections are a group named by the item's link. They are open while the
+  item or one of its sections is current, and closed otherwise, unless the
+  reader set them; `open` and `onOpenChange` hand that to the owner. Only the
+  section itself is current; the item holding it is marked in the default ink
+  without the bar, and the sections step in on a guide line the current one's
+  bar sits on. Deeper levels are not drawn: a column that nests further is a
+  Tree. A label that wraps keeps its icon and count on its first line, and the
+  row grows by its lines with the same air above and below.
 - **Pagination** is links too, and `paginationRange()` builds the list: the ends,
   the current page with its neighbours, and an ellipsis for what is left out —
   but never for a single page, because a gap costs the same room as the page and
@@ -2466,13 +2485,13 @@ sandbox build prints none.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 433 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
+| machine | node | `*.machine.test.ts` | 436 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
 | contract | node | `icons.contract.test.ts` | 337 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 4 tests. Every discovered theme — GGarry, now the only one: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 868 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 872 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 868 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 872 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
 | browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
 | browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |

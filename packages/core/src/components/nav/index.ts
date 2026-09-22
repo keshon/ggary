@@ -1,4 +1,4 @@
 export { navAnatomy } from './nav.anatomy'
 export type { NavPart } from './nav.anatomy'
-export { connect, navIds } from './nav.connect'
-export type { NavGroup, NavItem, NavProps } from './nav.types'
+export { NAV_WORDS, connect, hasCurrentSection, isNavItemOpen, navIds } from './nav.connect'
+export type { NavGroup, NavItem, NavProps, NavWords } from './nav.types'

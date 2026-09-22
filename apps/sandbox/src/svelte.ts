@@ -10,4 +10,4 @@ const app = document.getElementById('app')!
 mount(App, { target: app })
 // The chrome, drawn with the page's own components.
 mount(Bar, { target: document.getElementById('chrome')! })
-mount(Navigator, { target: document.body.appendChild(Object.assign(document.createElement('div'), { id: 'navigator' })), props: { app } })
+mount(Navigator, { target: document.body.appendChild(Object.assign(document.createElement('div'), { id: 'navigator' })), })
