@@ -107,8 +107,18 @@ import {
   ToolbarSeparator,
   ToolbarSpacer,
   Tooltip,
+  Metric,
+  MetricRow,
+  KeyValueList,
+  FileChange,
+  Timeline,
+  StatusDot,
+  Caret,
+  CodeBlock,
+  Copyable,
+  Inserts,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, rolloutGroups, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, HINT_READOUTS, generatorSource, templateInserts, HINT_CODE, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -1392,6 +1402,64 @@ function App() {
           </Card>
         </div>
         <p className="hint">Badges state a status in words, never colour alone. An avatar shows initials until its picture has loaded, and keeps them if it fails. The spinner is a status with a name; the skeleton is hidden from assistive technology, so say what is loading elsewhere.</p>
+      </section>
+
+      <section id="readouts">
+        <h2>Metric, key–values, file changes and timeline</h2>
+        <MetricRow joined headline>
+          {headlineMetrics.map((metric) => (
+            <Metric key={metric.label} {...metric} />
+          ))}
+        </MetricRow>
+        <div style={{ marginTop: 16 }}>
+          <MetricRow>
+            {runMetrics.map((metric) => (
+              <Metric key={metric.label} {...metric} />
+            ))}
+          </MetricRow>
+        </div>
+        <div className="panels">
+          <KeyValueList
+            items={runFacts.map((fact) => ({ label: fact.label, value: fact.label === 'Commit' ? <Copyable value={fact.value} /> : fact.value }))}
+          />
+          <ul className="changes">
+            {changedFiles.map((file) => (
+              <li key={file.path}>
+                <FileChange change={file.change} />
+                {file.path}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="panels">
+          <Timeline label="The nightly run" items={runEvents} locale="en-GB" />
+          <div className="stack" style={{ marginTop: 0 }}>
+            <span className="dot-line">
+              <StatusDot tone="running" /> Agents at work
+            </span>
+            <p style={{ margin: 0 }}>
+              Streaming the answer
+              <Caret />
+            </p>
+          </div>
+        </div>
+        <p className="hint">{HINT_READOUTS}</p>
+      </section>
+
+      <section id="code">
+        <h2>Code, copyable values and inserts</h2>
+        <CodeBlock label="the terrain generator" code={generatorSource} numbered start={12} />
+        <div className="row" style={{ marginTop: 16, alignItems: 'center' }}>
+          <span>Build</span>
+          <Copyable value="a4f7c2e" copyValue="a4f7c2e91b0d5537" />
+        </div>
+        <div className="form-column">
+          <Field label="Notification template">
+            <Textarea rows={3} defaultValue={'{{name}} has failed at {{time}}' + String.fromCharCode(10)} />
+            <Inserts items={templateInserts} label="Template variables" />
+          </Field>
+        </div>
+        <p className="hint">{HINT_CODE}</p>
       </section>
 
       <section id="regions">

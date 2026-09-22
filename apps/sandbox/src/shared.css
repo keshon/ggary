@@ -314,3 +314,8 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
   flex: 1;
   min-inline-size: 0;
 }
+
+/* The readouts demo: a list of changed files, each a mark beside its path; a dot beside its word. */
+.changes { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.changes li { display: flex; align-items: center; gap: 8px; }
+.dot-line { display: inline-flex; align-items: center; gap: 8px; }

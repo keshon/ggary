@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, two sibling renderers (React 19
 and Svelte 5), and one design language, GGarry, on top of it.
-Sixty-six components — DataGrid, Kanban, Gantt, CommandPalette, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Seventy-six components — DataGrid, Kanban, Gantt, CommandPalette, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 2491 tests, 948 of them in headless Chrome
+npm test         # 2724 tests, 1035 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -920,6 +920,115 @@ Found on the way:
   auto margin from pushing a panel's actions to the end of the header. The title takes the free space
   instead. The banner's 75ch measure moved from its body to its lines, so the body
   still fills the row and the actions sit at its end.
+
+## Readouts: Metric, KeyValueList, FileChange, Timeline, StatusDot and Caret
+
+Ported from Instrument's display set, drawn in GGarry's own terms. None has a
+machine; each is a `connect()` in core.
+
+```tsx
+<MetricRow joined headline>
+  <Metric label="Success rate" value="94.2" unit="%" delta="1.8 points down in a week" direction="down" tone="warn" />
+  <Metric label="In the queue" value={37} />
+</MetricRow>
+<KeyValueList items={[{ label: 'Runner', value: 'eu-west-3' }, { label: 'Commit', value: <Copyable value={sha} /> }]} />
+<FileChange change="deleted" /> src/legacy/csv.ts
+<Timeline label="The nightly run" locale="en-GB" items={events} />
+<StatusDot tone="running" /> Agents at work
+<p>Streaming the answer<Caret /></p>
+```
+
+- **Metric** is one watched number: a label, the value, a unit set smaller and
+  quieter, and the change in words. **Which way it moved** (`direction`, an
+  arrow) and **whether that is good** (`tone`, the colour) are separate props —
+  time going down is good, warnings going up are bad, and one attribute for both
+  is a mistake waiting to be made. The words carry the sign; the arrow is hidden
+  from a screen reader. Numbers are formatted in the locale and set tabular. A
+  value is 22px in a tile and 28px in the headline band — sizes of their own,
+  above the text scale: a figure is not a heading, and at 16px the numbers read
+  timid beside their labels. The unit is a little over half the value's size.
+  **MetricRow** is separate tiles on the subtle ground, never bordered cards, or
+  `joined`, one ground divided by hairlines: "one fact about this screen" rather
+  than "a set of numbers". `headline` is the band under a page header, one per
+  screen.
+- **KeyValueList** is a real `<dl>`: the name and its value are tied by the
+  markup, not by two columns that happen to line up. The name column is one
+  width across lists (`--ggarry-size-label-col`, 120px), so lists line up with
+  each other; `tight` sizes it to its longest name for a narrow card. Svelte
+  takes string values and a `value` snippet for rich ones.
+- **FileChange** is what happened to a file: `added · modified · deleted ·
+  renamed · conflict`, a closed set. A sign (`+ M − R !`) in an outline — the
+  outline is a mark at 3:1, the sign is text at 4.5:1 — and the word, visually
+  hidden, for a screen reader. Colours follow GGarry: added green, modified
+  accent, deleted red, renamed muted, conflict warning.
+- **Timeline** is an ordered list — the order means something — with a real
+  `<time datetime>` at each event's end, formatted in the locale. The dots are
+  joined by a line drawn from centre to centre, decorative and not spoken. Each
+  dot takes its event's tone; a running one pulses. The dot is hidden, so an
+  event's title must say its tone in words: "Run failed", not "Run".
+- **StatusDot** is the 6px mark of a state, always beside a word. It reads its
+  colour from the nearest tone — its own, or an ancestor's — so a dot in a
+  badge, a timeline row and on its own agree. Badge's dot now reads the same
+  channel. A running dot pulses and, under reduced motion, slows to 3s rather
+  than stopping.
+- **Caret** is the cursor of text still arriving: 0.45em by 1.05em, flush
+  against the last character, blinking in steps. Reduced motion stops the blink
+  and keeps it shown; print leaves it out.
+
+Found on the way:
+
+- **An `aria-label` on a plain `<span>` names nothing.** ARIA forbids it, and
+  some screen readers say nothing. FileChange shows its sign hidden and its word
+  visually hidden instead: it reads the same, and it is allowed.
+- **The theme's reset gave every root part the base font size,** which broke the
+  caret's em sizing; it inherits its line's size now. A browser test measures it
+  at 14px and 28px.
+- **Muted text on the muted ground is 4.34:1** in light mode, so a metric stands
+  on the subtle ground.
+
+## CodeBlock, Copyable and Inserts
+
+```tsx
+<CodeBlock label="the terrain generator" code={source} numbered start={12} />
+<Copyable value="a4f7c2e" copyValue="a4f7c2e91b0d5537" />
+<Field label="Notification template">
+  <Textarea rows={3} />
+  <Inserts items={[{ value: '{{name}}' }, { value: '{{time}}', hint: 'The time of the event' }]} />
+</Field>
+```
+
+- **CodeBlock** never wraps — a wrap can change a command's meaning — so it
+  scrolls sideways, with `scrollbar-gutter: stable` so a bar appearing does not
+  shift the code. The scrolling part is a named region with a tab stop, so the
+  keyboard can reach it; the frame around it holds the copy button, so the
+  button stays in its corner while the code scrolls. `numbered` adds a 5ch
+  column of line numbers, hidden from a screen reader and left out of a copy.
+- **Copyable** is one line — a hash, an id, a path — with an in-flow button,
+  always shown (touch has no hover), its name carrying the value: "Copy
+  a4f7c2e", so a column of them is not ten identical "Copy" buttons. Its 24px
+  target is an invisible area on the button, not the glyph.
+- **Copying** (`utils/copy.ts`) writes to the clipboard and falls back to a
+  hidden field and `execCommand('copy')` when the API is missing or refuses.
+  The button shows a tick for 1.5s and a polite live region inside the
+  component says "Copied" — or "Could not copy". `onCopy` returning `false`
+  means "I copy it myself". `copyValue` copies the full value behind an
+  abbreviation.
+- **Inserts** are real buttons for a field — the variables of a template. A
+  press puts the value where the caret is, replacing a selection, leaves the
+  caret after it and hands the focus back to the field, then fires a native
+  `input` so a controlled React or Svelte field keeps its state. Without a
+  `target`, inserts take the text field of the Field they stand in; `target`
+  names another by id or getter. `onInsert` returning `false` cancels.
+
+Found on the way:
+
+- **A Field gives its control an id of its own,** so an insert aimed at the
+  textarea's id found nothing inside a Field. Inserts now default to the
+  Field's own text field, as Instrument's did.
+- **A copy button inside the scroller scrolled away** with the code. The frame
+  and the scroller are two parts.
+- **No hover highlight on numbered lines:** muted numbers on the hover fill
+  measured 4.34:1.
 
 ## SegmentedControl, Slider and NumberField
 
@@ -2357,13 +2466,17 @@ sandbox build prints none.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 379 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row. |
-| contract | node | `icons.contract.test.ts` | 301 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 433 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
+| contract | node | `icons.contract.test.ts` | 337 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 4 tests. Every discovered theme — GGarry, now the only one: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 812 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 868 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 812 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 868 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
+| browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
+| browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |
+| browser | Chrome | `inserts.browser.test.ts` | 4 tests. A controlled React textarea typed into, the caret put mid-text, an insert landing there with the caret after it, the focus back and React's state updated; a selection replaced; Enter on an insert; inserts inside a Field finding its field with no target. |
 | browser | Chrome | `forced-colors.browser.test.ts` | 3 tests. Forced colours emulated through Playwright (`page.emulateMedia({ forcedColors })`): a checked box and a switch that is on keep their state as `Highlight` with a border, a checked radio's dot shows against its box, and a busy button's ring keeps a turning arc. Each fails with the `gg.forced` layer removed. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts` | 2 tests. The form rhythm — Field's label and hint included — option rows with the field's 6px corner and 32px tall, the menu's corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, in light and dark. |
@@ -2588,6 +2701,12 @@ Real, and deliberately left open:
 - **`minlength` only applies after a real edit.** Browsers report `tooShort` for
   user edits, not for a value set from script — native behaviour, but it means a
   pre-filled short value passes until touched.
+- **Instrument's inspector is not ported.** KeyValueList shows values; editing
+  them in a two-column property sheet (Instrument's `inst-props`) is not here.
+- **One Kanban browser test is timing-sensitive under load.** "Held at the
+  board's edge, the board scrolls toward it" failed once in a full run and
+  passed in the next and three times alone: it waits on real frames of
+  auto-scroll.
 - No Changesets, no docs site.
 
 ## Scope

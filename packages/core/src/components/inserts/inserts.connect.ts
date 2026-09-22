@@ -3,9 +3,17 @@ import { insertAtCaret, type TextField } from '../../utils/insert'
 import { insertsAnatomy } from './inserts.anatomy'
 import type { InsertItem, InsertsProps, InsertTarget } from './inserts.types'
 
-/** The field a target names, in the document the press came from. */
-export function resolveInsertTarget(target: InsertTarget, doc: Document): TextField | null {
-  const field = typeof target === 'string' ? doc.getElementById(target) : target()
+/**
+ * The field a target names, in the document the press came from — or, with no
+ * target, the text field of the Field the pressed insert stands in.
+ */
+export function resolveInsertTarget(target: InsertTarget | undefined, doc: Document, from?: Element | null): TextField | null {
+  const field =
+    target === undefined
+      ? (from?.closest('[data-scope="field"][data-part="root"]')?.querySelector('textarea, input:not([type="hidden"])') ?? null)
+      : typeof target === 'string'
+        ? doc.getElementById(target)
+        : target()
   if (!field) return null
   const view = field.ownerDocument.defaultView
   const isField = view && (field instanceof view.HTMLInputElement || field instanceof view.HTMLTextAreaElement)
@@ -13,8 +21,8 @@ export function resolveInsertTarget(target: InsertTarget, doc: Document): TextFi
 }
 
 /** One press: find the field, ask `onInsert`, put the value at the caret. */
-export function pressInsert(props: Pick<InsertsProps, 'target' | 'onInsert'>, value: string, doc: Document): boolean {
-  const field = resolveInsertTarget(props.target, doc)
+export function pressInsert(props: Pick<InsertsProps, 'target' | 'onInsert'>, value: string, doc: Document, from?: Element | null): boolean {
+  const field = resolveInsertTarget(props.target, doc, from)
   if (!field || field.disabled || field.readOnly) return false
   if (props.onInsert?.(value, field) === false) return false
   insertAtCaret(field, value)
@@ -48,8 +56,8 @@ export function connect<T = Dict>(props: InsertsProps, normalize: Normalizer<T>)
         'data-value': item.value,
         translate: 'no',
         onClick: (event: { currentTarget: EventTarget | null }) => {
-          const node = event.currentTarget as Node | null
-          pressInsert(props, item.value, node?.ownerDocument ?? document)
+          const node = event.currentTarget as Element | null
+          pressInsert(props, item.value, node?.ownerDocument ?? document, node)
         },
       }),
   }

@@ -3,7 +3,7 @@ import { userEvent } from '@vitest/browser/context'
 import '../packages/theme-ggarry/src/index.css'
 import { createElement as h, useState } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
-import { Inserts } from '../packages/react/src/index'
+import { Field, Inserts, Textarea } from '../packages/react/src/index'
 
 /**
  * Inserts where only a browser can say: a controlled React textarea typed into
@@ -93,5 +93,25 @@ describe('inserts', () => {
     const b = insert('{{status}}').getBoundingClientRect()
     expect(b.top).toBeGreaterThan(a.top)
     expect(b.right).toBeLessThanOrEqual(group.getBoundingClientRect().right + 0.5)
+  })
+
+  it('inside a Field, with no target, it takes the Field’s own text field — whose id the Field chose', async () => {
+    function Template() {
+      const [text, setText] = useState('Hello world')
+      return h(Field as never, { label: 'Template' }, h(Textarea as never, { value: text, onChange: (e: { target: HTMLTextAreaElement }) => setText(e.target.value), rows: 2 }), h(Inserts, { items: [{ value: '{{name}}' }] }), h('output', null, text))
+    }
+    const host = document.createElement('div')
+    document.body.append(host)
+    root = createRoot(host)
+    root.render(h(Template))
+    await wait(30)
+    const field = host.querySelector('textarea')!
+    expect(field.id).toMatch(/^gg-field-/)
+    field.focus()
+    field.setSelectionRange(6, 6)
+    await userEvent.click(host.querySelector<HTMLElement>('[data-scope="inserts"][data-part="item"]')!)
+    expect(field.value).toBe('Hello {{name}}world')
+    expect(document.activeElement).toBe(field)
+    expect(host.querySelector('output')!.textContent).toBe('Hello {{name}}world')
   })
 })

@@ -6,11 +6,13 @@
    starts comparing. Subtle rather than muted, because the muted label on the
    muted ground is 4.34:1 in light mode.
 
-   The value is a step above the page's body and below the page title, so a
-   metric inside a region never outranks the name of the screen it stands on;
-   only the headline band under the page header reaches the ceiling, the title's
-   own step. The unit is set in the label's size and ink: "42 s" at one size
-   reads as one word, and parted, the eye takes the number and the "s" recedes.
+   The value has sizes of its own, above the text scale: 22px in a tile, 28px
+   in the headline band. A figure is not a heading — a few digits carry far
+   less weight than a title's words at the same size, and at the text scale's
+   16px the numbers read timid beside their labels. The unit is set in the
+   label's ink at a little over half the value's size, so it keeps its place
+   at either size: "42 s" at one size reads as one word, and parted, the eye
+   takes the number and the "s" recedes.
    ========================================================================== */
 
 [data-scope='metric'][data-part='root'] {
@@ -30,16 +32,16 @@
 /* How loud the value is: one channel, set by the row for the headline band. */
 [data-scope='metric'][data-part='value'] {
   margin-block-start: var(--ggarry-space-1);
-  font-size: var(--metric-value-size, var(--ggarry-font-size-lg));
+  font-size: var(--metric-value-size, var(--ggarry-font-size-metric));
   font-weight: var(--ggarry-font-weight-semibold);
   letter-spacing: -0.01em;
   line-height: 1.2;
 }
 
 [data-scope='metric'][data-part='unit'] {
-  margin-inline-start: 2px;
+  margin-inline-start: 0.1em;
   color: var(--ggarry-text-muted);
-  font-size: var(--ggarry-font-size-xs);
+  font-size: 0.55em;
   font-weight: var(--ggarry-font-weight-normal);
   letter-spacing: normal;
 }
@@ -91,10 +93,10 @@
   box-shadow: 1px 0 0 var(--ggarry-border-default), 0 -1px 0 var(--ggarry-border-default);
 }
 
-/* The headline band: the value takes the ceiling of the scale, the page
-   title's own step, and stops there. One per screen. */
+/* The headline band, under the page header: the loudest figures on the
+   screen. One per screen. */
 [data-scope='metric-row'][data-part='root'][data-headline] {
-  --metric-value-size: var(--ggarry-font-size-xl);
+  --metric-value-size: var(--ggarry-font-size-metric-headline);
 }
 
 /* Forced colours drop the ground and the shadows: the tiles keep their air,

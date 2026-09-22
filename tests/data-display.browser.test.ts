@@ -48,8 +48,9 @@ describe('metric', () => {
     const host = await mount(row({}))
     const value = host.querySelector('[data-scope="metric"][data-part="value"]')!
     const unit = value.querySelector('[data-part="unit"]')!
-    expect(px(value, 'font-size')).toBe(16)
-    expect(px(unit, 'font-size')).toBe(12)
+    expect(px(value, 'font-size')).toBe(22)
+    // A little over half the value's size, whatever that is.
+    expect(px(unit, 'font-size')).toBeCloseTo(22 * 0.55, 1)
     expect(getComputedStyle(unit).color).not.toBe(getComputedStyle(value).color)
     expect(getComputedStyle(value).fontVariantNumeric).toContain('tabular-nums')
     // One line: the unit follows the number rather than dropping under it.
@@ -74,12 +75,13 @@ describe('metric', () => {
     expect(getComputedStyle(tile).backgroundColor).not.toBe('rgba(0, 0, 0, 0)')
   })
 
-  it('the headline band takes the ceiling of the scale — the page title’s step — and a region’s does not', async () => {
+  it('the headline band’s figures are the loudest, 28px to a tile’s 22px, the unit scaling with them', async () => {
     const host = await mount(h('div', null, row({}), row({ joined: true, headline: true })))
     const [plain, headline] = all(host, '[data-scope="metric-row"][data-part="root"]')
     const size = (band: HTMLElement) => px(band.querySelector('[data-part="value"]')!, 'font-size')
-    expect(size(plain)).toBe(16)
-    expect(size(headline)).toBe(20)
+    expect(size(plain)).toBe(22)
+    expect(size(headline)).toBe(28)
+    expect(px(headline.querySelector('[data-part="unit"]')!, 'font-size')).toBeCloseTo(28 * 0.55, 1)
   })
 
   it('a joined band wraps with no hairline hanging at its edge', async () => {

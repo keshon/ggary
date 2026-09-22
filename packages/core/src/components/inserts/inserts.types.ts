@@ -14,7 +14,12 @@ export type InsertTarget = string | (() => TextField | null | undefined)
 
 export interface InsertsProps {
   items: InsertItem[]
-  target: InsertTarget
+  /**
+   * The field: an element id, or a getter. Left out, the text field of the
+   * Field the inserts stand in — the usual case, since a Field gives its
+   * control an id of its own.
+   */
+  target?: InsertTarget
   /** Called before the insert. Return `false` to leave the field untouched — to insert by a logic of your own. */
   onInsert?: (value: string, field: TextField) => boolean | void
   /** The group's name. Default "Inserts". */

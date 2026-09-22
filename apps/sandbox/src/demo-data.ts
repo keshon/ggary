@@ -595,3 +595,50 @@ export const ganttScales = [
 
 export const HINT_GANTT =
   'The chart opens on today, a third of the way in. Tab to it: one stop, on a task. Up and Down walk the tasks — the row is tinted, the bar ringed, and a bar out of sight is brought into view clear of the list — Home and End, PageUp and PageDown; Enter or a double press opens one. A screen reader hears a grid: the task’s name as the row’s header, then its dates in words, how many days, how far along, and what it waits for. Switch the scale: days, weeks, months — the core counts in days and the theme says how wide a day is. Drag a bar to move it, or either end to resize it; or with its task focused, Left and Right move it a day (Shift, a week) and Alt with them moves its end — the change is said as it is made, and kept when the keys pause, on Enter, or on moving to another task; Escape puts it back. The pretend server takes a moment and refuses anything that would end after the launch: the bar goes back and the reason is read out. The done tasks are locked. An arrow runs from each task to the ones that wait for it, and turns red where one starts before the other ends — as the import does now; move it and the arrows follow. The tasks are grouped in phases: a phase’s bar runs from its first task’s start to its last one’s end, filled as far as they have got, and a press on its name — or Left and Right on its row — closes and opens it; the rollout waits for the whole pilot phase, its arrow from the phase’s bar. With a phase closed, its tasks’ arrows go from its row.'
+
+/** The readouts demo: one nightly run, told as figures, facts, changes and events. */
+export const runMetrics = [
+  { label: 'Run time', value: 42, unit: 's', delta: '18% faster than the last', direction: 'down' as const, tone: 'ok' as const },
+  { label: 'Tests passed', value: 248, unit: '/251', delta: '3 failing', tone: 'warn' as const },
+  { label: 'Warnings', value: 12, delta: '5 new', direction: 'up' as const, tone: 'error' as const },
+]
+export const headlineMetrics = [
+  { label: 'Success rate', value: '94.2', unit: '%', delta: '1.8 points down in a week', direction: 'down' as const, tone: 'warn' as const },
+  { label: 'Duration p95', value: '4:12', unit: 'min', delta: 'median 2:48' },
+  { label: 'In the queue', value: 37, delta: '9 waiting over an hour', direction: 'up' as const, tone: 'warn' as const },
+]
+export const runFacts = [
+  { label: 'Pipeline', value: 'nightly' },
+  { label: 'Started', value: '02:14:07' },
+  { label: 'Runner', value: 'eu-west-3' },
+  { label: 'Commit', value: '2f8a1c04-9b7e-4d31-a5f0-c6e2' },
+]
+export const changedFiles = [
+  { change: 'added' as const, path: 'src/import/leads.ts' },
+  { change: 'modified' as const, path: 'src/grid/filters.ts' },
+  { change: 'deleted' as const, path: 'src/legacy/csv.ts' },
+  { change: 'renamed' as const, path: 'docs/intro.md → docs/start.md' },
+  { change: 'conflict' as const, path: 'package.json' },
+]
+export const runEvents = [
+  { id: 'e4', title: 'Run finished with 3 failing tests', detail: '4 files changed', time: '2026-09-22T02:15:49', tone: 'warn' as const },
+  { id: 'e3', title: 'Tests running', detail: '251 in 6 shards', time: '2026-09-22T02:14:52', tone: 'running' as const },
+  { id: 'e2', title: 'Build succeeded', detail: 'bundle 7.4 MB', time: '2026-09-22T02:14:31', tone: 'ok' as const },
+  { id: 'e1', title: 'Queued', time: '2026-09-22T02:14:07' },
+]
+export const HINT_READOUTS =
+  'A metric is one watched number: its unit smaller and quieter, and its change in words — which way it went (the arrow) and whether that is good (the colour) are two separate things, so "18% faster" is green going down and "5 new" is red going up. A joined row is one fact about the screen; separate tiles are a set of numbers. The key–value list is a real <dl>, its names in one column across lists. A file change is a sign in an outline, its word said to a screen reader. The timeline is an ordered list with real <time> values; each dot takes its tone, and a running one pulses — as a dot inside a badge does, since both read the same tone.'
+
+export const generatorSource = `export function terrain(size = 256, seed = Date.now()) {
+  const noise = createNoise(seed)
+  return generate(size, (x, y) => noise.fractal(x / size, y / size, { octaves: 6, persistence: 0.5, lacunarity: 2 }))
+}`
+export const templateInserts = [
+  { value: '{{name}}', hint: 'The name of the monitor' },
+  { value: '{{target}}', hint: 'The address checked' },
+  { value: '{{status}}', hint: 'The state' },
+  { value: '{{error}}', hint: 'The text of the error' },
+  { value: '{{time}}', hint: 'The time of the event' },
+]
+export const HINT_CODE =
+  'Code never wraps — a wrap can change a command — so it scrolls sideways, and the scroller is a named region the keyboard can reach. The copy button is always there (touch has no hover) and names what it copies; a press copies, shows a tick for a moment and says "Copied" to a screen reader, falling back to the old copy command when the clipboard refuses. A copyable value is the same for one line: a hash, an id, a path. Inserts put their value where the caret is in the field, replacing a selection, and hand the focus back to the field — put the caret mid-line and press one.'
