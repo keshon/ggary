@@ -43,6 +43,18 @@
       "svelte": "./src/components/badge/index.ts",
       "default": "./src/components/badge/index.ts"
     },
+    "./metric": {
+      "svelte": "./src/components/metric/index.ts",
+      "default": "./src/components/metric/index.ts"
+    },
+    "./kv": {
+      "svelte": "./src/components/kv/index.ts",
+      "default": "./src/components/kv/index.ts"
+    },
+    "./file-change": {
+      "svelte": "./src/components/file-change/index.ts",
+      "default": "./src/components/file-change/index.ts"
+    },
     "./skeleton": {
       "svelte": "./src/components/skeleton/index.ts",
       "default": "./src/components/skeleton/index.ts"

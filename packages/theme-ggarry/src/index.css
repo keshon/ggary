@@ -26,6 +26,9 @@
 
 @import './components/avatar.css' layer(gg.components);
 @import './components/badge.css' layer(gg.components);
+@import './components/metric.css' layer(gg.components);
+@import './components/kv.css' layer(gg.components);
+@import './components/file-change.css' layer(gg.components);
 @import './components/banner.css' layer(gg.components);
 @import './components/breadcrumbs.css' layer(gg.components);
 @import './components/button.css' layer(gg.components);

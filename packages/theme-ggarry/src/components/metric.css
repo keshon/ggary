@@ -1,0 +1,109 @@
+/* ==========================================================================
+   GGarry — metric
+
+   A tile on the subtle ground, never in a bordered card: four numbers are one
+   group, and a border round each turns them into four objects the reader
+   starts comparing. Subtle rather than muted, because the muted label on the
+   muted ground is 4.34:1 in light mode.
+
+   The value is a step above the page's body and below the page title, so a
+   metric inside a region never outranks the name of the screen it stands on;
+   only the headline band under the page header reaches the ceiling, the title's
+   own step. The unit is set in the label's size and ink: "42 s" at one size
+   reads as one word, and parted, the eye takes the number and the "s" recedes.
+   ========================================================================== */
+
+[data-scope='metric'][data-part='root'] {
+  padding: var(--ggarry-space-2) var(--ggarry-space-3);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='metric'][data-part='label'] {
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 16px;
+}
+
+/* How loud the value is: one channel, set by the row for the headline band. */
+[data-scope='metric'][data-part='value'] {
+  margin-block-start: var(--ggarry-space-1);
+  font-size: var(--metric-value-size, var(--ggarry-font-size-lg));
+  font-weight: var(--ggarry-font-weight-semibold);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+[data-scope='metric'][data-part='unit'] {
+  margin-inline-start: 2px;
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-normal);
+  letter-spacing: normal;
+}
+
+/* The delta reads the tone's TEXT colour: it is read, so it owes 4.5:1, not a
+   mark's 3:1. The arrow takes the same ink; the tone says good or bad, the
+   arrow says which way, and neither stands in for the other. */
+[data-scope='metric'][data-part='delta'] {
+  --metric-delta-ink: var(--ggarry-text-muted);
+  gap: var(--ggarry-space-1);
+  margin-block-start: var(--ggarry-space-1);
+  color: var(--metric-delta-ink);
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 16px;
+}
+[data-scope='metric'][data-part='delta'][data-tone='running'] { --metric-delta-ink: var(--ggarry-text-accent); }
+[data-scope='metric'][data-part='delta'][data-tone='ok'] { --metric-delta-ink: var(--ggarry-text-success); }
+[data-scope='metric'][data-part='delta'][data-tone='warn'] { --metric-delta-ink: var(--ggarry-text-warning); }
+[data-scope='metric'][data-part='delta'][data-tone='error'] { --metric-delta-ink: var(--ggarry-text-danger); }
+
+[data-scope='metric'][data-part='delta-icon'] {
+  inline-size: 12px;
+  block-size: 12px;
+}
+
+/* A row: air between the tiles, not a corridor. */
+[data-scope='metric-row'][data-part='root'] {
+  gap: var(--ggarry-space-2);
+}
+
+/* Joined: one ground divided by hairlines — "this is one, divided" rather than
+   "these are separate". Each cell draws its line OUTSIDE its start and top
+   edges and the band clips what falls past its own: the first cell of every
+   line, wrapped or not, has nothing to its start, so no line hangs at the
+   band's edge. */
+[data-scope='metric-row'][data-part='root'][data-joined] {
+  gap: 0;
+  overflow: hidden;
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-subtle);
+}
+[data-scope='metric-row'][data-part='root'][data-joined] > [data-scope='metric'][data-part='root'] {
+  padding: var(--ggarry-space-3) var(--ggarry-space-4);
+  border-radius: 0;
+  background: none;
+  box-shadow: -1px 0 0 var(--ggarry-border-default), 0 -1px 0 var(--ggarry-border-default);
+}
+[data-scope='metric-row'][data-part='root'][data-joined]:dir(rtl) > [data-scope='metric'][data-part='root'] {
+  box-shadow: 1px 0 0 var(--ggarry-border-default), 0 -1px 0 var(--ggarry-border-default);
+}
+
+/* The headline band: the value takes the ceiling of the scale, the page
+   title's own step, and stops there. One per screen. */
+[data-scope='metric-row'][data-part='root'][data-headline] {
+  --metric-value-size: var(--ggarry-font-size-xl);
+}
+
+/* Forced colours drop the ground and the shadows: the tiles keep their air,
+   and the joined band says its edge and its divisions again as borders. */
+@media (forced-colors: active) {
+  [data-scope='metric-row'][data-part='root'][data-joined] {
+    border: 1px solid CanvasText;
+  }
+  [data-scope='metric-row'][data-part='root'][data-joined] > [data-scope='metric'][data-part='root'] + [data-scope='metric'][data-part='root'] {
+    border-inline-start: 1px solid CanvasText;
+  }
+}
