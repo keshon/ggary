@@ -626,8 +626,18 @@ export const runEvents = [
   { id: 'e2', title: 'Build succeeded', detail: 'bundle 7.4 MB', time: '2026-09-22T02:14:31', tone: 'ok' as const },
   { id: 'e1', title: 'Queued', time: '2026-09-22T02:14:07' },
 ]
+/** Eleven nights of run time, for the sparkline standing beside the metric that reports the last of them. */
+export const runTimeTrend = [58, 61, 54, 57, 49, 52, 47, 50, 45, 44, 42]
+/** Two suites over the same eleven nights. Two series, so each names its hue — and a legend names them in words. */
+export const suiteSeries = [
+  { label: 'Unit tests', series: 1 as const, value: '18.2 s', values: [24.6, 23.9, 25.1, 22.4, 23.0, 21.2, 21.8, 19.9, 20.4, 18.8, 18.2] },
+  { label: 'Browser tests', series: 2 as const, value: '11.5 s', values: [12.4, 13.1, 12.0, 12.8, 11.9, 12.6, 11.4, 12.2, 11.1, 11.8, 11.5] },
+]
+/** The key, in the chart's own order: the number of a series is a contract, not a sort order. */
+export const suiteLegend = suiteSeries.map(({ label, series, value }) => ({ label, series, value }))
+
 export const HINT_READOUTS =
-  'A metric is one watched number: its unit smaller and quieter, and its change in words — which way it went (the arrow) and whether that is good (the colour) are two separate things, so "18% faster" is green going down and "5 new" is red going up. A joined row is one fact about the screen; separate tiles are a set of numbers. The key–value list is a real <dl>, its names in one column across lists. A file change is a sign in an outline, its word said to a screen reader. The timeline is an ordered list with real <time> values; each dot takes its tone, and a running one pulses — as a dot inside a badge does, since both read the same tone.'
+  'A metric is one watched number: its unit smaller and quieter, and its change in words — which way it went (the arrow) and whether that is good (the colour) are two separate things, so "18% faster" is green going down and "5 new" is red going up. A joined row is one fact about the screen; separate tiles are a set of numbers. The key–value list is a real <dl>, its names in one column across lists. A file change is a sign in an outline, its word said to a screen reader. The timeline is an ordered list with real <time> values; each dot takes its tone, and a running one pulses — as a dot inside a badge does, since both read the same tone. The sparkline beside the run time is the shape of the eleven nights behind that number: no axes, no labels, and hidden from a screen reader, because the number it belongs to is already there in words. One series takes the accent — a categorical colour exists to tell series apart, and there is nothing there to tell apart. Two series do take the palette, and then the legend under them is obligatory: it names each in words, with its quantity, so the chart still reads in black and white, under colour blindness, and in forced colours where every hue collapses into one.'
 
 export const generatorSource = `export function terrain(size = 256, seed = Date.now()) {
   const noise = createNoise(seed)

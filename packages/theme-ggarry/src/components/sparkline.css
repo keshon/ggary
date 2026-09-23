@@ -1,0 +1,64 @@
+/* ==========================================================================
+   GGarry — sparkline
+
+   The shape of a change beside a number, and nothing more: no axes, no grid,
+   no labels. The geometry arrives from core on a 120×32 viewBox, so every
+   number here is a colour or a thickness.
+
+   ONE SERIES IS NOT A CATEGORY, so the default hue is the accent rather than
+   --ggarry-chart-1. A categorical colour exists to tell series apart, and a
+   lone line has nothing to be told apart from; the first hue of the palette
+   on it would name a category that does not exist. The six come into force
+   when a second series does — and then every sparkline in the row names its
+   own, the first included, with a legend beside them saying which is which.
+   ========================================================================== */
+
+[data-scope='sparkline'][data-part='root'] {
+  --series: var(--gg-series, var(--ggarry-bg-accent));
+
+  /* A quarter above a control: tall enough for the shape to be a shape,
+     short enough to stand under a number rather than beside a chart. The
+     width follows from the viewBox's proportion, so the picture is never
+     distorted until an application asks for a width of its own — and then
+     the stroke still holds, because it does not scale. */
+  block-size: calc(var(--ggarry-size-control-md) * 1.25);
+  inline-size: auto;
+  aspect-ratio: 120 / 32;
+}
+
+[data-scope='sparkline'][data-part='root'][data-series='1'] { --series: var(--gg-series, var(--ggarry-chart-1)); }
+[data-scope='sparkline'][data-part='root'][data-series='2'] { --series: var(--gg-series, var(--ggarry-chart-2)); }
+[data-scope='sparkline'][data-part='root'][data-series='3'] { --series: var(--gg-series, var(--ggarry-chart-3)); }
+[data-scope='sparkline'][data-part='root'][data-series='4'] { --series: var(--gg-series, var(--ggarry-chart-4)); }
+[data-scope='sparkline'][data-part='root'][data-series='5'] { --series: var(--gg-series, var(--ggarry-chart-5)); }
+[data-scope='sparkline'][data-part='root'][data-series='6'] { --series: var(--gg-series, var(--ggarry-chart-6)); }
+
+/* The line, the fill and the dot are one series and have no right to part in
+   colour: all three read --series, set once on the <svg>. */
+[data-scope='sparkline'][data-part='line'] {
+  stroke: var(--series);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The one gradient the theme allows, and it is not a gradient: one flat hue
+   at low alpha. A real gradient would report that the quantity changes down
+   the vertical, which it does not. Decoration — the line carries the value,
+   so the fill owes no contrast. */
+[data-scope='sparkline'][data-part='area'] {
+  fill: var(--series);
+  fill-opacity: 0.12;
+}
+
+/* The dot of the last value wears a ring the colour of the surface under it,
+   so it stays a dot where it crosses its own line. */
+[data-scope='sparkline'][data-part='last'] {
+  fill: var(--series);
+  stroke: var(--ggarry-bg-surface);
+  stroke-width: 1.5;
+}
+
+/* A chart is a state, not a process: nothing here moves, so there is nothing
+   for reduced motion to answer. What forced colours have to be told is said
+   in a11y/forced.css, with everything else the system's palette would eat. */

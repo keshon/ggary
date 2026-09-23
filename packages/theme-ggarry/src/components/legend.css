@@ -1,0 +1,61 @@
+/* ==========================================================================
+   GGarry — legend
+
+   The key to a chart's colours, and obligatory from two series up: without it
+   colour reports nothing and a chart is a coloured-in picture.
+
+   The quantity is the loudest thing in an item, and the label quieter: the
+   numbers are what gets scanned, and they are the second carrier for anyone
+   who does not tell the hues apart. Small type, because a legend is read
+   after the chart, never instead of it.
+   ========================================================================== */
+
+[data-scope='legend'][data-part='root'] {
+  gap: var(--ggarry-space-1) var(--ggarry-space-4);
+  color: var(--ggarry-text-muted);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 16px;
+}
+
+/* Down the side of a tall chart the items are a list rather than a line, so
+   the air between them is the list's, not the row's. */
+[data-scope='legend'][data-part='root'][data-direction='column'] {
+  gap: var(--ggarry-space-1);
+}
+
+[data-scope='legend'][data-part='item'] {
+  gap: var(--ggarry-space-2);
+}
+
+/* A SQUARE, and the radius is why it is stated in pixels.
+   --ggarry-radius-sm is 4px, and 4px on an 8px box clamps to half the edge,
+   which is a circle — and the circle is the state dot's (states.css). A
+   legend and a badge standing in one panel would then draw one mark for two
+   jobs, and a series would read as a status. 8px rather than the dot's 6px
+   for the same reason: the two marks are told apart before they are read.
+
+   The swatch is the one place a series hue is allowed to be a fill: it is a
+   mark at 3:1 against the surface, checked by the theme gate, and never
+   text. */
+[data-scope='legend'][data-part='swatch'] {
+  --series: var(--gg-series, var(--ggarry-bg-accent));
+
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 2px;
+  background: var(--series);
+}
+
+[data-scope='legend'][data-part='swatch'][data-series='1'] { --series: var(--gg-series, var(--ggarry-chart-1)); }
+[data-scope='legend'][data-part='swatch'][data-series='2'] { --series: var(--gg-series, var(--ggarry-chart-2)); }
+[data-scope='legend'][data-part='swatch'][data-series='3'] { --series: var(--gg-series, var(--ggarry-chart-3)); }
+[data-scope='legend'][data-part='swatch'][data-series='4'] { --series: var(--gg-series, var(--ggarry-chart-4)); }
+[data-scope='legend'][data-part='swatch'][data-series='5'] { --series: var(--gg-series, var(--ggarry-chart-5)); }
+[data-scope='legend'][data-part='swatch'][data-series='6'] { --series: var(--gg-series, var(--ggarry-chart-6)); }
+
+/* The full ink and a medium weight: the number is what the eye comes back to. */
+[data-scope='legend'][data-part='value'] {
+  color: var(--ggarry-text-default);
+  font-weight: var(--ggarry-font-weight-medium);
+}

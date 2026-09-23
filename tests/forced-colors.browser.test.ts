@@ -4,7 +4,7 @@ import '../packages/theme-ggarry/src/index.css'
 import { createElement as h } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
-import { Button, Checkbox, RadioGroup, Switch } from '../packages/react/src/index'
+import { Button, Checkbox, Legend, RadioGroup, Sparkline, Switch } from '../packages/react/src/index'
 
 /**
  * Windows High Contrast, emulated. Fills and shadows are reset to system
@@ -68,6 +68,24 @@ describe('forced colours', () => {
     const checked = [...dots].find((dot) => dot.previousElementSibling instanceof HTMLInputElement && dot.previousElementSibling.checked)!
     const input = checked.previousElementSibling!
     expect(style(checked).backgroundColor).not.toBe(style(input).backgroundColor)
+  })
+
+  it('a sparkline drops the fill under its line and keeps the ring round its last dot', async () => {
+    const host = mount(h(Sparkline, { values: [4, 9, 6, 14, 22], area: true }))
+    await forced()
+    const area = host.querySelector('[data-scope="sparkline"][data-part="area"]')!
+    // Reset, the fill comes back as a block over the shape it was shading.
+    expect(style(area).display).toBe('none')
+    const dot = host.querySelector('[data-scope="sparkline"][data-part="last"]')!
+    expect(style(dot).stroke).not.toBe(style(dot).fill)
+  })
+
+  it('a legend’s swatches survive the reset as marks, the labels saying which is which', async () => {
+    const host = mount(h(Legend, { items: [{ label: 'Render', series: 1 as const }, { label: 'Physics', series: 2 as const }] }))
+    await forced()
+    const swatches = [...host.querySelectorAll('[data-scope="legend"][data-part="swatch"]')]
+    const canvas = style(document.body).backgroundColor
+    expect(swatches.every((swatch) => style(swatch).backgroundColor !== canvas)).toBe(true)
   })
 
   it('a busy button’s ring keeps a turning arc: its top edge another colour than the rest', async () => {

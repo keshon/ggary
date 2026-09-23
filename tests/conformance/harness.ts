@@ -30,6 +30,9 @@ import type { StatusTone } from '../../packages/core/src/utils/tone'
 import type { HeadingLevel, LiveMode, RegionRank } from '../../packages/core/src/utils/region'
 import type { MetricDirection } from '../../packages/core/src/components/metric'
 import type { FileChangeKind, FileChangeWords } from '../../packages/core/src/components/file-change'
+import type { SparklineWords } from '../../packages/core/src/components/sparkline'
+import type { LegendDirection, LegendItem, LegendWords } from '../../packages/core/src/components/legend'
+import type { ChartSeries } from '../../packages/core/src/utils/series'
 
 export interface ButtonProps {
   label: string
@@ -616,6 +619,24 @@ export interface TimelineProps {
   rich?: boolean
 }
 
+export interface SparklineProps {
+  values: number[]
+  area?: boolean
+  last?: boolean
+  series?: ChartSeries
+  label?: string
+  describe?: boolean
+  locale?: string
+  words?: Partial<SparklineWords>
+}
+
+export interface LegendProps {
+  items: LegendItem[]
+  direction?: LegendDirection
+  label?: string
+  words?: Partial<LegendWords>
+}
+
 export interface StatusDotProps {
   tone?: StatusTone
 }
@@ -881,6 +902,8 @@ export interface Adapter {
   toaster(props: ToasterProps, target: HTMLElement): Promise<Mounted<ToasterProps>>
   badge(props: BadgeProps, target: HTMLElement): Promise<Mounted<BadgeProps>>
   timeline?(props: TimelineProps, target: HTMLElement): Promise<Mounted<TimelineProps>>
+  sparkline?(props: SparklineProps, target: HTMLElement): Promise<Mounted<SparklineProps>>
+  legend?(props: LegendProps, target: HTMLElement): Promise<Mounted<LegendProps>>
   statusDot?(props: StatusDotProps, target: HTMLElement): Promise<Mounted<StatusDotProps>>
   caret?(props: CaretProps, target: HTMLElement): Promise<Mounted<CaretProps>>
   avatar(props: AvatarProps, target: HTMLElement): Promise<Mounted<AvatarProps>>

@@ -269,6 +269,14 @@
       "types": "./src/components/gantt/index.ts",
       "default": "./src/components/gantt/index.ts"
     },
+    "./sparkline": {
+      "types": "./src/components/sparkline/index.ts",
+      "default": "./src/components/sparkline/index.ts"
+    },
+    "./legend": {
+      "types": "./src/components/legend/index.ts",
+      "default": "./src/components/legend/index.ts"
+    },
     "./code": {
       "types": "./src/components/code/index.ts",
       "default": "./src/components/code/index.ts"

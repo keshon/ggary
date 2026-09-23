@@ -1,0 +1,5 @@
+export { legendAnatomy } from './legend.anatomy'
+export type { LegendPart } from './legend.anatomy'
+export { connect, LEGEND_WORDS } from './legend.connect'
+export type { LegendApi } from './legend.connect'
+export type { LegendDirection, LegendItem, LegendProps, LegendWords } from './legend.types'

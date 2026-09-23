@@ -88,6 +88,8 @@
 @import './components/section.css' layer(gg.components);
 @import './components/textarea.css' layer(gg.components);
 @import './components/timeline.css' layer(gg.components);
+@import './components/sparkline.css' layer(gg.components);
+@import './components/legend.css' layer(gg.components);
 @import './components/tooltip.css' layer(gg.components);
 @import './components/code.css' layer(gg.components);
 @import './components/copyable.css' layer(gg.components);

@@ -112,13 +112,15 @@ import {
   KeyValueList,
   FileChange,
   Timeline,
+  Sparkline,
+  Legend,
   StatusDot,
   Caret,
   CodeBlock,
   Copyable,
   Inserts,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, HINT_READOUTS, generatorSource, templateInserts, HINT_CODE, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, HINT_READOUTS, generatorSource, templateInserts, HINT_CODE, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -1517,7 +1519,7 @@ function App() {
         </section>
 
         <section id="readouts">
-          <h3>Metric, key–values, file changes and timeline</h3>
+          <h3>Metric, sparkline, legend, key–values, file changes and timeline</h3>
           <MetricRow joined headline>
             {headlineMetrics.map((metric) => (
               <Metric key={metric.label} {...metric} />
@@ -1529,6 +1531,21 @@ function App() {
                 <Metric key={metric.label} {...metric} />
               ))}
             </MetricRow>
+          </div>
+          {/* The usual pairing: the number in words, the shape of the nights behind it beside them.
+              The picture is hidden from a screen reader — the metric has already said the number. */}
+          <div className="row" style={{ marginTop: 16, alignItems: 'center' }}>
+            <Metric {...runMetrics[0]} />
+            <Sparkline values={runTimeTrend} area describe={false} />
+          </div>
+          {/* Two series, so each names its hue — and a legend under them names both in words. */}
+          <div className="stack">
+            <div className="row" style={{ alignItems: 'center' }}>
+              {suiteSeries.map((suite) => (
+                <Sparkline key={suite.label} values={suite.values} series={suite.series} label={`${suite.label}: ${suite.value} on the last night`} />
+              ))}
+            </div>
+            <Legend items={suiteLegend} label="Time by suite" />
           </div>
           <div className="panels">
             <KeyValueList

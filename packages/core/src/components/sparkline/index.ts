@@ -1,0 +1,5 @@
+export { sparklineAnatomy } from './sparkline.anatomy'
+export type { SparklinePart } from './sparkline.anatomy'
+export { connect, sparklineGeometry, SPARKLINE_DOT_RADIUS, SPARKLINE_VIEWBOX, SPARKLINE_WORDS } from './sparkline.connect'
+export type { SparklineApi, SparklineGeometry, SparklinePoint } from './sparkline.connect'
+export type { SparklineDirection, SparklineProps, SparklineWords } from './sparkline.types'

@@ -56,21 +56,24 @@ describe('adapters draw no glyphs', () => {
   // They draw an <svg> whose geometry core computed, and still no glyph.
   const CHARTS = ['sparkline', 'ring']
   const isChart = (file: string) => CHARTS.some((chart) => file.includes(`components/${chart}/`) || file.includes(`components\\${chart}\\`))
+  // A chart's barrel re-exports and draws nothing, so it answers to the rule
+  // every other adapter file does rather than to the exception.
+  const drawsData = (file: string) => isChart(file) && !file.endsWith('index.ts')
   const everyAdapterFile = ['react', 'svelte'].flatMap((name) => walk(pkg(name, 'src'), ['.ts', '.tsx', '.svelte']))
-  const adapterFiles = everyAdapterFile.filter((file) => !isChart(file))
-  const chartFiles = everyAdapterFile.filter(isChart)
+  const adapterFiles = everyAdapterFile.filter((file) => !drawsData(file))
+  const chartFiles = everyAdapterFile.filter(drawsData)
 
   it.each(adapterFiles.map((f) => [f.slice(root.length + 1)]))('%s', (file) => {
     const source = readFileSync(join(root, file), 'utf8')
-    expect(source).not.toMatch(/<svg|<path|createElementNS/)
+    expect(source).not.toMatch(/<svg\b|<path\b|createElementNS/)
   })
 
   it.each(chartFiles.length ? chartFiles.map((f) => [f.slice(root.length + 1)]) : [['(no chart adapter yet)']])('%s draws data, not glyphs', (file) => {
     if (file.startsWith('(')) return
     const source = readFileSync(join(root, file), 'utf8')
-    expect(source).toMatch(/<(svg|path|circle|rect|polyline|line|g)/)
+    expect(source).toMatch(/<(svg|path|circle|rect|polyline|line|g)\b/)
     // A glyph would arrive as a sprite or a hand-built node; data does not.
-    expect(source).not.toMatch(/<use|xlink:href|createElementNS/)
+    expect(source).not.toMatch(/<use\b|xlink:href|createElementNS/)
   })
 })
 
