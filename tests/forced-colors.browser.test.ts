@@ -4,7 +4,7 @@ import '../packages/theme-ggarry/src/index.css'
 import { createElement as h } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
-import { Button, Checkbox, Legend, RadioGroup, Sparkline, Switch } from '../packages/react/src/index'
+import { Button, Checkbox, Legend, RadioGroup, Sparkline, Switch, Share } from '../packages/react/src/index'
 
 /**
  * Windows High Contrast, emulated. Fills and shadows are reset to system
@@ -86,6 +86,25 @@ describe('forced colours', () => {
     const swatches = [...host.querySelectorAll('[data-scope="legend"][data-part="swatch"]')]
     const canvas = style(document.body).backgroundColor
     expect(swatches.every((swatch) => style(swatch).backgroundColor !== canvas)).toBe(true)
+  })
+
+  it('a share bar keeps its divisions: the tones collapse, the parts do not', async () => {
+    const host = mount(
+      h(Share as never, {
+        items: [
+          { label: 'up', value: 22, tone: 'ok' },
+          { label: 'down', value: 1.5, tone: 'error' },
+          { label: 'unknown', value: 0.5, tone: 'neutral' },
+        ],
+      })
+    )
+    await forced()
+    const segments = [...host.querySelectorAll<HTMLElement>('[data-scope="share"][data-part="segment"]')]
+    // One fill is left for every tone, so the parts are told apart by the line
+    // each draws on its trailing edge — the last has nothing after it.
+    expect(new Set(segments.map((segment) => style(segment).backgroundColor)).size).toBe(1)
+    expect(segments.map((segment) => style(segment).borderInlineEndStyle)).toEqual(['solid', 'solid', 'none'])
+    expect(style(host.querySelector('[data-scope="share"][data-part="root"]')).borderTopStyle).toBe('solid')
   })
 
   it('a busy button’s ring keeps a turning arc: its top edge another colour than the rest', async () => {

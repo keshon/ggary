@@ -260,6 +260,26 @@ const pairs: Pair[] = [
   { label: 'copyable: failed glyph on surface', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'inserts: label on its recessed plate', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
 
+  // A share bar: its parts are marks — a tone or a series, both measured
+  // above on the grounds a mark stands on — and the empty strip is the track,
+  // which is not load-bearing and only has to read as room.
+  { label: 'share: the track off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'share: the track off the canvas', fg: '--ggarry-border-default', bg: ['--ggarry-bg-canvas'], min: STEP },
+
+  // The heatmap's ramp. The steps are marks and are not held to 3:1 — a step
+  // twice as dark is not a different sign — but the empty cell has to read as
+  // a cell, and the first step has to be told from it.
+  { label: 'heatmap: the empty cell on the canvas', fg: '--ggarry-bg-muted', bg: ['--ggarry-bg-canvas'], min: STEP },
+  { label: 'heatmap: the empty cell on the surface', fg: '--ggarry-bg-muted', bg: ['--ggarry-bg-surface'], min: STEP },
+  {
+    label: 'heatmap: the first step off the empty cell',
+    fg: 'color-mix(in oklab, var(--ggarry-bg-accent) 25%, var(--ggarry-bg-muted))',
+    bg: ['--ggarry-bg-muted'],
+    min: STEP,
+  },
+  { label: 'heatmap: the busiest day on the canvas', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'heatmap: a month name on the canvas', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-canvas'], min: TEXT },
+
   // Focus ring against what it stands on.
   { label: 'focus: ring on surface', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'focus: ring on canvas', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-canvas'], min: LARGE },

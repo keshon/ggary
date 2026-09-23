@@ -1,5 +1,5 @@
 import type { ChipItem } from '@ggary/core/chip-group'
-import { todayISO } from '@ggary/core'
+import { addDays, todayISO, weekday } from '@ggary/core'
 import type { PaletteCommand } from '@ggary/core/command-palette'
 import { setMode, type Mode } from './theme'
 import type { MenuEntry } from '@ggary/core/menu'
@@ -649,6 +649,41 @@ export const HINT_READOUTS =
   'The sparkline beside the run time is the shape of the eleven nights behind that number: no axes, no labels, and hidden from a screen reader, because the number it belongs to is already there in words. One series takes the accent — a categorical colour exists to tell series apart, and there is nothing there to tell apart. Two series do take the palette, and then the legend under them is obligatory: it names each in words, with its quantity, so the chart still reads in black and white, under colour blindness, and in forced colours where every hue collapses into one. ' +
   'A meter is one quantity against its own ceiling — a budget, a share of the time — so it takes one tone and never a series colour: with none it is the accent, and the disk takes warn because 237 of 240 has come to mean something. The reading stands in words above the bar, because a length and a colour are not a number; past the ceiling the fill stops at the end of the track, squares that end, and the words keep the figure that was given. A ring is the same reading where a bar has no room: the large one holds its share as a figure and names itself in words, the smaller one only repeats the count already beside it and is therefore hidden from a screen reader rather than read out twice. ' +
   'The share bar is what a period was made of, each part named beside it; its parts are outcomes, so they take tones rather than the series palette. The heatmap’s axis is intensity rather than category, so it takes steps of one hue: a column a week, seven rows of days, the four steps cut by rank so one release day does not flatten a year.'
+/**
+ * A pseudo-random stream from a fixed seed (mulberry32): the sandbox needs a
+ * year of plausible numbers, and a page that redrew itself differently on
+ * every reload would make every screenshot and every eye-check a new picture.
+ */
+function seeded(seed: number): () => number {
+  let state = seed >>> 0
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0
+    let t = Math.imul(state ^ (state >>> 15), 1 | state)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+/** A day of a monitored service, by outcome: the four parts add up to 24 hours. */
+export const dayOutcomes = [
+  { label: 'up', value: 22.1, tone: 'ok' as const },
+  { label: 'degraded', value: 1.4, tone: 'warn' as const },
+  { label: 'down', value: 0.4, tone: 'error' as const },
+  { label: 'not checked', value: 0.1, tone: 'neutral' as const },
+]
+
+/** A year of nightly runs, ending today: busy on weekdays, quiet at weekends, with idle days throughout. */
+export const runYear = (() => {
+  const random = seeded(20260922)
+  const last = todayISO()
+  return Array.from({ length: 365 }, (_, i) => {
+    const date = addDays(last, i - 364)
+    const weekend = weekday(date) === 0 || weekday(date) === 6
+    const idle = random() < (weekend ? 0.6 : 0.1)
+    const busy = weekend ? 4 : 12
+    return { date, value: idle ? 0 : Math.max(1, Math.round(busy * (0.3 + random() * 1.5))) }
+  })
+})()
 
 export const generatorSource = `export function terrain(size = 256, seed = Date.now()) {
   const noise = createNoise(seed)

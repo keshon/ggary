@@ -701,6 +701,26 @@ export interface FileChangeProps {
   words?: FileChangeWords
 }
 
+/** A share bar: the parts, and the words its name is built from. */
+export interface ShareProps {
+  items: import('../../packages/core/src/components/share').ShareItem[]
+  label?: string
+  unit?: string
+  locale?: string
+  size?: import('../../packages/core/src/components/share').ShareSize
+  words?: import('../../packages/core/src/components/share').ShareWords
+}
+
+/** A heatmap: the days it draws, and the words its name and titles are built from. */
+export interface HeatmapProps {
+  days: import('../../packages/core/src/components/heatmap').HeatmapDay[]
+  weekStart?: number
+  label?: string
+  unit?: string
+  locale?: string
+  words?: import('../../packages/core/src/components/heatmap').HeatmapWords
+}
+
 export interface AvatarProps {
   name: string
   src?: string
@@ -918,6 +938,8 @@ export interface Adapter {
   metricRow?(props: MetricRowProps, target: HTMLElement): Promise<Mounted<MetricRowProps>>
   keyValueList?(props: KeyValueListProps, target: HTMLElement): Promise<Mounted<KeyValueListProps>>
   fileChange?(props: FileChangeProps, target: HTMLElement): Promise<Mounted<FileChangeProps>>
+  share?(props: ShareProps, target: HTMLElement): Promise<Mounted<ShareProps>>
+  heatmap?(props: HeatmapProps, target: HTMLElement): Promise<Mounted<HeatmapProps>>
   datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>

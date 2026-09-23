@@ -1,0 +1,56 @@
+/* ==========================================================================
+   GGarry — heatmap
+
+   A year of days, a column a week. The axis here is INTENSITY, so the five
+   fills are one hue at five strengths: the accent mixed down into the empty
+   ground, a quarter of the way at each step. The chart palette is the wrong
+   one for this and could not be used — those six colours are chosen so that
+   series are told APART, and a ramp needs the opposite.
+
+   Mixed rather than declared: five more tokens would be five values to re-tune
+   in both modes every time the accent moved, while a mix follows the accent
+   wherever it goes. Four steps and no more — the eye reads a field by area,
+   and area needs coarse steps.
+
+   The cell rides --gg-heatmap-cell, so a page can make the field larger or
+   smaller without knowing any of this.
+   ========================================================================== */
+
+[data-scope='heatmap'][data-part='root'] {
+  --heatmap-ground: var(--ggarry-bg-muted);
+  gap: var(--ggarry-space-1);
+  /* The room the month names hang in, above the grid. */
+  padding-block-start: 18px;
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='heatmap'][data-part='week'] {
+  gap: var(--ggarry-space-1);
+}
+
+[data-scope='heatmap'][data-part='day'] {
+  inline-size: var(--gg-heatmap-cell, 11px);
+  block-size: var(--gg-heatmap-cell, 11px);
+  border-radius: 2px;
+  background: var(--heatmap-ground);
+}
+[data-scope='heatmap'][data-part='day'][data-level='1'] { background: color-mix(in oklab, var(--ggarry-bg-accent) 25%, var(--heatmap-ground)); }
+[data-scope='heatmap'][data-part='day'][data-level='2'] { background: color-mix(in oklab, var(--ggarry-bg-accent) 50%, var(--heatmap-ground)); }
+[data-scope='heatmap'][data-part='day'][data-level='3'] { background: color-mix(in oklab, var(--ggarry-bg-accent) 75%, var(--heatmap-ground)); }
+[data-scope='heatmap'][data-part='day'][data-level='4'] { background: var(--ggarry-bg-accent); }
+
+/* There is no such day: the range starts or ends mid-week. The room stays so
+   the rows line up, the mark does not. */
+[data-scope='heatmap'][data-part='day'][data-empty] {
+  background: none;
+}
+
+[data-scope='heatmap'][data-part='month-label'] {
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 16px;
+}
+
+/* Forced colours: no rule, deliberately. One fill is left there, and a grid of
+   identical squares would go on claiming an intensity it no longer draws. The
+   field's name carries the reading in words, which is what survives. */
