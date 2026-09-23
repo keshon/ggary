@@ -1,0 +1,107 @@
+/* ==========================================================================
+   GGarry — approval
+
+   The one block in the kit entitled to stop the eye: everything else on the
+   screen can be scrolled past, and this cannot. The accent on the leading edge
+   is the only place GGarry puts an accent on a block's border, because this is
+   the point where the system is waiting for a human.
+
+   The quiet list of consequences and the record line are shared with
+   failure.css: an approval lists what will happen, a failure lists what was
+   already tried, and both are a column of short lines inside a bordered block
+   — the same object with two contents.
+   ========================================================================== */
+
+[data-scope='approval'][data-part='root'] {
+  gap: var(--ggarry-space-3);
+  padding: var(--ggarry-space-4);
+  border: 1px solid var(--ggarry-border-accent);
+  border-inline-start: 3px solid var(--ggarry-bg-accent);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='approval'][data-part='head'] {
+  gap: var(--ggarry-space-2);
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+[data-scope='approval'][data-part='icon'] {
+  inline-size: 16px;
+  block-size: 16px;
+  color: var(--ggarry-text-accent);
+}
+
+/* What will be done is a command, a path or a call, read character by
+   character: the monospace face, on a plate that says "this is quoted". */
+[data-scope='approval'][data-part='what'] {
+  padding: var(--ggarry-space-2) var(--ggarry-space-3);
+  border-radius: var(--ggarry-radius-sm);
+  background: var(--ggarry-bg-subtle);
+  font-family: var(--ggarry-font-family-mono);
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 1.6;
+}
+
+/* The consequences are read BEFORE the press, so they take readable text; a
+   failure's attempts are read only if the first two lines did not explain it,
+   and take the muted step. That ordering is the one difference between the
+   two lists. */
+[data-scope='approval'][data-part='effects'] {
+  gap: var(--ggarry-space-1);
+  font-size: var(--ggarry-font-size-xs);
+  color: var(--ggarry-text-default);
+}
+[data-scope='approval'][data-part='effect'],
+[data-scope='failure'][data-part='attempt'] {
+  gap: var(--ggarry-space-2);
+}
+[data-scope='approval'][data-part='effect']::before,
+[data-scope='failure'][data-part='attempt']::before {
+  content: '';
+  flex: none;
+  inline-size: 6px;
+  block-size: 6px;
+  /* The centre of the mark meets the centre of the line at any type size. */
+  margin-block-start: calc((1lh - 6px) / 2);
+  border-radius: 50%;
+  background: var(--ggarry-text-muted);
+}
+/* A tone here means IRREVERSIBILITY. It is carried by the SHAPE as well as the
+   colour — a turned square rather than a dot — because under forced colours
+   and in print the colour is gone and the mark still has to differ. The word
+   in the line says it a third time. */
+[data-scope='approval'][data-part='effect']:is([data-tone='warn'], [data-tone='error'])::before {
+  border-radius: 0;
+  rotate: 45deg;
+  background: var(--ggarry-tone-mark, var(--ggarry-text-muted));
+}
+
+[data-scope='approval'][data-part='actions'] {
+  gap: var(--ggarry-space-2);
+}
+
+/* Once decided the block steps back: the accent edge comes off and a readable
+   record stays. A request that vanished cannot be checked an hour later. */
+[data-scope='approval'][data-part='root']:not([data-state='pending']) {
+  border-color: var(--ggarry-border-default);
+  border-inline-start-color: var(--ggarry-border-default);
+  background: transparent;
+}
+[data-scope='approval'][data-part='root']:not([data-state='pending']) > [data-part='head'] > [data-part='icon'] {
+  color: var(--ggarry-text-muted);
+}
+/* Denied strikes the action through: it is still there to read, and the line
+   says plainly that it was not carried out. */
+[data-scope='approval'][data-part='root'][data-state='denied'] > [data-part='what'] {
+  color: var(--ggarry-text-muted);
+  text-decoration: line-through;
+}
+
+[data-scope='approval'][data-part='verdict'],
+[data-scope='failure'][data-part='verdict'] {
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+}

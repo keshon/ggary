@@ -22,6 +22,7 @@ import DisplayWithContent from './DisplayWithContent.svelte'
 import CaretAfterText from './CaretAfterText.svelte'
 import type { TimelineItem } from '../../../packages/core/src/components/timeline'
 import DataDisplayWith from './DataDisplayWith.svelte'
+import ChatWith from './ChatWith.svelte'
 import FieldsetWithGroup from './FieldsetWithGroup.svelte'
 import { type Adapter, type ButtonProps, type CheckboxProps, type Mounted, track } from '../harness'
 import { reactiveProps } from './svelte-props.svelte'
@@ -151,6 +152,11 @@ export const svelte: Adapter = {
   menubar: (props, target) => mountSvelte(Menubar as Component<any>, props, target),
   tabs: (props, target) => mountSvelte(TabsWithPanels as Component<any>, props, target),
   toaster: (props, target) => mountSvelte(Toaster as Component<any>, props, target),
+  turn: (props, target) => mountSvelte(ChatWith as Component<any>, props, target, (p) => ({ ...p, component: 'turn' })),
+  composer: (props, target) => mountSvelte(ChatWith as Component<any>, props, target, (p) => ({ ...p, component: 'composer' })),
+  thinking: (props, target) => mountSvelte(ChatWith as Component<any>, props, target, (p) => ({ ...p, component: 'thinking' })),
+  approval: (props, target) => mountSvelte(ChatWith as Component<any>, props, target, (p) => ({ ...p, component: 'approval' })),
+  failure: (props, target) => mountSvelte(ChatWith as Component<any>, props, target, (p) => ({ ...p, component: 'failure' })),
   badge: (props, target) =>
     mountSvelte(Badge as Component<any>, props, target, ({ label, ...rest }) => (label === undefined ? rest : { ...rest, children: text(label) })),
   // The rich body is a snippet that takes the item, as an app writes `{#snippet item(entry)}`.

@@ -1,0 +1,5 @@
+export { failureAnatomy } from './failure.anatomy'
+export type { FailurePart } from './failure.anatomy'
+export { connect } from './failure.connect'
+export type { FailureConnectOptions } from './failure.connect'
+export type { FailureProps, FailureState, FailureWords } from './failure.types'

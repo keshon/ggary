@@ -1,0 +1,105 @@
+/* ==========================================================================
+   GGarry — composer
+
+   One frame, not two. The border, the ground and the focus ring live on the
+   composer; the field inside hands its own box outwards — input-group's
+   arrangement, for input-group's reason.
+
+   An empty composer is ONE LINE TALL. A textarea is two and a half controls
+   tall by definition, and that is right for a form, where the field says how
+   much answer is expected. A composer says something else: three rows of
+   nothing promise a paragraph nobody has typed. So the floor goes, the content
+   sets the height, and the cap is eight controls — past that the field scrolls
+   rather than eating the thread above it.
+   ========================================================================== */
+
+[data-scope='composer'][data-part='root'] {
+  --composer-pad: var(--ggarry-space-3);
+
+  border: 1px solid var(--ggarry-border-control);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+  /* The corners hold over the field and the bar alike. */
+  overflow: hidden;
+  transition: border-color var(--ggarry-duration-fast) ease;
+}
+[data-scope='composer'][data-part='root']:hover:not([data-disabled]),
+[data-scope='composer'][data-part='root']:focus-within {
+  border-color: var(--ggarry-border-accent);
+}
+/* The ring goes round the WHOLE frame, so what is highlighted is the object
+   the keyboard is in rather than a rectangle through the middle of it. */
+[data-scope='composer'][data-part='root']:has(> [data-scope='textarea']:focus-visible) {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+
+[data-scope='composer'][data-part='root'] > [data-scope='textarea'][data-part='root'] {
+  /* The air is a text surface's, not a control's: the composer is the largest
+     thing on the screen after the thread, and at a form field's inset one line
+     reads as a search box that has wandered in. */
+  padding: var(--ggarry-space-4) var(--composer-pad);
+  /* The field's own box is undone HERE rather than in the shared structure,
+     because what draws it — input.css, which styles both fields — is in this
+     layer, and a layer below cannot take a border off. */
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  /* The two-and-a-half-control floor every textarea has is exactly what a
+     composer must not have; the content sets the height instead. */
+  min-height: 0;
+  max-block-size: calc(var(--ggarry-size-control-md) * 8);
+  font-size: var(--ggarry-font-size-md);
+}
+[data-scope='composer'][data-part='root'] > [data-scope='textarea'][data-part='root']:focus-visible {
+  outline: none;
+}
+
+/* Inside the frame stand the controls of the MESSAGE — attaching to it,
+   sending it. What outlives the message (the mode, the model, what is left of
+   the context) belongs to a Toolbar UNDER the frame: a session is not a
+   message, and a frame drawn round both would say it was. */
+[data-scope='composer'][data-part='bar'] {
+  gap: var(--ggarry-space-3);
+  padding: var(--ggarry-space-2) var(--composer-pad);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+}
+/* Against the field there is no edge to clear, so that inset goes: the send
+   affordance would otherwise sit a whole field-padding from the text it
+   belongs to. */
+[data-scope='composer'][data-part='bar'][data-bar='edge'] {
+  padding-inline-start: 0;
+}
+
+[data-scope='composer'][data-part='send'] {
+  inline-size: var(--ggarry-size-control-sm);
+  block-size: var(--ggarry-size-control-sm);
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-bg-accent);
+  color: var(--ggarry-text-on-accent);
+  transition: background-color var(--ggarry-duration-fast) ease;
+}
+[data-scope='composer'][data-part='send']:hover:not(:disabled) {
+  background: var(--ggarry-bg-accent-hover);
+}
+[data-scope='composer'][data-part='send']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+/* Nothing to send: the control stays in place and goes quiet, rather than
+   leaving a hole the eye has to re-find when a character is typed. */
+[data-scope='composer'][data-part='send']:disabled {
+  background: var(--ggarry-bg-muted);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='composer'][data-part='send-icon'] {
+  inline-size: 14px;
+  block-size: 14px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='composer']:is([data-part='root'], [data-part='send']) { transition: none; }
+}

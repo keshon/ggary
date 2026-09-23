@@ -1,0 +1,93 @@
+/* ==========================================================================
+   GGarry — turn
+
+   A turn styles almost nothing, and that is the design. Everything else in the
+   agent layer shows work; a turn is what the work happens inside, and each
+   thing inside — a thinking aside, an approval, a failure — brings its own
+   frame. A plate under them would put a plate inside a plate at every answer.
+
+   So: the person's turn is recessed and the machine's is bare. Not a card, not
+   a panel and not a note — a card reads as an object rather than as speech, a
+   panel puts a header bar over a sentence, and a note means "the system is
+   telling you something", which is a different statement.
+   ========================================================================== */
+
+[data-scope='turn'][data-part='root'] {
+  gap: var(--ggarry-space-3);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+}
+
+/* Who spoke is a line, not a plate: the content is what is being read, and an
+   attribution heavier than the text would compete with it. */
+[data-scope='turn'][data-part='head'] {
+  gap: var(--ggarry-space-3);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+}
+[data-scope='turn'][data-part='who'] {
+  color: var(--ggarry-text-default);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+/* The cost stands at the far edge of the head: it is the least of the three
+   facts there and the one a reader most often skips. */
+[data-scope='turn'][data-part='cost'] {
+  margin-inline-start: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+/* An answer is READ rather than operated, so it takes prose leading and the
+   kit's reading size — it is the longest continuous text on the screen. */
+[data-scope='turn'][data-part='body'] {
+  font-size: var(--ggarry-font-size-md);
+  line-height: 1.65;
+}
+/* The ask is not prose. It is an instruction, usually one line: at 1.65 a
+   single line sits in its plate with a third of its height empty above and
+   below. The SIZE stays with the answer — both halves being one size is what
+   makes the exchange read as a conversation rather than a form and a receipt. */
+[data-scope='turn'][data-part='root'][data-from='user'] > [data-part='body'] {
+  line-height: 1.5;
+}
+
+/* The person's turn is recessed; the machine's has no surface at all. Wider
+   than it is tall: with an equal inset the text meets the corner arc, because
+   a large radius eats most of a small inset before the first letter. */
+[data-scope='turn'][data-part='root'][data-from='user'] {
+  padding: var(--ggarry-space-3) var(--ggarry-space-4);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-subtle);
+}
+
+/* The actions come up under the cursor, which is the opposite of the kit's
+   usual rule — hover may strengthen a control but may not bring one into
+   being. The exception is earned by what the rule protects against: the ROW is
+   always laid out and only the buttons fade, so nothing moves under the
+   cursor; focus shows them, so nothing is ever clickable while invisible; and
+   where there is no hover they simply stay. What it buys is a thread that
+   reads as prose rather than as forty buttons over twenty answers. */
+[data-scope='turn'][data-part='actions'] {
+  gap: var(--ggarry-space-3);
+  min-block-size: var(--ggarry-size-control-sm);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+}
+[data-scope='turn'][data-part='actions'] > * {
+  opacity: 0;
+  transition: opacity var(--ggarry-duration-fast) ease;
+}
+[data-scope='turn'][data-part='root']:hover > [data-part='actions'] > *,
+[data-scope='turn'][data-part='actions']:focus-within > * {
+  opacity: 1;
+}
+@media (hover: none) {
+  [data-scope='turn'][data-part='actions'] > * {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The fade goes; the row does not. A control that is reachable must be
+     visible the moment it is reachable, and that is what focus already says. */
+  [data-scope='turn'][data-part='actions'] > * { transition: none; }
+}

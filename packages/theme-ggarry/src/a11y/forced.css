@@ -140,4 +140,35 @@
   [data-scope='share'][data-part='segment']:not(:last-child) {
     border-inline-end: 1px solid Canvas;
   }
+
+  /* The agent layer. Four of its statements are fills and nothing else.
+
+     The person's turn is told from the machine's by a recess, which resets to
+     Canvas: the name in the head still says who spoke, and an edge gives the
+     ask back the body the recess was giving it. */
+  [data-scope='turn'][data-part='root'][data-from='user'] {
+    border: 1px solid CanvasText;
+  }
+
+  /* The send button is an accent disc. Reset, it is an empty circle beside a
+     glyph, and nothing says it is the principal control of the frame. */
+  [data-scope='composer'][data-part='send'] {
+    border: 1px solid ButtonText;
+  }
+
+  /* A consequence's mark. The SHAPE already carries irreversibility — a turned
+     square against a dot — which is why it survives here at all; what has to
+     come back is the mark itself, since its fill would reset to the ground. */
+  [data-scope='approval'][data-part='effect']::before,
+  [data-scope='failure'][data-part='attempt']::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+
+  /* Both machine-string plates: the tint that says "this is quoted" is gone,
+     so an edge says it instead. */
+  [data-scope='approval'][data-part='what'],
+  [data-scope='failure'][data-part='reason'] {
+    border: 1px solid CanvasText;
+  }
 }

@@ -280,6 +280,20 @@ const pairs: Pair[] = [
   { label: 'heatmap: the busiest day on the canvas', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-canvas'], min: LARGE },
   { label: 'heatmap: a month name on the canvas', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-canvas'], min: TEXT },
 
+  // The agent layer. A turn takes the recessed ground already measured above;
+  // what is new is the error block and the two machine-string plates, each of
+  // which stands on a ground of its own.
+  { label: 'failure: the head on the error ground', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface', '--ggarry-bg-danger-subtle'], min: TEXT },
+  { label: 'failure: the reason on its plate', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface', '--ggarry-bg-danger-subtle', 'color-mix(in oklab, var(--ggarry-text-danger) 10%, transparent)'], min: TEXT },
+  { label: 'failure: what was tried, on the error ground', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface', '--ggarry-bg-danger-subtle'], min: TEXT },
+  { label: 'failure: its edge off the error ground', fg: 'color-mix(in oklab, var(--ggarry-text-danger) 35%, transparent)', bg: ['--ggarry-bg-surface', '--ggarry-bg-danger-subtle'], min: STEP },
+  { label: 'approval: the head glyph on the surface', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'approval: the action on its plate', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface', '--ggarry-bg-subtle'], min: TEXT },
+  // The one accent GGarry puts on a block's edge: it has to read as a mark.
+  { label: 'approval: the waiting edge on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'composer: the glyph on the send disc', fg: '--ggarry-text-on-accent', bg: ['--ggarry-bg-accent'], min: TEXT },
+  { label: 'thinking: the aside on the canvas', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-canvas'], min: TEXT },
+
   // Focus ring against what it stands on.
   { label: 'focus: ring on surface', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'focus: ring on canvas', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-canvas'], min: LARGE },

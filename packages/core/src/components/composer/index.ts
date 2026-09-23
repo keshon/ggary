@@ -1,0 +1,5 @@
+export { composerAnatomy } from './composer.anatomy'
+export type { ComposerPart } from './composer.anatomy'
+export { connect, keyIntent } from './composer.connect'
+export type { ComposerConnectOptions, ComposerIntent, KeyLike, SendRules } from './composer.connect'
+export type { ComposerBar, ComposerProps, ComposerWords } from './composer.types'
