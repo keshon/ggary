@@ -80,6 +80,8 @@
     KeyValueList,
     FileChange,
     Timeline,
+    Sparkline,
+    Legend,
     StatusDot,
     Caret,
     CodeBlock,
@@ -113,7 +115,7 @@
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
   import { rangePresets } from '@ggary/core/date-picker'
   import type { PaletteCommand } from '@ggary/core/command-palette'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, HINT_READOUTS, generatorSource, templateInserts, HINT_CODE, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, HINT_READOUTS, generatorSource, templateInserts, HINT_CODE, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -1328,7 +1330,7 @@
   </section>
 
   <section id="readouts">
-    <h3>Metric, key–values, file changes and timeline</h3>
+    <h3>Metric, sparkline, legend, key–values, file changes and timeline</h3>
     <MetricRow joined headline>
       {#each headlineMetrics as metric (metric.label)}<Metric {...metric} />{/each}
     </MetricRow>
@@ -1336,6 +1338,21 @@
       <MetricRow>
         {#each runMetrics as metric (metric.label)}<Metric {...metric} />{/each}
       </MetricRow>
+    </div>
+    <!-- The usual pairing: the number in words, the shape of the nights behind it beside them.
+         The picture is hidden from a screen reader — the metric has already said the number. -->
+    <div class="row" style="margin-top: 16px; align-items: center">
+      <Metric {...runMetrics[0]} />
+      <Sparkline values={runTimeTrend} area describe={false} />
+    </div>
+    <!-- Two series, so each names its hue — and a legend under them names both in words. -->
+    <div class="stack">
+      <div class="row" style="align-items: center">
+        {#each suiteSeries as suite (suite.label)}
+          <Sparkline values={suite.values} series={suite.series} label={`${suite.label}: ${suite.value} on the last night`} />
+        {/each}
+      </div>
+      <Legend items={suiteLegend} label="Time by suite" />
     </div>
     <div class="panels">
       <KeyValueList items={runFacts}>

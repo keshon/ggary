@@ -1,0 +1,64 @@
+/* The charts: what a picture of numbers needs in order to be that picture,
+   in any theme. The hues, the thicknesses and the sizes are the theme's; the
+   geometry is core's; what is left is here.
+
+   Sparkline: an <svg> whose shape core computed on a fixed viewBox, stretched
+   to the width the theme gives it.
+   Legend: a list whose markers are gone, so the only marks in it are the
+   swatches. */
+
+[data-scope='sparkline'][data-part='root'] {
+  /* An inline <svg> sits on the baseline and carries a descender's worth of
+     space under it; a sparkline is a block that the theme places. */
+  display: block;
+  /* The stroke at the top and bottom of the range, and the dot standing on
+     the last point, are half outside the viewBox. Clipped, a series that
+     ends at its maximum loses the dot that says so. */
+  overflow: visible;
+}
+/* An open path with the default fill is a blot rather than a line. */
+[data-scope='sparkline'][data-part='line'] {
+  fill: none;
+  /* The picture is stretched across the width it is given and keeps its
+     height, so the two axes scale by different amounts. Without this the
+     line would come out thicker than the theme draws lines, and thicker at
+     one stretch than another. */
+  vector-effect: non-scaling-stroke;
+}
+/* The fill under the line is a fill: its own outline would double the line. */
+[data-scope='sparkline'][data-part='area'] {
+  stroke: none;
+}
+
+[data-scope='legend'][data-part='root'] {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  /* A list marker beside a swatch is a second mark saying nothing. */
+  list-style: none;
+}
+/* Along the foot of a chart: every series is visible, so the row wraps rather
+   than scrolling or squeezing the labels. */
+[data-scope='legend'][data-part='root'][data-direction='row'] {
+  flex-wrap: wrap;
+}
+[data-scope='legend'][data-part='root'][data-direction='column'] {
+  flex-direction: column;
+}
+[data-scope='legend'][data-part='item'] {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+}
+/* The swatch keeps its size when the label beside it does not fit: a squashed
+   swatch is a different mark. */
+[data-scope='legend'][data-part='swatch'] {
+  flex: none;
+}
+[data-scope='legend'][data-part='label'] {
+  min-inline-size: 0;
+}
+[data-scope='legend'][data-part='value'] {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}

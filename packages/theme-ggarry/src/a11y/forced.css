@@ -84,4 +84,25 @@
     border-color: ButtonFace;
     border-block-start-color: ButtonText;
   }
+
+  /* The charts. Every hue collapses into one system colour here, so what a
+     series was is carried by the words beside it — which is why a legend is
+     obligatory from two series up, and why its labels are text rather than
+     tooltips. What is left to do is keep the marks visible.
+
+     The sparkline's fill under the line is decoration, and reset it comes
+     back as a solid block over the shape it was shading: it goes, and the
+     line — the carrier — stays. The dot of the last value keeps a ring in
+     the system's ground, or it fuses with the line it stands on. */
+  [data-scope='sparkline'][data-part='area'] {
+    display: none;
+  }
+  [data-scope='sparkline'][data-part='last'] {
+    stroke: Canvas;
+  }
+  /* A swatch is a fill and nothing else: reset, six of them are six blanks. */
+  [data-scope='legend'][data-part='swatch'] {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
 }
