@@ -1,0 +1,45 @@
+/* ==========================================================================
+   GGarry — share
+
+   One bar, divided by the share of each part. The strip is the meter's track
+   and the meter's height, because in a row of figures this is the meter's job
+   with more than one answer; `lg` is a glyph's height, for the screen where
+   the bar is the subject rather than an annotation to a number.
+
+   A part reads one of two palettes and never both: the tone mark
+   (states.css), so an outcome agrees with every badge and dot saying the same
+   thing on the same screen, or a series from the chart palette, which is a
+   category and means nothing on its own. With neither it is the accent — one
+   part is not a category.
+
+   No transition. A share is a state rather than a process: the bar redraws as
+   the numbers arrive and does not animate towards them, so there is nothing
+   here for prefers-reduced-motion to answer.
+   ========================================================================== */
+
+[data-scope='share'][data-part='root'] {
+  block-size: 6px;
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-border-default);
+}
+[data-scope='share'][data-part='root'][data-size='lg'] {
+  block-size: 16px;
+  border-radius: var(--ggarry-radius-sm);
+}
+
+[data-scope='share'][data-part='segment'] {
+  --series: var(--gg-series, var(--ggarry-bg-accent));
+  background: var(--series);
+}
+[data-scope='share'][data-part='segment'][data-series='1'] { --series: var(--gg-series, var(--ggarry-chart-1)); }
+[data-scope='share'][data-part='segment'][data-series='2'] { --series: var(--gg-series, var(--ggarry-chart-2)); }
+[data-scope='share'][data-part='segment'][data-series='3'] { --series: var(--gg-series, var(--ggarry-chart-3)); }
+[data-scope='share'][data-part='segment'][data-series='4'] { --series: var(--gg-series, var(--ggarry-chart-4)); }
+[data-scope='share'][data-part='segment'][data-series='5'] { --series: var(--gg-series, var(--ggarry-chart-5)); }
+[data-scope='share'][data-part='segment'][data-series='6'] { --series: var(--gg-series, var(--ggarry-chart-6)); }
+
+/* An outcome: the kit's tone mark, a 3:1 colour on the surfaces a mark stands
+   on. The segment carries the tone itself, so it reads its own. */
+[data-scope='share'][data-part='segment'][data-tone] {
+  background: var(--ggarry-tone-mark, var(--ggarry-bg-accent));
+}

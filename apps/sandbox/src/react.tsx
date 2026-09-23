@@ -112,13 +112,15 @@ import {
   KeyValueList,
   FileChange,
   Timeline,
+  Share,
+  Heatmap,
   StatusDot,
   Caret,
   CodeBlock,
   Copyable,
   Inserts,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, HINT_READOUTS, generatorSource, templateInserts, HINT_CODE, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, dayOutcomes, runYear, HINT_READOUTS, generatorSource, templateInserts, HINT_CODE, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -1517,7 +1519,7 @@ function App() {
         </section>
 
         <section id="readouts">
-          <h3>Metric, key–values, file changes and timeline</h3>
+          <h3>Metric, key–values, file changes, timeline and charts</h3>
           <MetricRow joined headline>
             {headlineMetrics.map((metric) => (
               <Metric key={metric.label} {...metric} />
@@ -1554,6 +1556,13 @@ function App() {
                 <Caret />
               </p>
             </div>
+          </div>
+          <div style={{ marginTop: 16, maxInlineSize: 520 }}>
+            <Share items={dayOutcomes} unit="h" label="The last 24 hours" locale="en-GB" />
+            <p className="hint">22.1 h up · 1.4 h degraded · 0.4 h down · 0.1 h not checked</p>
+          </div>
+          <div style={{ marginTop: 16 }}>
+            <Heatmap days={runYear} unit="runs" label="Runs a day" locale="en-GB" />
           </div>
           <p className="hint">{HINT_READOUTS}</p>
         </section>

@@ -92,6 +92,8 @@
 @import './components/code.css' layer(gg.components);
 @import './components/copyable.css' layer(gg.components);
 @import './components/inserts.css' layer(gg.components);
+@import './components/share.css' layer(gg.components);
+@import './components/heatmap.css' layer(gg.components);
 
 /* Forced colours: gg.forced, declared after the components above, so what it
    says again under Windows High Contrast wins by layer order. */

@@ -34,6 +34,8 @@ import { displayConformance } from './display.spec'
 import { codeConformance } from './code.spec'
 import { insertsConformance } from './inserts.spec'
 import { dataDisplayConformance } from './data-display.spec'
+import { shareConformance } from './share.spec'
+import { heatmapConformance } from './heatmap.spec'
 import { textareaConformance } from './textarea.spec'
 import { timelineConformance } from './timeline.spec'
 
@@ -101,6 +103,8 @@ export function runConformance() {
       codeConformance(adapter)
       insertsConformance(adapter)
       dataDisplayConformance(adapter)
+      shareConformance(adapter)
+      heatmapConformance(adapter)
     })
   }
 }

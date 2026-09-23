@@ -277,6 +277,14 @@
       "types": "./src/components/copyable/index.ts",
       "default": "./src/components/copyable/index.ts"
     },
+    "./share": {
+      "types": "./src/components/share/index.ts",
+      "default": "./src/components/share/index.ts"
+    },
+    "./heatmap": {
+      "types": "./src/components/heatmap/index.ts",
+      "default": "./src/components/heatmap/index.ts"
+    },
     "./inserts": {
       "types": "./src/components/inserts/index.ts",
       "default": "./src/components/inserts/index.ts"

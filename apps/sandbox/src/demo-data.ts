@@ -1,5 +1,5 @@
 import type { ChipItem } from '@ggary/core/chip-group'
-import { todayISO } from '@ggary/core'
+import { addDays, todayISO, weekday } from '@ggary/core'
 import type { PaletteCommand } from '@ggary/core/command-palette'
 import { setMode, type Mode } from './theme'
 import type { MenuEntry } from '@ggary/core/menu'
@@ -626,8 +626,44 @@ export const runEvents = [
   { id: 'e2', title: 'Build succeeded', detail: 'bundle 7.4 MB', time: '2026-09-22T02:14:31', tone: 'ok' as const },
   { id: 'e1', title: 'Queued', time: '2026-09-22T02:14:07' },
 ]
+/**
+ * A pseudo-random stream from a fixed seed (mulberry32): the sandbox needs a
+ * year of plausible numbers, and a page that redrew itself differently on
+ * every reload would make every screenshot and every eye-check a new picture.
+ */
+function seeded(seed: number): () => number {
+  let state = seed >>> 0
+  return () => {
+    state = (state + 0x6d2b79f5) >>> 0
+    let t = Math.imul(state ^ (state >>> 15), 1 | state)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+/** A day of a monitored service, by outcome: the four parts add up to 24 hours. */
+export const dayOutcomes = [
+  { label: 'up', value: 22.1, tone: 'ok' as const },
+  { label: 'degraded', value: 1.4, tone: 'warn' as const },
+  { label: 'down', value: 0.4, tone: 'error' as const },
+  { label: 'not checked', value: 0.1, tone: 'neutral' as const },
+]
+
+/** A year of nightly runs, ending today: busy on weekdays, quiet at weekends, with idle days throughout. */
+export const runYear = (() => {
+  const random = seeded(20260922)
+  const last = todayISO()
+  return Array.from({ length: 365 }, (_, i) => {
+    const date = addDays(last, i - 364)
+    const weekend = weekday(date) === 0 || weekday(date) === 6
+    const idle = random() < (weekend ? 0.6 : 0.1)
+    const busy = weekend ? 4 : 12
+    return { date, value: idle ? 0 : Math.max(1, Math.round(busy * (0.3 + random() * 1.5))) }
+  })
+})()
+
 export const HINT_READOUTS =
-  'A metric is one watched number: its unit smaller and quieter, and its change in words — which way it went (the arrow) and whether that is good (the colour) are two separate things, so "18% faster" is green going down and "5 new" is red going up. A joined row is one fact about the screen; separate tiles are a set of numbers. The key–value list is a real <dl>, its names in one column across lists. A file change is a sign in an outline, its word said to a screen reader. The timeline is an ordered list with real <time> values; each dot takes its tone, and a running one pulses — as a dot inside a badge does, since both read the same tone.'
+  'A metric is one watched number: its unit smaller and quieter, and its change in words — which way it went (the arrow) and whether that is good (the colour) are two separate things, so "18% faster" is green going down and "5 new" is red going up. A joined row is one fact about the screen; separate tiles are a set of numbers. The key–value list is a real <dl>, its names in one column across lists. A file change is a sign in an outline, its word said to a screen reader. The timeline is an ordered list with real <time> values; each dot takes its tone, and a running one pulses — as a dot inside a badge does, since both read the same tone. The share bar is what a period was made OF: one strip divided by each part’s share, the percentages rounded in core so they still total 100 and a part with a value never rounded away to nothing. Its parts take TONES here, because they are outcomes; categories would take the chart palette instead. The bar is one picture with one name — the reading in words — so the words beside it are what say which colour is which. The heatmap is a year of nightly runs, a column a week: its axis is intensity, not a category, so it is one hue at five strengths, the step of each day computed in core from the numbers and the five colours held by the theme. It is one picture too, named by the quantity; a cell carries a title for the pointer and is hidden from a screen reader, which could not usefully walk 365 of them.'
 
 export const generatorSource = `export function terrain(size = 256, seed = Date.now()) {
   const noise = createNoise(seed)

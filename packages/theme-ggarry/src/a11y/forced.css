@@ -84,4 +84,20 @@
     border-color: ButtonFace;
     border-block-start-color: ButtonText;
   }
+
+  /* A share bar is nothing but fills, and they carry the values. The strip
+     takes an edge to stand in, and the parts survive as one colour — the
+     tones collapse, so what has to stay readable is the DIVISION: every part
+     but the last draws a line on its trailing edge. Which part is which is
+     the legend's to say, in words. */
+  [data-scope='share'][data-part='root'] {
+    border: 1px solid CanvasText;
+  }
+  [data-scope='share'][data-part='segment'] {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+  [data-scope='share'][data-part='segment']:not(:last-child) {
+    border-inline-end: 1px solid Canvas;
+  }
 }
