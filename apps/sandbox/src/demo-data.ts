@@ -299,15 +299,6 @@ export const railItems = [
 
 export const layoutLeads = ['Acme Labs 214', 'Borealis Group 77', 'Cobalt Works 902', 'Delta Retail 18', 'Ember Studio 450', 'Fjord Logistics 33', 'Granite Holding 610']
 
-export const HINT_SHELL =
-  'The frame of an application: the side column, the header, the work area and the status strip, each scrolling on its own. On a window under 60rem the column becomes a drawer behind the button in the header — Escape or a press outside closes it, the page under it is inert, and following a link closes it too; collapse="bar" lays it down under the header instead. Tab once from the top of the frame for the skip link. The separator between the list and the lead is dragged, or moved from the keyboard: arrows, Shift for bigger steps, Home and End, Enter folds the list away, a double click puts it back.'
-
-export const HINT_RAIL =
-  'The sections as a narrow column: a glyph over a short name, so nobody has to learn the pictures. The current one has a fill and a mark at its edge; the ones marked end stand at the bottom.'
-
-export const HINT_FLOW =
-  'The top of a screen and the stretches under it. The page header says where you are (breadcrumbs above), what this is, and what can be done with it; its actions fall under the title when there is no room. A section is a heading with no box, and sections stand farther apart than the rows inside one. The grid of cards falls to fewer columns as the window narrows, with no breakpoint; the stack stretches the field to its width and leaves the button at its own.'
-
 export const weekTiles = [
   { title: 'New leads', value: '1,284' },
   { title: 'Won', value: '96' },
@@ -320,9 +311,6 @@ export const isWeekend = (date: string) => {
   const day = new Date(date + 'T00:00:00Z').getUTCDay()
   return day === 0 || day === 6
 }
-
-export const HINT_DATES =
-  'Type a day the way your locale writes it — 18.09.2026, 9/18/2026, 18 Sep 2026 — and press Enter or move on; the field shows it back in the locale\'s words and submits it as 2026-09-18. Or open the calendar: arrows walk the days and cross into the next month, Home and End go to the ends of the week, PageUp and PageDown a month (with Shift, a year), Enter chooses. A range is two presses in either order, drawn under the pointer before the second; it submits as one ISO interval, 2026-09-01/2026-09-18. The week starts where the locale\'s does. The range picker has presets beside its month: today, yesterday, the last 7 and 30 days, this month, last month — one press chooses and closes.'
 
 /** Where a lead is: country, region, city — the cascader's tree. */
 export const regions = [
@@ -384,9 +372,6 @@ export const teams = [
   { value: 'product', label: 'Product' },
 ]
 
-export const HINT_CASCADER =
-  'A choice from a tree, one level to a column. Open it with a press or ArrowDown; Up and Down walk a column, Right goes into the children and Left back out, Enter chooses. A press on a branch opens it, a press on a leaf chooses. The button reads the whole path; the form gets the leaf. The team picker may stop at any level. Where the columns outrun the screen, the card scrolls sideways to the one the keyboard is on.'
-
 /** The accordion's sections: a lead's card, as a sales rep reads it. */
 export const leadSections = [
   { value: 'contact', label: 'Contact', description: 'Who to call, and when' },
@@ -423,9 +408,6 @@ export const projectTree = [
   { value: 'hr', label: 'HR', disabled: true, children: [{ value: 'hr/hiring', label: 'Hiring' }] },
   { value: 'wiki', label: 'Wiki' },
 ]
-
-export const HINT_DISCLOSURE =
-  'The accordion: one section at a time, a press or Enter opens it, Up and Down walk the buttons. A closed section is still in the page: press Ctrl+F and search for "Innoprom" — the browser opens History to show it. The tree: Up and Down walk the rows, Right opens a branch and steps in, Left steps out and closes it, Home and End, * opens every sibling, typing jumps to a name. A press on a row chooses it and opens or closes a branch; a press on the chevron only opens or closes. Progress: run the import to watch a bar and a ring move; a failed sync stays red.'
 
 /** The kanban's board: a sales pipeline. */
 export const dealStages = [
@@ -494,9 +476,6 @@ export const saveNewDeal = (title: string) =>
 
 export const formatAmount = (amount?: number) => (amount === undefined ? 'No amount yet' : `${amount.toLocaleString('ru-RU')} ₽`)
 
-export const HINT_KANBAN =
-  'Tab to the board: one stop, on a card. The arrows walk the cards; Space picks the focused one up, and then the arrows carry it — up and down, across the columns, Home and End — while a screen reader hears where it is; Space or Enter drops it, Escape puts it back, and Tab away does too. Enter on a card opens it. A move stands at once and fades until the pretend server answers, half a second later; move a deal with no amount into Won and it is refused — the card goes back and the reason is read out. In talks has a limit of 3: past it, the count turns red. The board is held to a height here: each column scrolls its own cards, and a card dragged to a column\u2019s top or bottom scrolls it. Right-click a card, press Shift+F10 on it, or use its ⋯ button for its menu: Move to another column, to the top or the bottom, or the demo\u2019s own Copy link and Archive. Add a card at a column\u2019s foot: Enter adds it and leaves the field open for the next; a title in capitals is refused and comes back to the field. Or drag a card: past a few pixels it comes up, a copy follows the pointer and the card’s slot moves where it would land; near the board’s edge the board scrolls; Escape puts it back. On a touch screen, hold a card still for a moment to pick it up — a quick swipe still scrolls.'
-
 /**
  * The sandbox's commands: its sections to go to, and a few things to do. Read
  * from the page once it is drawn, so every section has its own title.
@@ -523,9 +502,6 @@ export function sandboxCommands(notify: (text: string) => void): PaletteCommand[
     })),
   ]
 }
-
-export const HINT_PALETTE =
-  'Press Ctrl+K (⌘K on a Mac) anywhere on the page, or the button. Type to find a section to go to or a thing to do; the arrows move, Enter runs, a press does too. Colour mode opens a level of its own: Backspace in the empty field or Escape goes back up, Escape at the top closes. Type two letters of a company — "ke", "or" — and the leads that match come from the pretend server under Results.'
 
 /** The new deal form's stages, for its Select. */
 export const stageItems = [
@@ -556,9 +532,6 @@ export async function saveDealForm(data: FormData) {
   }
   return undefined
 }
-
-export const HINT_FORM =
-  'Press Create deal with nothing filled in: the form stops, each field says what is wrong — the browser’s own checks for the title and the email, the form’s rules for the company, stage and date, whose hidden inputs the browser does not check — and the summary at the top lists every error as a link and takes the focus. Fix a field and its error leaves as you type; set the stage to Offer sent and the amount becomes required. Fill it in with the title “Annual licence” and the pretend server refuses it after half a second: the error comes back to the title, and the summary says why.'
 
 /** The Gantt's plan: a CRM rollout, dated around today so today's line always crosses it. */
 /** The rollout's phases; the kickoff, the rollout itself and the launch stand on their own. */
@@ -592,9 +565,6 @@ export const ganttScales = [
   { value: 'week', label: 'Weeks' },
   { value: 'month', label: 'Months' },
 ]
-
-export const HINT_GANTT =
-  'The chart opens on today, a third of the way in. Tab to it: one stop, on a task. Up and Down walk the tasks — the row is tinted, the bar ringed, and a bar out of sight is brought into view clear of the list — Home and End, PageUp and PageDown; Enter or a double press opens one. A screen reader hears a grid: the task’s name as the row’s header, then its dates in words, how many days, how far along, and what it waits for. Switch the scale: days, weeks, months — the core counts in days and the theme says how wide a day is. Drag a bar to move it, or either end to resize it; or with its task focused, Left and Right move it a day (Shift, a week) and Alt with them moves its end — the change is said as it is made, and kept when the keys pause, on Enter, or on moving to another task; Escape puts it back. The pretend server takes a moment and refuses anything that would end after the launch: the bar goes back and the reason is read out. The done tasks are locked. An arrow runs from each task to the ones that wait for it, and turns red where one starts before the other ends — as the import does now; move it and the arrows follow. The tasks are grouped in phases: a phase’s bar runs from its first task’s start to its last one’s end, filled as far as they have got, and a press on its name — or Left and Right on its row — closes and opens it; the rollout waits for the whole pilot phase, its arrow from the phase’s bar. With a phase closed, its tasks’ arrows go from its row.'
 
 /** The readouts demo: one nightly run, told as figures, facts, changes and events. */
 export const runMetrics = [
@@ -644,11 +614,6 @@ export const suiteSeries = [
 /** The key, in the chart's own order: the number of a series is a contract, not a sort order. */
 export const suiteLegend = suiteSeries.map(({ label, series, value }) => ({ label, series, value }))
 
-export const HINT_READOUTS =
-  'A metric is one watched number: its unit smaller and quieter, and its change in words — which way it went (the arrow) and whether that is good (the colour) are two separate things, so "18% faster" is green going down and "5 new" is red going up. A joined row is one fact about the screen; separate tiles are a set of numbers. The key–value list is a real <dl>, its names in one column across lists. A file change is a sign in an outline, its word said to a screen reader. The timeline is an ordered list with real <time> values; each dot takes its tone, and a running one pulses — as a dot inside a badge does, since both read the same tone. ' +
-  'The sparkline beside the run time is the shape of the eleven nights behind that number: no axes, no labels, and hidden from a screen reader, because the number it belongs to is already there in words. One series takes the accent — a categorical colour exists to tell series apart, and there is nothing there to tell apart. Two series do take the palette, and then the legend under them is obligatory: it names each in words, with its quantity, so the chart still reads in black and white, under colour blindness, and in forced colours where every hue collapses into one. ' +
-  'A meter is one quantity against its own ceiling — a budget, a share of the time — so it takes one tone and never a series colour: with none it is the accent, and the disk takes warn because 237 of 240 has come to mean something. The reading stands in words above the bar, because a length and a colour are not a number; past the ceiling the fill stops at the end of the track, squares that end, and the words keep the figure that was given. A ring is the same reading where a bar has no room: the large one holds its share as a figure and names itself in words, the smaller one only repeats the count already beside it and is therefore hidden from a screen reader rather than read out twice. ' +
-  'The share bar is what a period was made of, each part named beside it; its parts are outcomes, so they take tones rather than the series palette. The heatmap’s axis is intensity rather than category, so it takes steps of one hue: a column a week, seven rows of days, the four steps cut by rank so one release day does not flatten a year.'
 /**
  * A pseudo-random stream from a fixed seed (mulberry32): the sandbox needs a
  * year of plausible numbers, and a page that redrew itself differently on
@@ -696,5 +661,3 @@ export const templateInserts = [
   { value: '{{error}}', hint: 'The text of the error' },
   { value: '{{time}}', hint: 'The time of the event' },
 ]
-export const HINT_CODE =
-  'Code never wraps — a wrap can change a command — so it scrolls sideways, and the scroller is a named region the keyboard can reach. The copy button is always there (touch has no hover) and names what it copies; a press copies, shows a tick for a moment and says "Copied" to a screen reader, falling back to the old copy command when the clipboard refuses. A copyable value is the same for one line: a hash, an id, a path. Inserts put their value where the caret is in the field, replacing a selection, and hand the focus back to the field — put the caret mid-line and press one.'

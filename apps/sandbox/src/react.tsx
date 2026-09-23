@@ -19,9 +19,7 @@ import {
   searchCompanies,
   managerOptions,
   tagOptions,
-  HINT_COMBOBOX,
   statusItems,
-  HINT_ROWS,
   statusTone,
   type Lead,
 } from './leads'
@@ -124,7 +122,7 @@ import {
   Copyable,
   Inserts,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, HINT_READOUTS, generatorSource, templateInserts, HINT_CODE, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -283,7 +281,6 @@ function App() {
               <Button emphasis="medium">Schedule</Button>
             </ButtonGroup>
           </div>
-          <p className="hint">Several different actions standing flush — unlike a segmented control, a group has no chosen one. Tab goes through every button, because each does its own thing.</p>
         </section>
 
         <section id="chip">
@@ -296,10 +293,6 @@ function App() {
             <Chip size="sm">Small</Chip>
             <Chip onRemove={() => alert('removed')}>Dismiss me</Chip>
           </div>
-          <p className="hint">
-            Stateless, like Button. A plain chip renders as a <code>&lt;span&gt;</code> — only chips that
-            do something become buttons and tab stops.
-          </p>
         </section>
 
         <section id="chip-group-multi">
@@ -317,10 +310,6 @@ function App() {
           <pre className="state">
             {`selection  ${JSON.stringify(selection)}\nitems      ${items.length}`}
           </pre>
-          <p className="hint">
-            Tab in once, then arrow between chips (they wrap), type to jump, Space toggles, Delete removes.
-            Removal is a <b>request</b> — the machine never touches <code>items</code>, this page does.
-          </p>
           <div className="row" style={{ marginTop: 12 }}>
             <Button size="sm" onClick={() => setItems(tags)}>
               Restore removed
@@ -367,7 +356,6 @@ function App() {
             />
           </div>
           <pre className="state">{menuLog}</pre>
-          <p className="hint">A menu button: arrows walk every item, disabled ones too, and wrap; a letter jumps to an item; Enter or a click chooses. The view menu stays open while you toggle: the page owns the state and passes new items back.</p>
         </section>
 
         <section id="menubar">
@@ -383,7 +371,6 @@ function App() {
             }}
           />
           <pre className="state">{menuLog}</pre>
-          <p className="hint">A menubar: Tab reaches it once, arrows walk it, Enter or ArrowDown opens a menu. While a menu is open, ArrowLeft and ArrowRight move between menus, and so does the pointer. Hold Alt to see the access keys; Alt+F opens File, F10 goes to the bar.</p>
         </section>
 
         <section id="palette">
@@ -399,7 +386,6 @@ function App() {
             )}
           />
           <pre className="state">{paletteLog}</pre>
-          <p className="hint">{HINT_PALETTE}</p>
         </section>
       </div>
 
@@ -421,10 +407,6 @@ function App() {
               <Input defaultValue="INV-2041" />
             </Field>
           </div>
-          <p className="hint">
-            No error shows while you type the first time, only when you leave the field or submit, and once
-            shown it clears as you fix it.
-          </p>
         </section>
 
         <section id="input-sizes">
@@ -527,7 +509,6 @@ function App() {
               <Checkbox checked={notify.digest} onCheckedChange={(on) => setNotify((n) => ({ ...n, digest: on }))}>Weekly digest</Checkbox>
             </div>
           </div>
-          <p className="hint">"All notifications" is indeterminate while only some are checked; checking it checks them all.</p>
         </section>
 
         <section id="switch">
@@ -638,10 +619,6 @@ function App() {
           <pre className="state">
             {`value       ${JSON.stringify(value)}\nlast event  ${lastEvent}`}
           </pre>
-          <p className="hint">
-            React owns the value here. The machine moves the highlight but never writes `value` — that is the
-            five-line `controlled` branch in select.machine.ts.
-          </p>
         </section>
 
         <section id="combobox">
@@ -670,7 +647,6 @@ function App() {
             />
           </div>
           <pre className="state">{comboLog}</pre>
-          <p className="hint">{HINT_COMBOBOX}</p>
         </section>
 
         <section id="cascader">
@@ -680,7 +656,6 @@ function App() {
             <Cascader label="Team" items={teams} selectParents placeholder="Any team" onValueChange={(value) => setPlaceLog(`team: ${value.join(' / ')}`)} />
           </div>
           <pre className="state">{placeLog}</pre>
-          <p className="hint">{HINT_CASCADER}</p>
         </section>
 
         <section id="dates">
@@ -693,7 +668,6 @@ function App() {
             <Calendar locale="en-GB" isDateDisabled={isWeekend} onValueChange={(value) => setDateLog(`call on: ${value.start}`)} />
           </div>
           <pre className="state">{dateLog}</pre>
-          <p className="hint">{HINT_DATES}</p>
         </section>
 
         <section id="controls">
@@ -703,7 +677,6 @@ function App() {
             <SegmentedControl items={densities} label="Row density" size="sm" value={density} onValueChange={setDensity} />
           </div>
           <pre className="state">{`view mode is ${viewMode}, density is ${density}`}</pre>
-          <p className="hint">A segmented control is native radios: one Tab stop, the arrow keys move and choose, the value submits with the form. The chosen segment is a surface and a border, never colour alone, and its weight does not change — a bolder label would shift the segments after it.</p>
   
           <h3 id="slider" style={{ marginTop: 32 }}>Slider</h3>
           <div className="controls">
@@ -712,7 +685,6 @@ function App() {
               <Slider min={0} max={100} step={5} defaultValue={80} showValue />
             </Field>
           </div>
-          <p className="hint">A native range input: the keys, the step and the announcement are the platform’s. The track is filled up to the thumb, which CSS cannot do by itself, so the share is handed to the theme as a custom property. The number beside it is hidden from screen readers, which already hear the value.</p>
   
           <h3 id="number-field" style={{ marginTop: 32 }}>Number field</h3>
           <div className="vector">
@@ -732,7 +704,6 @@ function App() {
             </Field>
           </div>
           <pre className="state">{`x ${position.x}  y ${position.y}  z ${position.z}`}</pre>
-          <p className="hint">Drag the axis letter sideways to change the number — Shift is ten times faster, Alt a tenth. The letter is a handle, not a label: each field is named "Position X" in full, because three squares marked X, Y and Z say nothing on their own.</p>
         </section>
 
         <section id="fields">
@@ -750,7 +721,6 @@ function App() {
             />
           </div>
           <pre className="state">{`mode ${mode}  ·  also ${extras.join(', ') || 'nothing'}`}</pre>
-          <p className="hint">A card is a bigger target for a real radio or checkbox — the box inside is the plain control, drawn by one rule. The heading and the explanation are inside the label, so both are the option’s name; the chosen one carries a border, a bar and its own check, never colour alone.</p>
   
           <h3 id="search" style={{ marginTop: 32 }}>Search, and a field with affixes</h3>
           <div className="form-column">
@@ -766,7 +736,6 @@ function App() {
               <Input name="subdomain" defaultValue="worldbox" aria-label="Subdomain" size="sm" />
             </InputGroup>
           </div>
-          <p className="hint">A native search field: the clear cross and Escape are the browser’s, so no script is needed. The magnifier is decoration and hidden from screen readers — the work is named by the label. The border belongs to the group, not to the field inside it: two borders at the join give two lines, and focus would ring half the control. An affix names nothing, so put the unit in the label or the hint too.</p>
   
           <h3 id="file-drop" style={{ marginTop: 32 }}>File drop</h3>
           <div className="form-column">
@@ -781,7 +750,6 @@ function App() {
           <pre className="state">
             {chosenFiles.map((file) => `${file.name} (${Math.ceil(file.size / 1024)} KB)`).join(', ') || '—'}
           </pre>
-          <p className="hint">Drag a file onto the zone, or press it and choose one. The input is clipped to a pixel rather than hidden, so Tab still reaches the zone; a drop writes the files into it, so the form submits them as if they had been chosen.</p>
   
           </section>
 
@@ -817,7 +785,6 @@ function App() {
             </div>
           </Form>
           <pre className="state">{dealFormLog}</pre>
-          <p className="hint">{HINT_FORM}</p>
         </section>
 
         <section id="native-form">
@@ -1061,7 +1028,6 @@ function App() {
               With an action
             </Button>
           </div>
-          <p className="hint">Toasts stand in the top layer and leave after five seconds; an error stays until dismissed. Rest the pointer on one, or tab to its button, and time stands still. They are announced through live regions that exist before the first toast.</p>
           <Toaster />
         </section>
       </div>
@@ -1093,13 +1059,11 @@ function App() {
             </Button>
           </div>
           <pre className="state">{tabsLog}</pre>
-          <p className="hint">Tab reaches the tab list once; the arrows move and select. Open files close with their button, Delete or a middle click, and the neighbour takes over; a dot marks unsaved changes.</p>
         </section>
 
         <section id="navigation">
           <h3>Breadcrumbs</h3>
           <Breadcrumbs items={crumbs} />
-          <p className="hint">Breadcrumbs answer "where am I and how do I get one level up" — not "what else is there". An ordered list inside a named landmark, and the last crumb is the page itself: text, never a link to where you already are. The chevron is drawn, so it reaches neither a screen reader nor a copy of the path.</p>
   
           <h3 id="nav" style={{ marginTop: 32 }}>Nav</h3>
           <div className="nav-demo">
@@ -1126,7 +1090,6 @@ function App() {
               <p>Rows would stand here.</p>
             </Panel>
           </div>
-          <p className="hint">Every item is a real link, so the middle click and "open in a new tab" work. The current one is marked by a bar at its edge as well as a surface, and by aria-current — never by colour alone. Naming a strip makes it a toolbar: one Tab stop, and the arrows move between the tools — so the name is only taken when the behaviour is there. A separator groups; one spacer pushes the tail to the far edge.</p>
   
           <h3 id="pagination" style={{ marginTop: 32 }}>Pagination</h3>
           <Pagination
@@ -1137,11 +1100,9 @@ function App() {
             }}
           />
           <pre className="state">{`page ${page}`}</pre>
-          <p className="hint">Pages are addresses, so these are links. At the edges the link stays reachable and is spoken as unavailable (aria-disabled): removing it would move the focus mid-journey. An ellipsis is only drawn when it stands for more than one page.</p>
   
           <h3 id="steps" style={{ marginTop: 32 }}>Steps</h3>
           <Steps items={importSteps} label="Import" />
-          <p className="hint">The bar says where the process is; the word under the name says it again in language, which is what survives a printout and a reader who cannot tell the shades apart.</p>
         </section>
       </div>
 
@@ -1177,7 +1138,6 @@ function App() {
               </Split>
             </Shell>
           </div>
-          <p className="hint">{HINT_SHELL}</p>
   
           <h3 id="rail" style={{ marginTop: 32 }}>Rail</h3>
           <div className="rail-demo">
@@ -1186,7 +1146,6 @@ function App() {
               <p>The section's content.</p>
             </div>
           </div>
-          <p className="hint">{HINT_RAIL}</p>
   
           <h3 id="page-header" style={{ marginTop: 32 }}>Page header, sections and flow</h3>
           <div className="flow-demo">
@@ -1219,7 +1178,6 @@ function App() {
               </Stack>
             </Section>
           </div>
-          <p className="hint">{HINT_FLOW}</p>
         </section>
 
         <section id="regions">
@@ -1264,7 +1222,6 @@ function App() {
             </Panel>
           </div>
           <pre className="state">{refreshes ? `refreshed the queue ${refreshes}×` : '—'}</pre>
-          <p className="hint">A card is an object on the page, a panel is a place. Rank sets the ground, the edge and the title size: lead, default, support. A region inside a region recedes. A tone tints only the ground.</p>
         </section>
       </div>
 
@@ -1359,9 +1316,6 @@ function App() {
             </GridDetail>
           )}
           <pre className="state">{leadLog}</pre>
-          <p className="hint">{HINT_ROWS}</p>
-          <p className="hint">Filters are chips: press one to change it, × to remove it; Views applies a named query, and the whole query lives in the address bar. Columns hides and shows columns and remembers the layout. Select rows and the bar offers every lead the query matches; Assign really reassigns them and the grid reloads, Export writes the query or the selection.</p>
-          <p className="hint">700,000 leads, answered after a 120 ms delay as a server would. Only a screenful of rows exists at a time; the scrollbar covers the whole list, and the last row is reachable. Sort by a header (Shift adds a second key), drag a header edge to resize, scroll sideways and the company stays pinned. The grid is one Tab stop: arrows move the active cell, Space selects, Shift+arrows extend, Ctrl+A selects all matching, Enter opens a lead.</p>
         </section>
 
         <section id="kanban">
@@ -1406,7 +1360,6 @@ function App() {
             </Kanban>
           </div>
           <pre className="state">{dealLog}</pre>
-          <p className="hint">{HINT_KANBAN}</p>
         </section>
 
         <section id="gantt">
@@ -1431,7 +1384,6 @@ function App() {
             />
           </div>
           <pre className="state">{ganttLog}</pre>
-          <p className="hint">{HINT_GANTT}</p>
         </section>
 
         <section id="disclosure">
@@ -1454,7 +1406,6 @@ function App() {
             </div>
           </div>
           <pre className="state">{boardLog}</pre>
-          <p className="hint">{HINT_DISCLOSURE}</p>
         </section>
       </div>
 
@@ -1487,7 +1438,6 @@ function App() {
               <Skeleton title lines={3} />
             </Card>
           </div>
-          <p className="hint">Badges state a status in words, never colour alone. An avatar shows initials until its picture has loaded, and keeps them if it fails. The spinner is a status with a name; the skeleton is hidden from assistive technology, so say what is loading elsewhere.</p>
         </section>
 
         <section id="banners">
@@ -1519,7 +1469,6 @@ function App() {
               Show the banner again
             </Button>
           </div>
-          <p className="hint">A banner is about the whole screen and can carry actions; whether closing one hides it is for the page to decide. A note is an aside. With live set to alert, a message is announced when it appears.</p>
         </section>
 
         <section id="readouts">
@@ -1593,12 +1542,10 @@ function App() {
           </div>
           <div style={{ marginTop: 16, maxInlineSize: 520 }}>
             <Share items={dayOutcomes} unit="h" label="The last 24 hours" locale="en-GB" />
-            <p className="hint">22.1 h up · 1.4 h degraded · 0.4 h down · 0.1 h not checked</p>
           </div>
           <div style={{ marginTop: 16 }}>
             <Heatmap days={runYear} unit="runs" label="Runs a day" locale="en-GB" />
           </div>
-          <p className="hint">{HINT_READOUTS}</p>
         </section>
 
         <section id="code">
@@ -1614,7 +1561,6 @@ function App() {
               <Inserts items={templateInserts} label="Template variables" />
             </Field>
           </div>
-          <p className="hint">{HINT_CODE}</p>
         </section>
       </div>
     </>

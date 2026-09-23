@@ -285,9 +285,6 @@ export function leadFacts(lead: Lead): { label: string; text: string }[] {
   }))
 }
 
-export const HINT_ROWS =
-  'Company, contact, email, status, manager and paid are editable: F2, Enter, a double click or just typing opens the editor; Enter saves, Escape undoes, Tab goes on to the next editable cell. The save takes 400 ms and shows at once — type a sum on a Lost lead and the server refuses it, the old sum comes back and the grid says why. Right-click a row (or Shift+F10) for its menu; on a row inside a selection the menu acts on all of it. Enter on a non-editable cell, or Open, shows the lead in a sheet that walks to the next and previous lead and follows the grid.'
-
 /** The managers, as options with where they sit. */
 export const managerOptions = MANAGERS.map((name, i) => ({ value: name, label: name, description: ['Moscow', 'Kazan', 'Samara', 'Perm', 'Moscow'][i] }))
 
@@ -324,5 +321,3 @@ export const tagOptions = ['Enterprise', 'Renewal', 'Partner', 'Trial', 'Educati
   (tag) => ({ value: tag.toLowerCase().replace(/\s+/g, '-'), label: tag })
 )
 
-export const HINT_COMBOBOX =
-  'Type to narrow the list: a label that starts with what you typed comes first, and case, accents and ё do not count. Arrows walk it, Enter chooses, Escape closes it and on a closed field empties it; leaving without choosing puts the field back. The field keeps the focus the whole time. Several values stand as chips: Backspace in an empty field takes the last. Type a tag that does not exist and “Create …” ends the list: Enter makes it and adds its chip. The company search asks a server — 700,000 leads, answered after 250 ms — once the typing pauses, drops an answer that arrives late for an older question, and keeps the last answer shown while it waits.'

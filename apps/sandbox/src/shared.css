@@ -139,7 +139,6 @@ form.demo {
   display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap;
   padding: 16px; border: 1px dashed var(--gg-border-strong); border-radius: 10px;
 }
-.hint { font-size: 13px; color: var(--gg-text-muted); margin: 8px 0 0; }
 
 .fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px 20px; align-items: start; }
 form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; padding: 16px; border: 1px dashed var(--gg-border-strong); border-radius: 10px; }

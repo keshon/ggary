@@ -153,6 +153,11 @@ components — `apps/sandbox/src/Chrome.tsx` on the React page, `Bar.svelte` and
 sticks to the top with the mark — two G's sharing a crossbar, wide open and cut
 square so they do not read as an "@" — and the name.
 
+The demo explains nothing. It shows the components working — the reasoning
+lives here, in this file, and a page that carried both had two copies of it
+to keep true. What the sandbox holds beside a component is its own state,
+read back: the value a select chose, the query a grid built.
+
 The page is laid out from one map, `apps/sandbox/src/sitemap.ts`: seven
 numbered categories (Actions, Inputs, Overlays, Navigation, Layout, Data,
 Display and feedback), the components in each, and a component's variants
