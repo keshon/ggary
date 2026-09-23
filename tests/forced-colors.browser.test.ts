@@ -4,7 +4,7 @@ import '../packages/theme-ggarry/src/index.css'
 import { createElement as h } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
-import { Button, Checkbox, Legend, RadioGroup, Sparkline, Switch, Share } from '../packages/react/src/index'
+import { Approval, Button, Checkbox, Composer, Legend, RadioGroup, Sparkline, Switch, Share, Turn } from '../packages/react/src/index'
 
 /**
  * Windows High Contrast, emulated. Fills and shadows are reset to system
@@ -105,6 +105,32 @@ describe('forced colours', () => {
     expect(new Set(segments.map((segment) => style(segment).backgroundColor)).size).toBe(1)
     expect(segments.map((segment) => style(segment).borderInlineEndStyle)).toEqual(['solid', 'solid', 'none'])
     expect(style(host.querySelector('[data-scope="share"][data-part="root"]')).borderTopStyle).toBe('solid')
+  })
+
+  it('an approval keeps its consequence marks, and both machine-string plates take an edge', async () => {
+    const host = mount(
+      h(Approval, {
+        what: 'rm -rf build/',
+        effects: [{ text: 'It will delete build/ entire' }, { text: 'Irreversible: nothing goes to a recycle bin', tone: 'error' as const }],
+      })
+    )
+    await forced()
+    const canvas = style(document.body).backgroundColor
+    const marks = [...host.querySelectorAll('[data-scope="approval"][data-part="effect"]')]
+    // A fill and nothing else: reset, the list would lose its marks entirely.
+    expect(marks.every((mark) => style(mark, '::before').backgroundColor !== canvas)).toBe(true)
+    // The shape is what carries irreversibility once every hue has collapsed.
+    expect(style(marks[0], '::before').borderTopLeftRadius).not.toBe('0px')
+    expect(style(marks[1], '::before').borderTopLeftRadius).toBe('0px')
+    // The tint that said "this is quoted" is gone, so an edge says it.
+    expect(style(host.querySelector('[data-scope="approval"][data-part="what"]')).borderTopStyle).toBe('solid')
+  })
+
+  it('the person’s turn keeps a body once its recess resets, and the send keeps its edge', async () => {
+    const host = mount(h('div', null, h(Turn, { who: 'You', from: 'user' }, 'Add a share bar.'), h(Composer, { label: 'Ask' })))
+    await forced()
+    expect(style(host.querySelector('[data-scope="turn"][data-part="root"]')).borderTopStyle).toBe('solid')
+    expect(style(host.querySelector('[data-scope="composer"][data-part="send"]')).borderTopStyle).toBe('solid')
   })
 
   it('a busy button’s ring keeps a turning arc: its top edge another colour than the rest', async () => {

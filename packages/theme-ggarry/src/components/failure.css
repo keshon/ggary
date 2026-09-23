@@ -1,0 +1,92 @@
+/* ==========================================================================
+   GGarry — failure
+
+   An approval's sibling: the same frame, the same quiet list, the same record
+   line, the same lifecycle of pending and then stepped back. What differs is
+   the tone and the edge marker — an approval is the one place the kit puts an
+   accent on a border, because it is the point where the system waits for a
+   human; a failure has already happened and needs no bar to be noticed, since
+   its whole ground is the error surface.
+
+   The list and the record line live in approval.css, which is imported first:
+   one rule for one object with two contents.
+   ========================================================================== */
+
+[data-scope='failure'][data-part='root'] {
+  gap: var(--ggarry-space-3);
+  padding: var(--ggarry-space-4);
+  border: 1px solid color-mix(in oklab, var(--ggarry-text-danger) 35%, transparent);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-danger-subtle);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+}
+
+/* Never colour alone: the head carries the tone's own glyph and a word. */
+[data-scope='failure'][data-part='head'] {
+  gap: var(--ggarry-space-2);
+  color: var(--ggarry-text-danger);
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+[data-scope='failure'][data-part='icon'] {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+/* The same plate as an approval's action, and for the same reason: this is a
+   machine string, read character by character, and a plate is what says "this
+   is quoted, not written". The COLOUR is not the subtle ground — that token is
+   a film of grey, and over the error ground it gives a dirty pink. A film of
+   the error ink over the error ground keeps the block one colour and still
+   drops the step the plate needs. */
+[data-scope='failure'][data-part='reason'] {
+  padding: var(--ggarry-space-2) var(--ggarry-space-3);
+  border-radius: var(--ggarry-radius-sm);
+  background: color-mix(in oklab, var(--ggarry-text-danger) 10%, transparent);
+  font-family: var(--ggarry-font-family-mono);
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 1.6;
+}
+
+/* What was already tried is read only if the first two lines did not explain
+   it, so Instrument sets it one step quieter than an approval's consequences.
+   GGarry cannot: muted ink on the light error ground measures 4.35:1, and
+   there is no tier between default and muted. The same wall the banner's text
+   met, answered the same way — the default ink, and the ordering carried by
+   the plate above rather than by a colour nobody can read. */
+[data-scope='failure'][data-part='tried'] {
+  gap: var(--ggarry-space-1);
+  color: var(--ggarry-text-default);
+  font-size: var(--ggarry-font-size-xs);
+}
+
+[data-scope='failure'][data-part='actions'] {
+  gap: var(--ggarry-space-2);
+}
+
+/* Resolved or given up, the block steps back the way an answered approval
+   does: the alert ground comes off and a quiet record stays. A failure that
+   vanished when it was fixed cannot be checked later against the same file
+   failing again.
+
+   Every place the error ink was read needs its own override: none of them
+   inherits from one property, and missing one leaves a stray patch of red on a
+   block that has otherwise gone quiet. */
+[data-scope='failure'][data-part='root']:not([data-state='pending']) {
+  border-color: var(--ggarry-border-default);
+  background: transparent;
+}
+[data-scope='failure'][data-part='root']:not([data-state='pending']) > [data-part='head'] {
+  color: var(--ggarry-text-default);
+}
+[data-scope='failure'][data-part='root']:not([data-state='pending']) > [data-part='reason'] {
+  background: var(--ggarry-bg-subtle);
+}
+/* Given up strikes the reason the way denied strikes the action: the machine
+   string is still there to read, and the line says plainly that nobody is
+   acting on it any further. */
+[data-scope='failure'][data-part='root'][data-state='given-up'] > [data-part='reason'] {
+  color: var(--ggarry-text-muted);
+  text-decoration: line-through;
+}

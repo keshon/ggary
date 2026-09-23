@@ -121,3 +121,10 @@ export * as sparkline from './components/sparkline'
 export * as legend from './components/legend'
 export * as share from './components/share'
 export * as heatmap from './components/heatmap'
+
+// The agent layer: one exchange with a machine, and the two blocks where it stops.
+export * as turn from './components/turn'
+export * as composer from './components/composer'
+export * as thinking from './components/thinking'
+export * as approval from './components/approval'
+export * as failure from './components/failure'

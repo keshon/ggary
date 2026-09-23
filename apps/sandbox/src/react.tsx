@@ -121,8 +121,13 @@ import {
   CodeBlock,
   Copyable,
   Inserts,
+  Turn,
+  Composer,
+  Thinking,
+  Approval,
+  Failure,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -151,6 +156,14 @@ function App() {
   const [ganttScale, setGanttScale] = useState<'day' | 'week' | 'month'>('day')
   const [ganttLog, setGanttLog] = useState('—')
   const [rolloutTasks, setRolloutTasks] = useState(rolloutPlan)
+  // The agent run the chat section shows: it is still working, so the last
+  // turn streams, the composer's control stops rather than sends, and the two
+  // blocks that stopped the run are still waiting for a human.
+  const [running, setRunning] = useState(true)
+  const [draft, setDraft] = useState('')
+  const [chatLog, setChatLog] = useState('—')
+  const [decision, setDecision] = useState<'pending' | 'approved' | 'denied'>('pending')
+  const [breakdown, setBreakdown] = useState<'pending' | 'resolved' | 'given-up'>('pending')
   // The sections are read from the page once it is drawn.
   useEffect(() => setPaletteCommands(sandboxCommands((text) => toast({ tone: 'neutral', title: text }))), [])
   const searchLeadCommands = async (query: string, signal: AbortSignal): Promise<PaletteCommand[]> =>
@@ -1575,6 +1588,137 @@ function App() {
 
         <section id="run-chat">
           <h3>Turn, composer, thinking, approval and failure</h3>
+          <Stack gap="loose" style={{ maxInlineSize: 680 }}>
+            <Turn who="You" from="user" time="14:02">
+              {chatThread.ask}
+            </Turn>
+
+            <Turn
+              who="Agent"
+              time="14:02"
+              tokens={1284}
+              duration={4.1}
+              locale="en-GB"
+              before={<Thinking duration={4.1} locale="en-GB">{chatThread.reasoning}</Thinking>}
+              actions={
+                <>
+                  <Button size="sm" emphasis="minimal" aria-label="Copy" onClick={() => setChatLog('copied the answer')}>
+                    <span data-icon="copy" aria-hidden="true" />
+                  </Button>
+                  <Button size="sm" emphasis="minimal" aria-label="Retry" onClick={() => setChatLog('asked again')}>
+                    <span data-icon="refresh" aria-hidden="true" />
+                  </Button>
+                  <Button size="sm" emphasis="minimal" aria-label="More" onClick={() => setChatLog('opened the menu')}>
+                    <span data-icon="more" aria-hidden="true" />
+                  </Button>
+                </>
+              }
+            >
+              {chatThread.answer}
+            </Turn>
+
+            <Turn
+              who="Agent"
+              time="14:04"
+              duration={5.2}
+              locale="en-GB"
+              after={
+                <Failure
+                  {...chatFailure}
+                  state={breakdown}
+                  resolvedAt="14:05"
+                  onRetry={() => {
+                    setBreakdown('resolved')
+                    setChatLog('retried the read, and it worked')
+                  }}
+                  actions={
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setBreakdown('given-up')
+                        setChatLog('skipped the file')
+                      }}
+                    >
+                      Skip the file
+                    </Button>
+                  }
+                />
+              }
+            >
+              {chatThread.reading}
+            </Turn>
+
+            <Turn who="You" from="user" time="14:06">
+              {chatThread.followUp}
+            </Turn>
+
+            <Turn
+              who="Agent"
+              time="14:06"
+              tokens={612}
+              locale="en-GB"
+              streaming={running}
+              before={<Thinking streaming={running} duration={2.4} locale="en-GB">{chatThread.reasoning}</Thinking>}
+              after={
+                <Approval
+                  {...chatApproval}
+                  state={decision}
+                  decidedBy="You"
+                  decidedAt="14:07"
+                  live="assertive"
+                  onDecide={(taken) => {
+                    setDecision(taken)
+                    setChatLog(taken === 'approved' ? 'allowed the rewrite' : 'denied the rewrite')
+                  }}
+                  actions={
+                    <Button size="sm" emphasis="minimal" onClick={() => setDecision('approved')}>
+                      Always allow
+                    </Button>
+                  }
+                />
+              }
+            >
+              {chatThread.working}
+            </Turn>
+
+            <Stack gap="tight">
+              <Composer
+                label="Describe a task or ask a question"
+                placeholder="Describe a task or ask a question"
+                busy={running}
+                value={draft}
+                onValueChange={setDraft}
+                onSend={(text) => {
+                  setDraft('')
+                  setRunning(true)
+                  setChatLog(`sent ${JSON.stringify(text)}`)
+                }}
+                onStop={() => {
+                  setRunning(false)
+                  setChatLog('stopped the run')
+                }}
+              >
+                <Button size="sm" emphasis="minimal" aria-label="Add context" onClick={() => setChatLog('added context')}>
+                  <span data-icon="plus" aria-hidden="true" />
+                </Button>
+              </Composer>
+
+              <Toolbar label="Session">
+                <Button size="sm" emphasis="minimal">
+                  Auto
+                </Button>
+                <Button size="sm" emphasis="minimal">
+                  Opus 5
+                </Button>
+                <ToolbarSpacer />
+                <Badge tone={running ? 'running' : 'neutral'}>{running ? 'working' : 'idle'}</Badge>
+                <Badge tone="warn">context 90%</Badge>
+              </Toolbar>
+            </Stack>
+          </Stack>
+          <pre className="state">
+            {`running   ${running}\ndraft     ${JSON.stringify(draft)}\napproval  ${decision}\nfailure   ${breakdown}\nlast      ${chatLog}`}
+          </pre>
         </section>
       </div>
     </>

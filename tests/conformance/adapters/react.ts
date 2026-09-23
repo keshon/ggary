@@ -93,6 +93,11 @@ import {
   Toolbar,
   ToolbarSeparator,
   ToolbarSpacer,
+  Turn,
+  Composer,
+  Thinking,
+  Approval,
+  Failure,
 } from '../../../packages/react/src/index'
 import {
   type Adapter,
@@ -119,6 +124,11 @@ import {
   type TabsProps,
   type MetricRowProps,
   type KeyValueListProps,
+  type TurnProps,
+  type ComposerProps,
+  type ThinkingProps,
+  type ApprovalProps,
+  type FailureProps,
   track,
 } from '../harness'
 
@@ -406,6 +416,26 @@ export const react: Adapter = {
     ]),
   menubar: (props, target) => mount(Menubar, props, target),
   toaster: (props, target) => mount(Toaster, props, target),
+  turn: (props, target) =>
+    mount(Turn as ComponentType<any>, props, target, ({ body, actions, ...rest }: TurnProps) => [
+      { ...rest, actions: actions ? createElement('button', { type: 'button' }, 'Copy') : undefined },
+      ...(body === undefined ? [] : [body]),
+    ]),
+  composer: (props, target) =>
+    mount(Composer as ComponentType<any>, props, target, ({ extra, ...rest }: ComposerProps) => [
+      rest,
+      ...(extra ? [createElement('button', { type: 'button', key: 'draft' }, 'Draft')] : []),
+    ]),
+  thinking: (props, target) =>
+    mount(Thinking as ComponentType<any>, props, target, ({ body, ...rest }: ThinkingProps) => [rest, ...(body === undefined ? [] : [body])]),
+  approval: (props, target) =>
+    mount(Approval as ComponentType<any>, props, target, ({ extra, ...rest }: ApprovalProps) => [
+      { ...rest, actions: extra ? createElement('button', { type: 'button' }, 'Always allow') : undefined },
+    ]),
+  failure: (props, target) =>
+    mount(Failure as ComponentType<any>, props, target, ({ extra, ...rest }: FailureProps) => [
+      { ...rest, actions: extra ? createElement('button', { type: 'button' }, 'Skip the file') : undefined },
+    ]),
   badge: (props, target) => mount(Badge, props, target, ({ label, ...rest }: { label: string }) => [rest, label]),
   timeline: (props, target) =>
     mount(Timeline as ComponentType<any>, props, target, ({ rich, ...rest }: { rich?: boolean }) => [

@@ -654,6 +654,37 @@ export const generatorSource = `export function terrain(size = 256, seed = Date.
   const noise = createNoise(seed)
   return generate(size, (x, y) => noise.fractal(x / size, y / size, { octaves: 6, persistence: 0.5, lacunarity: 2 }))
 }`
+/**
+ * One run of an agent on this very kit, caught with the answer still arriving:
+ * the thread the chat section shows. The strings live here so the two pages
+ * show the same conversation rather than two paraphrases of it.
+ */
+export const chatThread = {
+  ask: 'Add a share bar above the history strip, and let one legend key both.',
+  reasoning:
+    'The strip answers when, the share answers how much. The legend swatch already falls through to the tone, so it can key both without a second vocabulary.',
+  answer: "I'll put the bar above the strip and let the swatch read the tone.",
+  followUp: 'Now drop the app rules this replaces.',
+  reading: 'Reading the file those rules live in.',
+  working: 'Sixty lines go. This rewrites the file in place, so I need permission',
+}
+/** The failure the run hit on the way, with what it had already tried. */
+export const chatFailure = {
+  title: 'Could not read static/beacon.css',
+  code: 'EBUSY',
+  reason: 'The file is locked by another process',
+  tried: ['A retry after 1 s — the same code', 'A retry after 4 s — the same code'],
+}
+/** What permission is being asked for, and what it would touch. A tone here means irreversibility. */
+export const chatApproval = {
+  what: 'rm -rf build/ && npm run build',
+  effects: [
+    { text: 'It will delete the build/ directory entire — 1 284 files' },
+    { text: 'Irreversible: the contents do not go to a recycle bin', tone: 'error' as const },
+    { text: 'The rebuild will take about 40 s' },
+  ],
+}
+
 export const templateInserts = [
   { value: '{{name}}', hint: 'The name of the monitor' },
   { value: '{{target}}', hint: 'The address checked' },

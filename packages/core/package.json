@@ -304,6 +304,26 @@
     "./inserts": {
       "types": "./src/components/inserts/index.ts",
       "default": "./src/components/inserts/index.ts"
+    },
+    "./turn": {
+      "types": "./src/components/turn/index.ts",
+      "default": "./src/components/turn/index.ts"
+    },
+    "./composer": {
+      "types": "./src/components/composer/index.ts",
+      "default": "./src/components/composer/index.ts"
+    },
+    "./thinking": {
+      "types": "./src/components/thinking/index.ts",
+      "default": "./src/components/thinking/index.ts"
+    },
+    "./approval": {
+      "types": "./src/components/approval/index.ts",
+      "default": "./src/components/approval/index.ts"
+    },
+    "./failure": {
+      "types": "./src/components/failure/index.ts",
+      "default": "./src/components/failure/index.ts"
     }
   },
   "dependencies": {

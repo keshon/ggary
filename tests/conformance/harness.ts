@@ -852,6 +852,73 @@ export interface InsertsProps {
   label?: string
 }
 
+// --- the agent layer ----------------------------------------------------------
+
+/** A turn whose body is `body`, with a "Copy" button in the actions row when `actions`. */
+export interface TurnProps {
+  who: string
+  from?: import('../../packages/core/src/components/turn').TurnFrom
+  time?: string
+  tokens?: number
+  duration?: number
+  locale?: string
+  streaming?: boolean
+  body?: string
+  actions?: boolean
+}
+
+/** A composer with a "Draft" button standing in its bar before the send control. */
+export interface ComposerProps {
+  label: string
+  placeholder?: string
+  bar?: import('../../packages/core/src/components/composer').ComposerBar
+  busy?: boolean
+  disabled?: boolean
+  submitOnEnter?: boolean
+  rows?: number
+  maxRows?: number
+  defaultValue?: string
+  onSend?: (value: string) => void
+  onStop?: () => void
+  extra?: boolean
+}
+
+export interface ThinkingProps {
+  body?: string
+  defaultOpen?: boolean
+  streaming?: boolean
+  duration?: number
+  locale?: string
+  disabled?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+/** An approval; `extra` adds an "Always allow" button beside the two answers. */
+export interface ApprovalProps {
+  what: string
+  state?: import('../../packages/core/src/components/approval').ApprovalState
+  title?: string
+  effects?: import('../../packages/core/src/components/approval').ApprovalEffect[]
+  decidedBy?: string
+  decidedAt?: string
+  live?: 'off' | 'polite' | 'assertive'
+  onDecide?: (decision: import('../../packages/core/src/components/approval').ApprovalDecision) => void
+  extra?: boolean
+}
+
+/** A failure; `extra` adds a "Skip the file" button beside the retry. */
+export interface FailureProps {
+  title: string
+  code: string
+  reason: string
+  state?: import('../../packages/core/src/components/failure').FailureState
+  tried?: string[]
+  resolvedAt?: string
+  live?: 'off' | 'polite' | 'alert'
+  onRetry?: () => void
+  extra?: boolean
+}
+
 export interface Mounted<P> {
   /** The element the component was rendered into. Specs query inside it. */
   root: HTMLElement
@@ -969,6 +1036,11 @@ export interface Adapter {
   emptyState(props: EmptyStateProps, target: HTMLElement): Promise<Mounted<EmptyStateProps>>
   /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
+  turn?(props: TurnProps, target: HTMLElement): Promise<Mounted<TurnProps>>
+  composer?(props: ComposerProps, target: HTMLElement): Promise<Mounted<ComposerProps>>
+  thinking?(props: ThinkingProps, target: HTMLElement): Promise<Mounted<ThinkingProps>>
+  approval?(props: ApprovalProps, target: HTMLElement): Promise<Mounted<ApprovalProps>>
+  failure?(props: FailureProps, target: HTMLElement): Promise<Mounted<FailureProps>>
 }
 
 // --- lifecycle -----------------------------------------------------------------

@@ -91,6 +91,11 @@
     CodeBlock,
     Copyable,
     Inserts,
+    Turn,
+    Composer,
+    Thinking,
+    Approval,
+    Failure,
   } from '@ggary/svelte'
   import type { DataGridController } from '@ggary/core/data-grid'
   import { todayISO } from '@ggary/core'
@@ -117,7 +122,7 @@
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
   import { rangePresets } from '@ggary/core/date-picker'
   import type { PaletteCommand } from '@ggary/core/command-palette'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -145,6 +150,14 @@
   let ganttScale = $state<'day' | 'week' | 'month'>('day')
   let ganttLog = $state('—')
   let rolloutTasks = $state.raw(rolloutPlan)
+  // The agent run the chat section shows: it is still working, so the last
+  // turn streams, the composer's control stops rather than sends, and the two
+  // blocks that stopped the run are still waiting for a human.
+  let running = $state(true)
+  let draft = $state('')
+  let chatLog = $state('—')
+  let decision = $state<'pending' | 'approved' | 'denied'>('pending')
+  let breakdown = $state<'pending' | 'resolved' | 'given-up'>('pending')
   // The sections are read from the page once it is drawn.
   $effect(() => {
     paletteCommands = sandboxCommands((text) => toast({ tone: 'neutral', title: text }))
@@ -1370,5 +1383,93 @@
 
   <section id="run-chat">
     <h3>Turn, composer, thinking, approval and failure</h3>
+
+    {#snippet firstReasoning()}
+      <Thinking duration={4.1} locale="en-GB">{chatThread.reasoning}</Thinking>
+    {/snippet}
+    {#snippet firstActions()}
+      <Button size="sm" emphasis="minimal" aria-label="Copy" onclick={() => (chatLog = 'copied the answer')}>
+        <span data-icon="copy" aria-hidden="true"></span>
+      </Button>
+      <Button size="sm" emphasis="minimal" aria-label="Retry" onclick={() => (chatLog = 'asked again')}>
+        <span data-icon="refresh" aria-hidden="true"></span>
+      </Button>
+      <Button size="sm" emphasis="minimal" aria-label="More" onclick={() => (chatLog = 'opened the menu')}>
+        <span data-icon="more" aria-hidden="true"></span>
+      </Button>
+    {/snippet}
+    {#snippet skipTheFile()}
+      <Button size="sm" onclick={() => { breakdown = 'given-up'; chatLog = 'skipped the file' }}>Skip the file</Button>
+    {/snippet}
+    {#snippet theFailure()}
+      <Failure
+        {...chatFailure}
+        state={breakdown}
+        resolvedAt="14:05"
+        onRetry={() => { breakdown = 'resolved'; chatLog = 'retried the read, and it worked' }}
+        actions={skipTheFile}
+      />
+    {/snippet}
+    {#snippet lastReasoning()}
+      <Thinking streaming={running} duration={2.4} locale="en-GB">{chatThread.reasoning}</Thinking>
+    {/snippet}
+    {#snippet alwaysAllow()}
+      <Button size="sm" emphasis="minimal" onclick={() => (decision = 'approved')}>Always allow</Button>
+    {/snippet}
+    {#snippet theApproval()}
+      <Approval
+        {...chatApproval}
+        state={decision}
+        decidedBy="You"
+        decidedAt="14:07"
+        live="assertive"
+        onDecide={(taken) => { decision = taken; chatLog = taken === 'approved' ? 'allowed the rewrite' : 'denied the rewrite' }}
+        actions={alwaysAllow}
+      />
+    {/snippet}
+
+    <Stack gap="loose" style="max-inline-size: 680px">
+      <Turn who="You" from="user" time="14:02">{chatThread.ask}</Turn>
+
+      <Turn who="Agent" time="14:02" tokens={1284} duration={4.1} locale="en-GB" before={firstReasoning} actions={firstActions}>
+        {chatThread.answer}
+      </Turn>
+
+      <Turn who="Agent" time="14:04" duration={5.2} locale="en-GB" after={theFailure}>{chatThread.reading}</Turn>
+
+      <Turn who="You" from="user" time="14:06">{chatThread.followUp}</Turn>
+
+      <Turn who="Agent" time="14:06" tokens={612} locale="en-GB" streaming={running} before={lastReasoning} after={theApproval}>
+        {chatThread.working}
+      </Turn>
+
+      <Stack gap="tight">
+        <Composer
+          label="Describe a task or ask a question"
+          placeholder="Describe a task or ask a question"
+          busy={running}
+          bind:value={draft}
+          onSend={(text) => { draft = ''; running = true; chatLog = `sent ${JSON.stringify(text)}` }}
+          onStop={() => { running = false; chatLog = 'stopped the run' }}
+        >
+          <Button size="sm" emphasis="minimal" aria-label="Add context" onclick={() => (chatLog = 'added context')}>
+            <span data-icon="plus" aria-hidden="true"></span>
+          </Button>
+        </Composer>
+
+        <Toolbar label="Session">
+          <Button size="sm" emphasis="minimal">Auto</Button>
+          <Button size="sm" emphasis="minimal">Opus 5</Button>
+          <ToolbarSpacer />
+          <Badge tone={running ? 'running' : 'neutral'}>{running ? 'working' : 'idle'}</Badge>
+          <Badge tone="warn">context 90%</Badge>
+        </Toolbar>
+      </Stack>
+    </Stack>
+    <pre class="state">{`running   ${running}
+draft     ${JSON.stringify(draft)}
+approval  ${decision}
+failure   ${breakdown}
+last      ${chatLog}`}</pre>
   </section>
 </div>

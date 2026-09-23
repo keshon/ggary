@@ -1,0 +1,164 @@
+/* The agent layer: one exchange with a machine. Geometry and behaviour only —
+   what these five would be BROKEN without, in any theme. */
+
+/* --- turn ------------------------------------------------------------------
+   A column of the head, the body and whatever the answer produced. It draws
+   nothing of its own; its whole job is to say where one answer ends. */
+
+[data-scope='turn'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='turn'][data-part='head'] {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+/* The row is always laid out; only the controls in it fade. A row that is not
+   laid out at all does not exist on a touchscreen, and one that comes into
+   being under the cursor moves the thread the reader is in the middle of. */
+[data-scope='turn'][data-part='actions'] {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* --- composer --------------------------------------------------------------
+   A GRID rather than a column, so the bar has two places to stand: under the
+   field across both tracks, or in the trailing slot beside it — which is what
+   makes an empty composer one line tall. A column could not do that; it puts
+   the bar on its own line whether or not there is anything to justify one. */
+
+[data-scope='composer'][data-part='root'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  /* The bar sinks to the bottom of its row: on one line that reads as centred,
+     on ten it stays with the last one, where the text is. */
+  align-items: end;
+  min-inline-size: 0;
+}
+/* The field spans both tracks unless the bar has taken the trailing one. Its
+   resize grip goes: a corner grip inside a frame that also holds a bar tears
+   the object in half. The BOX it hands outwards — the border, the ground, the
+   corners — is undone in the theme, because that is the layer that drew it. */
+[data-scope='composer'][data-part='root'] > [data-scope='textarea'][data-part='root'] {
+  grid-column: 1 / -1;
+  resize: none;
+}
+[data-scope='composer'][data-part='root'][data-bar='edge'] > [data-scope='textarea'][data-part='root'] {
+  grid-column: 1;
+  grid-row: 1;
+}
+[data-scope='composer'][data-part='bar'] {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  grid-column: 1 / -1;
+}
+[data-scope='composer'][data-part='bar'][data-bar='edge'] {
+  grid-column: 2;
+  grid-row: 1;
+}
+[data-scope='composer'][data-part='send'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  margin: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+[data-scope='composer'][data-part='send']:disabled {
+  cursor: default;
+}
+
+/* --- thinking --------------------------------------------------------------
+   A disclosure of one: a button that owns a region by id. The same mechanics
+   the accordion's section has, without its heading, its landmark or its
+   arrow keys — see thinking.connect.ts for why. */
+
+[data-scope='thinking'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='thinking'][data-part='trigger'] {
+  display: flex;
+  align-items: center;
+  align-self: start;
+  margin: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+[data-scope='thinking'][data-part='trigger']:disabled {
+  cursor: default;
+}
+[data-scope='thinking'][data-part='indicator'] {
+  flex: none;
+}
+[data-scope='thinking'][data-part='indicator'][data-state='open'] {
+  rotate: 90deg;
+}
+[data-scope='thinking'][data-part='indicator'][data-state='closed']:dir(rtl) {
+  scale: -1 1;
+}
+[data-scope='thinking'][data-part='content'][hidden] {
+  display: none;
+}
+
+/* --- approval and failure --------------------------------------------------
+   One shape with two contents: a block in a column, a quiet list of short
+   lines, a row of ways out. Only the tone and the edge marker differ, and
+   those are the theme's. */
+
+[data-scope='approval'][data-part='root'],
+[data-scope='failure'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='approval'][data-part='head'],
+[data-scope='failure'][data-part='head'] {
+  display: flex;
+  align-items: center;
+}
+[data-scope='approval'][data-part='icon'],
+[data-scope='failure'][data-part='icon'] {
+  flex: none;
+}
+/* A machine string — a command, a path, an error text — is read character by
+   character, and a long one must break rather than push the block wider. */
+[data-scope='approval'][data-part='what'],
+[data-scope='failure'][data-part='reason'] {
+  overflow-wrap: anywhere;
+}
+[data-scope='approval'][data-part='effects'],
+[data-scope='failure'][data-part='tried'] {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+[data-scope='approval'][data-part='effect'],
+[data-scope='failure'][data-part='attempt'] {
+  display: flex;
+  align-items: flex-start;
+}
+[data-scope='approval'][data-part='actions'],
+[data-scope='failure'][data-part='actions'] {
+  display: flex;
+  flex-wrap: wrap;
+}
+[data-scope='approval'][data-part='verdict'],
+[data-scope='failure'][data-part='verdict'] {
+  margin: 0;
+}

@@ -41,6 +41,7 @@ import { shareConformance } from './share.spec'
 import { heatmapConformance } from './heatmap.spec'
 import { textareaConformance } from './textarea.spec'
 import { timelineConformance } from './timeline.spec'
+import { approvalConformance, composerConformance, failureConformance, thinkingConformance, turnConformance } from './chat.spec'
 
 /**
  * One contract, every adapter. A failure reads as `react > select > keyboard >
@@ -112,6 +113,11 @@ export function runConformance() {
       legendConformance(adapter)
       shareConformance(adapter)
       heatmapConformance(adapter)
+      turnConformance(adapter)
+      composerConformance(adapter)
+      thinkingConformance(adapter)
+      approvalConformance(adapter)
+      failureConformance(adapter)
     })
   }
 }
