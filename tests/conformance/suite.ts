@@ -40,7 +40,7 @@ import { legendConformance, sparklineConformance } from './charts.spec'
 import { shareConformance } from './share.spec'
 import { heatmapConformance } from './heatmap.spec'
 // The Run component's spec, aliased: this file's own entry point is runConformance().
-import { budgetConformance, historyConformance, queueConformance, runConformance as agentRunConformance } from './agent.spec'
+import { budgetConformance, historyConformance, queueConformance, runConformance as agentRunConformance, diffConformance, lanesConformance, logConformance, stepConformance } from './agent.spec'
 import { textareaConformance } from './textarea.spec'
 import { timelineConformance } from './timeline.spec'
 import { approvalConformance, composerConformance, failureConformance, thinkingConformance, turnConformance } from './chat.spec'
@@ -124,6 +124,10 @@ export function runConformance() {
       queueConformance(adapter)
       historyConformance(adapter)
       budgetConformance(adapter)
+      stepConformance(adapter)
+      logConformance(adapter)
+      diffConformance(adapter)
+      lanesConformance(adapter)
     })
   }
 }

@@ -1,0 +1,5 @@
+export { lanesAnatomy } from './lanes.anatomy'
+export type { LanesPart } from './lanes.anatomy'
+export { connect, LANES_WORDS, lanesWindow } from './lanes.connect'
+export type { LanesApi } from './lanes.connect'
+export type { Lane, LanesProps, LanesWords, LaneSpan, LaneToneWords } from './lanes.types'

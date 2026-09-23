@@ -320,6 +320,40 @@ const pairs: Pair[] = [
   { label: 'budget: the forecast on the surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'budget: a warning forecast', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'budget: a forecast that is spent', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: TEXT },
+  // The agent layer. A step's head, a log's columns, a diff's lines and the
+  // lanes of its workers — all of it small text on the recessed grounds these
+  // components use, and the two tints a diff paints a changed line with.
+  { label: 'step: the tool name on the surface', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'step: the argument and the time', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'step: the argument on a hovered head', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'step: the name of a running call', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface', '--ggarry-bg-subtle'], min: TEXT },
+  { label: 'step: the name of a call that failed', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface', '--ggarry-bg-subtle'], min: TEXT },
+  { label: 'step: the output on its recessed frame', fg: '--ggarry-text-default', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'step: the offer to unfold the output', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-subtle'], min: TEXT },
+
+  { label: 'log: the time on the stream', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'log: an ordinary message', fg: '--ggarry-text-default', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'log: a warning level', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'log: an error, level and message', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-subtle'], min: TEXT },
+
+  { label: 'diff: the path on its header band', fg: '--ggarry-text-default', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'diff: the count of added lines', fg: '--ggarry-text-success', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'diff: the count of deleted lines', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'diff: code on an added line', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface', '--ggarry-bg-success-subtle'], min: TEXT },
+  { label: 'diff: code on a deleted line', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface', '--ggarry-bg-danger-subtle'], min: TEXT },
+  // The signs are the carriers colour is not allowed to replace, so they are
+  // held to the threshold of text rather than of a mark.
+  { label: 'diff: the plus of an addition', fg: '--ggarry-text-success', bg: ['--ggarry-bg-surface', '--ggarry-bg-success-subtle'], min: TEXT },
+  { label: 'diff: the minus of a deletion', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface', '--ggarry-bg-danger-subtle'], min: TEXT },
+  { label: 'diff: a number beside an added line', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface', '--ggarry-bg-success-subtle'], min: TEXT },
+  { label: 'diff: a number beside a deleted line', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface', '--ggarry-bg-danger-subtle'], min: TEXT },
+  { label: 'diff: a number beside an unchanged line', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'diff: a skipped stretch', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
+
+  { label: 'lanes: the worker on the surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'lanes: the worker on the page', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-canvas'], min: TEXT },
+  { label: 'lanes: the axis off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'lanes: a segment on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
 
   // Focus ring against what it stands on.
   { label: 'focus: ring on surface', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-surface'], min: LARGE },

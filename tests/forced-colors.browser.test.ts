@@ -4,7 +4,7 @@ import '../packages/theme-ggarry/src/index.css'
 import { createElement as h } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
-import { Approval, Button, Checkbox, Composer, Legend, RadioGroup, Sparkline, Switch, Share, Turn, History, Run } from '../packages/react/src/index'
+import { Button, Checkbox, Diff, Lanes, Legend, RadioGroup, Sparkline, Switch, Share, Approval, Composer, Turn, History, Run } from '../packages/react/src/index'
 
 /**
  * Windows High Contrast, emulated. Fills and shadows are reset to system
@@ -107,6 +107,50 @@ describe('forced colours', () => {
     expect(style(host.querySelector('[data-scope="share"][data-part="root"]')).borderTopStyle).toBe('solid')
   })
 
+  it('a diff says what became of a line without the tint: the sign, and an edge in the gutter', async () => {
+    const host = mount(
+      h(Diff as never, {
+        path: 'a.ts',
+        rows: [
+          { kind: 'context', text: 'const size = 256;', before: 41, after: 41 },
+          { kind: 'del', text: 'let seed = 0;', before: 42 },
+          { kind: 'add', text: 'let seed = Date.now();', after: 42 },
+        ],
+      })
+    )
+    await forced()
+    const rows = [...host.querySelectorAll<HTMLElement>('[data-scope="diff"][data-part="row"]')]
+    // Both tints reset to one ground, so the colour says nothing any more.
+    expect(style(rows[1]).backgroundColor).toBe(style(rows[2]).backgroundColor)
+    expect(rows.map((row) => style(row, '::before').content)).toEqual(['" "', '"−"', '"+"'])
+    expect(rows.map((row) => style(row).borderInlineStartStyle)).toEqual(['none', 'solid', 'solid'])
+  })
+
+  it('a lane’s segments survive as marks on a track that still draws the empty time', async () => {
+    const host = mount(
+      h(Lanes as never, {
+        label: 'Workers',
+        lanes: [
+          { id: 'a', label: 'a', spans: [{ label: 'x', start: 0, end: 4000, tone: 'ok' }] },
+          { id: 'b', label: 'b', spans: [{ label: 'y', start: 6000, end: 10_000, tone: 'error' }] },
+        ],
+      })
+    )
+    await forced()
+    const spans = [...host.querySelectorAll<HTMLElement>('[data-scope="lanes"][data-part="span"]')]
+    const track = host.querySelector<HTMLElement>('[data-scope="lanes"][data-part="track"]')!
+    expect(new Set(spans.map((span) => style(span).backgroundColor)).size).toBe(1)
+    expect(spans.every((span) => style(span).backgroundColor !== style(track).backgroundColor)).toBe(true)
+    expect(style(track).borderTopStyle).toBe('solid')
+  })
+
+  it('a busy button’s ring keeps a turning arc: its top edge another colour than the rest', async () => {
+    const host = mount(h(Button, { loading: true }, 'Save'))
+    await forced()
+    const spinner = host.querySelector('[data-scope="button"][data-part="spinner"]')
+    expect(style(spinner).borderTopColor).not.toBe(style(spinner).borderRightColor)
+  })
+
   it('an approval keeps its consequence marks, and both machine-string plates take an edge', async () => {
     const host = mount(
       h(Approval, {
@@ -154,12 +198,5 @@ describe('forced colours', () => {
     await forced()
     const [done, pending] = [...host.querySelectorAll<HTMLElement>('[data-scope="dot"][data-part="root"]')]
     expect(style(pending).backgroundColor).not.toBe(style(done).backgroundColor)
-  })
-
-  it('a busy button’s ring keeps a turning arc: its top edge another colour than the rest', async () => {
-    const host = mount(h(Button, { loading: true }, 'Save'))
-    await forced()
-    const spinner = host.querySelector('[data-scope="button"][data-part="spinner"]')
-    expect(style(spinner).borderTopColor).not.toBe(style(spinner).borderRightColor)
   })
 })

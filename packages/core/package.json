@@ -317,6 +317,22 @@
       "types": "./src/components/heatmap/index.ts",
       "default": "./src/components/heatmap/index.ts"
     },
+    "./step": {
+      "types": "./src/components/step/index.ts",
+      "default": "./src/components/step/index.ts"
+    },
+    "./log": {
+      "types": "./src/components/log/index.ts",
+      "default": "./src/components/log/index.ts"
+    },
+    "./diff": {
+      "types": "./src/components/diff/index.ts",
+      "default": "./src/components/diff/index.ts"
+    },
+    "./lanes": {
+      "types": "./src/components/lanes/index.ts",
+      "default": "./src/components/lanes/index.ts"
+    },
     "./inserts": {
       "types": "./src/components/inserts/index.ts",
       "default": "./src/components/inserts/index.ts"

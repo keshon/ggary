@@ -46,6 +46,10 @@ import {
   Queue,
   History,
   Budget,
+  Step,
+  Log,
+  Diff,
+  Lanes,
   KeyValueList,
   FileChange,
   DatePicker,
@@ -354,6 +358,12 @@ export const react: Adapter = {
   queue: (props, target) => mount(Queue as ComponentType<any>, props, target),
   history: (props, target) => mount(History, props, target),
   budget: (props, target) => mount(Budget, props, target),
+  // The call's input is the body's children; what came back is a prop, so a
+  // step whose output is still arriving can carry a caret after it.
+  step: (props, target) => mount(Step as ComponentType<any>, props, target, ({ input, ...rest }: { input?: string }) => [rest, input]),
+  log: (props, target) => mount(Log as ComponentType<any>, props, target),
+  diff: (props, target) => mount(Diff as ComponentType<any>, props, target),
+  lanes: (props, target) => mount(Lanes as ComponentType<any>, props, target),
   commandPalette: (props, target) => mount(CommandPalette as ComponentType<any>, props, target),
   kanban: (props, target) => mount(Kanban as ComponentType<any>, props, target),
   progress: (props, target) => mount(Progress as ComponentType<any>, props, target),

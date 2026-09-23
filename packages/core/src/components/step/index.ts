@@ -1,0 +1,5 @@
+export { stepAnatomy } from './step.anatomy'
+export type { StepPart } from './step.anatomy'
+export { connect, STEP_TONES, STEP_WORDS, stepDuration } from './step.connect'
+export type { StepApi } from './step.connect'
+export type { StepProps, StepState, StepTones, StepWords } from './step.types'

@@ -1,0 +1,6 @@
+export { diffAnatomy } from './diff.anatomy'
+export type { DiffPart } from './diff.anatomy'
+export { connect, DIFF_WORDS } from './diff.connect'
+export type { DiffApi } from './diff.connect'
+export { diffLines, foldContext, LCS_CELLS, textLines } from './diff.lines'
+export type { DiffFold, DiffKind, DiffLine, DiffProps, DiffRow, DiffWords } from './diff.types'

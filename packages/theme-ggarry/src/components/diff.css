@@ -1,0 +1,104 @@
+/* ==========================================================================
+   GGarry — diff
+
+   What the agent changed in a file. A header with the path and the count, and
+   under it the lines: two columns of numbers, the sign, the code.
+
+   The tints are the badge's success and danger grounds, so an addition here
+   is the same green as an ok badge on the same screen. They are the second
+   carrier, never the first: the `+` and the `−` are content, drawn by the
+   structure layer, and they stay when the tints go — under forced colours, on
+   paper, and for a reader who cannot tell the two hues apart.
+
+   No transition: a diff is the record of an edit that has already happened.
+   ========================================================================== */
+
+[data-scope='diff'][data-part='root'] {
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-surface);
+  overflow: hidden;
+}
+
+[data-scope='diff'][data-part='head'] {
+  gap: var(--ggarry-space-2);
+  min-block-size: 28px;
+  padding-inline: var(--ggarry-space-3);
+  border-block-end: 1px solid var(--ggarry-border-default);
+  background: var(--ggarry-bg-subtle);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-xs);
+}
+[data-scope='diff'][data-part='path'] {
+  font-family: var(--ggarry-font-family-mono);
+  color: var(--ggarry-text-default);
+}
+[data-scope='diff'][data-part='stat'] {
+  gap: var(--ggarry-space-2);
+  font-variant-numeric: tabular-nums;
+}
+/* One axis, one record: the counts carry the same `data-kind` as the lines. */
+[data-scope='diff'][data-part='added'] { color: var(--ggarry-text-success); }
+[data-scope='diff'][data-part='removed'] { color: var(--ggarry-text-danger); }
+
+[data-scope='diff'][data-part='body'] {
+  font-family: var(--ggarry-font-family-mono);
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 1.6;
+  color: var(--ggarry-text-default);
+}
+[data-scope='diff'][data-part='body']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: calc(-1 * var(--ggarry-focus-ring-width));
+}
+
+[data-scope='diff'][data-part='row'] {
+  column-gap: var(--ggarry-space-2);
+}
+[data-scope='diff'][data-part='row'][data-kind='add'] { background: var(--ggarry-bg-success-subtle); }
+[data-scope='diff'][data-part='row'][data-kind='del'] { background: var(--ggarry-bg-danger-subtle); }
+[data-scope='diff'][data-part='row'][data-kind='add']::before { color: var(--ggarry-text-success); }
+[data-scope='diff'][data-part='row'][data-kind='del']::before { color: var(--ggarry-text-danger); }
+
+/* Muted, not subtle: a line number is read — people quote a file by it. On a
+   tinted row the tint eats the margin (muted on the danger ground is 4.35:1
+   in light mode), so a changed line's numbers take the full ink rather than
+   the number becoming the one thing on the row that cannot be read. */
+[data-scope='diff'][data-part='num'] {
+  color: var(--ggarry-text-muted);
+}
+[data-scope='diff'][data-part='row'][data-kind] > [data-part='num'] {
+  color: var(--ggarry-text-default);
+}
+
+/* A folded stretch names its number: skipping lines in silence is a lie about
+   the volume. It is drawn as a gap rather than as a line of the file. */
+[data-scope='diff'][data-part='fold'] {
+  padding-block: var(--ggarry-space-1);
+  padding-inline: var(--ggarry-space-3);
+  border-block: 1px solid var(--ggarry-border-default);
+  background: var(--ggarry-bg-subtle);
+  font-family: var(--ggarry-font-family-sans);
+  text-align: center;
+  color: var(--ggarry-text-muted);
+}
+[data-scope='diff'][data-part='fold']:first-child { border-block-start: 0; }
+[data-scope='diff'][data-part='fold']:last-child { border-block-end: 0; }
+
+/* On paper the tints go, so the tint is replaced by an edge on the leading
+   side. The sign is content and prints as it stands. */
+@media print {
+  [data-scope='diff'][data-part='row'][data-kind='add'],
+  [data-scope='diff'][data-part='row'][data-kind='del'] {
+    background: none;
+    border-inline-start: 2px solid currentColor;
+  }
+}
+
+/* The tints reset under forced colours; what says a row's kind again is in
+   a11y/forced.css, the layer after this one. */
+@media (forced-colors: active) {
+  [data-scope='diff'][data-part='root'],
+  [data-scope='diff'][data-part='head'],
+  [data-scope='diff'][data-part='fold'] { border-color: CanvasText; }
+}
