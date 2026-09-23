@@ -12,7 +12,7 @@
   color: var(--ggarry-text-muted);
 }
 [data-scope='chip-group'][data-part='label'][data-disabled] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
 }
 
 /* Flex, wrapping and orientation live in @ggary/structure. */

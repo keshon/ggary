@@ -27,8 +27,8 @@
   font-weight: var(--ggarry-font-weight-semibold);
 }
 [data-scope='calendar']:is([data-part='prev'], [data-part='next']) {
-  inline-size: 30px;
-  block-size: 30px;
+  inline-size: var(--ggarry-size-icon-button-md);
+  block-size: var(--ggarry-size-icon-button-md);
   border-radius: var(--ggarry-radius-md);
   color: var(--ggarry-text-muted);
 }

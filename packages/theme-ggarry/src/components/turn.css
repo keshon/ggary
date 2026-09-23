@@ -40,14 +40,14 @@
    kit's reading size — it is the longest continuous text on the screen. */
 [data-scope='turn'][data-part='body'] {
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.65;
+  line-height: var(--ggarry-line-height-relaxed);
 }
 /* The ask is not prose. It is an instruction, usually one line: at 1.65 a
    single line sits in its plate with a third of its height empty above and
    below. The SIZE stays with the answer — both halves being one size is what
    makes the exchange read as a conversation rather than a form and a receipt. */
 [data-scope='turn'][data-part='root'][data-from='user'] > [data-part='body'] {
-  line-height: 1.5;
+  line-height: var(--ggarry-line-height-normal);
 }
 
 /* The person's turn is recessed; the machine's has no surface at all. Wider
@@ -74,7 +74,7 @@
 }
 [data-scope='turn'][data-part='actions'] > * {
   opacity: 0;
-  transition: opacity var(--ggarry-duration-fast) ease;
+  transition: opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='turn'][data-part='root']:hover > [data-part='actions'] > *,
 [data-scope='turn'][data-part='actions']:focus-within > * {

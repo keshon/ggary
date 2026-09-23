@@ -44,7 +44,7 @@
 [data-scope='diff'][data-part='body'] {
   font-family: var(--ggarry-font-family-mono);
   font-size: var(--ggarry-font-size-xs);
-  line-height: 1.6;
+  line-height: var(--ggarry-line-height-relaxed);
   color: var(--ggarry-text-default);
 }
 [data-scope='diff'][data-part='body']:focus-visible {
@@ -91,7 +91,7 @@
   [data-scope='diff'][data-part='row'][data-kind='add'],
   [data-scope='diff'][data-part='row'][data-kind='del'] {
     background: none;
-    border-inline-start: 2px solid currentColor;
+    border-inline-start: var(--ggarry-size-indicator) solid currentColor;
   }
 }
 

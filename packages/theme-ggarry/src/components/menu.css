@@ -19,14 +19,14 @@
   box-shadow: var(--ggarry-shadow-popover);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.35;
+  line-height: var(--ggarry-line-height-tight);
 }
 
 [data-scope='menu'][data-part='item'] {
   gap: var(--ggarry-space-2);
   /* 32 pixels a row, with the field's corner, as the select's options. */
   padding: 6px var(--ggarry-space-2);
-  line-height: 20px;
+  line-height: var(--ggarry-line-height-row);
   border-radius: var(--ggarry-radius-md);
   cursor: pointer;
 }
@@ -97,8 +97,8 @@
 
 [data-scope='menu'][data-part='group-label'] {
   padding: var(--ggarry-space-2) var(--ggarry-space-2) var(--ggarry-space-1);
-  font-size: var(--ggarry-font-size-sm);
-  font-weight: var(--ggarry-font-weight-medium);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-semibold);
   color: var(--ggarry-text-muted);
   cursor: default;
 }
@@ -111,7 +111,7 @@
 
 /* Entry only, as the popover. */
 [data-scope='menu'][data-part='content']:popover-open {
-  transition: opacity var(--ggarry-duration-fast) ease;
+  transition: opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 @starting-style {

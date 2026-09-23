@@ -150,7 +150,7 @@
   border-inline-end-style: dashed;
 }
 [data-scope='gantt'][data-part='bar-progress'] {
-  background: color-mix(in srgb, var(--ggarry-bg-accent) 35%, transparent);
+  background: color-mix(in oklab, var(--ggarry-bg-accent) 35%, transparent);
 }
 [data-scope='gantt'][data-part='bar'][data-done] {
   border-color: var(--ggarry-text-success);
@@ -174,7 +174,7 @@
   inset-inline-start: calc((var(--gg-gantt-start) + 0.5) * var(--gantt-day));
   inline-size: 12px;
   block-size: 12px;
-  border-radius: 2px;
+  border-radius: var(--ggarry-radius-mark);
   background: var(--ggarry-bg-accent);
   translate: -50% -50%;
   rotate: 45deg;
@@ -211,14 +211,17 @@
   inline-size: calc(max(var(--a), var(--b)) - min(var(--a), var(--b)));
   block-size: calc((max(var(--gg-gantt-y1), var(--gg-gantt-y2)) - min(var(--gg-gantt-y1), var(--gg-gantt-y2))) * var(--gantt-row));
   box-sizing: border-box;
+  /* Three quarters of the indicator: heavier than a hairline, so an arrow reads
+     over the grid's lines, lighter than a bar. Centred on its path. */
+  --gantt-link-width: calc(var(--ggarry-size-indicator) * 0.75);
 }
 [data-scope='gantt'][data-part='link-segment'][data-axis='x'] {
-  border-block-start: 1.5px solid var(--gantt-link);
-  translate: 0 -0.75px;
+  border-block-start: var(--gantt-link-width) solid var(--gantt-link);
+  translate: 0 calc(var(--gantt-link-width) / -2);
 }
 [data-scope='gantt'][data-part='link-segment'][data-axis='y'] {
-  border-inline-start: 1.5px solid var(--gantt-link);
-  translate: -0.75px 0;
+  border-inline-start: var(--gantt-link-width) solid var(--gantt-link);
+  translate: calc(var(--gantt-link-width) / -2) 0;
 }
 /* The head: a small triangle pointing into the task, its tip on the last point. */
 [data-scope='gantt'][data-part='link-head'] {
@@ -244,10 +247,10 @@
   inset-block: 5px;
   inset-inline-start: 3px;
   inline-size: 2px;
-  border-radius: 1px;
+  border-radius: var(--ggarry-radius-mark);
   background: var(--ggarry-border-accent);
   opacity: 0;
-  transition: opacity var(--ggarry-duration-fast) ease;
+  transition: opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='gantt'][data-part='bar']:hover :is([data-part='bar-start'], [data-part='bar-end'])::after,
 [data-scope='gantt'][data-part='bar'][data-drafting] :is([data-part='bar-start'], [data-part='bar-end'])::after {
@@ -260,7 +263,7 @@
 }
 /* Waiting for its answer: a little faded. */
 [data-scope='gantt']:is([data-part='bar'], [data-part='milestone'])[data-pending]:not([data-drafting]) {
-  opacity: 0.6;
+  opacity: var(--ggarry-opacity-stale);
 }
 
 /* Groups. The heading's row is a shade sunken, its name set in semibold with
@@ -282,7 +285,7 @@
   block-size: 12px;
   padding: 2px;
   color: var(--ggarry-text-muted);
-  transition: rotate var(--ggarry-duration-fast) ease;
+  transition: rotate var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='gantt'][data-part='title'][data-group]:hover [data-part='group-toggle'] {
   color: var(--ggarry-text-default);
@@ -295,8 +298,8 @@
   inset-inline-start: calc(var(--gg-gantt-start) * var(--gantt-day));
   inline-size: calc(var(--gg-gantt-span) * var(--gantt-day));
   block-size: 6px;
-  border-radius: 1px;
-  background: color-mix(in srgb, var(--ggarry-text-default) 55%, transparent);
+  border-radius: var(--ggarry-radius-mark);
+  background: color-mix(in oklab, var(--ggarry-text-default) 55%, transparent);
 }
 [data-scope='gantt'][data-part='summary']:not([data-before])::before,
 [data-scope='gantt'][data-part='summary']:not([data-after])::after {
@@ -323,7 +326,7 @@
 }
 [data-scope='gantt'][data-part='schedule'][data-group]:focus-visible [data-part='summary'] {
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
-  outline-offset: 3px;
+  outline-offset: var(--ggarry-focus-ring-offset);
 }
 @media (prefers-reduced-motion: reduce) {
   [data-scope='gantt'][data-part='group-toggle'] { transition: none; }

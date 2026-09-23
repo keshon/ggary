@@ -22,7 +22,7 @@
 }
 
 [data-scope='fieldset'][data-part='legend'][data-disabled] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
 }
 
 [data-scope='fieldset'][data-part='content'] {
@@ -36,7 +36,7 @@
 [data-scope='fieldset'][data-part='error'] {
   margin-block-start: var(--ggarry-rhythm-option);
   font-size: var(--ggarry-font-size-xs);
-  line-height: 1.4;
+  line-height: var(--ggarry-line-height-snug);
 }
 
 [data-scope='fieldset'][data-part='hint'] {

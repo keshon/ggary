@@ -11,7 +11,7 @@
 [data-scope='code'][data-part='root'] {
   /* The line box, named once: the button is centred on the first LINE, not
      pinned to the padding edge, and needs the number. */
-  --code-line: calc(var(--ggarry-font-size-xs) * 1.6);
+  --code-line: calc(var(--ggarry-font-size-xs) * var(--ggarry-line-height-relaxed));
   --code-pad-block: var(--ggarry-space-2);
   --code-pad-inline: var(--ggarry-space-3);
   --code-glyph: 14px;
@@ -63,7 +63,7 @@
   background: transparent;
   color: var(--ggarry-text-muted);
   cursor: pointer;
-  transition: background-color var(--ggarry-duration-fast) ease, color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 /* 20px drawn, 24px to a finger: the area grows, not the glyph. */
 [data-scope='code'][data-part='copy']::before {

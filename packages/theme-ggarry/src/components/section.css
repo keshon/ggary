@@ -35,7 +35,7 @@
   color: var(--section-title-ink);
   font-size: var(--section-title-size);
   font-weight: var(--ggarry-font-weight-semibold);
-  line-height: 1.4;
+  line-height: var(--ggarry-line-height-snug);
 }
 
 /* No reading cap here: a capped line fits beside the title and stops being the
@@ -44,7 +44,7 @@
   margin: 0;
   color: var(--ggarry-text-muted);
   font-size: var(--ggarry-font-size-sm);
-  line-height: 1.5;
+  line-height: var(--ggarry-line-height-normal);
 }
 
 [data-scope='section'][data-part='actions'] {

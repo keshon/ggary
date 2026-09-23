@@ -16,7 +16,7 @@
   gap: var(--ggarry-space-3);
   padding: var(--ggarry-space-4);
   border: 1px solid var(--ggarry-border-accent);
-  border-inline-start: 3px solid var(--ggarry-bg-accent);
+  border-inline-start: var(--ggarry-size-edge) solid var(--ggarry-bg-accent);
   border-radius: var(--ggarry-radius-lg);
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-default);
@@ -42,7 +42,7 @@
   background: var(--ggarry-bg-subtle);
   font-family: var(--ggarry-font-family-mono);
   font-size: var(--ggarry-font-size-xs);
-  line-height: 1.6;
+  line-height: var(--ggarry-line-height-relaxed);
 }
 
 /* The consequences are read BEFORE the press, so they take readable text; a

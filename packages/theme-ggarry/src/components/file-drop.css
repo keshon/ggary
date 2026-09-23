@@ -15,8 +15,8 @@
   color: var(--ggarry-text-default);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.5;
-  transition: border-color var(--ggarry-duration-fast) ease, background-color var(--ggarry-duration-fast) ease;
+  line-height: var(--ggarry-line-height-normal);
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 [data-scope='file-drop'][data-part='root']:hover:not([data-disabled]),
@@ -35,7 +35,7 @@
 }
 
 [data-scope='file-drop'][data-part='root'][data-disabled] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
 }
 
 [data-scope='file-drop'][data-part='icon'] {

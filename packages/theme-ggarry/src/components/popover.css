@@ -17,7 +17,7 @@
   box-shadow: var(--ggarry-shadow-popover);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.5;
+  line-height: var(--ggarry-line-height-normal);
 }
 
 [data-scope='popover'][data-part='content'] > :last-child {
@@ -29,7 +29,7 @@
   padding-inline-end: var(--ggarry-space-6);
   font-size: var(--ggarry-font-size-md);
   font-weight: var(--ggarry-font-weight-semibold);
-  line-height: 1.35;
+  line-height: var(--ggarry-line-height-tight);
 }
 
 [data-scope='popover'][data-part='close'] {
@@ -38,8 +38,8 @@
   inset-inline-end: var(--ggarry-space-2);
   display: inline-grid;
   place-items: center;
-  inline-size: 24px;
-  block-size: 24px;
+  inline-size: var(--ggarry-size-icon-button-sm);
+  block-size: var(--ggarry-size-icon-button-sm);
   padding: 0;
   border: 0;
   border-radius: var(--ggarry-radius-md);
@@ -60,7 +60,7 @@
 
 /* Entry only: a closed popover leaves at once, as a dialog does. */
 [data-scope='popover'][data-part='content']:popover-open {
-  transition: opacity var(--ggarry-duration-fast) ease;
+  transition: opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 @starting-style {

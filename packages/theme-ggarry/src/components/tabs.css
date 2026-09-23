@@ -27,9 +27,9 @@
   padding-block: var(--ggarry-space-2);
   /* The bar covers the list's line rather than sitting under it. */
   margin-block-end: -1px;
-  border-block-end: 2px solid transparent;
+  border-block-end: var(--ggarry-size-indicator) solid transparent;
   color: var(--ggarry-text-muted);
-  transition: color var(--ggarry-duration-fast) ease, border-color var(--ggarry-duration-fast) ease;
+  transition: color var(--ggarry-duration-fast) var(--ggarry-easing-standard), border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 [data-scope='tabs'][data-part='list'][data-variant='line'] > [data-part='tab']:hover:not([data-disabled]) {
@@ -53,7 +53,7 @@
   margin-block-end: 0;
   margin-inline-end: -1px;
   border-block-end: 0;
-  border-inline-end: 2px solid transparent;
+  border-inline-end: var(--ggarry-size-indicator) solid transparent;
 }
 [data-scope='tabs'][data-part='list'][data-variant='line'][data-orientation='vertical'] > [data-part='tab']:hover:not([data-disabled]) {
   border-inline-end-color: var(--ggarry-border-strong);
@@ -81,7 +81,7 @@
   padding-inline: var(--ggarry-space-3);
   border: 1px solid transparent;
   /* Concentric with the track: its radius less the padding between them. */
-  border-radius: max(2px, calc(var(--tabs-track-radius) - var(--tabs-track-inset)));
+  border-radius: max(var(--ggarry-radius-mark), calc(var(--tabs-track-radius) - var(--tabs-track-inset)));
   color: var(--ggarry-text-muted);
   font-size: var(--ggarry-font-size-sm);
 }

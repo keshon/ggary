@@ -26,11 +26,11 @@
   block-size: var(--ggarry-size-control-md);
   padding-inline: var(--ggarry-space-3) 3px;
   border: 1px solid var(--ggarry-border-control);
-  border-radius: var(--ggarry-radius-md);
+  border-radius: var(--ggarry-radius-control-md);
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-default);
   font-size: var(--ggarry-font-size-md);
-  transition: border-color var(--ggarry-duration-fast) ease;
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='date-picker'][data-part='control']:hover,
 [data-scope='date-picker'][data-part='control'][data-state='open'] {
@@ -53,8 +53,8 @@
 }
 
 [data-scope='date-picker'][data-part='trigger'] {
-  inline-size: 30px;
-  block-size: 30px;
+  inline-size: var(--ggarry-size-icon-button-sm);
+  block-size: var(--ggarry-size-icon-button-sm);
   border-radius: var(--ggarry-radius-sm);
   color: var(--ggarry-text-muted);
 }
@@ -111,5 +111,5 @@
 }
 [data-scope='date-picker'][data-part='preset']:focus-visible {
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
-  outline-offset: -2px;
+  outline-offset: calc(-1 * var(--ggarry-focus-ring-width));
 }

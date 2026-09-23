@@ -8,7 +8,7 @@
 [data-scope='skeleton'][data-part='root'] {
   gap: var(--ggarry-space-2);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.4;
+  line-height: var(--ggarry-line-height-snug);
 }
 
 [data-scope='skeleton'][data-part='bar'] {
@@ -16,7 +16,7 @@
   /* border-default, not bg-muted: muted is a step from white that reads as a
      printing defect under a pulse, as Instrument warned about its own ramp. */
   background: var(--ggarry-border-default);
-  animation: ggarry-fade 1.6s ease-in-out infinite;
+  animation: ggarry-fade var(--ggarry-duration-pulse) var(--ggarry-easing-breathe) infinite;
 }
 
 @keyframes ggarry-fade {
@@ -25,5 +25,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-scope='skeleton'][data-part='bar'] { animation-duration: 3s; }
+  [data-scope='skeleton'][data-part='bar'] { animation-duration: var(--ggarry-duration-calm); }
 }

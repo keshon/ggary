@@ -23,7 +23,7 @@
 [data-scope='pagination'][data-part='link'] {
   border: 1px solid transparent;
   color: var(--ggarry-text-muted);
-  transition: background-color var(--ggarry-duration-fast) ease, color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 [data-scope='pagination'][data-part='link']:hover:not([aria-disabled='true']) {
@@ -39,7 +39,7 @@
 }
 
 [data-scope='pagination'][data-part='link'][aria-disabled='true'] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
 }
 
 [data-scope='pagination'][data-part='gap'] {

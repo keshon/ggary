@@ -22,9 +22,9 @@
 [data-scope='progress'][data-part='root'][data-shape='ring'][data-size='md'] { --progress-thickness: 3px; }
 [data-scope='progress'][data-part='root'][data-shape='ring'][data-size='lg'] { --progress-thickness: 4px; }
 
-[data-scope='progress'][data-part='root'][data-tone='ok'] { --progress-fill: var(--ggarry-text-success); }
-[data-scope='progress'][data-part='root'][data-tone='warn'] { --progress-fill: var(--ggarry-text-warning); }
-[data-scope='progress'][data-part='root'][data-tone='error'] { --progress-fill: var(--ggarry-bg-danger); }
+[data-scope='progress'][data-part='root'][data-tone='ok'] { --progress-fill: var(--ggarry-mark-ok); }
+[data-scope='progress'][data-part='root'][data-tone='warn'] { --progress-fill: var(--ggarry-mark-warn); }
+[data-scope='progress'][data-part='root'][data-tone='error'] { --progress-fill: var(--ggarry-mark-error); }
 
 [data-scope='progress'][data-part='header'] {
   gap: var(--ggarry-space-3);
@@ -50,7 +50,7 @@
 [data-scope='progress'][data-part='root'][data-shape='bar'] [data-part='range'] {
   border-radius: inherit;
   background: var(--progress-fill);
-  transition: scale var(--ggarry-duration-normal) ease;
+  transition: scale var(--ggarry-duration-normal) var(--ggarry-easing-standard);
 }
 
 /* The ring: a border draws the room, and the range's conic sweep is cut to the

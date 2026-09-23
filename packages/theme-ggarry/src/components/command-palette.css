@@ -47,7 +47,7 @@
 }
 [data-scope='command-palette'][data-part='input'] {
   font-size: var(--ggarry-font-size-lg);
-  line-height: 1.4;
+  line-height: var(--ggarry-line-height-snug);
 }
 /* The field is the header, and the only thing that ever has the focus here:
    no ring around it (the theme's own focus rule would draw one). */
@@ -70,15 +70,13 @@
   color: var(--ggarry-text-muted);
   font-size: var(--ggarry-font-size-xs);
   font-weight: var(--ggarry-font-weight-semibold);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 [data-scope='command-palette'][data-part='item'] {
   gap: var(--ggarry-space-3);
   /* 32 pixels a row, as the select's options. */
   min-block-size: 32px;
   padding: 6px var(--ggarry-space-2);
-  line-height: 20px;
+  line-height: var(--ggarry-line-height-row);
   border-radius: var(--ggarry-radius-md);
 }
 [data-scope='command-palette'][data-part='item'][data-highlighted] {
@@ -113,7 +111,7 @@
   block-size: 20px;
   padding-inline: 5px;
   border: 1px solid var(--ggarry-border-default);
-  border-block-end-width: 2px;
+  border-block-end-width: var(--ggarry-size-indicator);
   border-radius: var(--ggarry-radius-sm);
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-muted);
@@ -124,7 +122,7 @@
   white-space: nowrap;
 }
 [data-scope='command-palette'][data-part='item'][data-highlighted] [data-part='item-shortcut'] {
-  border-color: color-mix(in srgb, currentColor 40%, transparent);
+  border-color: color-mix(in oklab, currentColor 40%, transparent);
   background: transparent;
   color: inherit;
 }

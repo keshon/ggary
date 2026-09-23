@@ -12,5 +12,5 @@
   height: auto;
   min-height: calc(var(--input-height) * 2.5);
   padding-block: var(--ggarry-space-2);
-  line-height: 1.5;
+  line-height: var(--ggarry-line-height-normal);
 }

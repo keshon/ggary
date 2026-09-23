@@ -14,7 +14,7 @@
   color: var(--ggarry-text-default);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-sm);
-  line-height: 20px;
+  line-height: var(--ggarry-line-height-row);
 }
 [data-scope='kv'][data-part='root']:not([data-tight]) {
   grid-template-columns: minmax(0, var(--ggarry-size-label-col)) minmax(0, 1fr);

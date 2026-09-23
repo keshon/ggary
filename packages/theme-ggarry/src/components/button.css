@@ -42,11 +42,13 @@
   color: var(--button-fg);
   background: var(--button-bg);
   border: 1px solid var(--button-border);
-  border-radius: var(--ggarry-radius-md);
+  /* A corner grows with the control: a constant is a pill on a small one and a
+     square on a large one. */
+  border-radius: var(--button-radius, var(--ggarry-radius-control-md));
   cursor: pointer;
   user-select: none;
-  transition: background-color var(--ggarry-duration-fast) ease, border-color var(--ggarry-duration-fast) ease,
-    color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 [data-scope='button'][data-part='root']:hover:not([data-disabled]) {
@@ -58,7 +60,7 @@
 }
 
 [data-scope='button'][data-part='root'][data-disabled] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
   cursor: not-allowed;
 }
 
@@ -117,11 +119,13 @@
 
 [data-scope='button'][data-part='root'][data-size='sm'] {
   --button-height: var(--ggarry-size-control-sm);
+  --button-radius: var(--ggarry-radius-control-sm);
   --button-padding-x: var(--ggarry-space-2);
   --button-font-size: var(--ggarry-font-size-sm);
 }
 [data-scope='button'][data-part='root'][data-size='lg'] {
   --button-height: var(--ggarry-size-control-lg);
+  --button-radius: var(--ggarry-radius-control-lg);
   --button-padding-x: var(--ggarry-space-4);
   --button-font-size: var(--ggarry-font-size-lg);
 }
@@ -137,10 +141,10 @@
 [data-scope='button'][data-part='spinner'] {
   width: 1em;
   height: 1em;
-  border: 2px solid currentColor;
+  border: var(--ggarry-size-indicator) solid currentColor;
   border-top-color: transparent;
   border-radius: var(--ggarry-radius-full);
-  animation: ggarry-button-spin 600ms linear infinite;
+  animation: ggarry-button-spin var(--ggarry-duration-spin) linear infinite;
 }
 
 @keyframes ggarry-button-spin {
@@ -148,6 +152,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-scope='button'][data-part='spinner'] { animation-duration: 2s; }
+  [data-scope='button'][data-part='spinner'] { animation-duration: var(--ggarry-duration-calm); }
   [data-scope='button'][data-part='root'] { transition: none; }
 }

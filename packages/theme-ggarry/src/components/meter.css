@@ -42,7 +42,7 @@
 [data-scope='meter'][data-part='fill'] {
   border-radius: inherit;
   background: var(--meter-fill);
-  transition: inline-size var(--ggarry-duration-normal) ease-out;
+  transition: inline-size var(--ggarry-duration-normal) var(--ggarry-easing-settle);
 }
 /* Over the ceiling the fill is already at the end of the track and can say no
    more by its length. It squares that end instead, so a bar that is full and

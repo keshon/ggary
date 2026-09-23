@@ -10,7 +10,7 @@
   padding: var(--ggarry-space-8) var(--ggarry-space-6);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.5;
+  line-height: var(--ggarry-line-height-normal);
 }
 
 [data-scope='empty-state'][data-part='title'] {

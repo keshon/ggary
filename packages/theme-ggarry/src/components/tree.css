@@ -17,7 +17,7 @@
 
 [data-scope='tree'][data-part='item'] {
   gap: var(--ggarry-space-1);
-  min-block-size: 30px;
+  min-block-size: var(--ggarry-size-row);
   padding-inline: calc(var(--ggarry-space-1) + (var(--gg-tree-level, 1) - 1) * var(--tree-indent)) var(--ggarry-space-2);
   border-radius: var(--ggarry-radius-md);
   font-size: var(--ggarry-font-size-md);
@@ -46,7 +46,7 @@
   box-sizing: content-box;
   border-radius: var(--ggarry-radius-sm);
   color: var(--ggarry-text-muted);
-  transition: rotate var(--ggarry-duration-fast) ease;
+  transition: rotate var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='tree'][data-part='toggle']:hover:not([data-leaf]) {
   color: var(--ggarry-text-default);

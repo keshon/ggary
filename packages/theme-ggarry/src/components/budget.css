@@ -17,7 +17,7 @@
 
 [data-scope='budget'][data-part='note'] {
   font-size: var(--ggarry-font-size-xs);
-  line-height: 1.4;
+  line-height: var(--ggarry-line-height-snug);
   color: var(--ggarry-text-muted);
 }
 [data-scope='budget'][data-part='root'][data-tone='warn'] [data-part='note'] {

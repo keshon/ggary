@@ -376,12 +376,4 @@ export default defineThemeCheck({
     { label: 'dark', attributes: { 'data-mode': 'dark' } },
   ],
   pairs,
-  waivers: [
-    {
-      pair: 'hover: the muted fill off the subtle one',
-      context: 'light',
-      reason:
-        'slate-50 to slate-100 is ΔL 0.016. Moving light bg.muted also moves the chip plate, the heatmap’s empty cell and every muted fill, so it waits for a decision on the light neutral ramp.',
-    },
-  ],
 })

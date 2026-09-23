@@ -24,13 +24,13 @@
   block-size: var(--ggarry-size-control-md);
   padding-inline: var(--ggarry-space-3);
   border: 1px solid var(--ggarry-border-control);
-  border-radius: var(--ggarry-radius-md);
+  border-radius: var(--ggarry-radius-control-md);
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-default);
   font: inherit;
   font-size: var(--ggarry-font-size-md);
   text-align: start;
-  transition: border-color var(--ggarry-duration-fast) ease;
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='cascader'][data-part='trigger']:hover:not(:disabled),
 [data-scope='cascader'][data-part='trigger'][data-state='open'] {
@@ -42,7 +42,7 @@
   outline-offset: var(--ggarry-focus-ring-offset);
 }
 [data-scope='cascader'][data-part='trigger']:disabled {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
   background: var(--ggarry-bg-subtle);
   cursor: not-allowed;
 }
@@ -65,7 +65,7 @@
   inline-size: 14px;
   block-size: 14px;
   color: var(--ggarry-text-muted);
-  transition: rotate var(--ggarry-duration-fast) ease;
+  transition: rotate var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='cascader'][data-part='indicator'][data-state='open'] {
   rotate: 180deg;
@@ -90,7 +90,7 @@
   gap: var(--ggarry-space-2);
   /* 32 pixels a row, as the select's options. */
   padding: 6px var(--ggarry-space-2);
-  line-height: 20px;
+  line-height: var(--ggarry-line-height-row);
   border-radius: var(--ggarry-radius-md);
   color: var(--ggarry-text-default);
   font-size: var(--ggarry-font-size-md);
@@ -133,7 +133,7 @@
   color: var(--ggarry-text-muted);
 }
 [data-scope='cascader'][data-part='item-branch']:hover {
-  background: color-mix(in srgb, currentColor 12%, transparent);
+  background: color-mix(in oklab, currentColor 12%, transparent);
 }
 [data-scope='cascader'][data-part='item'][data-highlighted] > [data-part='item-branch'] {
   color: inherit;

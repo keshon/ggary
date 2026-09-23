@@ -32,8 +32,8 @@
   outline-offset: var(--ggarry-focus-ring-offset);
 }
 [data-scope='data-grid'][data-part='root']:focus-visible :is([data-part='cell'], [data-part='header-cell'])[data-focused] {
-  outline: 2px solid var(--ggarry-focus-ring);
-  outline-offset: -2px;
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: calc(-1 * var(--ggarry-focus-ring-width));
 }
 
 /* --- header -------------------------------------------------------------- */
@@ -75,7 +75,7 @@
 /* The place of a column in a sort by several: 1, 2, 3. */
 [data-scope='data-grid'][data-part='header-cell'][data-sort-order]::after {
   content: attr(data-sort-order);
-  font-size: 10px;
+  font-size: var(--ggarry-font-size-2xs);
   color: var(--ggarry-text-muted);
 }
 
@@ -164,8 +164,8 @@
 
 /* The previous answer, while the new one loads: still there, plainly not current. */
 [data-scope='data-grid'][data-part='frame'][data-stale] [data-part='body'] {
-  opacity: 0.55;
-  transition: opacity var(--ggarry-duration-normal) ease;
+  opacity: var(--ggarry-opacity-disabled);
+  transition: opacity var(--ggarry-duration-normal) var(--ggarry-easing-standard);
 }
 
 [data-scope='data-grid'][data-part='overlay'] {
@@ -296,8 +296,8 @@
   padding-inline: var(--ggarry-space-3);
   border: 0;
   border-radius: 0;
-  outline: 2px solid var(--ggarry-focus-ring);
-  outline-offset: -2px;
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: calc(-1 * var(--ggarry-focus-ring-width));
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-default);
 }
@@ -331,13 +331,13 @@
 /* The save failed and the old value is back: marked until the next save of this cell. */
 [data-scope='data-grid'][data-part='cell'][data-save='failed'] {
   background: var(--ggarry-bg-danger-subtle);
-  box-shadow: inset 2px 0 0 var(--ggarry-border-danger);
+  box-shadow: inset var(--ggarry-size-indicator) 0 0 var(--ggarry-border-danger);
 }
 
 /* The row open in the detail sheet: a bar at its start, so the list says which
    row the sheet beside it is showing. */
 [data-scope='data-grid'][data-part='row'][data-open] > [data-part='cell']:first-child {
-  box-shadow: inset 3px 0 0 var(--ggarry-border-accent);
+  box-shadow: inset var(--ggarry-size-edge) 0 0 var(--ggarry-border-accent);
 }
 /* …and the pinned edge, when the first column is also the last pinned one. */
 [data-scope='data-grid'][data-part='row'][data-open] > [data-part='cell']:first-child[data-pinned='start'][data-pin-edge] {

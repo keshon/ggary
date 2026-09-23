@@ -22,9 +22,9 @@
   box-shadow: var(--ggarry-shadow-popover);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.4;
+  line-height: var(--ggarry-line-height-snug);
 
-  transition: opacity var(--ggarry-duration-normal) ease, translate var(--ggarry-duration-normal) ease;
+  transition: opacity var(--ggarry-duration-normal) var(--ggarry-easing-standard), translate var(--ggarry-duration-normal) var(--ggarry-easing-standard);
 }
 
 [data-scope='toast'][data-part='toast'][data-state='leaving'] {
@@ -75,8 +75,8 @@
 }
 
 [data-scope='toast'][data-part='close'] {
-  inline-size: 24px;
-  block-size: 24px;
+  inline-size: var(--ggarry-size-icon-button-sm);
+  block-size: var(--ggarry-size-icon-button-sm);
   border-radius: var(--ggarry-radius-md);
   color: var(--ggarry-text-muted);
 }

@@ -22,7 +22,7 @@
   color: var(--ggarry-text-default);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.5;
+  line-height: var(--ggarry-line-height-normal);
 }
 
 [data-scope='banner'][data-part='icon'] {
@@ -53,8 +53,8 @@
 }
 
 [data-scope='banner'][data-part='close'] {
-  inline-size: 24px;
-  block-size: 24px;
+  inline-size: var(--ggarry-size-icon-button-sm);
+  block-size: var(--ggarry-size-icon-button-sm);
   border-radius: var(--ggarry-radius-md);
   color: var(--ggarry-text-muted);
 }

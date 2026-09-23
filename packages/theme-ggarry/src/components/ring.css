@@ -45,7 +45,7 @@
   stroke-width: var(--ring-stroke);
   /* Rounded, so a small share is still an arc rather than a chip of colour. */
   stroke-linecap: round;
-  transition: stroke-dashoffset var(--ggarry-duration-normal) ease-out;
+  transition: stroke-dashoffset var(--ggarry-duration-normal) var(--ggarry-easing-settle);
 }
 /* Past the ceiling the arc is a closed circle; a round cap lying over the
    start of the ring blurs where it begins, so the caps go square. */
@@ -53,8 +53,9 @@
 
 [data-scope='ring'][data-part='value'] {
   fill: var(--ggarry-text-default);
-  /* In viewBox units: 5.5 of 20 is 11px inside the large rung, the floor of the type scale. */
-  font-size: 5.5px;
+  /* In viewBox units, and the large rung draws them at twice their size:
+     half the floor of the type scale is the floor inside it. */
+  font-size: calc(var(--ggarry-font-size-2xs) / 2);
   font-family: var(--ggarry-font-family-sans);
   font-weight: var(--ggarry-font-weight-medium);
 }

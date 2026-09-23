@@ -39,8 +39,8 @@
   color: var(--ggarry-text-default);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.5;
-  transition: border-color var(--ggarry-duration-fast) ease, background-color var(--ggarry-duration-fast) ease;
+  line-height: var(--ggarry-line-height-normal);
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 /* The control centres on the FIRST LINE of the heading, not on the block:
@@ -58,7 +58,7 @@
   background: var(--ggarry-bg-subtle);
   /* text-accent, not the accent fill: the fill measures 2.80:1 on the subtle
      ground in dark mode, and this bar is a state, so it owes 3:1. */
-  box-shadow: inset 3px 0 0 0 var(--ggarry-text-accent);
+  box-shadow: inset var(--ggarry-size-edge) 0 0 0 var(--ggarry-text-accent);
 }
 
 /* The ring goes round the whole card: on the control it would ring a dot. */
@@ -68,7 +68,7 @@
 }
 
 [data-scope='choice-card'][data-part='root'][data-disabled] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
 }
 
 [data-scope='choice-card'][data-part='title'] {

@@ -20,7 +20,7 @@
   color: var(--ggarry-text-muted);
 }
 [data-scope='combobox'][data-part='label'][data-disabled] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
 }
 
 [data-scope='combobox'][data-part='control'] {
@@ -28,11 +28,11 @@
   min-block-size: var(--ggarry-size-control-md);
   padding: 3px var(--ggarry-space-1) 3px var(--ggarry-space-3);
   border: 1px solid var(--ggarry-border-control);
-  border-radius: var(--ggarry-radius-md);
+  border-radius: var(--ggarry-radius-control-md);
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-default);
   font-size: var(--ggarry-font-size-md);
-  transition: border-color var(--ggarry-duration-fast) ease;
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='combobox'][data-part='root'][data-multiple] [data-part='control'] {
   padding-inline-start: var(--ggarry-space-1);
@@ -48,7 +48,7 @@
   outline-offset: var(--ggarry-focus-ring-offset);
 }
 [data-scope='combobox'][data-part='control'][data-disabled] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
   background: var(--ggarry-bg-subtle);
   cursor: not-allowed;
 }
@@ -89,8 +89,8 @@
 }
 
 [data-scope='combobox']:is([data-part='clear'], [data-part='trigger']) {
-  inline-size: 26px;
-  block-size: 26px;
+  inline-size: var(--ggarry-size-icon-button-sm);
+  block-size: var(--ggarry-size-icon-button-sm);
   border-radius: var(--ggarry-radius-sm);
   color: var(--ggarry-text-muted);
 }
@@ -105,7 +105,7 @@
 [data-scope='combobox'][data-part='trigger-icon'] {
   inline-size: 14px;
   block-size: 14px;
-  transition: rotate var(--ggarry-duration-fast) ease;
+  transition: rotate var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='combobox'][data-part='trigger'][data-state='open'] > [data-part='trigger-icon'] {
   rotate: 180deg;
@@ -121,18 +121,18 @@
   background: var(--ggarry-bg-surface);
   box-shadow: var(--ggarry-shadow-popover);
   font-family: var(--ggarry-font-family-sans);
-  transition: opacity var(--ggarry-duration-fast) ease;
+  transition: opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 /* The last answer, while the next is on its way: still there, plainly not current. */
 [data-scope='combobox'][data-part='content'][data-stale] {
-  opacity: 0.6;
+  opacity: var(--ggarry-opacity-stale);
 }
 
 [data-scope='combobox'][data-part='item'] {
   column-gap: var(--ggarry-space-2);
   /* 32 pixels a row, with the field's corner, as the select's options. */
   padding: 6px var(--ggarry-space-2);
-  line-height: 20px;
+  line-height: var(--ggarry-line-height-row);
   border-radius: var(--ggarry-radius-md);
   color: var(--ggarry-text-default);
   font-size: var(--ggarry-font-size-md);
@@ -148,7 +148,7 @@
   color: var(--ggarry-text-accent);
 }
 [data-scope='combobox'][data-part='item'][aria-busy='true'] {
-  opacity: 0.7;
+  opacity: var(--ggarry-opacity-stale);
 }
 [data-scope='combobox'][data-part='item'][data-selected] {
   font-weight: var(--ggarry-font-weight-semibold);

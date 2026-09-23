@@ -20,7 +20,7 @@
  *   font-size    em and %: relative to the text around, which is tokenised
  *   font-weight  normal, inherit
  *   motion       0s, linear and steps(): a turn and a blink are not a feel
- *   focus        0
+ *   focus        0, and a 1px hairline: an edge drawn with an outline is not a ring
  *   edge         a 1px hairline: a border wider than that is a mark
  *   z-index      below 10: stacking siblings inside one component
  * Rules under forced colours are not read: the tokens are gone there.
@@ -114,7 +114,7 @@ export function classify(property: string, value: string): Family[] {
   }
 
   if (/^outline(-width|-offset)?$/.test(p) || /-ring-(width|offset)$/.test(p)) {
-    if (lengths(v).some(([n]) => n !== 0)) out.add('focus')
+    if (lengths(v).some(([n]) => n !== 0 && n !== 1)) out.add('focus')
   }
 
   if (EDGE.test(p) && lengths(v).some(([n, u]) => u === 'px' && n > 1)) out.add('edge')
@@ -171,7 +171,7 @@ export function formatDebt(debt: Debt): string {
   const rows = Object.keys(debt)
     .sort()
     .map((file) => `  ${JSON.stringify(file)}: ${JSON.stringify(debt[file]).replace(/([:,])/g, '$1 ')}`)
-  return `{\n${rows.join(',\n')}\n}\n`
+  return rows.length ? `{\n${rows.join(',\n')}\n}\n` : '{}\n'
 }
 
 export function readDebt(check: ThemeCheck, workspaceRoot: string): Debt {

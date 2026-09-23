@@ -200,6 +200,7 @@ describe('literal gate', () => {
       ['animation', 'spin var(--slow) linear infinite', []],
       ['outline-offset', '-2px', ['focus']],
       ['outline-offset', 'calc(-1 * var(--ring))', []],
+      ['outline', '1px solid var(--x-alarm)', []],
       ['border-inline-start', '3px solid var(--x-ink)', ['edge']],
       ['border', '1px solid var(--x-ink)', []],
       ['z-index', '40', ['z-index']],

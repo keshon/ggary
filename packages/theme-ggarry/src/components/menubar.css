@@ -18,7 +18,7 @@
   padding-inline: var(--ggarry-space-3);
   border-radius: var(--ggarry-radius-md);
   cursor: pointer;
-  transition: background-color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 [data-scope='menubar'][data-part='item']:hover:not([data-disabled]),

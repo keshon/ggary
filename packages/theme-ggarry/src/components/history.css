@@ -43,8 +43,8 @@
   inline-size: var(--history-tick);
   /* A corner may not depend on the data: a radius clamps to half the width,
      and the same mark would be a lozenge on a sparse strip and a hairline on
-     a dense one. 2px moves the shape as little as anything can. */
-  border-radius: 2px;
+     a dense one. The mark radius moves the shape as little as anything can. */
+  border-radius: var(--ggarry-radius-mark);
   /* With no tone the attempt happened and the outcome is unknown: the mark is
      the colour of the track. */
   background: var(--ggarry-tone-mark, var(--ggarry-border-default));

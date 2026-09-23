@@ -18,7 +18,7 @@
 }
 
 [data-scope='search'][data-part='root'][data-disabled] > [data-part='icon'] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
 }
 
 /* The native cross, recoloured rather than replaced: a button of our own would

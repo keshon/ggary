@@ -21,7 +21,7 @@
   box-shadow: var(--ggarry-shadow-modal);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.5;
+  line-height: var(--ggarry-line-height-normal);
 }
 
 [data-scope='dialog'][data-part='content'][data-size='sm'] { --dialog-width: 400px; }
@@ -53,7 +53,7 @@
   margin: 0;
   font-size: var(--ggarry-font-size-lg);
   font-weight: var(--ggarry-font-weight-semibold);
-  line-height: 1.35;
+  line-height: var(--ggarry-line-height-tight);
 }
 
 [data-scope='dialog'][data-part='description'] {
@@ -67,8 +67,8 @@
   grid-area: 1 / 2;
   display: inline-grid;
   place-items: center;
-  inline-size: 28px;
-  block-size: 28px;
+  inline-size: var(--ggarry-size-icon-button-md);
+  block-size: var(--ggarry-size-icon-button-md);
   margin: -4px -6px 0 0;
   padding: 0;
   border: 0;
@@ -144,7 +144,7 @@
 
 /* Entry: a short fade and rise. Exit is instant — the body unmounts with it. */
 [data-scope='dialog'][data-part='content'][open] {
-  transition: opacity var(--ggarry-duration-normal) ease, translate var(--ggarry-duration-normal) ease;
+  transition: opacity var(--ggarry-duration-normal) var(--ggarry-easing-standard), translate var(--ggarry-duration-normal) var(--ggarry-easing-standard);
 }
 
 @starting-style {

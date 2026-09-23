@@ -63,10 +63,10 @@
   background: var(--ggarry-bg-surface);
   outline: none;
   transition:
-    border-color var(--ggarry-duration-fast) ease,
-    box-shadow var(--ggarry-duration-fast) ease,
-    opacity var(--ggarry-duration-fast) ease,
-    translate var(--ggarry-duration-fast) ease;
+    border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    box-shadow var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    translate var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='kanban'][data-part='card']:hover {
   border-color: var(--ggarry-border-strong);
@@ -105,18 +105,18 @@
   cursor: grabbing;
 }
 [data-scope='kanban'][data-part='card'][data-pending] {
-  opacity: 0.6;
+  opacity: var(--ggarry-opacity-stale);
 }
 /* A card's menu button: quiet in the corner, shown on the card the pointer or
    the focus is on — and always on a screen that cannot hover. */
 [data-scope='kanban'][data-part='card-menu'] {
-  inline-size: 28px;
-  block-size: 28px;
+  inline-size: var(--ggarry-size-icon-button-md);
+  block-size: var(--ggarry-size-icon-button-md);
   margin: 4px;
   border-radius: var(--ggarry-radius-md);
   color: var(--ggarry-text-muted);
   opacity: 0;
-  transition: opacity var(--ggarry-duration-fast) ease;
+  transition: opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='kanban'][data-part='card']:is(:hover, :focus-within) [data-part='card-menu'],
 [data-scope='kanban'][data-part='card-menu'][aria-expanded='true'] {
@@ -132,7 +132,7 @@
 [data-scope='kanban'][data-part='card-menu']:focus-visible {
   opacity: 1;
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
-  outline-offset: -2px;
+  outline-offset: calc(-1 * var(--ggarry-focus-ring-width));
 }
 [data-scope='kanban'][data-part='card'][data-dragging] [data-part='card-menu'],
 [data-scope='kanban'][data-part='card'][data-drag-overlay] [data-part='card-menu'] {
@@ -169,7 +169,7 @@
 }
 [data-scope='kanban'][data-part='add-trigger']:focus-visible {
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
-  outline-offset: -2px;
+  outline-offset: calc(-1 * var(--ggarry-focus-ring-width));
 }
 [data-scope='kanban'][data-part='add-trigger-icon'] {
   inline-size: 14px;
@@ -186,7 +186,7 @@
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-default);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.35;
+  line-height: var(--ggarry-line-height-tight);
 }
 [data-scope='kanban'][data-part='add-input']:focus-visible {
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
@@ -227,7 +227,7 @@
   padding-inline-end: 24px;
   font-size: var(--ggarry-font-size-md);
   font-weight: var(--ggarry-font-weight-medium);
-  line-height: 1.35;
+  line-height: var(--ggarry-line-height-tight);
 }
 [data-scope='kanban'][data-part='card-body'] {
   margin-block-start: var(--ggarry-space-2);

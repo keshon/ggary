@@ -19,7 +19,7 @@
   margin-inline-start: calc(-1 * var(--ggarry-space-2));
   border-radius: var(--ggarry-radius-sm);
   color: inherit;
-  transition: color var(--ggarry-duration-fast) ease;
+  transition: color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='thinking'][data-part='trigger']:hover:not(:disabled) {
   color: var(--ggarry-text-default);
@@ -36,7 +36,7 @@
 [data-scope='thinking'][data-part='indicator'] {
   inline-size: 12px;
   block-size: 12px;
-  transition: rotate var(--ggarry-duration-normal) ease;
+  transition: rotate var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 /* Reasoning is read through rather than skimmed: prose leading, as the
@@ -45,7 +45,7 @@
   margin-block-start: var(--ggarry-space-2);
   border-inline-start: 1px solid var(--ggarry-border-default);
   padding-inline-start: var(--ggarry-space-3);
-  line-height: 1.65;
+  line-height: var(--ggarry-line-height-relaxed);
 }
 
 /* The summary of a thought still arriving reads as live: the same accent the

@@ -26,7 +26,7 @@
 [data-scope='metric'][data-part='label'] {
   color: var(--ggarry-text-muted);
   font-size: var(--ggarry-font-size-xs);
-  line-height: 16px;
+  line-height: var(--ggarry-line-height-caption);
 }
 
 /* How loud the value is: one channel, set by the row for the headline band. */
@@ -35,7 +35,7 @@
   font-size: var(--metric-value-size, var(--ggarry-font-size-metric));
   font-weight: var(--ggarry-font-weight-semibold);
   letter-spacing: -0.01em;
-  line-height: 1.2;
+  line-height: var(--ggarry-line-height-tight);
 }
 
 [data-scope='metric'][data-part='unit'] {
@@ -55,7 +55,7 @@
   margin-block-start: var(--ggarry-space-1);
   color: var(--metric-delta-ink);
   font-size: var(--ggarry-font-size-xs);
-  line-height: 16px;
+  line-height: var(--ggarry-line-height-caption);
 }
 [data-scope='metric'][data-part='delta'][data-tone='running'] { --metric-delta-ink: var(--ggarry-text-accent); }
 [data-scope='metric'][data-part='delta'][data-tone='ok'] { --metric-delta-ink: var(--ggarry-text-success); }

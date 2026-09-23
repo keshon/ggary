@@ -46,7 +46,7 @@
   background: color-mix(in oklab, var(--ggarry-text-danger) 10%, transparent);
   font-family: var(--ggarry-font-family-mono);
   font-size: var(--ggarry-font-size-xs);
-  line-height: 1.6;
+  line-height: var(--ggarry-line-height-relaxed);
 }
 
 /* What was already tried is read only if the first two lines did not explain

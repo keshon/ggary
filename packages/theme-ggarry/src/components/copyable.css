@@ -28,7 +28,7 @@
   background: transparent;
   color: var(--ggarry-text-muted);
   cursor: pointer;
-  transition: background-color var(--ggarry-duration-fast) ease, color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 /* The same device as the checkbox: the tap area grows to 24px, the glyph and
    the line keep their size. On the button, not the glyph — a mask would clip it. */

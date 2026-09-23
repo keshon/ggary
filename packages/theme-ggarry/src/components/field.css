@@ -32,13 +32,13 @@
 }
 
 [data-scope='field'][data-part='label'][data-disabled] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
 }
 
 [data-scope='field'][data-part='hint'],
 [data-scope='field'][data-part='error'] {
   font-size: var(--ggarry-font-size-xs);
-  line-height: 1.4;
+  line-height: var(--ggarry-line-height-snug);
 }
 
 [data-scope='field'][data-part='hint'] {

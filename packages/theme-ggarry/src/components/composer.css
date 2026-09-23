@@ -23,7 +23,7 @@
   font-family: var(--ggarry-font-family-sans);
   /* The corners hold over the field and the bar alike. */
   overflow: hidden;
-  transition: border-color var(--ggarry-duration-fast) ease;
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='composer'][data-part='root']:hover:not([data-disabled]),
 [data-scope='composer'][data-part='root']:focus-within {
@@ -80,7 +80,7 @@
   border-radius: var(--ggarry-radius-full);
   background: var(--ggarry-bg-accent);
   color: var(--ggarry-text-on-accent);
-  transition: background-color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='composer'][data-part='send']:hover:not(:disabled) {
   background: var(--ggarry-bg-accent-hover);

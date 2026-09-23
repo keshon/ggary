@@ -28,7 +28,7 @@
   min-block-size: 28px;
   padding-inline: var(--ggarry-space-2);
   border-radius: inherit;
-  transition: background-color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='step'][data-part='head']:hover {
   background: var(--ggarry-bg-subtle);
@@ -42,7 +42,7 @@
   inline-size: 12px;
   block-size: 12px;
   color: var(--ggarry-text-muted);
-  transition: rotate var(--ggarry-duration-fast) ease;
+  transition: rotate var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 /* Machine-like, because it IS the machine's name for the tool. */
@@ -89,7 +89,7 @@
   background: var(--ggarry-bg-subtle);
   font-family: var(--ggarry-font-family-mono);
   font-size: var(--ggarry-font-size-xs);
-  line-height: 1.6;
+  line-height: var(--ggarry-line-height-relaxed);
   color: var(--ggarry-text-default);
 }
 /* A cut output and its button are one block: the button closes the bottom of
@@ -114,7 +114,7 @@
   font-size: var(--ggarry-font-size-xs);
   color: var(--ggarry-text-accent);
   cursor: pointer;
-  transition: background-color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='step'][data-part='more']:hover {
   background: var(--ggarry-bg-muted);

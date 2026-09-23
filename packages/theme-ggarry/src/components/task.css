@@ -51,7 +51,7 @@
 }
 
 [data-scope='task'][data-part='title'] {
-  line-height: 1.4;
+  line-height: var(--ggarry-line-height-snug);
 }
 [data-scope='task'][data-part='root'][data-state='running'] [data-part='title'] {
   color: var(--ggarry-text-accent);
@@ -60,7 +60,7 @@
   color: var(--ggarry-text-muted);
 }
 [data-scope='task'][data-part='root'][data-state='skipped'] {
-  opacity: 0.7;
+  opacity: var(--ggarry-opacity-quiet);
 }
 /* Shown, and out of reach: the row keeps its place in the arrow traversal. */
 [data-scope='task'][data-part='root'][data-disabled] {
@@ -70,7 +70,7 @@
 [data-scope='task'][data-part='sub'],
 [data-scope='task'][data-part='meta'] {
   font-size: var(--ggarry-font-size-xs);
-  line-height: 1.4;
+  line-height: var(--ggarry-line-height-snug);
   color: var(--ggarry-text-muted);
 }
 [data-scope='task'][data-part='sub'] {

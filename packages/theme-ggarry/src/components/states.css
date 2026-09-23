@@ -24,7 +24,7 @@
   block-size: 6px;
   border-radius: 50%;
   background: var(--ggarry-tone-mark, var(--ggarry-mark-neutral));
-  animation: var(--ggarry-tone-pulse, none) 1.6s ease-in-out infinite;
+  animation: var(--ggarry-tone-pulse, none) var(--ggarry-duration-pulse) var(--ggarry-easing-breathe) infinite;
 }
 @keyframes ggarry-tone-pulse {
   0%, 100% { opacity: 1; }
@@ -43,7 +43,7 @@
   block-size: 1.05em;
   margin-inline-start: 0.1em;
   background: var(--ggarry-bg-accent);
-  animation: ggarry-caret-blink 1s steps(2, start) infinite;
+  animation: ggarry-caret-blink var(--ggarry-duration-blink) steps(2, start) infinite;
 }
 @keyframes ggarry-caret-blink {
   50% { opacity: 0; }
@@ -51,7 +51,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   /* A busy mark slows rather than stops: a still dot says the work halted. */
-  [data-scope='dot'][data-part='root'] { animation-duration: 3s; }
+  [data-scope='dot'][data-part='root'] { animation-duration: var(--ggarry-duration-calm); }
   /* The caret's blink says nothing the caret does not: the blink goes, the
      caret stays. */
   [data-scope='caret'][data-part='root'] { animation: none; opacity: 1; }

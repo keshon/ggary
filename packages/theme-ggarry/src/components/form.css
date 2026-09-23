@@ -14,7 +14,7 @@
   gap: var(--ggarry-space-2);
   padding: var(--ggarry-space-4);
   border: 1px solid var(--ggarry-border-danger);
-  border-inline-start-width: 4px;
+  border-inline-start-width: var(--ggarry-size-edge);
   border-radius: var(--ggarry-radius-md);
   background: var(--ggarry-bg-surface);
   font-family: var(--ggarry-font-family-sans);
@@ -50,15 +50,15 @@
   text-decoration-thickness: 2px;
 }
 [data-scope='form-summary'][data-part='link']:focus-visible {
-  border-radius: 2px;
+  border-radius: var(--ggarry-radius-mark);
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
-  outline-offset: 2px;
+  outline-offset: var(--ggarry-focus-ring-offset);
 }
 
 [data-scope='form'][data-part='field-error'] {
   color: var(--ggarry-text-danger);
   font-size: var(--ggarry-font-size-xs);
-  line-height: 1.4;
+  line-height: var(--ggarry-line-height-snug);
 }
 
 /* A composite in error: its box in danger, as a Field's input is — hovered too. */

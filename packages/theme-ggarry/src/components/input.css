@@ -25,8 +25,8 @@
   color: var(--ggarry-text-default);
   background: var(--ggarry-bg-surface);
   border: 1px solid var(--ggarry-border-control);
-  border-radius: var(--ggarry-radius-md);
-  transition: border-color var(--ggarry-duration-fast) ease, background-color var(--ggarry-duration-fast) ease;
+  border-radius: var(--input-radius, var(--ggarry-radius-control-md));
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 /* A placeholder is read: readable text, not the decorative subtle step. */
@@ -56,18 +56,20 @@
 }
 
 :is([data-scope='input'], [data-scope='textarea'])[data-part='root']:disabled {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
   cursor: not-allowed;
   background: var(--ggarry-bg-subtle);
 }
 
 :is([data-scope='input'], [data-scope='textarea'])[data-part='root'][data-size='sm'] {
   --input-height: var(--ggarry-size-control-sm);
+  --input-radius: var(--ggarry-radius-control-sm);
   --input-font-size: var(--ggarry-font-size-sm);
 }
 
 :is([data-scope='input'], [data-scope='textarea'])[data-part='root'][data-size='lg'] {
   --input-height: var(--ggarry-size-control-lg);
+  --input-radius: var(--ggarry-radius-control-lg);
   --input-font-size: var(--ggarry-font-size-lg);
 }
 

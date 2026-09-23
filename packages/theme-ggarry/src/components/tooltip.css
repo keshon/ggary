@@ -15,11 +15,11 @@
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-xs);
   font-weight: var(--ggarry-font-weight-medium);
-  line-height: 1.4;
+  line-height: var(--ggarry-line-height-snug);
 }
 
 [data-scope='tooltip'][data-part='content']:popover-open {
-  transition: opacity var(--ggarry-duration-fast) ease;
+  transition: opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 @starting-style {

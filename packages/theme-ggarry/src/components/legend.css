@@ -15,7 +15,7 @@
   color: var(--ggarry-text-muted);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-xs);
-  line-height: 16px;
+  line-height: var(--ggarry-line-height-caption);
 }
 
 /* Down the side of a tall chart the items are a list rather than a line, so
@@ -43,7 +43,7 @@
 
   inline-size: 8px;
   block-size: 8px;
-  border-radius: 2px;
+  border-radius: var(--ggarry-radius-mark);
   background: var(--series);
 }
 

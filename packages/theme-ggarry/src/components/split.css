@@ -25,7 +25,7 @@
   inset-inline-start: 4px;
   inline-size: 1px;
   background: var(--ggarry-border-default);
-  transition: background-color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='split'][data-part='separator'][data-orientation='vertical']::before {
   inset-inline: 0;
@@ -47,7 +47,9 @@
   block-size: 3px;
 }
 [data-scope='split'][data-part='separator']:focus-visible {
-  outline: none;
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: calc(-1 * var(--ggarry-focus-ring-width));
+  border-radius: var(--ggarry-radius-sm);
 }
 /* The grip: three dots at the middle of the line, where a hand looks for it. */
 [data-scope='split'][data-part='handle'] {

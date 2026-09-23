@@ -15,15 +15,15 @@
   block-size: var(--number-height);
   background: var(--ggarry-bg-surface);
   border: 1px solid var(--ggarry-border-control);
-  border-radius: var(--ggarry-radius-md);
+  border-radius: var(--ggarry-radius-control-md);
   color: var(--ggarry-text-default);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-md);
-  transition: border-color var(--ggarry-duration-fast) ease, background-color var(--ggarry-duration-fast) ease;
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='number-field'][data-part='root'][data-size='sm'] {
   --number-height: var(--ggarry-size-control-sm);
-  border-radius: var(--ggarry-radius-sm);
+  border-radius: var(--ggarry-radius-control-sm);
   font-size: var(--ggarry-font-size-sm);
 }
 
@@ -41,7 +41,7 @@
   border-color: var(--ggarry-border-default);
 }
 [data-scope='number-field'][data-part='root'][data-disabled] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
   background: var(--ggarry-bg-subtle);
 }
 

@@ -23,7 +23,7 @@
   font-size: var(--ggarry-font-size-xs);
   line-height: 1;
   cursor: pointer;
-  transition: background-color var(--ggarry-duration-fast) ease, color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='inserts'][data-part='item']:hover {
   background: var(--ggarry-bg-muted);

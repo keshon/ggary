@@ -13,7 +13,7 @@
   cursor: default;
 }
 [data-scope='select'][data-part='label'][data-disabled] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
 }
 
 [data-scope='select'][data-part='trigger'] {
@@ -33,9 +33,9 @@
      boundary, so it owes 3:1 (WCAG 1.4.11). A button's outline is decoration —
      its label identifies it — and keeps the quieter border-strong. */
   border: 1px solid var(--ggarry-border-control);
-  border-radius: var(--ggarry-radius-md);
+  border-radius: var(--ggarry-radius-control-md);
   cursor: pointer;
-  transition: border-color var(--ggarry-duration-fast) ease;
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 [data-scope='select'][data-part='trigger']:hover:not([data-disabled]) {
@@ -45,7 +45,7 @@
   border-color: var(--ggarry-border-accent);
 }
 [data-scope='select'][data-part='trigger'][data-disabled] {
-  opacity: 0.55;
+  opacity: var(--ggarry-opacity-disabled);
   cursor: not-allowed;
   background: var(--ggarry-bg-subtle);
 }
@@ -64,7 +64,7 @@
   inline-size: 14px;
   block-size: 14px;
   color: var(--ggarry-text-muted);
-  transition: transform var(--ggarry-duration-fast) ease;
+  transition: transform var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='select'][data-part='indicator'][data-state='open'] {
   transform: rotate(180deg);
@@ -90,12 +90,12 @@
      that opens it, a highlighted option read as a second field, and a heavy one. */
   padding: 6px var(--ggarry-space-2);
   font-size: var(--ggarry-font-size-md);
-  line-height: 20px;
+  line-height: var(--ggarry-line-height-row);
   color: var(--ggarry-text-default);
   /* The field's own corner. The panel's less its inset would be concentric,
      but a pixel tighter than the field it opens from, and the eye holds the
      option against the field. */
-  border-radius: var(--ggarry-radius-md);
+  border-radius: var(--ggarry-radius-control-md);
   cursor: pointer;
   user-select: none;
 }
@@ -128,4 +128,8 @@
   font-size: var(--ggarry-font-size-sm);
   color: var(--ggarry-text-muted);
   text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='select']:is([data-part='trigger'], [data-part='indicator']) { transition: none; }
 }

@@ -20,6 +20,8 @@
   --region-ground: var(--ggarry-bg-surface);
   --region-edge: var(--ggarry-border-default);
   --region-title-size: var(--ggarry-font-size-md);
+  /* A panel's title is a step under a card's: it names data rather than holding it. */
+  --region-label-size: var(--ggarry-font-size-sm);
   --region-title-ink: var(--ggarry-text-default);
 }
 
@@ -31,11 +33,13 @@
 
 :is([data-scope='card'], [data-scope='panel'])[data-part='root'][data-rank='lead'] {
   --region-title-size: var(--ggarry-font-size-lg);
+  --region-label-size: var(--ggarry-font-size-md);
 }
 :is([data-scope='card'], [data-scope='panel'])[data-part='root'][data-rank='support'] {
   --region-ground: var(--ggarry-bg-subtle);
   --region-edge: transparent;
   --region-title-size: var(--ggarry-font-size-sm);
+  --region-label-size: var(--ggarry-font-size-xs);
   --region-title-ink: var(--ggarry-text-muted);
 }
 :is([data-scope='card'], [data-scope='panel'])[data-part='root'][data-plain] {
@@ -55,12 +59,12 @@
   color: var(--ggarry-text-default);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.5;
+  line-height: var(--ggarry-line-height-normal);
 }
 
 [data-scope='card'][data-part='root'][data-interactive] {
   cursor: pointer;
-  transition: border-color var(--ggarry-duration-fast) ease, background-color var(--ggarry-duration-fast) ease;
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='card'][data-part='root'][data-interactive]:hover {
   border-color: var(--ggarry-border-strong);
@@ -70,7 +74,7 @@
   font-size: var(--region-title-size);
   font-weight: var(--ggarry-font-weight-semibold);
   color: var(--region-title-ink);
-  line-height: 1.35;
+  line-height: var(--ggarry-line-height-tight);
 }
 
 [data-scope='card'][data-part='subtitle'] {

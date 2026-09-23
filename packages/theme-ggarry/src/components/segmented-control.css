@@ -18,7 +18,7 @@
   border-radius: var(--segmented-radius);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-sm);
-  line-height: 1.25;
+  line-height: var(--ggarry-line-height-tight);
 }
 
 [data-scope='segmented-control'][data-part='item'] {
@@ -26,9 +26,9 @@
   padding-inline: var(--ggarry-space-3);
   border: 1px solid transparent;
   /* Concentric with the track: its radius less the padding between them. */
-  border-radius: max(2px, calc(var(--segmented-radius) - var(--segmented-inset)));
+  border-radius: max(var(--ggarry-radius-mark), calc(var(--segmented-radius) - var(--segmented-inset)));
   color: var(--ggarry-text-muted);
-  transition: background-color var(--ggarry-duration-fast) ease, color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 [data-scope='segmented-control'][data-part='root'][data-size='sm'] > [data-part='item'] {

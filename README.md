@@ -298,17 +298,19 @@ component CSS to it:
 |---|---|
 | space | `space-1` … `space-8`, on a 4px grid |
 | radius | `mark` 2 (a glyph under 8px), `sm` 4, `md` 6, `lg` 10, `full`; `control-sm/md/lg` by a control's size |
-| type | `font-size-xs` … `xl`, three weights; `line-height-tight` 1.3 (titles), `snug` 1.4 (labels), `normal` 1.5 (body), `relaxed` 1.6 (long reading) |
-| size | `control-sm/md/lg` 28/34/40, `icon-button-sm/md` 24/28, `tap` 24, `edge` 3 (an accent edge), `indicator` 2 (a chosen tab's line, a thumb's border) |
-| opacity | `disabled` 0.55, `stale` 0.6 (content being replaced) |
-| motion | `duration-fast` 120ms, `normal` 200ms; `easing-standard` (ease), `settle` (ease-out, a value arriving), `breathe` (ease-in-out, a loop) |
+| type | `font-size-2xs` 11 (the floor: a rail's labels, a count on a dot) … `xl`, three weights; `line-height-tight` 1.3 (titles), `snug` 1.4 (labels), `normal` 1.5 (body), `relaxed` 1.6 (long reading), `row` 20px (a one-line list row, whose height is this and its padding), `caption` 16px (a readout's small line) |
+| size | `control-sm/md/lg` 28/34/40, `row` 32 (a list row), `icon-button-sm` 24 (closes a message, sits in a field), `icon-button-md` 28 (a surface's own tool), `tap` 24, `edge` 3 (an accent edge), `indicator` 2 (a chosen tab's line, a thumb's border) |
+| opacity | `disabled` 0.55, `stale` 0.6 (content being replaced, or waiting on its owner), `quiet` 0.6 (a secondary glyph at rest), `area` 0.12 (a series' fill under its line) |
+| motion | `duration-fast` 120ms (a control), `normal` 200ms (a surface moving); loops: `spin` 600ms, `blink` 1s, `pulse` 1.6s, `calm` 3s (a loop slowed under reduced motion); `easing-standard` (ease), `settle` (ease-out, a value arriving), `breathe` (ease-in-out, a loop) |
 | z | `sheet` 10, `drawer` 30, `skip-link` 40, `popover` 50 — public as `--gg-z-*`, and the only levels structure stacks at |
 
 Colours are semantic: `bg.*`, `text.*`, `border.*`, and `mark.*` for the
 five state tones (neutral, running, ok, warn, error), which a dot, a meter, a
 ring and a share bar read through `--ggarry-tone-mark`. Marks equal their
 text colours today; they are separate so a mark can move to 3:1 without
-moving a label. A component never reads a colour primitive.
+moving a label. A component never reads a colour primitive. Shadows are
+`sm`, `popover`, `modal` and `thumb` (a switch's or a slider's knob, which has
+thickness).
 
 Found on the way:
 
@@ -318,10 +320,25 @@ Found on the way:
   add button, the copy buttons — had a hover that repainted the same colour.
   Dark `bg.muted` is now a new `slate-750` `#283548`, and a pair holds
   muted a lightness step off subtle.
-- **The same pair is short in light mode**: slate-50 to slate-100 is ΔL 0.016
-  against the 0.022 step. It is GGarry's one waiver, because moving light
-  `bg.muted` moves the chip plate, the heatmap's empty cell and every muted
-  fill with it — a decision about the light neutral ramp, not a fix.
+- **The same pair was short in light mode**: slate-50 to slate-100 is ΔL
+  0.016 against the 0.022 step, and light hovers were faint. Muted cannot
+  simply go a step darker: a chip hovers from muted to `border.default`, and
+  that pair needs its step too. Light `bg.muted` is a new `slate-150`
+  `#ecf1f6`, the middle of the window both pairs leave (ΔL 0.028 and 0.027).
+- **Four controls had four rules for their corners.** Button and Input kept
+  6px at every size while ButtonGroup, InputGroup and NumberField stepped
+  4/6/10. Every sized control now reads `radius-control-sm/md/lg` — 4, 6
+  and 10 — and the field triggers (Select, Combobox, Cascader, DatePicker)
+  the medium one.
+- **The same status had two reds.** Progress painted an error fill with
+  `bg.danger`, Meter and Ring with the danger text colour. All three read
+  `mark.*` now.
+- **Three group-label looks** — the menu's small medium, the nav's extra-small
+  semibold, the palette's uppercase tracked — are one: the nav's.
+- **Controls that resolved in 200ms**: the switch's thumb, the accordion's and
+  the thinking block's chevrons. They take `duration-fast` now; the select's
+  chevron also stops turning under reduced motion. The split's separator had
+  no focus ring, only its hover line; it has the kit's ring.
 
 ## The first four components, and why these four
 
@@ -2624,7 +2641,7 @@ foreground of some pair. The Go gate skipped relay variables (`--btn-fg`,
 a property never declared on the root is traced through every value it is given
 down to the root tokens, and those must be covered.
 
-**Waivers.** A theme may waive a known failure with a reason (GGarry has one; see Theme principles). A waived pair that
+**Waivers.** A theme may waive a known failure with a reason (GGarry has none). A waived pair that
 starts passing is itself a failure, so fixing a token forces the stale excuse out
 with it. When GGarry's palette fixes landed, the gate flagged each waiver as
 stale with its new value before the waivers were removed.
@@ -2642,7 +2659,7 @@ colours) and puts each raw value into the family whose scale it skipped:
 | opacity | `0.55` | `0` and `1` |
 | font-size, font-weight | `11px`, `600` | `em` and `%` |
 | motion | `120ms`, `ease` | `linear` and `steps()` |
-| focus | `outline-offset: -2px` | `0` |
+| focus | `outline-offset: -2px` | `0`, and a 1px hairline: an edge drawn with an outline is not a ring |
 | edge | a border wider than 1px | the hairline |
 | z-index | 10 and above | stacking inside one component |
 
@@ -2652,10 +2669,10 @@ file and per family, against a ledger the theme keeps:
 the ledger is new drift and fails at its line. A count below it fails too until
 the ledger is lowered — `npm run check:themes -- --pay` lowers it and never
 raises it — so a paid debt cannot quietly come back. GGarry opened the ledger
-at 201 literals in 72 files; paying it down is the polish work, family by
-family.
+at 201 literals in 72 files and paid it to zero in the next step; its ledger
+is now `{}`, and every raw value in a family is a failure.
 
- builds a
+Every rule was proven able to fail: `tests/checks.contract.test.ts` builds a
 throwaway workspace per rule with exactly one defect planted; a planted
 regression in a real theme's muted text (Instrument's, at the time) failed every
 row that reads it.
@@ -2957,6 +2974,10 @@ Real, and deliberately left open:
   pre-filled short value passes until touched.
 - **Instrument's inspector is not ported.** KeyValueList shows values; editing
   them in a two-column property sheet (Instrument's `inst-props`) is not here.
+- **The grid's frame budget is timing-sensitive under load.** "A scroll step
+  costs a frame's share" asks for under 40ms a step and measures about 21ms
+  alone; deep in a full run on a busy machine it has measured 42–45ms, on
+  the commit before the token sweep as well as after it.
 - **One Kanban browser test is timing-sensitive under load.** "Held at the
   board's edge, the board scrolls toward it" failed once in a full run and
   passed in the next and three times alone: it waits on real frames of

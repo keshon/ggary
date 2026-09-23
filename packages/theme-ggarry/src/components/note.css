@@ -8,11 +8,11 @@
 [data-scope='note'][data-part='root'] {
   gap: var(--ggarry-space-3);
   padding: var(--ggarry-space-2) var(--ggarry-space-4);
-  border-inline-start: 3px solid var(--tone-ink, var(--ggarry-border-strong));
+  border-inline-start: var(--ggarry-size-edge) solid var(--tone-ink, var(--ggarry-border-strong));
   color: var(--ggarry-text-muted);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-sm);
-  line-height: 1.5;
+  line-height: var(--ggarry-line-height-normal);
 }
 
 [data-scope='note'][data-part='icon'] {

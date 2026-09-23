@@ -13,7 +13,7 @@
   color: var(--ggarry-text-default);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-md);
-  line-height: 1.5;
+  line-height: var(--ggarry-line-height-normal);
 }
 
 [data-scope='panel'][data-part='header'] {
@@ -25,10 +25,10 @@
 
 /* A step under the data it names; rank moves it (card.css). */
 [data-scope='panel'][data-part='title'] {
-  font-size: calc(var(--region-title-size) - 1px);
+  font-size: var(--region-label-size);
   font-weight: var(--ggarry-font-weight-semibold);
   color: var(--region-title-ink);
-  line-height: 1.35;
+  line-height: var(--ggarry-line-height-tight);
 }
 
 [data-scope='panel'][data-part='actions'] {

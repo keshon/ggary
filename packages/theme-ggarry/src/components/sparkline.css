@@ -48,7 +48,7 @@
    so the fill owes no contrast. */
 [data-scope='sparkline'][data-part='area'] {
   fill: var(--series);
-  fill-opacity: 0.12;
+  fill-opacity: var(--ggarry-opacity-area);
 }
 
 /* The dot of the last value wears a ring the colour of the surface under it,

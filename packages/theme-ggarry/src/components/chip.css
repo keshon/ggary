@@ -26,8 +26,8 @@
   border: 1px solid var(--chip-border);
   border-radius: var(--ggarry-radius-full);
   user-select: none;
-  transition: background-color var(--ggarry-duration-fast) ease, border-color var(--ggarry-duration-fast) ease,
-    color var(--ggarry-duration-fast) ease;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 /* Only chips that are actually buttons get a pointer and hover feedback. */
@@ -64,7 +64,7 @@ button[data-scope='chip'][data-part='root']:hover:not([data-disabled]) {
 }
 
 [data-scope='chip'][data-part='root'][data-disabled] {
-  opacity: 0.5;
+  opacity: var(--ggarry-opacity-disabled);
   cursor: not-allowed;
 }
 
@@ -91,9 +91,9 @@ button[data-scope='chip'][data-part='root']:hover:not([data-disabled]) {
   margin-inline-end: -4px;
   border-radius: var(--ggarry-radius-full);
   position: relative;
-  opacity: 0.6;
+  opacity: var(--ggarry-opacity-quiet);
   cursor: pointer;
-  transition: opacity var(--ggarry-duration-fast) ease, background-color var(--ggarry-duration-fast) ease;
+  transition: opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard), background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 /* WCAG 2.2's 24px target for a 14px button: an invisible area on the target
    part, not the icon — a mask would clip it. */
@@ -108,7 +108,7 @@ button[data-scope='chip'][data-part='root']:hover:not([data-disabled]) {
 }
 [data-scope='chip'][data-part='remove']:hover {
   opacity: 1;
-  background: rgb(from currentColor r g b / 0.2);
+  background: color-mix(in oklab, currentColor 20%, transparent);
 }
 [data-scope='chip'][data-part='root'][data-disabled] [data-part='remove'] {
   cursor: not-allowed;

@@ -38,7 +38,7 @@
   background: var(--ggarry-tone-mark, var(--ggarry-text-muted));
 }
 [data-scope='badge'][data-part='root'][data-tone='running'] > [data-part='dot'] {
-  animation: ggarry-pulse 1.6s ease-in-out infinite;
+  animation: ggarry-pulse var(--ggarry-duration-pulse) var(--ggarry-easing-breathe) infinite;
 }
 @keyframes ggarry-pulse {
   0%, 100% { opacity: 1; }
@@ -56,11 +56,11 @@
   justify-content: center;
   min-inline-size: 20px;
   padding-inline: var(--ggarry-space-1);
-  border-radius: 999px;
+  border-radius: var(--ggarry-radius-full);
   background: var(--ggarry-bg-accent);
   color: var(--ggarry-text-on-accent);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-scope='badge'][data-part='root'][data-tone='running'] > [data-part='dot'] { animation-duration: 3.2s; }
+  [data-scope='badge'][data-part='root'][data-tone='running'] > [data-part='dot'] { animation-duration: var(--ggarry-duration-calm); }
 }

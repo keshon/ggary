@@ -21,7 +21,7 @@
   background: var(--ggarry-bg-subtle);
   font-family: var(--ggarry-font-family-mono);
   font-size: var(--ggarry-font-size-xs);
-  line-height: 1.6;
+  line-height: var(--ggarry-line-height-relaxed);
   color: var(--ggarry-text-default);
 }
 [data-scope='log'][data-part='root']:focus-visible {
