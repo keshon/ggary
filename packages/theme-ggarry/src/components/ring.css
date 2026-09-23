@@ -1,0 +1,64 @@
+/* ==========================================================================
+   GGarry — ring
+
+   The same reading as a meter's where a bar has no room: an arc in the tone's
+   mark colour over a quiet track, in the size of a control.
+
+   THE LADDER IS THE KIT'S CONTROL HEIGHTS, so a ring standing in a row of
+   controls moves when the row moves rather than becoming a third object
+   between them. The smallest rung is not a control height at all: there the
+   ring stands where a GLYPH stands — at the end of a strip, beside a name —
+   and takes a glyph's box.
+
+   THE STROKE COMES DOWN WITH THE BOX, and not in proportion. It is stated in
+   viewBox units, so 3 of 20 is 15% at every size, and 15% of 16px is a
+   doughnut rather than a ring. 2 is where the arc still reads as an arc and
+   the track behind it is still a track.
+
+   THE FIGURE AT THE CENTRE DOES NOT COME DOWN WITH IT. 11px is the floor of
+   the type scale and does not fit inside the middle rung, let alone the small
+   one — which is why core draws it at the large size only, and below that the
+   reading goes in the words beside the ring.
+   ========================================================================== */
+
+[data-scope='ring'][data-part='root'] {
+  --ring-arc: var(--ggarry-tone-mark, var(--ggarry-bg-accent));
+  --ring-room: var(--ggarry-border-default);
+  /* The middle rung is the default: a ring among controls. */
+  --ring-box: var(--ggarry-size-control-sm);
+  --ring-stroke: 2.5;
+  inline-size: var(--ring-box);
+  block-size: var(--ring-box);
+}
+/* A ring with no tone of its own is plain, whatever tone it stands inside. */
+[data-scope='ring'][data-part='root']:not([data-tone]) { --ggarry-tone-mark: initial; }
+[data-scope='ring'][data-part='root'][data-size='lg'] { --ring-box: var(--ggarry-size-control-lg); --ring-stroke: 3; }
+/* Where a glyph stands. 16px is the box a glyph takes in GGarry's rows. */
+[data-scope='ring'][data-part='root'][data-size='sm'] { --ring-box: 16px; --ring-stroke: 2; }
+
+[data-scope='ring'][data-part='track'] {
+  stroke: var(--ring-room);
+  stroke-width: var(--ring-stroke);
+}
+[data-scope='ring'][data-part='arc'] {
+  stroke: var(--ring-arc);
+  stroke-width: var(--ring-stroke);
+  /* Rounded, so a small share is still an arc rather than a chip of colour. */
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--ggarry-duration-normal) ease-out;
+}
+/* Past the ceiling the arc is a closed circle; a round cap lying over the
+   start of the ring blurs where it begins, so the caps go square. */
+[data-scope='ring'][data-part='arc'][data-state='over'] { stroke-linecap: butt; }
+
+[data-scope='ring'][data-part='value'] {
+  fill: var(--ggarry-text-default);
+  /* In viewBox units: 5.5 of 20 is 11px inside the large rung, the floor of the type scale. */
+  font-size: 5.5px;
+  font-family: var(--ggarry-font-family-sans);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='ring'][data-part='arc'] { transition: none; }
+}

@@ -607,6 +607,14 @@ export const headlineMetrics = [
   { label: 'Duration p95', value: '4:12', unit: 'min', delta: 'median 2:48' },
   { label: 'In the queue', value: 37, delta: '9 waiting over an hour', direction: 'up' as const, tone: 'warn' as const },
 ]
+/** Two budgets of the same run, each against its own ceiling: one comfortable, one at the wall. */
+export const runBudgets = [
+  { label: 'Tokens', value: 184320, max: 250000 },
+  { label: 'Disk on the runner', value: 237, max: 240, tone: 'warn' as const, valueText: '237 of 240 GB' },
+]
+/** The same reading where a bar has no room: one ring named on its own, one hidden beside its words. */
+export const runWindow = { value: 74, label: '74% of the nightly window used' }
+export const runShards = { value: 18, max: 60, note: '18 of 60 shards finished' }
 export const runFacts = [
   { label: 'Pipeline', value: 'nightly' },
   { label: 'Started', value: '02:14:07' },
@@ -627,6 +635,7 @@ export const runEvents = [
   { id: 'e1', title: 'Queued', time: '2026-09-22T02:14:07' },
 ]
 export const HINT_READOUTS =
+  'A meter is one quantity against its own ceiling — a budget, a share of the time — so it takes one tone and never a series colour: with none it is the accent, and the disk takes warn because 237 of 240 has come to mean something. The reading stands in words above the bar, because a length and a colour are not a number; past the ceiling the fill stops at the end of the track, squares that end, and the words keep the figure that was given. A ring is the same reading where a bar has no room: the large one holds its share as a figure and names itself in words, the smaller one only repeats the count already beside it and is therefore hidden from a screen reader rather than read out twice. ' +
   'A metric is one watched number: its unit smaller and quieter, and its change in words — which way it went (the arrow) and whether that is good (the colour) are two separate things, so "18% faster" is green going down and "5 new" is red going up. A joined row is one fact about the screen; separate tiles are a set of numbers. The key–value list is a real <dl>, its names in one column across lists. A file change is a sign in an outline, its word said to a screen reader. The timeline is an ordered list with real <time> values; each dot takes its tone, and a running one pulses — as a dot inside a badge does, since both read the same tone.'
 
 export const generatorSource = `export function terrain(size = 256, seed = Date.now()) {

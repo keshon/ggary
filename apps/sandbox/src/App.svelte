@@ -77,6 +77,8 @@
     Tooltip,
     Metric,
     MetricRow,
+    Meter,
+    Ring,
     KeyValueList,
     FileChange,
     Timeline,
@@ -113,7 +115,7 @@
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
   import { rangePresets } from '@ggary/core/date-picker'
   import type { PaletteCommand } from '@ggary/core/command-palette'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, HINT_READOUTS, generatorSource, templateInserts, HINT_CODE, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, HINT_DATES, HINT_CASCADER, HINT_DISCLOSURE, HINT_KANBAN, HINT_PALETTE, HINT_FORM, HINT_GANTT, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runBudgets, runWindow, runShards, runFacts, changedFiles, runEvents, HINT_READOUTS, generatorSource, templateInserts, HINT_CODE, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, HINT_FLOW, HINT_RAIL, HINT_SHELL, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -1336,6 +1338,18 @@
       <MetricRow>
         {#each runMetrics as metric (metric.label)}<Metric {...metric} />{/each}
       </MetricRow>
+    </div>
+    <div class="panels">
+      <div style="display: grid; gap: 16px; align-content: start">
+        {#each runBudgets as budget (budget.label)}<Meter {...budget} locale="en-GB" />{/each}
+      </div>
+      <div class="row" style="align-items: center; gap: 24px">
+        <Ring value={runWindow.value} label={runWindow.label} size="lg" locale="en-GB" />
+        <span class="dot-line">
+          <Ring value={runShards.value} max={runShards.max} decorative locale="en-GB" />
+          {runShards.note}
+        </span>
+      </div>
     </div>
     <div class="panels">
       <KeyValueList items={runFacts}>

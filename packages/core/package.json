@@ -253,6 +253,14 @@
       "types": "./src/components/progress/index.ts",
       "default": "./src/components/progress/index.ts"
     },
+    "./meter": {
+      "types": "./src/components/meter/index.ts",
+      "default": "./src/components/meter/index.ts"
+    },
+    "./ring": {
+      "types": "./src/components/ring/index.ts",
+      "default": "./src/components/ring/index.ts"
+    },
     "./kanban": {
       "types": "./src/components/kanban/index.ts",
       "default": "./src/components/kanban/index.ts"

@@ -136,6 +136,65 @@
   to { translate: 250% 0; }
 }
 
+/* Meter: one quantity against its own ceiling. The label and the reading share
+   the line ABOVE the bar — a number beside it would eat the bar's length, and
+   the length is the data. The share is one number on the track, --gg-meter,
+   0 to 1, and the fill takes that much of the track's width rather than being
+   scaled to it: a scaled fill stretches its own rounded end, so the end of the
+   bar would change shape as the value moved. */
+[data-scope='meter'][data-part='root'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  min-inline-size: 0;
+}
+[data-scope='meter'][data-part='label'] {
+  grid-column: 1;
+  min-inline-size: 0;
+}
+[data-scope='meter'][data-part='value'] {
+  grid-column: 2;
+  justify-self: end;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+[data-scope='meter'][data-part='track'] {
+  grid-column: 1 / -1;
+  position: relative;
+  overflow: hidden;
+}
+[data-scope='meter'][data-part='fill'] {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: calc(var(--gg-meter, 0) * 100%);
+}
+
+/* Ring: the same reading where a bar has no room. The box is 20 units and the
+   radius 8 in every theme, because the arc's dash is the circumference at that
+   radius; a theme scales the box and says how thick the stroke is.
+   Only the ARC is turned a quarter back, so the value starts at the top and
+   the figure at the centre stays upright — turning the svg would turn it too. */
+[data-scope='ring'][data-part='root'] {
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+}
+[data-scope='ring'][data-part='track'],
+[data-scope='ring'][data-part='arc'] {
+  fill: none;
+}
+[data-scope='ring'][data-part='arc'] {
+  transform: rotate(-90deg);
+  transform-box: view-box;
+  transform-origin: center;
+}
+[data-scope='ring'][data-part='value'] {
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-variant-numeric: tabular-nums;
+}
+
 /* The state dot and the caret: inline marks that sit in a line of text. The
    caret is placed after the last character, so it keeps to the line's baseline
    box rather than its own. */
