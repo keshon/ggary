@@ -1472,7 +1472,6 @@ function App() {
         </section>
 
         <section id="readouts">
-          <h3>Metric, sparkline, legend, key–values, file changes and timeline</h3>
           <h3>Metric, key–values, file changes, timeline and charts</h3>
           <MetricRow joined headline>
             {headlineMetrics.map((metric) => (
