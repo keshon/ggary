@@ -101,6 +101,23 @@ const pairs: Pair[] = [
   // The arc against the surface, not the track: the arc says busy, the track only draws the circle.
   { label: 'spinner: arc on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'skeleton: bar off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
+  // A meter and a ring: the fill and the arc ARE the reading, so they take the
+  // mark threshold against what they stand on — not against the track, which
+  // only draws the room out and is held to a step. The fill takes the kit's
+  // tone marks, so each tone is measured where a meter is put.
+  { label: 'meter: the fill on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'meter: the fill on the page', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'meter: an ok fill on the surface', fg: '--ggarry-text-success', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'meter: a warn fill on the surface', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'meter: an error fill on the surface', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'meter: the track off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'meter: the reading beside the label', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'ring: the arc on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'ring: a warn arc on the surface', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'ring: the track off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
+  // The figure inside a ring is SVG text, which the coverage rule cannot see:
+  // it is measured here by hand, at the floor of the type scale.
+  { label: 'ring: the figure at the centre', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'grid filters: the column on its chip', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'grid bulk: the count on the band', fg: '--ggarry-text-default', bg: ['--ggarry-bg-accent-subtle'], min: TEXT },
   { label: 'grid bulk: the offer of everything', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-accent-subtle'], min: TEXT },

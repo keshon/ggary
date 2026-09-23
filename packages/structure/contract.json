@@ -42,6 +42,7 @@
     "--gg-split-rest-min": "written by core onto a split's frame: the least the other pane keeps",
     "--gg-tree-level": "set by core on each tree row: its depth, from 1, for the indent",
     "--gg-progress": "set by core on a progress track: how far along, from 0 to 1",
+    "--gg-meter": "set by core on a meter's track: the share of the maximum the fill reaches, from 0 to 1",
     "--gg-gantt-days": "set by core on a gantt's root: how many days the chart shows",
     "--gg-gantt-start": "set by core on a gantt's bar, scale cell and today line: its first day, counted from the chart's",
     "--gg-gantt-span": "set by core on a gantt's bar and scale cell: how many days it spans",

@@ -1,0 +1,59 @@
+/* ==========================================================================
+   GGarry — meter
+
+   A thin rounded bar under its label: the share in the tone's mark colour over
+   a quiet track. The fill is the message and owes 3:1 against the surface; the
+   track only draws the room out, so it is held to a step off the surface and
+   no more.
+
+   With no tone the fill takes the accent, which is the right answer nearly
+   always — a tone here means the quantity has come to MEAN something, a
+   threshold crossed or a limit spent. The colours are the kit's tone marks
+   (states.css), so a meter agrees with every dot and badge in the same tone.
+
+   The fill travels when the value changes, so an update reads as movement
+   rather than as a jump. Nothing animates on arrival: a reading is not an
+   event.
+   ========================================================================== */
+
+[data-scope='meter'][data-part='root'] {
+  --meter-fill: var(--ggarry-tone-mark, var(--ggarry-bg-accent));
+  --meter-room: var(--ggarry-border-default);
+  --meter-thickness: 6px;
+  column-gap: var(--ggarry-space-3);
+  row-gap: var(--ggarry-space-2);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-default);
+}
+/* A meter with no tone of its own is plain, whatever tone it stands inside. */
+[data-scope='meter'][data-part='root']:not([data-tone]) { --ggarry-tone-mark: initial; }
+[data-scope='meter'][data-part='root'][data-size='sm'] { --meter-thickness: 4px; }
+[data-scope='meter'][data-part='root'][data-size='lg'] { --meter-thickness: 8px; }
+
+[data-scope='meter'][data-part='label'] { font-weight: var(--ggarry-font-weight-medium); }
+[data-scope='meter'][data-part='value'] { color: var(--ggarry-text-muted); }
+
+[data-scope='meter'][data-part='track'] {
+  block-size: var(--meter-thickness);
+  border-radius: var(--ggarry-radius-full);
+  background: var(--meter-room);
+}
+[data-scope='meter'][data-part='fill'] {
+  border-radius: inherit;
+  background: var(--meter-fill);
+  transition: inline-size var(--ggarry-duration-normal) ease-out;
+}
+/* Over the ceiling the fill is already at the end of the track and can say no
+   more by its length. It squares that end instead, so a bar that is full and
+   one that has run past are not the same picture. */
+[data-scope='meter'][data-part='root'][data-state='over'] [data-part='fill'] {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The bar is not saying anything by moving — it is the length that speaks —
+     so here the transition goes rather than slowing. */
+  [data-scope='meter'][data-part='fill'] { transition: none; }
+}

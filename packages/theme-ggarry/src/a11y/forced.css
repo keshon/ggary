@@ -77,6 +77,26 @@
     background: CanvasText;
   }
 
+  /* A reading is a fill and a length and nothing else. Reset, a meter is an
+     empty box and a ring an even circle — both saying the same thing at every
+     value. The track keeps an edge so the room is still drawn, and the fill
+     and the arc survive the reset because they ARE the number. */
+  [data-scope='meter'][data-part='track'] {
+    border: 1px solid CanvasText;
+  }
+  [data-scope='meter'][data-part='fill'] {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  [data-scope='ring'][data-part='track'] {
+    forced-color-adjust: none;
+    stroke: GrayText;
+  }
+  [data-scope='ring'][data-part='arc'] {
+    forced-color-adjust: none;
+    stroke: Highlight;
+  }
+
   /* The busy button's ring: every border would turn CanvasText, the ring would
      be even, and the turning would not show at all. */
   [data-scope='button'][data-part='spinner'] {

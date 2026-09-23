@@ -449,6 +449,34 @@ export interface ProgressProps {
   showValue?: boolean
 }
 
+/** One quantity against its own ceiling, drawn as a bar. */
+export interface MeterProps {
+  value: number
+  max?: number
+  label?: string
+  hideLabel?: boolean
+  valueText?: string
+  showValue?: boolean
+  tone?: import('../../packages/core/src/utils/tone').StatusTone
+  size?: import('../../packages/core/src/components/meter').MeterSize
+  locale?: string
+  words?: Partial<import('../../packages/core/src/utils/reading').ReadingWords>
+}
+
+/** The same reading, drawn as an arc in the size of a control. */
+export interface RingProps {
+  value: number
+  max?: number
+  label?: string
+  decorative?: boolean
+  valueText?: string
+  showValue?: boolean
+  tone?: import('../../packages/core/src/utils/tone').StatusTone
+  size?: import('../../packages/core/src/components/ring').RingSize
+  locale?: string
+  words?: Partial<import('../../packages/core/src/utils/reading').ReadingWords>
+}
+
 /** A sign-up form: Email, Password and Confirm password in named Fields, Role in a Select, and a summary. */
 export interface FormProps {
   summary?: boolean
@@ -877,6 +905,8 @@ export interface Adapter {
   accordion?(props: AccordionProps, target: HTMLElement): Promise<Mounted<AccordionProps>>
   tree?(props: TreeProps, target: HTMLElement): Promise<Mounted<TreeProps>>
   progress?(props: ProgressProps, target: HTMLElement): Promise<Mounted<ProgressProps>>
+  meter?(props: MeterProps, target: HTMLElement): Promise<Mounted<MeterProps>>
+  ring?(props: RingProps, target: HTMLElement): Promise<Mounted<RingProps>>
   kanban?(props: KanbanProps, target: HTMLElement): Promise<Mounted<KanbanProps>>
   commandPalette?(props: CommandPaletteProps, target: HTMLElement): Promise<Mounted<CommandPaletteProps>>
   form?(props: FormProps, target: HTMLElement): Promise<Mounted<FormProps>>

@@ -31,6 +31,8 @@ import { selectConformance } from './select.spec'
 import { tabsConformance } from './tabs.spec'
 import { toastConformance } from './toast.spec'
 import { displayConformance } from './display.spec'
+import { meterConformance } from './meter.spec'
+import { ringConformance } from './ring.spec'
 import { codeConformance } from './code.spec'
 import { insertsConformance } from './inserts.spec'
 import { dataDisplayConformance } from './data-display.spec'
@@ -98,6 +100,8 @@ export function runConformance() {
       tabsConformance(adapter)
       toastConformance(adapter)
       displayConformance(adapter)
+      meterConformance(adapter)
+      ringConformance(adapter)
       timelineConformance(adapter)
       codeConformance(adapter)
       insertsConformance(adapter)
