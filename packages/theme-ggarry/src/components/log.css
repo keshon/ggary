@@ -1,0 +1,58 @@
+/* ==========================================================================
+   GGarry — log
+
+   A machine's stream on a recessed surface, set small in the monospace face.
+   The columns are the structure's; what is here is the ink.
+
+   The level is muted by default and takes a colour only at `warn` and
+   `error`: in a thousand lines what is coloured has to be what asks to be
+   seen. An error is painted ENTIRE, because it is found by scanning rather
+   than by reading.
+
+   No transition and no animation. A log is a record arriving, and a line that
+   faded in would be a line the eye followed instead of read; there is nothing
+   here for prefers-reduced-motion to answer.
+   ========================================================================== */
+
+[data-scope='log'][data-part='root'] {
+  padding: var(--ggarry-space-2) var(--ggarry-space-3);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-subtle);
+  font-family: var(--ggarry-font-family-mono);
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 1.6;
+  color: var(--ggarry-text-default);
+}
+[data-scope='log'][data-part='root']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: calc(-1 * var(--ggarry-focus-ring-width));
+}
+
+[data-scope='log'][data-part='line'] {
+  column-gap: var(--ggarry-space-3);
+}
+
+/* Muted, not subtle: a timestamp is READ — it is how a line is placed against
+   the rest of the run — so it is due the 4.5:1 of text. */
+[data-scope='log'][data-part='time'] {
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='log'][data-part='level'] {
+  color: var(--ggarry-text-muted);
+}
+[data-scope='log'][data-part='line'][data-tone='warn'] > [data-part='level'] {
+  color: var(--ggarry-text-warning);
+}
+[data-scope='log'][data-part='line'][data-tone='error'] > [data-part='level'] {
+  color: var(--ggarry-text-danger);
+}
+/* The whole message, not the level alone: an error is looked for by scanning. */
+[data-scope='log'][data-part='line'][data-tone='error'] > [data-part='message'] {
+  color: var(--ggarry-text-danger);
+}
+
+@media (forced-colors: active) {
+  [data-scope='log'][data-part='root'] { border-color: CanvasText; }
+}

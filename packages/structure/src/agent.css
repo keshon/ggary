@@ -1,0 +1,221 @@
+/* The agent layer: a machine's work while it is going on. Geometry only —
+   what each of these needs in order to be the shape it is, in any theme.
+
+   Step: a `<details>` whose head is a row that ends in the time.
+   Log: three columns, declared on the LINE so every line shares them.
+   Diff: a row of two numbers, a sign and the code, and the sign is HERE
+     rather than in a theme, because colour alone carrying a change is a
+     defect rather than a different look.
+   Lanes: one axis, segments placed on it by two numbers. */
+
+/* --- step ------------------------------------------------------------------ */
+
+[data-scope='step'][data-part='root'] {
+  display: block;
+  min-inline-size: 0;
+}
+/* The browser's own triangle would stand beside the kit's indicator; the
+   `<summary>` keeps everything else it gives — focus, Enter and Space, the
+   `open` state, and find-in-page opening what is folded. */
+[data-scope='step'][data-part='head'] {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  list-style: none;
+  cursor: pointer;
+}
+[data-scope='step'][data-part='head']::-webkit-details-marker {
+  display: none;
+}
+[data-scope='step'][data-part='indicator'] {
+  flex: none;
+}
+[data-scope='step'][data-part='root'][open] > [data-part='head'] > [data-part='indicator'] {
+  rotate: 90deg;
+}
+/* Closed, it points the way the script runs; open, it points down in both. */
+[data-scope='step'][data-part='root']:not([open]) > [data-part='head'] > [data-part='indicator']:dir(rtl) {
+  scale: -1 1;
+}
+[data-scope='step'][data-part='name'] {
+  flex: none;
+}
+/* A path longer than the line would otherwise drive the time past the edge. */
+[data-scope='step'][data-part='argument'] {
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+[data-scope='step'][data-part='meta'] {
+  flex: none;
+  margin-inline-start: auto;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+[data-scope='step'][data-part='body'] {
+  min-inline-size: 0;
+}
+[data-scope='step'][data-part='output'] {
+  position: relative;
+  min-inline-size: 0;
+}
+/* A tool's output is text, not code: it wraps rather than scrolling away. */
+[data-scope='step'][data-part='output-body'] {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* --- log ------------------------------------------------------------------- */
+
+[data-scope='log'][data-part='root'] {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+/* The grid is on the line, so every line has one of its own and the columns
+   cannot be pulled about by a neighbour. The level is 5ch: sized by content,
+   `info` is narrower than `error` and the messages go off in a staircase. */
+[data-scope='log'][data-part='line'] {
+  display: grid;
+  grid-template-columns: max-content 5ch minmax(0, 1fr);
+  align-items: baseline;
+}
+[data-scope='log'][data-part='time'] {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+[data-scope='log'][data-part='level'] {
+  overflow: hidden;
+  white-space: nowrap;
+}
+/* On the message alone: on the container this would collapse the columns. */
+[data-scope='log'][data-part='message'] {
+  min-inline-size: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* --- diff ------------------------------------------------------------------ */
+
+[data-scope='diff'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='diff'][data-part='head'] {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+}
+[data-scope='diff'][data-part='path'] {
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+[data-scope='diff'][data-part='stat'] {
+  display: flex;
+  flex: none;
+  margin-inline-start: auto;
+  white-space: nowrap;
+}
+[data-scope='diff'][data-part='body'] {
+  overflow-x: auto;
+  scrollbar-gutter: stable;
+}
+/* Two numbers, the sign, the code, each in a column named outright — a
+   pseudo-element is the box's first child, so left to flow the sign would
+   stand before the numbers and push the rest off the row. The number columns
+   are 5ch, the Code block's width and for its reason: sized by content they
+   would shift the code at line 100, and five digits occur in real files. A row
+   is as wide as the longest line needs and never narrower than the frame, so a
+   row's tint reaches the far edge while the body scrolls. */
+[data-scope='diff'][data-part='row'] {
+  display: grid;
+  grid-template-columns: 5ch 5ch 2ch max-content;
+  min-inline-size: 100%;
+  inline-size: max-content;
+}
+/* The sign, never colour alone: it survives a black-and-white print and
+   colour blindness. A pseudo-element, so it is not copied with the code. */
+[data-scope='diff'][data-part='row']::before {
+  content: ' ';
+  grid-area: 1 / 3;
+  text-align: center;
+  user-select: none;
+}
+/* The row is named outright, not only the column: a pseudo-element placed by
+   column alone takes a grid row of its own and drops the code onto a second. */
+[data-scope='diff'][data-part='row'] > [data-part='num']:nth-child(1) {
+  grid-area: 1 / 1;
+}
+[data-scope='diff'][data-part='row'] > [data-part='num']:nth-child(2) {
+  grid-area: 1 / 2;
+}
+[data-scope='diff'][data-part='row'] > [data-part='code'] {
+  grid-area: 1 / 4;
+}
+[data-scope='diff'][data-part='row'][data-kind='add']::before {
+  content: '+';
+}
+[data-scope='diff'][data-part='row'][data-kind='del']::before {
+  content: '−';
+}
+/* Read by eye, not taken: a copied fragment carries the code alone. */
+[data-scope='diff'][data-part='num'] {
+  text-align: end;
+  user-select: none;
+}
+/* No wrapping: a wrapped line of code is a line that has stopped being read. */
+[data-scope='diff'][data-part='code'] {
+  white-space: pre;
+  tab-size: 4;
+}
+
+/* --- lanes ----------------------------------------------------------------- */
+
+[data-scope='lanes'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+[data-scope='lanes'][data-part='lane'] {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: center;
+}
+[data-scope='lanes'][data-part='label'] {
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+[data-scope='lanes'][data-part='track'] {
+  position: relative;
+  display: block;
+  min-inline-size: 0;
+}
+/* The two numbers ARE the data: where the work began and how long it took, as
+   percentages of the window every lane shares. Logical properties, so the axis
+   of time mirrors itself in RTL. */
+[data-scope='lanes'][data-part='span'] {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: calc(var(--gg-lane-start, 0) * 1%);
+  inline-size: calc(var(--gg-lane-span, 0) * 1%);
+}
+
+/* Spoken, not shown: the phase of a call, and a lane's work in words. */
+[data-scope='step'][data-part='status'],
+[data-scope='lanes'][data-part='lane-text'] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

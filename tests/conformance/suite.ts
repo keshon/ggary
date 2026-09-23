@@ -39,6 +39,7 @@ import { dataDisplayConformance } from './data-display.spec'
 import { legendConformance, sparklineConformance } from './charts.spec'
 import { shareConformance } from './share.spec'
 import { heatmapConformance } from './heatmap.spec'
+import { diffConformance, lanesConformance, logConformance, stepConformance } from './agent.spec'
 import { textareaConformance } from './textarea.spec'
 import { timelineConformance } from './timeline.spec'
 
@@ -112,6 +113,10 @@ export function runConformance() {
       legendConformance(adapter)
       shareConformance(adapter)
       heatmapConformance(adapter)
+      stepConformance(adapter)
+      logConformance(adapter)
+      diffConformance(adapter)
+      lanesConformance(adapter)
     })
   }
 }

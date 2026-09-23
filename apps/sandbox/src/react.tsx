@@ -119,10 +119,14 @@ import {
   StatusDot,
   Caret,
   CodeBlock,
+  Step,
+  Log,
+  Diff,
+  Lanes,
   Copyable,
   Inserts,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -151,6 +155,9 @@ function App() {
   const [ganttScale, setGanttScale] = useState<'day' | 'week' | 'month'>('day')
   const [ganttLog, setGanttLog] = useState('—')
   const [rolloutTasks, setRolloutTasks] = useState(rolloutPlan)
+  const [streamLines, setStreamLines] = useState(runLines)
+  const [wholeFile, setWholeFile] = useState(false)
+  const [streamLog, setStreamLog] = useState('—')
   // The sections are read from the page once it is drawn.
   useEffect(() => setPaletteCommands(sandboxCommands((text) => toast({ tone: 'neutral', title: text }))), [])
   const searchLeadCommands = async (query: string, signal: AbortSignal): Promise<PaletteCommand[]> =>
@@ -1572,6 +1579,70 @@ function App() {
 
         <section id="run-stream">
           <h3>Step, log, diff and lanes</h3>
+          <div className="run-stream">
+            <Panel title="agent-01 on shard 4" actions={<Badge tone="running">running</Badge>}>
+              <div className="run-steps">
+                <Step
+                  name="read_file"
+                  argument="src/grid/filters.ts"
+                  state="ok"
+                  detail="240 lines"
+                  duration={320}
+                  locale="en-GB"
+                  output={filtersExcerpt}
+                  outputLines={wholeFile ? undefined : 240}
+                  onShowAll={() => {
+                    setWholeFile(true)
+                    setStreamLog('asked for all 240 lines of read_file')
+                  }}
+                  onOpenChange={(open) => setStreamLog(`read_file ${open ? 'open' : 'closed'}`)}
+                >
+                  <CodeBlock code={'{ "path": "src/grid/filters.ts", "range": [1, 240] }'} label="The call" />
+                </Step>
+                <Step
+                  name="edit_file"
+                  argument="src/grid/filters.ts"
+                  state="ok"
+                  detail="+3 −1"
+                  duration={1400}
+                  locale="en-GB"
+                  defaultOpen
+                  onOpenChange={(open) => setStreamLog(`edit_file ${open ? 'open' : 'closed'}`)}
+                >
+                  <Diff path="src/grid/filters.ts" change="modified" before={filtersBefore} after={filtersAfter} context={2} locale="en-GB" />
+                </Step>
+                <Step
+                  name="run_tests"
+                  argument="--shard 4 --retry"
+                  state="running"
+                  detail="29 of 41"
+                  duration={17_000}
+                  locale="en-GB"
+                  defaultOpen
+                  streaming
+                  output={shardOutput}
+                  onOpenChange={(open) => setStreamLog(`run_tests ${open ? 'open' : 'closed'}`)}
+                >
+                  <CodeBlock code={'{ "shard": 4, "retry": true }'} label="The call" />
+                </Step>
+              </div>
+            </Panel>
+            <Lanes label="The shards of run 4127" lanes={runLanes} locale="en-GB" />
+            <Log lines={streamLines} label="The log of run 4127" locale="en-GB" />
+            <div className="row">
+              <Button
+                size="sm"
+                disabled={streamLines.length > runLines.length}
+                onClick={() => {
+                  setStreamLines((lines) => [...lines, runNextLine])
+                  setStreamLog(`log 02:16:58 ${runNextLine.text}`)
+                }}
+              >
+                Next line
+              </Button>
+            </div>
+          </div>
+          <pre className="state">{streamLog}</pre>
         </section>
 
         <section id="run-chat">

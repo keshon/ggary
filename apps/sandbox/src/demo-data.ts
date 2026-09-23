@@ -661,3 +661,104 @@ export const templateInserts = [
   { value: '{{error}}', hint: 'The text of the error' },
   { value: '{{time}}', hint: 'The time of the event' },
 ]
+
+/* --- the agent's run: one attempt at the three tests that failed last night --- */
+
+/** What the agent read before it changed anything. Cut at 40 of 240 lines. */
+export const filtersExcerpt = `export function applyFilters(rows: Lead[], filters: Filter[]) {
+  if (filters.length === 0) return rows
+  return rows.filter((row) => filters.every((filter) => match(row, filter)))
+}
+
+function match(row: Lead, filter: Filter) {
+  const value = row[filter.column]
+  switch (filter.op) {
+    case 'is': return value === filter.value
+    case 'contains': return String(value).includes(filter.value)
+    case 'before': return new Date(value) < new Date(filter.value)
+  }
+}`
+
+/** The file as the night left it, and as the agent handed it back. */
+export const filtersBefore = `function match(row: Lead, filter: Filter) {
+  const value = row[filter.column]
+  switch (filter.op) {
+    case 'is':
+      return value === filter.value
+    case 'contains':
+      return String(value).includes(filter.value)
+    case 'before':
+      return new Date(value) < new Date(filter.value)
+  }
+}
+`
+export const filtersAfter = `function match(row: Lead, filter: Filter) {
+  const value = row[filter.column]
+  if (value == null) return false
+  switch (filter.op) {
+    case 'is':
+      return value === filter.value
+    case 'contains':
+      // an empty needle matched every row, including the ones with no value
+      return filter.value !== '' && String(value).includes(filter.value)
+    case 'before':
+      return new Date(value) < new Date(filter.value)
+  }
+}
+`
+
+/** The output of the shard still running, as far as it has been written. */
+export const shardOutput = `PASS  src/grid/filters.test.ts (18 tests)
+PASS  src/grid/columns.test.ts (11 tests)
+RUNS  src/import/leads.test.ts`
+
+/** The stream of run 4127, oldest first. */
+export const runLines = [
+  { id: 'l1', level: 'info' as const, time: '02:14:07', text: 'Queued on eu-west-3' },
+  { id: 'l2', level: 'info' as const, time: '02:14:31', text: 'Build succeeded, bundle 7.4 MB' },
+  { id: 'l3', level: 'debug' as const, time: '02:14:33', text: 'cache hit: node_modules (412 MB)' },
+  { id: 'l4', level: 'info' as const, time: '02:14:52', text: '251 tests in 6 shards' },
+  { id: 'l5', level: 'warn' as const, time: '02:15:18', text: 'shard 4 is slower than its neighbours (86 s)' },
+  { id: 'l6', level: 'error' as const, time: '02:15:49', text: 'AssertionError: applyFilters returned 40 rows, expected 0' },
+  { id: 'l7', level: 'info' as const, time: '02:16:02', text: 'agent-01 opened src/grid/filters.ts' },
+  { id: 'l8', level: 'debug' as const, time: '02:16:04', text: 'reading 240 lines' },
+  { id: 'l9', level: 'info' as const, time: '02:16:40', text: 'agent-01 wrote src/grid/filters.ts (+3 −1)' },
+  { id: 'l10', level: 'info' as const, time: '02:16:41', text: 'shard 4 restarted' },
+  { id: 'l11', level: 'debug' as const, time: '02:16:44', text: 'PASS src/grid/filters.test.ts (18 tests)' },
+  { id: 'l12', level: 'debug' as const, time: '02:16:47', text: 'PASS src/grid/columns.test.ts (11 tests)' },
+]
+
+/** A line that has not arrived yet: the reader presses for it. */
+export const runNextLine = { id: 'l13', level: 'info' as const, time: '02:16:58', text: 'shard 4 finished: 41 tests, 0 failing' }
+
+/** The shards of run 4127 on one axis: 0 s is 02:14:52, and shard 4 is still going. */
+export const runLanes = [
+  {
+    id: 'shard-1',
+    label: 'shard 1',
+    spans: [
+      { label: 'unit tests', start: 0, end: 38_000, tone: 'ok' as const },
+      { label: 'coverage', start: 38_000, end: 47_000, tone: 'ok' as const },
+    ],
+  },
+  { id: 'shard-2', label: 'shard 2', spans: [{ label: 'unit tests', start: 1000, end: 52_000, tone: 'ok' as const }] },
+  {
+    id: 'shard-3',
+    label: 'shard 3',
+    spans: [
+      { label: 'unit tests', start: 1000, end: 44_000, tone: 'warn' as const },
+      { label: 'retry', start: 46_000, end: 61_000, tone: 'ok' as const },
+    ],
+  },
+  {
+    id: 'shard-4',
+    label: 'shard 4',
+    spans: [
+      { label: 'unit tests', start: 2000, end: 57_000, tone: 'error' as const },
+      { label: 'the agent’s edit', start: 70_000, end: 109_000, tone: 'neutral' as const },
+      { label: 'unit tests, again', start: 109_000, end: 126_000, tone: 'running' as const },
+    ],
+  },
+  { id: 'shard-5', label: 'shard 5', spans: [{ label: 'unit tests', start: 2000, end: 40_000, tone: 'ok' as const }] },
+  { id: 'shard-6', label: 'shard 6', spans: [{ label: 'unit tests', start: 3000, end: 35_000, tone: 'ok' as const }] },
+]

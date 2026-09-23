@@ -140,4 +140,27 @@
   [data-scope='share'][data-part='segment']:not(:last-child) {
     border-inline-end: 1px solid Canvas;
   }
+
+  /* The agent layer. A diff says what became of a line twice — with a tint
+     and with a sign — and here the tint is gone, every row on one ground.
+     The sign is content and survives, and an edge on the leading side of a
+     changed row says it a second time at the scale a page is scanned at. */
+  [data-scope='diff'][data-part='row'][data-kind='add'],
+  [data-scope='diff'][data-part='row'][data-kind='del'] {
+    border-inline-start: 2px solid CanvasText;
+  }
+
+  /* A lane's segment is a fill and nothing else, and the fill IS the data:
+     when it began and how long it took. It survives the reset; the track
+     keeps an edge, so the time that is still empty is still drawn. The tones
+     collapse into one colour, and the lane's spoken reading — which it has
+     anyway, since a rectangle is spoken by nothing — says which stretch
+     ended how. */
+  [data-scope='lanes'][data-part='track'] {
+    border: 1px solid CanvasText;
+  }
+  [data-scope='lanes'][data-part='span'] {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
 }

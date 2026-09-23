@@ -98,6 +98,10 @@
 @import './components/inserts.css' layer(gg.components);
 @import './components/share.css' layer(gg.components);
 @import './components/heatmap.css' layer(gg.components);
+@import './components/step.css' layer(gg.components);
+@import './components/log.css' layer(gg.components);
+@import './components/diff.css' layer(gg.components);
+@import './components/lanes.css' layer(gg.components);
 
 /* Forced colours: gg.forced, declared after the components above, so what it
    says again under Windows High Contrast wins by layer order. */

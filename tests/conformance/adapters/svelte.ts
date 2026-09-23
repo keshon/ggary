@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, StatusDot, Timeline, Button, CodeBlock, Copyable, Inserts, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster, Metric, FileChange, Sparkline, Legend, Meter, Ring, Share, Heatmap } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, StatusDot, Timeline, Button, CodeBlock, Copyable, Inserts, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster, Metric, FileChange, Sparkline, Legend, Meter, Ring, Share, Heatmap, Log, Diff, Lanes } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
@@ -22,6 +22,7 @@ import DisplayWithContent from './DisplayWithContent.svelte'
 import CaretAfterText from './CaretAfterText.svelte'
 import type { TimelineItem } from '../../../packages/core/src/components/timeline'
 import DataDisplayWith from './DataDisplayWith.svelte'
+import StepWith from './StepWith.svelte'
 import FieldsetWithGroup from './FieldsetWithGroup.svelte'
 import { type Adapter, type ButtonProps, type CheckboxProps, type Mounted, track } from '../harness'
 import { reactiveProps } from './svelte-props.svelte'
@@ -118,6 +119,11 @@ export const svelte: Adapter = {
   legend: (props, target) => mountSvelte(Legend as Component<any>, props, target),
   share: (props, target) => mountSvelte(Share as Component<any>, props, target),
   heatmap: (props, target) => mountSvelte(Heatmap as Component<any>, props, target),
+  // A step's input and its output are snippets, so a wrapper makes them from the spec's text.
+  step: (props, target) => mountSvelte(StepWith as Component<any>, props, target),
+  log: (props, target) => mountSvelte(Log as Component<any>, props, target),
+  diff: (props, target) => mountSvelte(Diff as Component<any>, props, target),
+  lanes: (props, target) => mountSvelte(Lanes as Component<any>, props, target),
   commandPalette: (props, target) => mountSvelte(CommandPalette as Component<any>, props, target),
   kanban: (props, target) => mountSvelte(Kanban as Component<any>, props, target),
   progress: (props, target) => mountSvelte(Progress as Component<any>, props, target),

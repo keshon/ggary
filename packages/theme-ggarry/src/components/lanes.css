@@ -1,0 +1,48 @@
+/* ==========================================================================
+   GGarry — run lanes
+
+   A worker to a row, its work as segments on one axis of time. The label
+   column has the kit's label width, so lanes line up with a form's labels and
+   with a Gantt's task column on the same page.
+
+   A segment takes the kit's tone mark (states.css), so a failed stretch here
+   is the same red as the badge that reports it. It does NOT pulse while it
+   runs: the segment grows as the data arrives, which is the movement, and a
+   second one would say the length is uncertain.
+   ========================================================================== */
+
+[data-scope='lanes'][data-part='root'] {
+  gap: var(--ggarry-space-1);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-xs);
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='lanes'][data-part='lane'] {
+  column-gap: var(--ggarry-space-3);
+}
+
+[data-scope='lanes'][data-part='label'] {
+  inline-size: var(--ggarry-size-label-col);
+  font-family: var(--ggarry-font-family-mono);
+  color: var(--ggarry-text-muted);
+}
+
+/* The axis: the same recessed track a meter runs in, so an empty stretch of
+   time reads as room rather than as a boundary. */
+[data-scope='lanes'][data-part='track'] {
+  block-size: 10px;
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-border-default);
+}
+
+[data-scope='lanes'][data-part='span'] {
+  border-radius: var(--ggarry-radius-sm);
+  /* A stretch too short to draw is still a stretch that happened. */
+  min-inline-size: 2px;
+  background: var(--ggarry-tone-mark, var(--ggarry-bg-accent));
+}
+
+/* Under forced colours a segment is nothing but a fill, and the fill IS the
+   data: what has to be said again is in a11y/forced.css, the layer after
+   this one. */

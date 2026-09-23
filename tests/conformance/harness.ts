@@ -721,6 +721,57 @@ export interface HeatmapProps {
   words?: import('../../packages/core/src/components/heatmap').HeatmapWords
 }
 
+/** One tool call. `input` and `output` are plain text: what the adapters put inside the body. */
+export interface StepProps {
+  name: string
+  argument?: string
+  state?: import('../../packages/core/src/components/step').StepState
+  detail?: string
+  duration?: number
+  locale?: string
+  defaultOpen?: boolean
+  outputLines?: number
+  onShowAll?: () => void
+  streaming?: boolean
+  onOpenChange?: (open: boolean) => void
+  words?: import('../../packages/core/src/components/step').StepWords
+  input?: string
+  output?: string
+}
+
+/** A machine's stream: the lines, and how loudly the region speaks. */
+export interface LogProps {
+  lines: import('../../packages/core/src/components/log').LogLine[]
+  label: string
+  locale?: string
+  timeZone?: string
+  announce?: boolean
+  tail?: boolean
+  words?: import('../../packages/core/src/components/log').LogWords
+}
+
+/** An edit in a file: rows already worked out, or the two texts to compare. */
+export interface DiffProps {
+  path: string
+  change?: FileChangeKind
+  rows?: import('../../packages/core/src/components/diff').DiffRow[]
+  before?: string
+  after?: string
+  context?: number
+  locale?: string
+  words?: import('../../packages/core/src/components/diff').DiffWords
+}
+
+/** Parallel workers on one axis of time. */
+export interface LanesProps {
+  lanes: import('../../packages/core/src/components/lanes').Lane[]
+  label: string
+  start?: number
+  end?: number
+  locale?: string
+  words?: import('../../packages/core/src/components/lanes').LanesWords
+}
+
 export interface AvatarProps {
   name: string
   src?: string
@@ -940,6 +991,10 @@ export interface Adapter {
   fileChange?(props: FileChangeProps, target: HTMLElement): Promise<Mounted<FileChangeProps>>
   share?(props: ShareProps, target: HTMLElement): Promise<Mounted<ShareProps>>
   heatmap?(props: HeatmapProps, target: HTMLElement): Promise<Mounted<HeatmapProps>>
+  step?(props: StepProps, target: HTMLElement): Promise<Mounted<StepProps>>
+  log?(props: LogProps, target: HTMLElement): Promise<Mounted<LogProps>>
+  diff?(props: DiffProps, target: HTMLElement): Promise<Mounted<DiffProps>>
+  lanes?(props: LanesProps, target: HTMLElement): Promise<Mounted<LanesProps>>
   datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
