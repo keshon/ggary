@@ -1,0 +1,79 @@
+/* ==========================================================================
+   GGarry — the queue and its rows
+
+   A flat row, and hundreds of them. No border, no surface of its own, no
+   shadow: at a hundred rows an edge around each turns the queue into a grid,
+   and what a queue is read by is the column of dots down the gutter.
+
+   The phase paints the row through the kit's tone map (states.css), so the
+   dot in the gutter agrees with every other mark in the same tone and the one
+   that is going pulses with everything else that is going.
+
+   Two things are the queue's own. The finished row STEPS BACK — its title
+   goes muted rather than fading — so the history stays readable while it
+   stops arguing with what is happening now. And the skipped row is the one
+   case of transparency, a mild one: at 0.55 the caption drops under the
+   threshold of readability.
+
+   Nothing here moves: the pulse of a running row is the dot's, and it answers
+   prefers-reduced-motion in states.css by slowing rather than stopping.
+   ========================================================================== */
+
+[data-scope='queue'][data-part='root'] {
+  /* Not cosmetic: without it the highlight of the chosen row meets the
+     highlight under the pointer and the two read as one block. */
+  gap: var(--ggarry-space-1);
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='task'][data-part='root'] {
+  /* The dot is 6px; the gutter is wider, so a checkbox in a queue that is also
+     a picker (15px) still lands on the same vertical. */
+  --gg-task-gutter: 14px;
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-1) var(--ggarry-space-2);
+  border-radius: var(--ggarry-radius-sm);
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-default);
+  /* A row is chosen, not typed into: the text cursor would promise otherwise. */
+  cursor: default;
+}
+
+[data-scope='task'][data-part='root']:hover {
+  background: var(--ggarry-bg-subtle);
+}
+/* Declared after hover, and the two add up: hovering the chosen row stays visible. */
+[data-scope='task'][data-part='root'][aria-selected='true'] {
+  background: var(--ggarry-bg-accent-subtle);
+}
+[data-scope='task'][data-part='root'][aria-selected='true']:hover {
+  background: color-mix(in oklab, var(--ggarry-bg-accent-subtle), var(--ggarry-bg-subtle));
+}
+
+[data-scope='task'][data-part='title'] {
+  line-height: 1.4;
+}
+[data-scope='task'][data-part='root'][data-state='running'] [data-part='title'] {
+  color: var(--ggarry-text-accent);
+}
+[data-scope='task'][data-part='root']:is([data-state='done'], [data-state='warn']) [data-part='title'] {
+  color: var(--ggarry-text-muted);
+}
+[data-scope='task'][data-part='root'][data-state='skipped'] {
+  opacity: 0.7;
+}
+/* Shown, and out of reach: the row keeps its place in the arrow traversal. */
+[data-scope='task'][data-part='root'][data-disabled] {
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='task'][data-part='sub'],
+[data-scope='task'][data-part='meta'] {
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 1.4;
+  color: var(--ggarry-text-muted);
+}
+[data-scope='task'][data-part='sub'] {
+  /* A hairline of air, not a line of it: the caption belongs to the title above it. */
+  margin-block-start: 1px;
+}

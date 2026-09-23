@@ -1,0 +1,28 @@
+/* ==========================================================================
+   GGarry — budget
+
+   The meter draws the bar and the reading; what is added here is the
+   forecast, and it is the part people come for — "65,800 left" does not say
+   whether the run will make it, "in about 12 minutes" does.
+
+   The forecast is quiet by default and takes the tone's ink once the budget
+   has come to mean something, because the tone of the bar must never be the
+   only carrier: what the colour says, the sentence says too.
+   ========================================================================== */
+
+[data-scope='budget'][data-part='root'] {
+  gap: var(--ggarry-space-2);
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='budget'][data-part='note'] {
+  font-size: var(--ggarry-font-size-xs);
+  line-height: 1.4;
+  color: var(--ggarry-text-muted);
+}
+[data-scope='budget'][data-part='root'][data-tone='warn'] [data-part='note'] {
+  color: var(--ggarry-text-warning);
+}
+[data-scope='budget'][data-part='root'][data-tone='error'] [data-part='note'] {
+  color: var(--ggarry-text-danger);
+}

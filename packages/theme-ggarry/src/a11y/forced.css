@@ -140,4 +140,33 @@
   [data-scope='share'][data-part='segment']:not(:last-child) {
     border-inline-end: 1px solid Canvas;
   }
+
+  /* The agent layer. A history's marks and a run's units are fills carrying
+     outcomes, and the outcomes collapse into one system colour here: what
+     survives is the strip's own name, which says in words how the attempts
+     ended — which is why that name is not optional.
+
+     What must NOT collapse is the difference between a mark and an absence.
+     An attempt nobody made keeps its room and no fill; one whose result is
+     unknown, and a unit that has not begun, come back in the system's grey. */
+  [data-scope='history'][data-part='tick'] {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+  [data-scope='history'][data-part='tick']:not([data-tone]) {
+    background: GrayText;
+  }
+  [data-scope='history'][data-part='tick'][data-empty] {
+    background: none;
+  }
+  [data-scope='run'][data-part='units'] > [data-scope='dot'][data-part='root']:not([data-tone]) {
+    background: GrayText;
+  }
+
+  /* The chosen row of a queue is a tinted fill and nothing else. */
+  [data-scope='task'][data-part='root'][aria-selected='true'] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+  }
 }

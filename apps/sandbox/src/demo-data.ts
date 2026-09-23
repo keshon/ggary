@@ -6,6 +6,9 @@ import type { MenuEntry } from '@ggary/core/menu'
 import type { MenubarMenu } from '@ggary/core/menubar'
 import type { TabItem } from '@ggary/core/tabs'
 import type { SelectItem } from '@ggary/core/select'
+import type { RunUnit } from '@ggary/core/run'
+import type { TaskItem } from '@ggary/core/task'
+import type { HistoryGroup, HistoryTick } from '@ggary/core/history'
 
 export const frameworks: SelectItem[] = [
   { value: 'vanilla', label: 'Vanilla JS' },
@@ -654,6 +657,80 @@ export const generatorSource = `export function terrain(size = 256, seed = Date.
   const noise = createNoise(seed)
   return generate(size, (x, y) => noise.fractal(x / size, y / size, { octaves: 6, persistence: 0.5, lacunarity: 2 }))
 }`
+/* --- the agent layer: one audit run, going on now ------------------------------- */
+
+/** The phases of the run. The unit is an agent, and there are few — a bar at 57% would invent a precision the work has not got. */
+export const runPhases: { id: string; label: string; units: RunUnit[] }[] = [
+  {
+    id: 'analysis',
+    label: 'Analysis',
+    units: [
+      { tone: 'ok', title: 'analysis:docs-drift' },
+      { tone: 'ok', title: 'analysis:shared-and-chunk' },
+      { tone: 'warn', title: 'analysis:probes-assert' },
+      { tone: 'ok', title: 'analysis:silent-failure' },
+      { tone: 'running', title: 'analysis:coverage-hole' },
+      { title: 'analysis:history' },
+      { title: 'analysis:eyes-only' },
+    ],
+  },
+  { id: 'refutation', label: 'Refutation', units: [{}, {}, {}] },
+  { id: 'report', label: 'Report', units: [{ tone: 'error', title: 'report:link-check' }, {}] },
+]
+
+/** The counters of the run, beside its phases. */
+export const runCounters = [
+  { label: 'Running', value: '7 min 58 s' },
+  { label: 'Agents', value: '12' },
+  { label: 'Tokens', value: '186 000' },
+]
+
+/** The queue of agents: flat rows, a phase each, arriving while the work goes on. */
+export const runTasks: TaskItem[] = [
+  { value: 'docs-drift', title: 'analysis:docs-drift', detail: 'docs/ · 4 calls', meta: '18 s', state: 'done' },
+  { value: 'shared-and-chunk', title: 'analysis:shared-and-chunk', detail: 'src/shared/ · 5 calls', meta: '18 s', state: 'done' },
+  { value: 'probes-assert', title: 'analysis:probes-assert', detail: '2 probes assert nothing', meta: '18 s', state: 'warn' },
+  { value: 'silent-failure', title: 'analysis:silent-failure', detail: 'src/runtime/ · 4 calls', meta: '18 s', state: 'done' },
+  { value: 'coverage-hole', title: 'analysis:coverage-hole', detail: 'the third pass is going', meta: '14.0 s', state: 'running' },
+  { value: 'history', title: 'analysis:history', detail: 'waiting for a free runner', meta: '—', state: 'queued' },
+  { value: 'eyes-only', title: 'analysis:eyes-only', detail: 'waiting for a free runner', meta: '—', state: 'queued' },
+  { value: 'refutation-a', title: 'refutation:class-a', detail: 'waiting for the analysis', meta: '—', state: 'queued' },
+  { value: 'refutation-b', title: 'refutation:class-b', detail: 'waiting for the analysis', meta: '—', state: 'queued' },
+  { value: 'link-check', title: 'report:link-check', detail: 'the network is off', meta: '0.4 s', state: 'failed' },
+  { value: 'screenshots', title: 'report:screenshots', detail: 'skipped by a flag', meta: '—', state: 'skipped' },
+]
+
+/** What the run is spending, and how fast: the forecast is the reason a budget is not a meter. */
+export const runSpending = [
+  { label: 'Tokens', value: 186_000, max: 250_000, rate: 90, tone: 'warn' as const },
+  { label: 'Agent minutes', value: 31, max: 60, rate: 0.117 },
+]
+
+/** The last twenty-four nightly audits of this workflow: one attempt, one mark. */
+export const runHistory: HistoryTick[] = [
+  ...Array.from({ length: 6 }, () => ({ tone: 'ok' as const, title: 'passed' })),
+  { tone: 'error', title: 'failed: 3 probes assert nothing' },
+  { tone: 'error', title: 'failed: 3 probes assert nothing' },
+  ...Array.from({ length: 4 }, () => ({ tone: 'ok' as const, title: 'passed' })),
+  { empty: true, title: 'no run: the runner was down' },
+  { empty: true, title: 'no run: the runner was down' },
+  ...Array.from({ length: 5 }, () => ({ tone: 'ok' as const, title: 'passed' })),
+  { tone: 'warn', title: 'passed with 2 remarks' },
+  ...Array.from({ length: 4 }, () => ({ tone: 'ok' as const, title: 'passed' })),
+  { tone: 'running', title: 'going now' },
+]
+
+/** The same workflow by the hour: a batch is an hour, and its width is how many runs stand behind it. */
+export const runHistoryHours: HistoryGroup[] = [
+  { label: '02', ticks: [{ tone: 'ok' }], title: '02:00 — 1 run' },
+  { label: '03', minor: true, ticks: [{ tone: 'ok' }, { tone: 'ok' }, { tone: 'ok' }], title: '03:00 — 3 runs' },
+  { label: '04', minor: true, ticks: [{ tone: 'error' }, { tone: 'error' }, { tone: 'ok' }, { tone: 'ok' }, { tone: 'ok' }], title: '04:00 — 5 runs' },
+  { label: '05', ticks: [{ tone: 'ok' }], count: 8, title: '05:00 — 8 runs, shown as one' },
+  { label: '06', minor: true, ticks: [{ empty: true }], title: '06:00 — no runs' },
+  { label: '07', minor: true, ticks: [{ tone: 'ok' }, { tone: 'warn' }, { tone: 'ok' }], title: '07:00 — 3 runs' },
+  { label: '08', ticks: [{ tone: 'ok' }, { tone: 'ok' }, { tone: 'running' }], title: '08:00 — 3 runs' },
+]
+
 export const templateInserts = [
   { value: '{{name}}', hint: 'The name of the monitor' },
   { value: '{{target}}', hint: 'The address checked' },

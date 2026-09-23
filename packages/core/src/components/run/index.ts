@@ -1,0 +1,5 @@
+export { runAnatomy } from './run.anatomy'
+export type { RunPart } from './run.anatomy'
+export { connect, RUN_WORDS } from './run.connect'
+export type { RunApi } from './run.connect'
+export type { RunProps, RunUnit, RunWords } from './run.types'

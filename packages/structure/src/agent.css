@@ -1,0 +1,133 @@
+/* The agent layer: a run's countable units, the queue of tasks, the strip of
+   past attempts and the budget. What each of them needs in order to BE that
+   shape; how big a mark is, and what a tone looks like, is the theme's.
+
+   Run: dots in a row with the reading beside them.
+   Queue: flat rows on one vertical, with the live region spoken and not shown.
+   History: a strip pushed to its end, so the old falls off the start.
+   Budget: the meter with its forecast under it. */
+
+[data-scope='run'][data-part='root'],
+[data-scope='run'][data-part='units'] {
+  display: inline-flex;
+  align-items: center;
+}
+/* The figures change as the run goes on and must not tug at what is beside them. */
+[data-scope='run'][data-part='value'] {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+[data-scope='queue'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+}
+/* Spoken, not shown: the phase that just turned over. */
+[data-scope='queue'][data-part='status'] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The gutter is a floor rather than a fixed column: it holds the state dots of
+   every row on one vertical, and grows for anything wider that is put in it —
+   a checkbox in a queue that is also a picker does not fit a dot's width. */
+[data-scope='task'][data-part='root'] {
+  display: grid;
+  grid-template-columns: minmax(var(--gg-task-gutter, 14px), auto) 1fr auto;
+  align-items: center;
+}
+[data-scope='task'][data-part='gutter'] {
+  display: flex;
+  justify-content: center;
+}
+[data-scope='task'][data-part='main'] {
+  min-inline-size: 0;
+}
+/* Cut at the edge, whole in the DOM: a long name otherwise pushes the row wide
+   and drives the time past its end. */
+[data-scope='task'][data-part='title'] {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+[data-scope='task'][data-part='sub'] {
+  display: block;
+  min-inline-size: 0;
+}
+[data-scope='task'][data-part='meta'] {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Pushed to the end, so what does not fit runs past the START and is clipped
+   there: the old disappears first and the latest attempt is always visible.
+   The markup meanwhile is ordinary — oldest to latest, as the array arrives. */
+[data-scope='history'][data-part='strip'] {
+  display: flex;
+  justify-content: flex-end;
+  align-items: stretch;
+  overflow: hidden;
+}
+/* A grouped strip fits by construction — the batches divide what they were
+   given — so there is nothing to clip, and clipping would cut off a batch's
+   own hint. */
+[data-scope='history'][data-part='strip'][data-grouped] {
+  overflow: visible;
+}
+[data-scope='history'][data-part='tick'] {
+  flex: none;
+}
+/* A share of the strip, by the number of attempts behind it: equal slots would
+   hold as many marks as fit into the narrowest of them. The basis is 0 so the
+   shares come out even, and a batch never vanishes entirely. */
+[data-scope='history'][data-part='group'] {
+  display: flex;
+  flex: var(--gg-history-n, 1) 1 0;
+  min-inline-size: 1px;
+}
+/* Inside a batch the marks divide it evenly: here their NUMBER carries the
+   reading, not their width, and a floor on something dividing a fixed width is
+   a way of asking for overflow. */
+[data-scope='history'][data-part='group'] > [data-part='tick'] {
+  flex: 1 1 0;
+  min-inline-size: 0;
+}
+/* The ruler repeats the geometry of the batches rather than computing
+   positions: the same share, laid out by the same rule, so the two rows cannot
+   drift apart. It is its own container, so the pair needs no wrapper. */
+[data-scope='history'][data-part='axis'] {
+  display: flex;
+  container-type: inline-size;
+  font-variant-numeric: tabular-nums;
+}
+[data-scope='history'][data-part='axis-cell'] {
+  flex: var(--gg-history-n, 1) 1 0;
+  /* A label may be wider than the batch it names: it hangs over its neighbours
+     rather than taking width from them, which would part the ruler from the
+     strip — the one thing it exists not to do. */
+  min-inline-size: 1px;
+  overflow: visible;
+  white-space: nowrap;
+}
+/* Which labels may go when the ruler is narrow is the caller's decision. The
+   cell keeps its place — `visibility`, not `display` — or the surviving labels
+   would slide, and a label that moves as the window resizes is worse than none. */
+@container (max-width: 36rem) {
+  [data-scope='history'][data-part='axis-cell'][data-minor] {
+    visibility: hidden;
+  }
+}
+
+[data-scope='budget'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+}
+[data-scope='budget'][data-part='note'] {
+  /* The forecast is a sentence and wraps; nothing else in the budget does. */
+  text-wrap: pretty;
+}

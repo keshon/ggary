@@ -297,6 +297,22 @@
       "types": "./src/components/share/index.ts",
       "default": "./src/components/share/index.ts"
     },
+    "./run": {
+      "types": "./src/components/run/index.ts",
+      "default": "./src/components/run/index.ts"
+    },
+    "./task": {
+      "types": "./src/components/task/index.ts",
+      "default": "./src/components/task/index.ts"
+    },
+    "./history": {
+      "types": "./src/components/history/index.ts",
+      "default": "./src/components/history/index.ts"
+    },
+    "./budget": {
+      "types": "./src/components/budget/index.ts",
+      "default": "./src/components/budget/index.ts"
+    },
     "./heatmap": {
       "types": "./src/components/heatmap/index.ts",
       "default": "./src/components/heatmap/index.ts"

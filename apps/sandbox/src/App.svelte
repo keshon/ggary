@@ -86,6 +86,10 @@
     Legend,
     Share,
     Heatmap,
+    Run,
+    Queue,
+    History,
+    Budget,
     StatusDot,
     Caret,
     CodeBlock,
@@ -117,7 +121,7 @@
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
   import { rangePresets } from '@ggary/core/date-picker'
   import type { PaletteCommand } from '@ggary/core/command-palette'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -126,6 +130,7 @@
   let viewMode = $state('list')
   let density = $state('regular')
   let agents = $state(6)
+  let agentTask = $state<string | null>('coverage-hole')
   let position = $state({ x: 128, y: 0, z: -64 })
   let mode = $state('parallel')
   let extras = $state<string[]>([])
@@ -1363,6 +1368,36 @@
   <h2 class="category-title" id="agent-layer"><span class="category-number" aria-hidden="true">08</span>Agent layer</h2>
   <section id="run-queue">
     <h3>Run, queue, history and budget</h3>
+    <Panel title="audit-worldbox-1">
+      {#snippet actions()}
+        <span class="dot-line">
+          <History ticks={runHistory} size="sm" label="Nightly audits" locale="en-GB" />
+          <Badge tone="running">running</Badge>
+        </span>
+      {/snippet}
+      <KeyValueList items={runCounters} tight />
+      <div class="run-phases">
+        {#each runPhases as phase (phase.id)}
+          <div class="run-phase">
+            <span>{phase.label}</span>
+            <Run units={phase.units} label={`${phase.label}: agents finished`} locale="en-GB" />
+          </div>
+        {/each}
+      </div>
+    </Panel>
+    <div class="panels">
+      <Panel title="The queue of agents" body="list">
+        {#snippet actions()}
+          <Badge>{`${runTasks.filter((task) => task.state === 'done').length} of ${runTasks.length}`}</Badge>
+        {/snippet}
+        <Queue tasks={runTasks} label="The queue of agents" bind:value={agentTask} />
+      </Panel>
+      <div style="display: grid; gap: 16px; align-content: start">
+        {#each runSpending as budget (budget.label)}<Budget {...budget} locale="en-GB" />{/each}
+        <History groups={runHistoryHours} size="lg" label="Nightly audits by the hour" locale="en-GB" />
+      </div>
+    </div>
+    <pre class="state">{`chosen  ${JSON.stringify(agentTask)}`}</pre>
   </section>
 
   <section id="run-stream">

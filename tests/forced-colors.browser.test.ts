@@ -4,7 +4,7 @@ import '../packages/theme-ggarry/src/index.css'
 import { createElement as h } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
-import { Button, Checkbox, Legend, RadioGroup, Sparkline, Switch, Share } from '../packages/react/src/index'
+import { Button, Checkbox, History, Legend, RadioGroup, Run, Sparkline, Switch, Share } from '../packages/react/src/index'
 
 /**
  * Windows High Contrast, emulated. Fills and shadows are reset to system
@@ -105,6 +105,29 @@ describe('forced colours', () => {
     expect(new Set(segments.map((segment) => style(segment).backgroundColor)).size).toBe(1)
     expect(segments.map((segment) => style(segment).borderInlineEndStyle)).toEqual(['solid', 'solid', 'none'])
     expect(style(host.querySelector('[data-scope="share"][data-part="root"]')).borderTopStyle).toBe('solid')
+  })
+
+  it('a history keeps the difference between a mark, an unknown result and no attempt at all', async () => {
+    const host = mount(
+      h(History as never, {
+        ticks: [{ tone: 'ok' }, { tone: 'error' }, {}, { empty: true }],
+      })
+    )
+    await forced()
+    const marks = [...host.querySelectorAll<HTMLElement>('[data-scope="history"][data-part="tick"]')]
+    // The outcomes collapse into one colour — the strip's name says how they
+    // ended — but an unknown result and an attempt nobody made do not.
+    expect(style(marks[0]).backgroundColor).toBe(style(marks[1]).backgroundColor)
+    expect(style(marks[2]).backgroundColor).not.toBe(style(marks[0]).backgroundColor)
+    expect(style(marks[3]).backgroundImage).toBe('none')
+    expect(style(marks[3]).backgroundColor).toBe('rgba(0, 0, 0, 0)')
+  })
+
+  it('a run keeps the unit that has not begun apart from the ones that have', async () => {
+    const host = mount(h(Run as never, { label: 'Agents', units: [{ tone: 'ok' }, {}] }))
+    await forced()
+    const [done, pending] = [...host.querySelectorAll<HTMLElement>('[data-scope="dot"][data-part="root"]')]
+    expect(style(pending).backgroundColor).not.toBe(style(done).backgroundColor)
   })
 
   it('a busy button’s ring keeps a turning arc: its top edge another colour than the rest', async () => {

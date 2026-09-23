@@ -311,6 +311,11 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
   min-inline-size: 0;
 }
 
+/* The agent layer: the phases of a run, each a name and its counting meter. */
+.run-phases { display: grid; gap: 8px; margin-block-start: 16px; }
+/* A fixed column for the name, so the phases' dots stand on one vertical. */
+.run-phase { display: grid; grid-template-columns: 7rem auto; align-items: center; gap: 16px; }
+
 /* The readouts demo: a list of changed files, each a mark beside its path; a dot beside its word. */
 .changes { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .changes li { display: flex; align-items: center; gap: 8px; }

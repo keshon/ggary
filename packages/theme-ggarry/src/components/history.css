@@ -1,0 +1,75 @@
+/* ==========================================================================
+   GGarry — history
+
+   A strip of equal marks, one per attempt, the latest at the end. The mark
+   takes the kit's tone (states.css), because an outcome here means exactly
+   what it means on a badge and on a dot.
+
+   The width of a mark is FIXED on a plain strip rather than a share: as a
+   share a strip of twenty attempts and one of two hundred would look the
+   same while meaning different things. In a batch it is the other way round —
+   there the NUMBER of marks carries the reading and the batch keeps its share
+   of the strip.
+
+   Three heights, because the strip does three jobs: a column in a table of
+   objects, where at glyph height it out-shouts the names beside it; a mark
+   among marks in a row with a name and a badge; and the subject of a screen,
+   where it takes a small control's height because that is what it is being
+   compared with. Nothing animates: a history is a state, not a process.
+   ========================================================================== */
+
+[data-scope='history'][data-part='root'] {
+  font-family: var(--ggarry-font-family-sans);
+}
+
+[data-scope='history'][data-part='strip'] {
+  --history-tick: 3px;
+  gap: 2px;
+  block-size: 16px;
+}
+[data-scope='history'][data-part='strip'][data-size='sm'] {
+  block-size: 6px;
+}
+[data-scope='history'][data-part='strip'][data-size='lg'] {
+  block-size: var(--ggarry-size-control-sm);
+}
+/* A batch reads as a batch: the gap between batches is twice the gap between
+   the marks inside one, and no more — wider, and the combs eat the strip. */
+[data-scope='history'][data-part='strip'][data-grouped] {
+  gap: var(--ggarry-space-1);
+}
+
+[data-scope='history'][data-part='tick'] {
+  inline-size: var(--history-tick);
+  /* A corner may not depend on the data: a radius clamps to half the width,
+     and the same mark would be a lozenge on a sparse strip and a hairline on
+     a dense one. 2px moves the shape as little as anything can. */
+  border-radius: 2px;
+  /* With no tone the attempt happened and the outcome is unknown: the mark is
+     the colour of the track. */
+  background: var(--ggarry-tone-mark, var(--ggarry-border-default));
+}
+/* There was NO attempt. The room stays, the mark does not — and it is neither
+   outlined nor tinted: an outline changes the rhythm of the row, which the eye
+   reads as a change of meaning, and a colour promises a judgement where there
+   is nothing to judge. If a gap deserves alarm, it belongs in the line beside
+   the strip, in words. */
+[data-scope='history'][data-part='tick'][data-empty] {
+  background: none;
+}
+
+/* The separator yields before the data does. A gap does not shrink and a mark
+   does, so in a dense batch the combs would take their pixels first and the
+   batch would come out wider than its share — and a grouped strip does not
+   clip, so the oldest would be painted outside it. The gap is capped at a
+   share of the batch instead: 40% of it across however many gaps there are. */
+[data-scope='history'][data-part='group'] {
+  column-gap: min(2px, calc(40% / max(1, var(--gg-history-n, 1) - 1)));
+}
+
+[data-scope='history'][data-part='axis'] {
+  gap: var(--ggarry-space-1);
+  margin-block-start: var(--ggarry-space-1);
+  font-size: var(--ggarry-font-size-xs);
+  color: var(--ggarry-text-muted);
+}
