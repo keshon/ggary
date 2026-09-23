@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, two sibling renderers (React 19
 and Svelte 5), and one design language, GGarry, on top of it.
-Seventy-six components — DataGrid, Kanban, Gantt, CommandPalette, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Eighty-two components — DataGrid, Kanban, Gantt, CommandPalette, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 2736 tests, 1039 of them in headless Chrome
+npm test         # 2990 tests, 1140 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -928,6 +928,89 @@ Found on the way:
   auto margin from pushing a panel's actions to the end of the header. The title takes the free space
   instead. The banner's 75ch measure moved from its body to its lines, so the body
   still fills the row and the actions sit at its end.
+
+## Charts: Sparkline, Legend, Meter, Ring, Share and Heatmap
+
+Six readings of numbers, ported from Instrument and drawn in GGarry's own
+palette. Core computes every geometry — the path, the percentages, the arc's
+dash, the grid — and the theme owns the colours and the sizes.
+
+```tsx
+<Metric label="Run time" value={42} unit="s" delta="18% faster" direction="down" tone="ok" />
+<Sparkline values={nights} area describe={false} />          // the number beside it already says it
+
+<Sparkline values={unit} series={1} label="Unit tests" />
+<Sparkline values={browser} series={2} label="Browser tests" />
+<Legend items={[{ label: 'Unit tests', series: 1, value: '18.2 s' }, { label: 'Browser tests', series: 2, value: '11.5 s' }]} />
+
+<Meter label="Disk on the runner" value={237} max={240} unit="GB" tone="warn" />
+<Ring value={74} label="Of the window used" size="lg" />
+<Share items={[{ label: 'up', value: 22.1, tone: 'ok' }, { label: 'down', value: 0.4, tone: 'error' }]} unit="h" />
+<Heatmap days={year} unit="runs" />
+```
+
+**The palette.** Six series colours, `--gg-chart-1..6`, public so an
+application can key a measure to a number once. They are GGarry's own hues,
+chosen against the theme's: every one stands 25° or more from red (27),
+amber (58), green (149) and the accent (260), so a series never reads as
+"it failed" or "done", and they climb a ladder of lightness (0.52 to 0.66)
+so they survive colour blindness and a black-and-white print. Each holds
+3:1 on the surface and on the canvas in both modes, measured by the gate.
+A series is a **category**, never a state: a status tone may not colour one,
+a series colour may not be used for text, and `--gg-series` lets an
+application override one. A chart of one series takes the accent, because
+there is nothing to tell apart; at two or more a Legend is obligatory.
+
+- **Sparkline** is the shape of a change beside a number: no axes, no grid,
+  no labels. Core turns the values into the line, the optional area and the
+  last point over a fixed 120×32 box; the theme sizes it at that proportion,
+  so the last value's dot stays a circle rather than stretching into an
+  ellipse. A flat series still draws a line; one value draws nothing and says
+  so with `data-empty`. `describe` names the picture in words by default and
+  is turned off where the number already stands beside it.
+- **Legend** is the key: a swatch, the name in words and an optional value,
+  as a list. The swatch is 8px and square — the state dot is 6px and round,
+  so the two marks never read as each other — and hidden from a screen
+  reader, which hears the name.
+- **Meter** is one quantity against its own ceiling, so it takes one tone and
+  never a series. `role="meter"` with the reading in `aria-valuetext`; the
+  figure stands in words above the bar, because a length and a colour are not
+  a number. Past the ceiling the fill stops square at the end of the track and
+  the words keep the figure that was given. The native `<meter>` is not used:
+  its bar is drawn by the platform and cannot be held to 3:1.
+- **Ring** is the same reading where a bar has no room — beside a card's text.
+  An SVG arc whose dash core computes, at three sizes; the figure sits inside
+  only at the largest, where the type scale still fits. `decorative` hides it
+  when the count already stands next to it in words.
+- **Share** is what a period was made of: one bar divided by each part's share
+  of the whole. Core rounds by largest remainder so the parts total exactly
+  100 and the bar is always full, and a part with a value of its own never
+  falls to nothing — it takes its point from the largest. Outcomes take tones,
+  categories take series; more than two parts want a Legend.
+- **Heatmap** is how much happened per day across a year. Its axis is
+  intensity, not category, so it takes four steps of one hue rather than the
+  palette, cut by rank over the days that have something on them — one
+  release day cannot flatten a year. A column is a week, seven rows are the
+  days, the blanks at either end keep the weeks true, and a month is labelled
+  only where it owns two columns. It scrolls rather than wraps: a wrapped
+  year is two pictures. The grid is one named picture and its cells are
+  hidden — a screen reader cannot usefully walk 365 of them.
+
+Found on the way:
+
+- **A word boundary written through a heredoc is a backspace.** `\b` inside a
+  Python string is 0x08, and two of this repo's own contract regexes ended up
+  holding that byte instead — the rule "no `<svg>` in an adapter" was checking
+  nothing but `createElementNS` for an hour. Both are word boundaries again,
+  and the rule fails on a planted `<svg>`.
+- **A chart's barrel draws nothing.** `index.ts` re-exports, so it answers to
+  the ordinary rule rather than to the charts' exception.
+- **A stretched viewBox turns a dot into an ellipse.** `preserveAspectRatio:
+  none` scales the last value's circle with the box; the sparkline keeps its
+  own proportion, and a width an application sets still draws an undistorted
+  line through `vector-effect: non-scaling-stroke`.
+- **A scaled fill stretches its own rounded end.** The meter sizes its fill
+  rather than scaling it, unlike Progress.
 
 ## Readouts: Metric, KeyValueList, FileChange, Timeline, StatusDot and Caret
 
@@ -2490,18 +2573,22 @@ sandbox build prints none.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 436 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
-| contract | node | `icons.contract.test.ts` | 337 tests. Core names only real glyphs, adapters draw none. |
+| machine | node | `*.machine.test.ts` | 503 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
+| contract | node | `icons.contract.test.ts` | 356 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 4 tests. Every discovered theme — GGarry, now the only one: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 872 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 940 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 872 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 940 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
 | browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
 | browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |
 | browser | Chrome | `inserts.browser.test.ts` | 4 tests. A controlled React textarea typed into, the caret put mid-text, an insert landing there with the caret after it, the focus back and React's state updated; a selection replaced; Enter on an insert; inserts inside a Field finding its field with no target. |
-| browser | Chrome | `forced-colors.browser.test.ts` | 3 tests. Forced colours emulated through Playwright (`page.emulateMedia({ forcedColors })`): a checked box and a switch that is on keep their state as `Highlight` with a border, a checked radio's dot shows against its box, and a busy button's ring keeps a turning arc. Each fails with the `gg.forced` layer removed. |
+| browser | Chrome | `charts.browser.test.ts` | 9 tests. A sparkline's line drawn where its numbers are, its last dot on the final value, a flat series still drawn, its natural proportion kept so the dot stays a circle; a legend wrapping, its swatch square and 8px. |
+| browser | Chrome | `meter.browser.test.ts` | 10 tests. A meter's fill measured against its track at a reading and past the ceiling, its reading in words above it; a ring's arc as a dash of its circumference, the figure inside only at the large size, and the three sizes' boxes. |
+| browser | Chrome | `share.browser.test.ts` | 5 tests. The parts filling the bar exactly, a part too small to see still drawn, the whole named in words. |
+| browser | Chrome | `heatmap.browser.test.ts` | 6 tests. A column a week with the blanks kept, the four steps by rank, the months labelled only where one owns two columns, a year scrolling rather than wrapping. |
+| browser | Chrome | `forced-colors.browser.test.ts` | 6 tests. Forced colours emulated through Playwright (`page.emulateMedia({ forcedColors })`): a checked box and a switch that is on keep their state as `Highlight` with a border, a checked radio's dot shows against its box, and a busy button's ring keeps a turning arc. Each fails with the `gg.forced` layer removed. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts` | 2 tests. The form rhythm — Field's label and hint included — option rows with the field's 6px corner and 32px tall, the menu's corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, in light and dark. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
