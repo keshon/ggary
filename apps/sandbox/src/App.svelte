@@ -1358,3 +1358,18 @@
     </div>
   </section>
 </div>
+
+<div class="category" aria-labelledby="agent-layer">
+  <h2 class="category-title" id="agent-layer"><span class="category-number" aria-hidden="true">08</span>Agent layer</h2>
+  <section id="run-queue">
+    <h3>Run, queue, history and budget</h3>
+  </section>
+
+  <section id="run-stream">
+    <h3>Step, log, diff and lanes</h3>
+  </section>
+
+  <section id="run-chat">
+    <h3>Turn, composer, thinking, approval and failure</h3>
+  </section>
+</div>

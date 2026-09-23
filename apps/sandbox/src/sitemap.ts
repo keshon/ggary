@@ -489,5 +489,38 @@ export const SITEMAP: SiteCategory[] = [
         ]
       }
     ]
+  },
+  {
+    "id": "agent-layer",
+    "title": "Agent layer",
+    "components": [
+      {
+        "label": "Run, queue, history and budget",
+        "anchors": [
+          {
+            "id": "run-queue",
+            "label": null
+          }
+        ]
+      },
+      {
+        "label": "Step, log, diff and lanes",
+        "anchors": [
+          {
+            "id": "run-stream",
+            "label": null
+          }
+        ]
+      },
+      {
+        "label": "Turn, composer, thinking, approval and failure",
+        "anchors": [
+          {
+            "id": "run-chat",
+            "label": null
+          }
+        ]
+      }
+    ]
   }
 ]
