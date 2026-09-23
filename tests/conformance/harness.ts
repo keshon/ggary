@@ -721,6 +721,47 @@ export interface HeatmapProps {
   words?: import('../../packages/core/src/components/heatmap').HeatmapWords
 }
 
+/** A run: the countable units of one run, and the words its reading is built from. */
+export interface RunProps {
+  units: import('../../packages/core/src/components/run').RunUnit[]
+  label?: string
+  showValue?: boolean
+  locale?: string
+  words?: Partial<import('../../packages/core/src/components/run').RunWords>
+}
+
+/** A queue of tasks: the rows, and what may be chosen among them. */
+export interface QueueProps {
+  tasks: import('../../packages/core/src/components/task').TaskItem[]
+  label?: string
+  value?: string | null
+  defaultValue?: string | null
+  onValueChange?: (value: string | null) => void
+  words?: import('../../packages/core/src/components/task').QueueWordsInput
+}
+
+/** A history: the attempts it draws, flat or in batches, and the words of its name. */
+export interface HistoryProps {
+  ticks?: import('../../packages/core/src/components/history').HistoryTick[]
+  groups?: import('../../packages/core/src/components/history').HistoryGroup[]
+  label?: string
+  size?: import('../../packages/core/src/components/history').HistorySize
+  locale?: string
+  words?: Partial<import('../../packages/core/src/components/history').HistoryWords>
+}
+
+/** A budget: what is spent against what is allowed, and how fast. */
+export interface BudgetProps {
+  value: number
+  max: number
+  label: string
+  rate?: number
+  tone?: StatusTone
+  size?: import('../../packages/core/src/components/meter').MeterSize
+  locale?: string
+  words?: Partial<import('../../packages/core/src/components/budget').BudgetWords>
+}
+
 export interface AvatarProps {
   name: string
   src?: string
@@ -1007,6 +1048,10 @@ export interface Adapter {
   fileChange?(props: FileChangeProps, target: HTMLElement): Promise<Mounted<FileChangeProps>>
   share?(props: ShareProps, target: HTMLElement): Promise<Mounted<ShareProps>>
   heatmap?(props: HeatmapProps, target: HTMLElement): Promise<Mounted<HeatmapProps>>
+  run?(props: RunProps, target: HTMLElement): Promise<Mounted<RunProps>>
+  queue?(props: QueueProps, target: HTMLElement): Promise<Mounted<QueueProps>>
+  history?(props: HistoryProps, target: HTMLElement): Promise<Mounted<HistoryProps>>
+  budget?(props: BudgetProps, target: HTMLElement): Promise<Mounted<BudgetProps>>
   datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>

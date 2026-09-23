@@ -39,6 +39,8 @@ import { dataDisplayConformance } from './data-display.spec'
 import { legendConformance, sparklineConformance } from './charts.spec'
 import { shareConformance } from './share.spec'
 import { heatmapConformance } from './heatmap.spec'
+// The Run component's spec, aliased: this file's own entry point is runConformance().
+import { budgetConformance, historyConformance, queueConformance, runConformance as agentRunConformance } from './agent.spec'
 import { textareaConformance } from './textarea.spec'
 import { timelineConformance } from './timeline.spec'
 import { approvalConformance, composerConformance, failureConformance, thinkingConformance, turnConformance } from './chat.spec'
@@ -118,6 +120,10 @@ export function runConformance() {
       thinkingConformance(adapter)
       approvalConformance(adapter)
       failureConformance(adapter)
+      agentRunConformance(adapter)
+      queueConformance(adapter)
+      historyConformance(adapter)
+      budgetConformance(adapter)
     })
   }
 }

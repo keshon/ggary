@@ -1,0 +1,28 @@
+/* ==========================================================================
+   GGarry — run
+
+   The counting meter of one run: a row of state dots and the reading beside
+   them. Nothing new is drawn here — a unit IS the kit's dot (states.css), so
+   the tones, the pulse of the one that is going and forced colours all come
+   from the one place they come from everywhere else.
+
+   A unit that has not begun is the only case the dot does not already know:
+   it keeps the room and takes the strong border's colour, a step off the
+   surface and no more. It must not be a tone — a grey dot in the tone
+   vocabulary means "neutral", which is an outcome, and this unit has none.
+   ========================================================================== */
+
+[data-scope='run'][data-part='root'] {
+  gap: var(--ggarry-space-2);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-xs);
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='run'][data-part='units'] {
+  gap: var(--ggarry-space-1);
+}
+
+[data-scope='run'][data-part='units'] > [data-scope='dot'][data-part='root']:not([data-tone]) {
+  background: var(--ggarry-border-strong);
+}

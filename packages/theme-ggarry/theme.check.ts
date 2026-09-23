@@ -293,6 +293,33 @@ const pairs: Pair[] = [
   { label: 'approval: the waiting edge on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'composer: the glyph on the send disc', fg: '--ggarry-text-on-accent', bg: ['--ggarry-bg-accent'], min: TEXT },
   { label: 'thinking: the aside on the canvas', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-canvas'], min: TEXT },
+  // The agent layer. A run's units and a history's marks take the kit's tone
+  // marks, measured above on the grounds a mark stands on; what is new is the
+  // absence of an outcome. A unit that has not begun and a mark with no result
+  // are not marks at all — they only have to read as room, so they are held to
+  // a step rather than to 3:1.
+  { label: 'run: a unit not begun, on the surface', fg: '--ggarry-border-strong', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'run: a unit not begun, on the canvas', fg: '--ggarry-border-strong', bg: ['--ggarry-bg-canvas'], min: STEP },
+  { label: 'run: the reading beside the units', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'history: a mark with no outcome, on the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'history: a mark with no outcome, on the canvas', fg: '--ggarry-border-default', bg: ['--ggarry-bg-canvas'], min: STEP },
+  { label: 'history: the ruler under the strip', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+
+  // The queue. The chosen row is a tint and has to be seen as one; the titles
+  // are read on it, and a phase colours the title it belongs to.
+  { label: 'queue: the chosen row off the surface', fg: '--ggarry-bg-accent-subtle', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'queue: a title on the chosen row', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface', '--ggarry-bg-accent-subtle'], min: TEXT },
+  { label: 'queue: a title on a hovered row', fg: '--ggarry-text-default', bg: ['--ggarry-bg-subtle'], min: TEXT },
+  { label: 'queue: a running title', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'queue: a finished title, stepped back', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'queue: the caption and the time', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+
+  // The budget's forecast: quiet by default, and in the tone's ink once the
+  // spending means something — the colour is never the only carrier, but it
+  // still has to be readable.
+  { label: 'budget: the forecast on the surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'budget: a warning forecast', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'budget: a forecast that is spent', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: TEXT },
 
   // Focus ring against what it stands on.
   { label: 'focus: ring on surface', fg: '--ggarry-focus-ring', bg: ['--ggarry-bg-surface'], min: LARGE },

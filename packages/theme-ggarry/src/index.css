@@ -98,6 +98,10 @@
 @import './components/inserts.css' layer(gg.components);
 @import './components/share.css' layer(gg.components);
 @import './components/heatmap.css' layer(gg.components);
+@import './components/run.css' layer(gg.components);
+@import './components/task.css' layer(gg.components);
+@import './components/history.css' layer(gg.components);
+@import './components/budget.css' layer(gg.components);
 
 /* The agent layer. approval.css comes before failure.css: the two share the
    list of short lines and the record line, and the shared rule lives with the

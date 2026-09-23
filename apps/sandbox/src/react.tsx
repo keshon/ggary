@@ -116,6 +116,10 @@ import {
   Legend,
   Share,
   Heatmap,
+  Run,
+  Queue,
+  History,
+  Budget,
   StatusDot,
   Caret,
   CodeBlock,
@@ -127,7 +131,7 @@ import {
   Approval,
   Failure,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -137,6 +141,7 @@ function App() {
   const [viewMode, setViewMode] = useState('list')
   const [density, setDensity] = useState('regular')
   const [agents, setAgents] = useState(6)
+  const [agentTask, setAgentTask] = useState<string | null>('coverage-hole')
   const [position, setPosition] = useState({ x: 128, y: 0, z: -64 })
   const [mode, setMode] = useState('parallel')
   const [extras, setExtras] = useState<string[]>([])
@@ -1580,6 +1585,37 @@ function App() {
         <h2 className="category-title" id="agent-layer"><span className="category-number" aria-hidden="true">08</span>Agent layer</h2>
         <section id="run-queue">
           <h3>Run, queue, history and budget</h3>
+          <Panel
+            title="audit-worldbox-1"
+            actions={
+              <span className="dot-line">
+                <History ticks={runHistory} size="sm" label="Nightly audits" locale="en-GB" />
+                <Badge tone="running">running</Badge>
+              </span>
+            }
+          >
+            <KeyValueList items={runCounters} tight />
+            <div className="run-phases">
+              {runPhases.map((phase) => (
+                <div key={phase.id} className="run-phase">
+                  <span>{phase.label}</span>
+                  <Run units={phase.units} label={`${phase.label}: agents finished`} locale="en-GB" />
+                </div>
+              ))}
+            </div>
+          </Panel>
+          <div className="panels">
+            <Panel title="The queue of agents" body="list" actions={<Badge>{`${runTasks.filter((task) => task.state === 'done').length} of ${runTasks.length}`}</Badge>}>
+              <Queue tasks={runTasks} label="The queue of agents" value={agentTask} onValueChange={setAgentTask} />
+            </Panel>
+            <div style={{ display: 'grid', gap: 16, alignContent: 'start' }}>
+              {runSpending.map((budget) => (
+                <Budget key={budget.label} {...budget} locale="en-GB" />
+              ))}
+              <History groups={runHistoryHours} size="lg" label="Nightly audits by the hour" locale="en-GB" />
+            </div>
+          </div>
+          <pre className="state">{`chosen  ${JSON.stringify(agentTask)}`}</pre>
         </section>
 
         <section id="run-stream">
