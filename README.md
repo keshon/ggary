@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, two sibling renderers (React 19
 and Svelte 5), and one design language, GGarry, on top of it.
-Eighty-two components — DataGrid, Kanban, Gantt, CommandPalette, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Ninety-five components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 2990 tests, 1140 of them in headless Chrome
+npm test         # 3498 tests, 1309 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -933,6 +933,82 @@ Found on the way:
   auto margin from pushing a panel's actions to the end of the header. The title takes the free space
   instead. The banner's 75ch measure moved from its body to its lines, so the body
   still fills the row and the actions sit at its end.
+
+## The agent layer: Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval and Failure
+
+Thirteen components for one job: showing a person the work of a machine that
+is going on now. They differ in the UNIT of work, not the look — a phase, a
+task, a tool call, a line, an edit, a worker, an attempt, a decision.
+
+```tsx
+<Run units={shards} label="Shards" />                    // 4 of 7 done, 1 with a remark
+<Queue tasks={tasks} bind:value={chosen} />              // hundreds of flat rows, one tab stop
+<History ticks={attempts} label="The last 20 nights" />
+<Budget value={184200} max={250000} rate={tokensPerHour} label="Tokens" />
+
+<Step name="edit_file" argument="src/grid/filters.ts" state="ok" duration={412}>
+  <Diff path="src/grid/filters.ts" before={was} after={now} />
+</Step>
+<Log lines={lines} label="The run" />
+<Lanes lanes={shards} label="Six shards on one axis" />
+
+<Turn who="Claude" time="14:32" tokens={1284} duration={4.1} streaming>…</Turn>
+<Thinking duration={6}>…</Thinking>
+<Approval what="rm -rf ./build" effects={[{ text: 'Deletes 2,318 files', tone: 'warn' }]} onDecide={decide} />
+<Failure title="Could not read the file" code="ENOENT" reason="…" tried={['retried twice']} onRetry={retry} />
+<Composer label="Ask" busy={running} onSend={send} onStop={stop} />
+```
+
+Each was weighed against what the kit already had, and composed rather than
+copied where the answer was yes:
+
+- **Budget** is the **Meter** with a forecast. Everything else it draws —
+  the label, "184,200 of 250,000", the bar — is the Meter's, so it renders
+  one. What it adds is the exhaustion a rate implies, which the Meter cannot
+  have from one value and one ceiling. Without a `rate` it says so plainly:
+  a budget with no forecast is a meter with a longer name.
+- **Step** and **Thinking** take a disclosure's *shape* — a button owning a
+  region — without the **Accordion**'s promises. Accordion is a group: one
+  machine over a list, a single-open policy, a heading level per item and
+  arrows roving between siblings. A transcript has none of those: steps
+  arrive one at a time and each opens alone. Step is a native
+  `<details>`, so find-in-page opens it for free.
+- **Lanes** is not a small **Gantt**. The Gantt is a treegrid with a name
+  column, days as its atom, dependency arrows, groups that close and a
+  machine holding drafts. Lanes has no column, no dependencies and nothing
+  editable: what is left is arithmetic over one window, handed to CSS as two
+  custom properties.
+- **Queue** is a `listbox`, not a grid. A grid compares records field by
+  field; a queue exists so one of hundreds can be **chosen**. One tab stop,
+  arrows, and a polite live region saying which phase just turned over.
+- **Failure** is not a **Banner** with a retry. What does the work is the
+  list of what was already tried, the machine code as a plate a person can
+  search a log for, and the fact that it stays afterwards as a record — a
+  banner that has served its purpose is dismissed.
+- **Run**'s unit *is* the **StatusDot**: core calls the dot's own connect, so
+  the pulse, the tones and the forced-colours rules come from one place.
+  **Turn** asks for the **Caret** rather than drawing one; **Composer**
+  arranges the **Textarea**, **Button** and **Toolbar** and owns only the
+  frame and the sending rules.
+
+The vocabulary is the kit's one set of tones. A component with a phase of
+its own — queued, skipped, cancelled — carries `data-state`, but its colour
+comes through a tone, so a queue row, a badge and a dot never disagree on
+one screen.
+
+Found on the way:
+
+- **Three branches writing one file cut it at the seams.** Batch C's
+  worktrees each created `packages/structure/src/agent.css`, `agent.spec.ts`
+  and a browser suite of the same name; joining them by hand left rules and
+  test blocks unclosed, and every browser test failed to load rather than
+  failing. They are rebuilt from each branch's own version — a file two
+  authors wrote at once is merged whole, not stitched.
+- **A machine outruns speech.** The Log's live region is off by default,
+  against `role="log"`'s implied polite: a hundred lines a second is not
+  something to read aloud, and the run's own status does the announcing.
+- **A muted line number on a deleted line measured 4.35:1.** The gate caught
+  it; a changed line's numbers take the full ink.
 
 ## Charts: Sparkline, Legend, Meter, Ring, Share and Heatmap
 
@@ -2578,13 +2654,13 @@ sandbox build prints none.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 503 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
+| machine | node | `*.machine.test.ts` | 661 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
 | contract | node | `icons.contract.test.ts` | 356 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 4 tests. Every discovered theme — GGarry, now the only one: structure, contrast, coverage. |
 | contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 940 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1078 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 940 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1078 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
 | browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
 | browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |
@@ -2593,7 +2669,10 @@ sandbox build prints none.
 | browser | Chrome | `meter.browser.test.ts` | 10 tests. A meter's fill measured against its track at a reading and past the ceiling, its reading in words above it; a ring's arc as a dash of its circumference, the figure inside only at the large size, and the three sizes' boxes. |
 | browser | Chrome | `share.browser.test.ts` | 5 tests. The parts filling the bar exactly, a part too small to see still drawn, the whole named in words. |
 | browser | Chrome | `heatmap.browser.test.ts` | 6 tests. A column a week with the blanks kept, the four steps by rank, the months labelled only where one owns two columns, a year scrolling rather than wrapping. |
-| browser | Chrome | `forced-colors.browser.test.ts` | 6 tests. Forced colours emulated through Playwright (`page.emulateMedia({ forcedColors })`): a checked box and a switch that is on keep their state as `Highlight` with a border, a checked radio's dot shows against its box, and a busy button's ring keeps a turning arc. Each fails with the `gg.forced` layer removed. |
+| browser | Chrome | `agent.browser.test.ts` | 6 tests. A history clipped at its leading edge, batches dividing the width they were given, a queue's dots on one vertical whatever the titles, one Tab into the queue and the arrows moving real focus, a run's room drawn before it begins. |
+| browser | Chrome | `agent-stream.browser.test.ts` | 11 tests. A log holding the bottom as lines arrive and letting go the moment the reader scrolls up; a diff copying clean code with no numbers or signs in the text, its sign drawn in the gutter, a long line scrolling rather than wrapping; a step opened by find-in-page; lanes measured against one axis. |
+| browser | Chrome | `chat.browser.test.ts` | 8 tests. The composer's field growing and its frame holding one line at rest, Enter sending and Shift+Enter breaking the line, nothing sent while busy; a turn's actions appearing under the pointer; an approval and a failure keeping their record once answered. |
+| browser | Chrome | `forced-colors.browser.test.ts` | 12 tests. Forced colours emulated through Playwright (`page.emulateMedia({ forcedColors })`): a checked box and a switch that is on keep their state as `Highlight` with a border, a checked radio's dot shows against its box, and a busy button's ring keeps a turning arc. Each fails with the `gg.forced` layer removed. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts` | 2 tests. The form rhythm — Field's label and hint included — option rows with the field's 6px corner and 32px tall, the menu's corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, in light and dark. |
 | browser | Chrome | `overlay.browser.test.ts` | 18 tests. Popover placement and flipping, the top layer escaping a clipping ancestor, Select unclipped inside `overflow: hidden` and a short dialog, a long Select and a long Menu keeping their row in view, real hover and Tab for tooltips, a menu driven by the real keyboard and pointer, submenu placement, flipping and the pointer corridor, a menubar by real keys (Tab, arrows, Alt+key, F10) and pointer, nested and passive layers. |
