@@ -39,7 +39,7 @@
   inline-size: 14px;
   block-size: 14px;
   border-radius: var(--ggarry-radius-full);
-  background: var(--ggarry-color-white);
+  background: var(--ggarry-bg-thumb);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.2);
   transition: margin-inline-start var(--ggarry-duration-normal) ease;
 }

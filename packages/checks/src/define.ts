@@ -79,7 +79,7 @@ export const defineThemeCheck = (check: ThemeCheck): ThemeCheck => check
 
 export interface Finding {
   theme: string
-  check: 'imports' | 'layers' | 'orphans' | 'parity' | 'contract' | 'variables' | 'selectors' | 'structure' | 'contrast' | 'coverage' | 'waivers'
+  check: 'imports' | 'layers' | 'orphans' | 'parity' | 'contract' | 'variables' | 'selectors' | 'structure' | 'contrast' | 'coverage' | 'waivers' | 'literals'
   message: string
   context?: string
   where?: string

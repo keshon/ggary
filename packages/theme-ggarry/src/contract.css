@@ -37,4 +37,7 @@
   --gg-chart-5: var(--ggarry-chart-5);
   --gg-chart-6: var(--ggarry-chart-6);
   --gg-z-popover: var(--ggarry-z-popover);
+  --gg-z-sheet: var(--ggarry-z-sheet);
+  --gg-z-drawer: var(--ggarry-z-drawer);
+  --gg-z-skip-link: var(--ggarry-z-skip-link);
 }

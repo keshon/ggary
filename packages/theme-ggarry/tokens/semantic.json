@@ -9,9 +9,11 @@
     "accent-hover": "{color.brand.700}",
     "accent-subtle": "{color.brand.50}",
     "danger": "{color.danger.600}",
+    "danger-hover": "{color.danger.700}",
     "danger-subtle": "{color.danger.50}",
     "success-subtle": "{color.success.50}",
     "warning-subtle": "{color.warning.50}",
+    "thumb": "{color.white}",
     "scrim": "rgba(15, 23, 42, 0.45)"
   },
   "text": {
@@ -19,11 +21,19 @@
     "muted": "{color.slate.500}",
     "subtle": "{color.slate.450}",
     "on-accent": "{color.white}",
+    "on-danger": "{color.white}",
     "on-inverted": "{color.slate.50}",
     "accent": "{color.brand.700}",
     "danger": "{color.danger.700}",
     "success": "{color.success.700}",
     "warning": "{color.warning.700}"
+  },
+  "mark": {
+    "neutral": "{color.slate.500}",
+    "running": "{color.brand.700}",
+    "ok": "{color.success.700}",
+    "warn": "{color.warning.700}",
+    "error": "{color.danger.700}"
   },
   "border": {
     "default": "{color.slate.200}",

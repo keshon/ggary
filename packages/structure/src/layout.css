@@ -71,7 +71,7 @@
 /* Out of sight until it takes the focus: the first thing a keyboard meets. */
 [data-scope='shell'][data-part='skip-link'] {
   position: absolute;
-  z-index: 40;
+  z-index: var(--gg-z-skip-link);
   inset-inline-start: 0;
   inset-block-start: 0;
 }
@@ -120,7 +120,7 @@
   }
   [data-scope='shell'][data-collapse='drawer'] > [data-part='aside'] {
     position: fixed;
-    z-index: 30;
+    z-index: var(--gg-z-drawer);
     inset-block: 0;
     inset-inline-start: 0;
     translate: -100% 0;
@@ -139,7 +139,7 @@
   [data-scope='shell'][data-collapse='drawer'][data-state='open']::after {
     content: '';
     position: fixed;
-    z-index: 29;
+    z-index: calc(var(--gg-z-drawer) - 1);
     inset: 0;
   }
 }

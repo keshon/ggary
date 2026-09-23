@@ -22,7 +22,7 @@
 [data-scope='dialog'][data-part='content']:is([data-placement='start'], [data-placement='end'])[open]:not(:modal) {
   position: fixed;
   inset: 0;
-  z-index: 10;
+  z-index: var(--gg-z-sheet);
 }
 
 /* The UA's <dialog> box is a bordered, padded block; the parts lay it out. */

@@ -46,6 +46,9 @@ const pairs: Pair[] = [
   // option. Hover must not drop below the threshold either.
   { label: 'on accent: label on fill', fg: '--ggarry-text-on-accent', bg: ['--ggarry-bg-accent'], min: TEXT },
   { label: 'on accent: label on hover fill', fg: '--ggarry-text-on-accent', bg: ['--ggarry-bg-accent-hover'], min: TEXT },
+  // A destructive action at high emphasis, and a destructive menu row highlighted.
+  { label: 'on danger: label on fill', fg: '--ggarry-text-on-danger', bg: ['--ggarry-bg-danger'], min: TEXT },
+  { label: 'on danger: label on hover fill', fg: '--ggarry-text-on-danger', bg: ['--ggarry-bg-danger-hover'], min: TEXT },
 
   // High-emphasis danger: GGarry's solid red button.
   { label: 'danger: white label on fill', fg: '--ggarry-color-white', bg: ['--ggarry-bg-danger'], min: TEXT },
@@ -86,14 +89,14 @@ const pairs: Pair[] = [
   { label: 'badge: count on its fill', fg: '--ggarry-text-on-accent', bg: ['--ggarry-bg-accent'], min: TEXT },
   { label: 'badge: plain dot on its plate', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: LARGE },
   // The tone mark: a dot with no label of its own, so the non-text threshold, on the grounds a dot stands on.
-  { label: 'dot: neutral mark on the surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: LARGE },
-  { label: 'dot: running mark on the surface', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
-  { label: 'dot: ok mark on the surface', fg: '--ggarry-text-success', bg: ['--ggarry-bg-surface'], min: LARGE },
-  { label: 'dot: warn mark on the surface', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-surface'], min: LARGE },
-  { label: 'dot: error mark on the surface', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: LARGE },
-  { label: 'dot: running mark on the canvas', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-canvas'], min: LARGE },
-  { label: 'dot: ok mark on the canvas', fg: '--ggarry-text-success', bg: ['--ggarry-bg-canvas'], min: LARGE },
-  { label: 'dot: warn mark on the canvas', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'dot: neutral mark on the surface', fg: '--ggarry-mark-neutral', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'dot: running mark on the surface', fg: '--ggarry-mark-running', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'dot: ok mark on the surface', fg: '--ggarry-mark-ok', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'dot: warn mark on the surface', fg: '--ggarry-mark-warn', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'dot: error mark on the surface', fg: '--ggarry-mark-error', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'dot: running mark on the canvas', fg: '--ggarry-mark-running', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'dot: ok mark on the canvas', fg: '--ggarry-mark-ok', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'dot: warn mark on the canvas', fg: '--ggarry-mark-warn', bg: ['--ggarry-bg-canvas'], min: LARGE },
   { label: 'caret: the cursor on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'timeline: the time and the detail on the surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'timeline: the thread off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
@@ -107,13 +110,13 @@ const pairs: Pair[] = [
   // tone marks, so each tone is measured where a meter is put.
   { label: 'meter: the fill on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'meter: the fill on the page', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-canvas'], min: LARGE },
-  { label: 'meter: an ok fill on the surface', fg: '--ggarry-text-success', bg: ['--ggarry-bg-surface'], min: LARGE },
-  { label: 'meter: a warn fill on the surface', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-surface'], min: LARGE },
-  { label: 'meter: an error fill on the surface', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'meter: an ok fill on the surface', fg: '--ggarry-mark-ok', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'meter: a warn fill on the surface', fg: '--ggarry-mark-warn', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'meter: an error fill on the surface', fg: '--ggarry-mark-error', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'meter: the track off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
   { label: 'meter: the reading beside the label', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'ring: the arc on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
-  { label: 'ring: a warn arc on the surface', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'ring: a warn arc on the surface', fg: '--ggarry-mark-warn', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'ring: the track off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
   // The figure inside a ring is SVG text, which the coverage rule cannot see:
   // it is measured here by hand, at the floor of the type scale.
@@ -210,6 +213,11 @@ const pairs: Pair[] = [
   // has to stand off the surface it sits on, and hover has to be a visible step.
   { label: 'chip: low plate off the surface', fg: '--ggarry-bg-muted', bg: ['--ggarry-bg-surface'], min: STEP },
   { label: 'chip: hover step from the plate', fg: '--ggarry-border-default', bg: ['--ggarry-bg-muted'], min: STEP },
+  // The neutral hover: a quiet fill at rest (subtle) steps to the next (muted)
+  // under the pointer — the segmented control, the tab chips, a step's head, the
+  // rail, the board's add button, the copy buttons. Equal in dark mode, the
+  // hover in all of them was there and drew nothing.
+  { label: 'hover: the muted fill off the subtle one', fg: '--ggarry-bg-muted', bg: ['--ggarry-bg-subtle'], min: STEP },
   { label: 'chip: label on hover plate', fg: '--ggarry-text-default', bg: ['--ggarry-border-default'], min: TEXT },
 
   // The high-emphasis chip: inverted plate.
@@ -368,4 +376,12 @@ export default defineThemeCheck({
     { label: 'dark', attributes: { 'data-mode': 'dark' } },
   ],
   pairs,
+  waivers: [
+    {
+      pair: 'hover: the muted fill off the subtle one',
+      context: 'light',
+      reason:
+        'slate-50 to slate-100 is ΔL 0.016. Moving light bg.muted also moves the chip plate, the heatmap’s empty cell and every muted fill, so it waits for a decision on the light neutral ramp.',
+    },
+  ],
 })

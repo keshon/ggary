@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3498 tests, 1309 of them in headless Chrome
+npm test         # 3505 tests, 1309 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -80,7 +80,7 @@ differ enough that core leaning on either shows up as the other failing.
 
 ## The contract
 
-Three rules every component obeys, so themes and third-party components can
+Four rules every component obeys, so themes and third-party components can
 participate without importing any JS:
 
 1. Every node carries `data-scope` and `data-part`. No theme stylesheet targets a
@@ -289,6 +289,39 @@ What Instrument measured, kept as rules for GGarry and for any theme after it.
   lose.
 - **Every gate is proven by planting a defect.** A check that has never failed
   has not been shown to check anything.
+
+**The scales.** Every family a component draws from has a token in
+`tokens/primitives.json`, and the literal gate (see Theme checks) holds the
+component CSS to it:
+
+| Family | Tokens |
+|---|---|
+| space | `space-1` … `space-8`, on a 4px grid |
+| radius | `mark` 2 (a glyph under 8px), `sm` 4, `md` 6, `lg` 10, `full`; `control-sm/md/lg` by a control's size |
+| type | `font-size-xs` … `xl`, three weights; `line-height-tight` 1.3 (titles), `snug` 1.4 (labels), `normal` 1.5 (body), `relaxed` 1.6 (long reading) |
+| size | `control-sm/md/lg` 28/34/40, `icon-button-sm/md` 24/28, `tap` 24, `edge` 3 (an accent edge), `indicator` 2 (a chosen tab's line, a thumb's border) |
+| opacity | `disabled` 0.55, `stale` 0.6 (content being replaced) |
+| motion | `duration-fast` 120ms, `normal` 200ms; `easing-standard` (ease), `settle` (ease-out, a value arriving), `breathe` (ease-in-out, a loop) |
+| z | `sheet` 10, `drawer` 30, `skip-link` 40, `popover` 50 — public as `--gg-z-*`, and the only levels structure stacks at |
+
+Colours are semantic: `bg.*`, `text.*`, `border.*`, and `mark.*` for the
+five state tones (neutral, running, ok, warn, error), which a dot, a meter, a
+ring and a share bar read through `--ggarry-tone-mark`. Marks equal their
+text colours today; they are separate so a mark can move to 3:1 without
+moving a label. A component never reads a colour primitive.
+
+Found on the way:
+
+- **Hover drew nothing in dark mode.** `bg.subtle` and `bg.muted` were both
+  slate-800, so every quiet control that rests on subtle and hovers to muted —
+  the segmented control, the tab chips, a step's head, the rail, the board's
+  add button, the copy buttons — had a hover that repainted the same colour.
+  Dark `bg.muted` is now a new `slate-750` `#283548`, and a pair holds
+  muted a lightness step off subtle.
+- **The same pair is short in light mode**: slate-50 to slate-100 is ΔL 0.016
+  against the 0.022 step. It is GGarry's one waiver, because moving light
+  `bg.muted` moves the chip plate, the heatmap's empty cell and every muted
+  fill with it — a decision about the light neutral ramp, not a fix.
 
 ## The first four components, and why these four
 
@@ -2557,7 +2590,7 @@ contract defines, so the two cannot drift apart.
 | contract | a `--gg-*` name is not mapped on the root, or an unknown one is declared |
 | variables | a `var()` with no fallback names a property declared nowhere the theme loads |
 | selectors | a rule targets a class instead of `[data-scope][data-part]` and state |
-| structure | the shared structure layer reads a theme-private token |
+| structure | the shared structure layer reads a theme-private token, or stacks at a literal `z-index` of 10 or more instead of a `--gg-z-*` level |
 
 Variables are resolved per theme in isolation, which also catches one theme's
 private token leaking into another's CSS.
@@ -2570,7 +2603,7 @@ layers composited onto their base — in every context a theme declares:
 
 | Theme | Contexts | Pairs | Measurements |
 |---|---|---|---|
-| GGarry | light, dark | 15 contract + 23 own | 76 |
+| GGarry | light, dark | 15 contract + 241 own | 512 |
 
 Thresholds are WCAG's 4.5:1 for text and 3:1 for large text and meaningful
 non-text (a control's own border, a state mark), plus Instrument's OKLCH
@@ -2591,12 +2624,38 @@ foreground of some pair. The Go gate skipped relay variables (`--btn-fg`,
 a property never declared on the root is traced through every value it is given
 down to the root tokens, and those must be covered.
 
-**Waivers.** A theme may waive a known failure with a reason. A waived pair that
+**Waivers.** A theme may waive a known failure with a reason (GGarry has one; see Theme principles). A waived pair that
 starts passing is itself a failure, so fixing a token forces the stale excuse out
 with it. When GGarry's palette fixes landed, the gate flagged each waiver as
 stale with its new value before the waivers were removed.
 
-Every rule was proven able to fail: `tests/checks.contract.test.ts` builds a
+**Literals.** A value that has a token is written as the token. The gate reads
+the theme's own CSS (everything but the tokens layer and rules under forced
+colours) and puts each raw value into the family whose scale it skipped:
+
+| Family | A literal | Let through |
+|---|---|---|
+| colour | `#b00`, `rgb()`, `color-mix(in srgb …)` | named and system colours, a mask's `#000` |
+| primitive | `var(--ggarry-color-white)` | — a component reads the semantic layer |
+| radius | `2px`, `999px` | `0` |
+| line-height | `1.6`, `20px` | `1` for a glyph box, a `1px` hairline in `calc()` |
+| opacity | `0.55` | `0` and `1` |
+| font-size, font-weight | `11px`, `600` | `em` and `%` |
+| motion | `120ms`, `ease` | `linear` and `steps()` |
+| focus | `outline-offset: -2px` | `0` |
+| edge | a border wider than 1px | the hairline |
+| z-index | 10 and above | stacking inside one component |
+
+The gate cannot tell a deliberate value from an accident, so it counts, per
+file and per family, against a ledger the theme keeps:
+`packages/theme-ggarry/literal-debt.json`, one line per file. A count above
+the ledger is new drift and fails at its line. A count below it fails too until
+the ledger is lowered — `npm run check:themes -- --pay` lowers it and never
+raises it — so a paid debt cannot quietly come back. GGarry opened the ledger
+at 201 literals in 72 files; paying it down is the polish work, family by
+family.
+
+ builds a
 throwaway workspace per rule with exactly one defect planted; a planted
 regression in a real theme's muted text (Instrument's, at the time) failed every
 row that reads it.
@@ -2604,7 +2663,7 @@ row that reads it.
 ### What the first run found
 
 **GGarry had nine real failures.** They were first waived, each with a measured
-candidate fix, then fixed. GGarry now passes all 76 measurements with no waivers:
+candidate fix, then fixed. GGarry then passed all 76 measurements with no waivers:
 
 | Failure | Before | Fix | After |
 |---|---|---|---|
@@ -2655,9 +2714,9 @@ sandbox build prints none.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 661 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
-| contract | node | `icons.contract.test.ts` | 356 tests. Core names only real glyphs, adapters draw none. |
-| contract | node | `themes.contract.test.ts` | 4 tests. Every discovered theme — GGarry, now the only one: structure, contrast, coverage. |
-| contract | node | `checks.contract.test.ts` | 24 tests. The gates themselves: each rule fires on a planted defect; the colour engine. |
+| contract | node | `icons.contract.test.ts` | 399 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `themes.contract.test.ts` | 5 tests. Every discovered theme — GGarry, now the only one: structure, literals, contrast, coverage. |
+| contract | node | `checks.contract.test.ts` | 30 tests. The gates themselves: each rule fires on a planted defect — the literal families and their ledger among them; the colour engine. |
 | dom | jsdom | `conformance.dom.test.ts` | 1078 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
 | browser | Chrome | `conformance.browser.test.ts` | 1078 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |

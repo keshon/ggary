@@ -46,7 +46,7 @@
 }
 [data-scope='menu'][data-part='item'][data-tone='danger'][data-highlighted] {
   background: var(--ggarry-bg-danger);
-  color: var(--ggarry-color-white);
+  color: var(--ggarry-text-on-danger);
 }
 
 /* Reachable, not choosable: the highlight is a quiet plate, not the accent

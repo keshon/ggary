@@ -161,5 +161,20 @@ export function checkStructure(check: ThemeCheck, workspaceRoot: string): Findin
     }
   }
 
+  // 9. Structure stacks with the contract's levels. A number there is a level
+  //    no theme can move and no page can read, and the next number written
+  //    beside it is a guess at where the first one stands.
+  for (const rule of rules) {
+    if (!rule.file.includes(join('packages', 'structure'))) continue
+    for (const decl of rule.declarations) {
+      if (decl.property !== 'z-index' || !/^-?\d+$/.test(decl.value.trim()) || Math.abs(Number(decl.value)) < 10) continue
+      add({
+        check: 'structure',
+        message: `shared structure stacks at z-index ${decl.value} — read a --gg-z-* level instead`,
+        where: where(workspaceRoot, rule.file, decl.line),
+      })
+    }
+  }
+
   return findings
 }

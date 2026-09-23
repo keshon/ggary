@@ -109,8 +109,8 @@
 }
 [data-scope='button'][data-part='root'][data-tone='danger'][data-emphasis='high'] {
   --button-bg: var(--ggarry-bg-danger);
-  --button-bg-hover: var(--ggarry-color-danger-700);
-  --button-fg: var(--ggarry-color-white);
+  --button-bg-hover: var(--ggarry-bg-danger-hover);
+  --button-fg: var(--ggarry-text-on-danger);
 }
 
 /* --- sizes --------------------------------------------------------------- */

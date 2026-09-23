@@ -3,7 +3,7 @@
     "slate": {
       "50": "#f8fafc", "100": "#f1f5f9", "200": "#e2e8f0", "300": "#cbd5e1",
       "400": "#94a3b8", "450": "#8492a6", "500": "#64748b", "600": "#475569", "700": "#334155",
-      "800": "#1e293b", "900": "#0f172a", "950": "#020617"
+      "750": "#283548", "800": "#1e293b", "900": "#0f172a", "950": "#020617"
     },
     "brand": {
       "50": "#eef6ff", "100": "#d9eaff", "200": "#bcdcff", "300": "#8ec7ff",
@@ -21,7 +21,10 @@
     "black": "#000000"
   },
   "space": { "0": "0px", "1": "4px", "2": "8px", "3": "12px", "4": "16px", "5": "20px", "6": "24px", "8": "32px" },
-  "radius": { "sm": "4px", "md": "6px", "lg": "10px", "full": "9999px" },
+  "radius": {
+    "mark": "2px", "sm": "4px", "md": "6px", "lg": "10px", "full": "9999px",
+    "control": { "sm": "{radius.sm}", "md": "{radius.md}", "lg": "{radius.lg}" }
+  },
   "font": {
     "family": {
       "sans": "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif",
@@ -30,7 +33,17 @@
     "size": { "xs": "12px", "sm": "13px", "md": "14px", "lg": "16px", "xl": "20px", "metric": "22px", "metric-headline": "28px" },
     "weight": { "normal": "400", "medium": "500", "semibold": "600" }
   },
-  "size": { "control": { "sm": "28px", "md": "34px", "lg": "40px" }, "tap": "24px", "label-col": "120px" },
+  "line-height": { "tight": "1.3", "snug": "1.4", "normal": "1.5", "relaxed": "1.6" },
+  "size": {
+    "control": { "sm": "28px", "md": "34px", "lg": "40px" },
+    "icon-button": { "sm": "24px", "md": "28px" },
+    "tap": "24px",
+    "label-col": "120px",
+    "edge": "3px",
+    "indicator": "2px"
+  },
+  "opacity": { "disabled": "0.55", "stale": "0.6" },
   "duration": { "fast": "120ms", "normal": "200ms" },
-  "z": { "popover": "50" }
+  "easing": { "standard": "ease", "settle": "ease-out", "breathe": "ease-in-out" },
+  "z": { "sheet": "10", "drawer": "30", "skip-link": "40", "popover": "50" }
 }

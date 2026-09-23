@@ -9,7 +9,10 @@ import {
   type ThemeCheck,
   Resolver,
   checkContrast,
+  checkLiterals,
   checkStructure,
+  classify,
+  pay,
   ratio,
   toHex,
 } from '@ggary/checks'
@@ -157,6 +160,97 @@ describe('structural checks', () => {
       files: { 'packages/structure/src/index.css': '[data-scope] { color: var(--x-ink); padding: var(--gg-page, 0); }' },
     })
     expect(kinds(root)).toEqual(['structure'])
+  })
+
+  it('reports shared structure stacking at a literal level, and accepts a contract level', () => {
+    const at = (value: string) =>
+      workspace({ files: { 'packages/structure/src/index.css': `[data-scope] { z-index: ${value}; }` } })
+    expect(kinds(at('30'))).toEqual(['structure'])
+    expect(kinds(at('var(--gg-page)'))).toEqual([])
+    expect(kinds(at('1'))).toEqual([])
+  })
+})
+
+// --- literals --------------------------------------------------------------------
+
+describe('literal gate', () => {
+  it('puts a raw value in its family, and lets through what each family allows', () => {
+    const cases: [string, string, string[]][] = [
+      ['color', '#b00', ['colour']],
+      ['background', 'rgb(0 0 0 / 0.2)', ['colour']],
+      ['background', 'color-mix(in srgb, currentColor 12%, transparent)', ['colour']],
+      ['background', 'color-mix(in oklab, var(--x-ink) 12%, transparent)', []],
+      ['mask', 'radial-gradient(#000, transparent)', []],
+      ['color', 'var(--x-color-white)', ['primitive']],
+      ['border-radius', '2px', ['radius']],
+      ['border-radius', '0', []],
+      ['--tabs-radius', 'max(2px, var(--r))', ['radius']],
+      ['line-height', '1.6', ['line-height']],
+      ['line-height', '20px', ['line-height']],
+      ['line-height', '1', []],
+      ['line-height', 'calc(var(--row) - 1px)', []],
+      ['opacity', '0.55', ['opacity']],
+      ['opacity', '0', []],
+      ['opacity', 'var(--x-opacity-disabled)', []],
+      ['font-size', '11px', ['font-size']],
+      ['font-size', '0.85em', []],
+      ['font-weight', '600', ['font-weight']],
+      ['transition', 'color var(--fast) ease', ['motion']],
+      ['transition', 'color 120ms var(--easing)', ['motion']],
+      ['animation', 'spin var(--slow) linear infinite', []],
+      ['outline-offset', '-2px', ['focus']],
+      ['outline-offset', 'calc(-1 * var(--ring))', []],
+      ['border-inline-start', '3px solid var(--x-ink)', ['edge']],
+      ['border', '1px solid var(--x-ink)', []],
+      ['z-index', '40', ['z-index']],
+      ['z-index', '2', []],
+    ]
+    for (const [property, value, families] of cases) {
+      expect(classify(property, value), `${property}: ${value}`).toEqual(families)
+    }
+  })
+
+  const literal = (body: string, debt?: object) => {
+    const root = workspace({ files: { 'packages/theme-x/src/components/button.css': body } })
+    if (debt) writeFileSync(join(root, 'packages/theme-x/literal-debt.json'), JSON.stringify(debt))
+    return root
+  }
+  const RAW = "[data-scope='button'] { color: var(--x-ink); line-height: 1.6; }"
+
+  it('fails a raw value the ledger does not owe, where it stands', () => {
+    const [finding] = checkLiterals(theme(), literal(RAW))
+    expect(finding.check).toBe('literals')
+    expect(finding.message).toMatch(/^line-height: line-height: 1\.6/)
+    expect(finding.where).toBe('packages/theme-x/src/components/button.css:1')
+  })
+
+  it('accepts what the ledger owes, and fails a ledger that owes more than is left', () => {
+    expect(checkLiterals(theme(), literal(RAW, { 'components/button.css': { 'line-height': 1 } }))).toEqual([])
+    const paid = literal("[data-scope='button'] { color: var(--x-ink); }", { 'components/button.css': { 'line-height': 1 } })
+    expect(checkLiterals(theme(), paid).map((f) => f.message)).toEqual([
+      expect.stringMatching(/^line-height: the ledger owes 1 here and 0 remain/),
+    ])
+  })
+
+  it('pays a ledger down and never up: new drift stays out of it', () => {
+    const root = literal("[data-scope='button'] { line-height: 1.6; opacity: 0.5; }", {
+      'components/button.css': { 'line-height': 2 },
+    })
+    expect(pay(theme(), root)).toEqual({ 'components/button.css': { 'line-height': 1 } })
+  })
+
+  it('does not read the tokens layer, forced colours or keyframes', () => {
+    const root = workspace({
+      files: {
+        'packages/theme-x/src/tokens.css': ':root { --x-ink: #111111; --x-paper: #ffffff; --gg-page: var(--x-paper); --gg-text: var(--x-ink); }',
+        'packages/theme-x/src/components/button.css': [
+          "[data-scope='button'] { color: var(--x-ink); }",
+          "@media (forced-colors: active) { [data-scope='button'] { outline: 2px solid Highlight; } }",
+          '@keyframes x-pulse { 50% { opacity: 0.35; } }',
+        ].join('\n'),
+      },
+    })
+    expect(checkLiterals(theme(), root)).toEqual([])
   })
 })
 

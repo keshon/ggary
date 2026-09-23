@@ -27,6 +27,9 @@
     "--gg-space-option": "between the options of one group, and from a group's label to its first option",
     "--gg-space-group": "between groups and fields stacked in a form: more than inside a group, so a group reads as one",
     "--gg-z-popover": "the stacking level of floating content",
+    "--gg-z-sheet": "a non-modal sheet standing beside the page, outside the top layer",
+    "--gg-z-drawer": "the shell's drawer on a narrow screen; its scrim stands one below it",
+    "--gg-z-skip-link": "the shell's skip link once it has the focus: above everything the page draws",
     "--gg-chart-1": "the colour of series 1 in a chart: a mark (3:1), never text. The order is part of the contract",
     "--gg-chart-2": "the colour of series 2 in a chart: a mark (3:1), never text. The order is part of the contract",
     "--gg-chart-3": "the colour of series 3 in a chart: a mark (3:1), never text. The order is part of the contract",
@@ -36,6 +39,7 @@
   },
   "runtime": {
     "--gg-available-height": "written by core's attachPositioner onto a positioner at runtime",
+    "--gg-available-width": "written by core's attachPositioner onto a positioner at runtime",
     "--gg-grid-row-height": "the height of every data grid row: a theme sets it on the grid's frame, and core reads it to place rows (or writes it, when the page fixes a height)",
     "--gg-grid-header-height": "written by core onto a data grid's frame: the measured height of its header row",
     "--gg-split-size": "written by core onto a split's frame: the primary pane's size",

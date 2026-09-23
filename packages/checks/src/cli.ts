@@ -6,18 +6,24 @@
  * tightest passing rows, because a pair that passes by 0.02 is the next failure.
  * `-v` prints every measurement. Exit code 1 on any finding.
  *
+ * `--pay` lowers each theme's literal-debt.json to what is still found, and
+ * never raises it: new drift keeps failing. With no ledger yet, it writes the
+ * first one from what is there, which is the only way a count goes up.
+ *
  * Runs under Node's built-in TypeScript support (Node 22.18+ / 24).
  */
-import { existsSync, readdirSync } from 'node:fs'
+import { existsSync, readdirSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { checkContrast, format } from './contrast.ts'
 import type { Finding, ThemeCheck } from './define.ts'
+import { DEBT_FILE, checkLiterals, debtOf, findLiterals, formatDebt, pay } from './literals.ts'
 import { checkStructure } from './structure.ts'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
 const args = process.argv.slice(2)
 const verbose = args.includes('-v')
+const paying = args.includes('--pay')
 const only = args.includes('--theme') ? args[args.indexOf('--theme') + 1] : null
 
 const bold = (s: string) => `\x1b[1m${s}\x1b[22m`
@@ -45,6 +51,18 @@ for (const dir of dirs) {
   const structure = checkStructure(check, root)
   console.log(structure.length ? bold('structure') : `${green('·')} structure: complete`)
   for (const f of structure) console.log(line(f))
+
+  const ledger = join(root, 'packages', dir, DEBT_FILE)
+  if (paying) {
+    const next = existsSync(ledger) ? pay(check, root) : debtOf(findLiterals(check, root))
+    writeFileSync(ledger, formatDebt(next))
+    console.log(dim(`  ${DEBT_FILE} written`))
+  }
+  const literals = checkLiterals(check, root)
+  const owed = debtOf(findLiterals(check, root))
+  const owedCount = Object.values(owed).reduce((n, row) => n + Object.values(row).reduce((a, b) => a + (b ?? 0), 0), 0)
+  console.log(`${literals.length ? red('✗') : green('·')} literals: ${owedCount} owed in ${Object.keys(owed).length} files`)
+  for (const f of literals) console.log(line(f))
 
   const report = checkContrast(check, root)
   const byContext = new Map<string, typeof report.measurements>()
@@ -88,7 +106,7 @@ for (const dir of dirs) {
     for (const { m } of tight) console.log(dim(`    ${m.context.padEnd(26)} ${m.pair.label.padEnd(48)} ${format(m.pair, m.value!)}`))
   }
 
-  const total = structure.length + report.findings.length
+  const total = structure.length + literals.length + report.findings.length
   failed += total
   console.log(
     total

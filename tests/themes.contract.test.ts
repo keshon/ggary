@@ -2,7 +2,7 @@ import { existsSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { describe, expect, it } from 'vitest'
-import { type Finding, type ThemeCheck, checkContrast, checkStructure } from '@ggary/checks'
+import { type Finding, type ThemeCheck, checkContrast, checkLiterals, checkStructure } from '@ggary/checks'
 
 /**
  * Every theme package, every rule. Themes are DISCOVERED, not listed: a new
@@ -33,6 +33,10 @@ describe.each(themeDirs)('%s', (dir) => {
     const check = await load()
     expect(check.dir).toBe(dir)
     expect(show(checkStructure(check, root))).toEqual([])
+  })
+
+  it('writes no raw value its ledger does not owe (literal-debt.json)', async () => {
+    expect(show(checkLiterals(await load(), root))).toEqual([])
   })
 
   it('meets its contrast promises, and every text colour is measured', async () => {

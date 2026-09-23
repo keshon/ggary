@@ -11,11 +11,11 @@
    pulses and one inside a finished group nested in it does not.
    ========================================================================== */
 
-[data-tone='neutral'] { --ggarry-tone-mark: var(--ggarry-text-muted); --ggarry-tone-pulse: none; }
-[data-tone='running'] { --ggarry-tone-mark: var(--ggarry-text-accent); --ggarry-tone-pulse: ggarry-tone-pulse; }
-[data-tone='ok'] { --ggarry-tone-mark: var(--ggarry-text-success); --ggarry-tone-pulse: none; }
-[data-tone='warn'] { --ggarry-tone-mark: var(--ggarry-text-warning); --ggarry-tone-pulse: none; }
-[data-tone='error'] { --ggarry-tone-mark: var(--ggarry-text-danger); --ggarry-tone-pulse: none; }
+[data-tone='neutral'] { --ggarry-tone-mark: var(--ggarry-mark-neutral); --ggarry-tone-pulse: none; }
+[data-tone='running'] { --ggarry-tone-mark: var(--ggarry-mark-running); --ggarry-tone-pulse: ggarry-tone-pulse; }
+[data-tone='ok'] { --ggarry-tone-mark: var(--ggarry-mark-ok); --ggarry-tone-pulse: none; }
+[data-tone='warn'] { --ggarry-tone-mark: var(--ggarry-mark-warn); --ggarry-tone-pulse: none; }
+[data-tone='error'] { --ggarry-tone-mark: var(--ggarry-mark-error); --ggarry-tone-pulse: none; }
 
 /* 6px: a mark, not a target. What is pressed is the row it stands in. With
    no tone anywhere above it, the neutral mark. */
@@ -23,7 +23,7 @@
   inline-size: 6px;
   block-size: 6px;
   border-radius: 50%;
-  background: var(--ggarry-tone-mark, var(--ggarry-text-muted));
+  background: var(--ggarry-tone-mark, var(--ggarry-mark-neutral));
   animation: var(--ggarry-tone-pulse, none) 1.6s ease-in-out infinite;
 }
 @keyframes ggarry-tone-pulse {

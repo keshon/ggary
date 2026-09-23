@@ -3,12 +3,13 @@
     "canvas": "{color.slate.950}",
     "surface": "{color.slate.900}",
     "subtle": "{color.slate.800}",
-    "muted": "{color.slate.800}",
+    "muted": "{color.slate.750}",
     "inverted": "{color.slate.100}",
     "accent": "{color.brand.600}",
     "accent-hover": "{color.brand.700}",
     "accent-subtle": "{color.brand.950}",
     "danger": "{color.danger.600}",
+    "danger-hover": "{color.danger.700}",
     "danger-subtle": "{color.danger.950}",
     "success-subtle": "{color.success.950}",
     "warning-subtle": "{color.warning.950}",
@@ -24,6 +25,13 @@
     "danger": "{color.danger.400}",
     "success": "{color.success.400}",
     "warning": "{color.warning.400}"
+  },
+  "mark": {
+    "neutral": "{color.slate.400}",
+    "running": "{color.brand.300}",
+    "ok": "{color.success.400}",
+    "warn": "{color.warning.400}",
+    "error": "{color.danger.400}"
   },
   "border": {
     "default": "{color.slate.700}",

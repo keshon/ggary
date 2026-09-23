@@ -2,7 +2,9 @@
 // want to read and change this, and Style Dictionary's config format is a worse
 // place to express "our tokens" than plain JS is.
 //
-//   tokens/primitives.json  raw values, never referenced by a component
+//   tokens/primitives.json  raw values: the colour ramps, which no component reads,
+//                           and the scales (space, radius, type, size, motion, z),
+//                           which components read directly
 //   tokens/semantic.json    the light mode, expressed as {refs} into primitives
 //   tokens/modes/*.json     mode overrides (dark), same shape as semantic.json
 //
