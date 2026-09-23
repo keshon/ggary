@@ -8,6 +8,16 @@
 import { LARGE, STEP, TEXT, defineThemeCheck, type Pair } from '@ggary/checks'
 
 const pairs: Pair[] = [
+  // The six series of a chart. A series is a MARK, not text: 3:1, and never
+  // used for a label. They are told apart by hue AND by lightness, so they
+  // survive colour blindness and a black-and-white print.
+  { label: 'chart: series 1 on surface', fg: '--ggarry-chart-1', bg: ['--ggarry-bg-surface', '--ggarry-bg-canvas'], min: LARGE },
+  { label: 'chart: series 2 on surface', fg: '--ggarry-chart-2', bg: ['--ggarry-bg-surface', '--ggarry-bg-canvas'], min: LARGE },
+  { label: 'chart: series 3 on surface', fg: '--ggarry-chart-3', bg: ['--ggarry-bg-surface', '--ggarry-bg-canvas'], min: LARGE },
+  { label: 'chart: series 4 on surface', fg: '--ggarry-chart-4', bg: ['--ggarry-bg-surface', '--ggarry-bg-canvas'], min: LARGE },
+  { label: 'chart: series 5 on surface', fg: '--ggarry-chart-5', bg: ['--ggarry-bg-surface', '--ggarry-bg-canvas'], min: LARGE },
+  { label: 'chart: series 6 on surface', fg: '--ggarry-chart-6', bg: ['--ggarry-bg-surface', '--ggarry-bg-canvas'], min: LARGE },
+
   // Body text on every surface a component stands on.
   { label: 'text: default on canvas', fg: '--ggarry-text-default', bg: ['--ggarry-bg-canvas'], min: TEXT },
   { label: 'text: default on surface', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface'], min: TEXT },

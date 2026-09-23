@@ -32,7 +32,11 @@
     "accent": "{color.brand.600}",
     "danger": "{color.danger.500}"
   },
-  "focus": { "ring": "{color.brand.500}", "ring-width": "2px", "ring-offset": "2px" },
+  "focus": {
+    "ring": "{color.brand.500}",
+    "ring-width": "2px",
+    "ring-offset": "2px"
+  },
   "rhythm": {
     "option": "{space.2}",
     "group": "{space.5}"
@@ -41,5 +45,13 @@
     "sm": "0 1px 2px rgba(15, 23, 42, 0.06)",
     "popover": "0 8px 24px -6px rgba(15, 23, 42, 0.18), 0 2px 6px rgba(15, 23, 42, 0.08)",
     "modal": "0 24px 56px -12px rgba(15, 23, 42, 0.30), 0 4px 12px rgba(15, 23, 42, 0.10)"
+  },
+  "chart": {
+    "1": "{color.chart.light.1}",
+    "2": "{color.chart.light.2}",
+    "3": "{color.chart.light.3}",
+    "4": "{color.chart.light.4}",
+    "5": "{color.chart.light.5}",
+    "6": "{color.chart.light.6}"
   }
 }

@@ -48,15 +48,29 @@ describe('core names only glyphs that exist', () => {
 })
 
 describe('adapters draw no glyphs', () => {
-  // A glyph in adapter markup is a glyph no theme can replace, copied into three
-  // frameworks. That is exactly what @ggary/icons removed.
-  const adapterFiles = ['react', 'svelte'].flatMap((name) =>
-    walk(pkg(name, 'src'), ['.ts', '.tsx', '.svelte'])
-  )
+  // A glyph in adapter markup is a glyph no theme can replace, copied into every
+  // framework. That is exactly what @ggary/icons removed.
+  //
+  // The charts are the one exception: a sparkline's line and a ring's arc are
+  // DATA — their shape comes from the numbers, so no glyph set can hold them.
+  // They draw an <svg> whose geometry core computed, and still no glyph.
+  const CHARTS = ['sparkline', 'ring']
+  const isChart = (file: string) => CHARTS.some((chart) => file.includes(`components/${chart}/`) || file.includes(`components\\${chart}\\`))
+  const everyAdapterFile = ['react', 'svelte'].flatMap((name) => walk(pkg(name, 'src'), ['.ts', '.tsx', '.svelte']))
+  const adapterFiles = everyAdapterFile.filter((file) => !isChart(file))
+  const chartFiles = everyAdapterFile.filter(isChart)
 
   it.each(adapterFiles.map((f) => [f.slice(root.length + 1)]))('%s', (file) => {
     const source = readFileSync(join(root, file), 'utf8')
-    expect(source).not.toMatch(/<svg\b|<path\b|createElementNS/)
+    expect(source).not.toMatch(/<svg|<path|createElementNS/)
+  })
+
+  it.each(chartFiles.length ? chartFiles.map((f) => [f.slice(root.length + 1)]) : [['(no chart adapter yet)']])('%s draws data, not glyphs', (file) => {
+    if (file.startsWith('(')) return
+    const source = readFileSync(join(root, file), 'utf8')
+    expect(source).toMatch(/<(svg|path|circle|rect|polyline|line|g)/)
+    // A glyph would arrive as a sprite or a hand-built node; data does not.
+    expect(source).not.toMatch(/<use|xlink:href|createElementNS/)
   })
 })
 
