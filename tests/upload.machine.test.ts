@@ -172,13 +172,25 @@ describe('upload', () => {
     expect(changes).toEqual([['a.pdf:uploading'], ['a.pdf:done']])
   })
 
-  it('going away aborts what is under way', async () => {
+  it('going away aborts what is under way; coming back starts it again as a new try', async () => {
     const { upload, calls } = manual()
-    const { machine } = setup({ upload })
+    const { machine, status } = setup({ upload })
     machine.send({ type: 'ADD', files: [file('a.pdf')] })
     await tick()
     machine.dispose()
     expect(calls[0].context.signal.aborted).toBe(true)
+    machine.resume()
+    await tick()
+    expect(calls).toHaveLength(2)
+    calls[0].reject(new DOMException('Aborted', 'AbortError'))
+    await tick()
+    expect(status()).toEqual(['a.pdf:uploading'])
+    calls[1].resolve()
+    await tick()
+    expect(status()).toEqual(['a.pdf:done'])
+    machine.resume()
+    await tick()
+    expect(calls).toHaveLength(2)
   })
 
   it('a disabled upload takes no files, and a reset puts back the files it started with', () => {

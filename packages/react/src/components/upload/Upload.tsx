@@ -95,7 +95,10 @@ export function Upload(props: UploadProps) {
     () => machine.send({ type: 'SYNC_OPTIONS', accept: accept ?? null, maxSize: maxSize ?? null, maxFiles: maxFiles ?? null, concurrency, disabled }),
     [machine, accept, maxSize, maxFiles, concurrency, disabled]
   )
-  useEffect(() => () => machine.dispose(), [machine])
+  useEffect(() => {
+    machine.resume()
+    return () => machine.dispose()
+  }, [machine])
 
   const input = useRef<HTMLInputElement>(null)
   useFormReset(input, () => machine.send({ type: 'RESET', files: latest.current.defaultFiles ?? [] }))

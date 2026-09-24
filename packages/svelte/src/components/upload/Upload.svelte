@@ -56,7 +56,10 @@
   )
   let snapshot = $state.raw(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))
-  $effect(() => () => machine.dispose())
+  $effect(() => {
+    machine.resume()
+    return () => machine.dispose()
+  })
   const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { view, name, locale, words }))
 
   $effect(() => machine.send({ type: 'SYNC_OPTIONS', accept: accept ?? null, maxSize: maxSize ?? null, maxFiles: maxFiles ?? null, concurrency, disabled }))

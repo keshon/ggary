@@ -288,11 +288,15 @@ export const SITEMAP: SiteCategory[] = [
         "anchors": [
           {
             "id": "upload",
-            "label": "Rows"
+            "label": "Every state"
           },
           {
             "id": "upload-tiles",
             "label": "Tiles"
+          },
+          {
+            "id": "upload-try",
+            "label": "Try it"
           }
         ]
       },

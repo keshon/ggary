@@ -143,7 +143,7 @@
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
   import { rangePresets } from '@ggary/core/date-picker'
   import type { PaletteCommand } from '@ggary/core/command-palette'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload, stagedUpload, stagedRowFiles, stagedTileFiles, stageDrop, avatarPicture } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -158,6 +158,17 @@
   let extras = $state<string[]>([])
   let chosenFiles = $state<File[]>([])
   let uploadLog = $state('—')
+  // Upload's states are on the page as it loads: a drop is staged on each once it is there.
+  let stagedRows = $state<HTMLDivElement>()
+  let stagedTiles = $state<HTMLDivElement>()
+  $effect(() => {
+    const host = stagedRows
+    if (host) requestAnimationFrame(() => stageDrop(host, stagedRowFiles()))
+  })
+  $effect(() => {
+    const host = stagedTiles
+    if (host) requestAnimationFrame(async () => stageDrop(host, await stagedTileFiles()))
+  })
   let page = $state(8)
   let leadGrid = $state<DataGridController<Lead>>()
   let leadLog = $state('—')
@@ -773,18 +784,27 @@
     </div>
     <pre class="state">{chosenFiles.map((file) => `${file.name} (${Math.ceil(file.size / 1024)} KB)`).join(', ') || '—'}</pre>
 
-    <h3 id="upload" style="margin-top: 32px">Upload — rows</h3>
-    <p class="note">Sent as chosen. A name with "fail" in it fails half way; "slow" never says how far. Over 20 MB, or not PDF, DOCX or an image, is refused before it goes.</p>
-    <div class="form-column">
-      <Upload upload={demoUpload} name="attachments" accept=".pdf,.docx,image/*" maxSize={20_000_000} label="Drop files here or browse" hint="PDF, DOCX or images · up to 20 MB each" locale="en-GB" defaultFiles={[{ name: 'brief-v1.pdf', size: 1_240_000, value: 'k-brief' }]} onFilesChange={(items) => (uploadLog = items.map((item) => `${item.name}: ${item.status}`).join(', ') || '—')} />
+    <h3 id="upload" style="margin-top: 32px">Upload — every state</h3>
+    <p class="note">Going (64%), there, failed with Retry, too large, going without saying how far, the wrong type, and waiting for a place — two go at a time.</p>
+    <div class="form-column" bind:this={stagedRows}>
+      <Upload upload={stagedUpload} concurrency={2} name="attachments" accept=".pdf,.docx,image/*" maxSize={20_000_000} label="Drop files here or browse" hint="PDF, DOCX or images · up to 20 MB each" locale="en-GB" />
     </div>
-    <pre class="state">{uploadLog}</pre>
 
     <h3 id="upload-tiles" style="margin-top: 32px">Upload — tiles</h3>
+    <p class="note">Going, there, failed, and not a picture; beside it, an avatar's one tile, already there.</p>
     <div class="row" style="gap: 48px; align-items: flex-start">
-      <Upload upload={demoUpload} view="tiles" accept="image/*" maxSize={5_000_000} label="Add photo" hint="JPG, PNG or WebP · up to 5 MB" locale="en-GB" />
-      <Upload upload={demoUpload} view="tiles" accept="image/*" maxFiles={1} label="Avatar" hint="One picture; a new one replaces it" locale="en-GB" />
+      <div bind:this={stagedTiles}>
+        <Upload upload={stagedUpload} view="tiles" accept="image/*" maxSize={5_000_000} label="Add photo" hint="JPG, PNG or WebP · up to 5 MB" locale="en-GB" />
+      </div>
+      <Upload upload={demoUpload} view="tiles" accept="image/*" maxFiles={1} label="Avatar" hint="One picture; a new one replaces it" locale="en-GB" defaultFiles={[{ name: 'avatar.png', url: avatarPicture }]} />
     </div>
+
+    <h3 id="upload-try" style="margin-top: 32px">Upload — try it</h3>
+    <p class="note">Sent as chosen, at about 2 MB a second. A name with "fail" in it fails half way; "slow" never says how far.</p>
+    <div class="form-column">
+      <Upload upload={demoUpload} name="documents" accept=".pdf,.docx,image/*" maxSize={20_000_000} label="Drop files here or browse" hint="PDF, DOCX or images · up to 20 MB each" locale="en-GB" defaultFiles={[{ name: 'brief-v1.pdf', size: 1_240_000, value: 'k-brief' }]} onFilesChange={(items) => (uploadLog = items.map((item) => `${item.name}: ${item.status}`).join(', ') || '—')} />
+    </div>
+    <pre class="state">{uploadLog}</pre>
 
     </section>
 

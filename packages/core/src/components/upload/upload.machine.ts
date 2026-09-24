@@ -115,6 +115,14 @@ export function reducer(state: UploadState, event: UploadEvent): UploadState {
       return pump(
         patch(state, event.id, (item) => (item.status === 'error' && item.error === 'failed' ? { ...item, status: 'waiting', error: null, message: null, progress: null } : item))
       )
+    case 'RESTART': {
+      const ids = new Set(event.ids)
+      if (!state.items.some((item) => ids.has(item.id) && item.status === 'uploading')) return state
+      return {
+        ...state,
+        items: state.items.map((item) => (ids.has(item.id) && item.status === 'uploading' ? { ...item, progress: null, attempt: item.attempt + 1 } : item)),
+      }
+    }
     case 'RESET':
       return {
         ...state,
@@ -166,6 +174,12 @@ const shapeOf = (items: UploadItem[]) => items.map((item) => `${item.id}:${item.
 export type UploadMachine = Machine<UploadState, UploadEvent> & {
   /** Aborts every upload under way: the component is going. */
   dispose(): void
+  /**
+   * The component is back — React runs an effect's cleanup and then the effect
+   * again under StrictMode, and when it hides and shows a tree. What dispose
+   * cut off starts again, as new tries, so an old try's late answer is not taken.
+   */
+  resume(): void
 }
 
 export function createUploadMachine(config: UploadMachineConfig): UploadMachine {
@@ -220,6 +234,10 @@ export function createUploadMachine(config: UploadMachineConfig): UploadMachine 
     dispose() {
       for (const entry of going.values()) entry.controller.abort()
       going.clear()
+    },
+    resume() {
+      const ids = base.getState().items.filter((item) => item.status === 'uploading' && !going.has(item.id)).map((item) => item.id)
+      if (ids.length > 0) machine.send({ type: 'RESTART', ids })
     },
   }
   return machine

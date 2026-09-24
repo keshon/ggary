@@ -1,7 +1,7 @@
 import './theme'
 import './shared.css'
 
-import { StrictMode, useEffect, useMemo, useState, type FormEvent } from 'react'
+import { StrictMode, useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import type { DataGridController } from '@ggary/core/data-grid'
 import { todayISO } from '@ggary/core'
 import {
@@ -148,7 +148,29 @@ import {
   Prose,
   Text,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload, stagedUpload, stagedRowFiles, stagedTileFiles, stageDrop, avatarPicture } from './demo-data'
+
+/**
+ * Upload's states on the page as it loads: once the Upload inside is there, a
+ * drop of `files` is staged on it. Once only — StrictMode runs the effect twice.
+ */
+function Staged({ files, className, children }: { files: () => File[] | Promise<File[]>; className?: string; children: ReactNode }) {
+  const host = useRef<HTMLDivElement>(null)
+  const staged = useRef(false)
+  useEffect(() => {
+    if (staged.current) return
+    staged.current = true
+    requestAnimationFrame(async () => {
+      const list = await files()
+      if (host.current) stageDrop(host.current, list)
+    })
+  }, [files])
+  return (
+    <div ref={host} className={className}>
+      {children}
+    </div>
+  )
+}
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -826,12 +848,27 @@ function App() {
             {chosenFiles.map((file) => `${file.name} (${Math.ceil(file.size / 1024)} KB)`).join(', ') || '—'}
           </pre>
 
-          <h3 id="upload" style={{ marginTop: 32 }}>Upload — rows</h3>
-          <p className="note">Sent as chosen. A name with "fail" in it fails half way; "slow" never says how far. Over 20 MB, or not PDF, DOCX or an image, is refused before it goes.</p>
+          <h3 id="upload" style={{ marginTop: 32 }}>Upload — every state</h3>
+          <p className="note">Going (64%), there, failed with Retry, too large, going without saying how far, the wrong type, and waiting for a place — two go at a time.</p>
+          <Staged files={stagedRowFiles} className="form-column">
+            <Upload upload={stagedUpload} concurrency={2} name="attachments" accept=".pdf,.docx,image/*" maxSize={20_000_000} label="Drop files here or browse" hint="PDF, DOCX or images · up to 20 MB each" locale="en-GB" />
+          </Staged>
+
+          <h3 id="upload-tiles" style={{ marginTop: 32 }}>Upload — tiles</h3>
+          <p className="note">Going, there, failed, and not a picture; beside it, an avatar's one tile, already there.</p>
+          <div className="row" style={{ gap: 48, alignItems: 'flex-start' }}>
+            <Staged files={stagedTileFiles}>
+              <Upload upload={stagedUpload} view="tiles" accept="image/*" maxSize={5_000_000} label="Add photo" hint="JPG, PNG or WebP · up to 5 MB" locale="en-GB" />
+            </Staged>
+            <Upload upload={demoUpload} view="tiles" accept="image/*" maxFiles={1} label="Avatar" hint="One picture; a new one replaces it" locale="en-GB" defaultFiles={[{ name: 'avatar.png', url: avatarPicture }]} />
+          </div>
+
+          <h3 id="upload-try" style={{ marginTop: 32 }}>Upload — try it</h3>
+          <p className="note">Sent as chosen, at about 2 MB a second. A name with "fail" in it fails half way; "slow" never says how far.</p>
           <div className="form-column">
             <Upload
               upload={demoUpload}
-              name="attachments"
+              name="documents"
               accept=".pdf,.docx,image/*"
               maxSize={20_000_000}
               label="Drop files here or browse"
@@ -842,12 +879,6 @@ function App() {
             />
           </div>
           <pre className="state">{uploadLog}</pre>
-
-          <h3 id="upload-tiles" style={{ marginTop: 32 }}>Upload — tiles</h3>
-          <div className="row" style={{ gap: 48, alignItems: 'flex-start' }}>
-            <Upload upload={demoUpload} view="tiles" accept="image/*" maxSize={5_000_000} label="Add photo" hint="JPG, PNG or WebP · up to 5 MB" locale="en-GB" />
-            <Upload upload={demoUpload} view="tiles" accept="image/*" maxFiles={1} label="Avatar" hint="One picture; a new one replaces it" locale="en-GB" />
-          </div>
 
           </section>
 

@@ -69,6 +69,8 @@ export type UploadEvent =
   | { type: 'CANCEL'; id: string }
   | { type: 'REMOVE'; id: string }
   | { type: 'RETRY'; id: string }
+  /** Starts these files going again as new tries: their old ones were cut off. */
+  | { type: 'RESTART'; ids: string[] }
   | { type: 'RESET'; files: UploadedFile[] }
   | ({ type: 'SYNC_OPTIONS' } & Partial<UploadOptions>)
 

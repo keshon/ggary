@@ -2731,6 +2731,11 @@ Found on the way:
   listens for `change` alone; a test that sent only `input` saw nothing and
   looked like a broken component. A real drop sends both, as the dialog does,
   and so does the spec now.
+- **React's second run cut uploads off.** Under StrictMode, and when React hides
+  and shows a tree, an effect's cleanup runs and then the effect again; the
+  cleanup aborted every file going, and nothing started them again. The effect
+  now resumes what was cut off, each as a new try, so the old try's late
+  answer is not taken for it.
 - **An unknown progress escaped its row.** The sliding piece was a box moved
   from -40% to 100%, and it hung outside the row's rounded edge. It is now a
   background painted inside the progress part, which is the row's own size.
