@@ -903,3 +903,31 @@ export const runLanes = [
   { id: 'shard-5', label: 'shard 5', spans: [{ label: 'unit tests', start: 2000, end: 40_000, tone: 'ok' as const }] },
   { id: 'shard-6', label: 'shard 6', spans: [{ label: 'unit tests', start: 3000, end: 35_000, tone: 'ok' as const }] },
 ]
+
+/**
+ * An upload with no server: a file goes at about 2 MB a second in steps, and
+ * stops when it is cancelled. One whose name has "fail" in it is refused half
+ * way, the way a server's 503 would be; one with "slow" never says how far.
+ */
+export function demoUpload(file: File, { signal, onProgress }: import('@ggary/core/upload').UploadContext): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const total = Math.max(file.size, 1)
+    const slow = /slow/i.test(file.name)
+    let loaded = 0
+    const timer = setInterval(() => {
+      loaded = Math.min(total, loaded + Math.max(total / 12, 200_000))
+      if (!slow) onProgress(loaded, total)
+      if (/fail/i.test(file.name) && loaded >= total / 2) {
+        clearInterval(timer)
+        reject(new Error('The server said no (503)'))
+      } else if (loaded >= total) {
+        clearInterval(timer)
+        resolve(`upload-${file.name}`)
+      }
+    }, slow ? 700 : 160)
+    signal.addEventListener('abort', () => {
+      clearInterval(timer)
+      reject(signal.reason)
+    })
+  })
+}

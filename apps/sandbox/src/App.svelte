@@ -24,6 +24,7 @@
     Field,
     Fieldset,
     FileDrop,
+    Upload,
     Input,
     InputGroup,
     Menu,
@@ -142,7 +143,7 @@
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
   import { rangePresets } from '@ggary/core/date-picker'
   import type { PaletteCommand } from '@ggary/core/command-palette'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -156,6 +157,7 @@
   let mode = $state('parallel')
   let extras = $state<string[]>([])
   let chosenFiles = $state<File[]>([])
+  let uploadLog = $state('—')
   let page = $state(8)
   let leadGrid = $state<DataGridController<Lead>>()
   let leadLog = $state('—')
@@ -770,7 +772,20 @@
       <FileDrop name="import" accept=".json,.csv" multiple hint="Up to 20 MB, the formats .json and .csv" onFilesChange={(list) => (chosenFiles = list)} />
     </div>
     <pre class="state">{chosenFiles.map((file) => `${file.name} (${Math.ceil(file.size / 1024)} KB)`).join(', ') || '—'}</pre>
-  
+
+    <h3 id="upload" style="margin-top: 32px">Upload — rows</h3>
+    <p class="note">Sent as chosen. A name with "fail" in it fails half way; "slow" never says how far. Over 20 MB, or not PDF, DOCX or an image, is refused before it goes.</p>
+    <div class="form-column">
+      <Upload upload={demoUpload} name="attachments" accept=".pdf,.docx,image/*" maxSize={20_000_000} label="Drop files here or browse" hint="PDF, DOCX or images · up to 20 MB each" locale="en-GB" defaultFiles={[{ name: 'brief-v1.pdf', size: 1_240_000, value: 'k-brief' }]} onFilesChange={(items) => (uploadLog = items.map((item) => `${item.name}: ${item.status}`).join(', ') || '—')} />
+    </div>
+    <pre class="state">{uploadLog}</pre>
+
+    <h3 id="upload-tiles" style="margin-top: 32px">Upload — tiles</h3>
+    <div class="row" style="gap: 48px; align-items: flex-start">
+      <Upload upload={demoUpload} view="tiles" accept="image/*" maxSize={5_000_000} label="Add photo" hint="JPG, PNG or WebP · up to 5 MB" locale="en-GB" />
+      <Upload upload={demoUpload} view="tiles" accept="image/*" maxFiles={1} label="Avatar" hint="One picture; a new one replaces it" locale="en-GB" />
+    </div>
+
     </section>
 
   <section id="form">

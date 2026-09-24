@@ -77,6 +77,7 @@ import {
   Field,
   Fieldset,
   FileDrop,
+  Upload,
   Input,
   InputGroup,
   Menu,
@@ -147,7 +148,7 @@ import {
   Prose,
   Text,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -162,6 +163,7 @@ function App() {
   const [mode, setMode] = useState('parallel')
   const [extras, setExtras] = useState<string[]>([])
   const [chosenFiles, setChosenFiles] = useState<File[]>([])
+  const [uploadLog, setUploadLog] = useState('—')
   const [page, setPage] = useState(8)
   const [leadGrid, setLeadGrid] = useState<DataGridController<Lead>>()
   const [leadLog, setLeadLog] = useState('—')
@@ -823,7 +825,30 @@ function App() {
           <pre className="state">
             {chosenFiles.map((file) => `${file.name} (${Math.ceil(file.size / 1024)} KB)`).join(', ') || '—'}
           </pre>
-  
+
+          <h3 id="upload" style={{ marginTop: 32 }}>Upload — rows</h3>
+          <p className="note">Sent as chosen. A name with "fail" in it fails half way; "slow" never says how far. Over 20 MB, or not PDF, DOCX or an image, is refused before it goes.</p>
+          <div className="form-column">
+            <Upload
+              upload={demoUpload}
+              name="attachments"
+              accept=".pdf,.docx,image/*"
+              maxSize={20_000_000}
+              label="Drop files here or browse"
+              hint="PDF, DOCX or images · up to 20 MB each"
+              locale="en-GB"
+              defaultFiles={[{ name: 'brief-v1.pdf', size: 1_240_000, value: 'k-brief' }]}
+              onFilesChange={(items) => setUploadLog(items.map((item) => `${item.name}: ${item.status}`).join(', ') || '—')}
+            />
+          </div>
+          <pre className="state">{uploadLog}</pre>
+
+          <h3 id="upload-tiles" style={{ marginTop: 32 }}>Upload — tiles</h3>
+          <div className="row" style={{ gap: 48, alignItems: 'flex-start' }}>
+            <Upload upload={demoUpload} view="tiles" accept="image/*" maxSize={5_000_000} label="Add photo" hint="JPG, PNG or WebP · up to 5 MB" locale="en-GB" />
+            <Upload upload={demoUpload} view="tiles" accept="image/*" maxFiles={1} label="Avatar" hint="One picture; a new one replaces it" locale="en-GB" />
+          </div>
+
           </section>
 
         <section id="form">

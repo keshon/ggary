@@ -153,6 +153,7 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
 .grid-tools { display: grid; gap: 10px; margin-bottom: 12px; }
 
 .form-column { display: grid; gap: 20px; max-inline-size: 520px; margin-top: 16px; }
+.note { margin: 4px 0 0; max-inline-size: 64ch; color: var(--gg-text-muted); font-size: 13px; }
 
 /* A vector of number fields: equal shares, so a six-digit number does not skew it. */
 .vector { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; max-inline-size: 340px; }

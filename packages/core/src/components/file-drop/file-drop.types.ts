@@ -12,4 +12,8 @@ export interface FileDropProps {
   invalid?: boolean
   /** The names of what was chosen, shown under the call to action. */
   files?: string[]
+  /** Name what was chosen under the call to action. Default true; Upload, which lists them itself, turns it off. */
+  listFiles?: boolean
+  /** Pass on a dropped file `accept` refuses, rather than leave it out. Upload turns it on, and lists the file with the reason. */
+  keepRefused?: boolean
 }

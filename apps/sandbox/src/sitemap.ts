@@ -284,6 +284,19 @@ export const SITEMAP: SiteCategory[] = [
         ]
       },
       {
+        "label": "Upload",
+        "anchors": [
+          {
+            "id": "upload",
+            "label": "Rows"
+          },
+          {
+            "id": "upload-tiles",
+            "label": "Tiles"
+          }
+        ]
+      },
+      {
         "label": "Form",
         "anchors": [
           {

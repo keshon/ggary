@@ -5,30 +5,20 @@
  * that a form and a framework both see.
  */
 
+import { acceptsFile } from './bytes'
+
 export interface FileDropCallbacks {
   /** Called when the zone is entered and left, for the drawn state. */
   onDraggingChange?: (dragging: boolean) => void
+  /** Pass on a dropped file the `accept` list refuses, rather than leave it out: Upload lists it with the reason. Read on every drop. */
+  keepRefused?: () => boolean
 }
 
 const hasFiles = (event: DragEvent) => [...(event.dataTransfer?.types ?? [])].includes('Files')
 
 /** Everything the input will accept, by the `accept` list; an empty list means everything. */
-export function acceptedFiles(input: HTMLInputElement, files: File[]): File[] {
-  const accept = input.accept
-    .split(',')
-    .map((rule) => rule.trim().toLowerCase())
-    .filter(Boolean)
-  const allowed = accept.length === 0
-    ? files
-    : files.filter((file) =>
-        accept.some((rule) =>
-          rule.startsWith('.')
-            ? file.name.toLowerCase().endsWith(rule)
-            : rule.endsWith('/*')
-              ? file.type.startsWith(rule.slice(0, -1))
-              : file.type.toLowerCase() === rule
-        )
-      )
+export function acceptedFiles(input: HTMLInputElement, files: File[], keepRefused = false): File[] {
+  const allowed = keepRefused ? files : files.filter((file) => acceptsFile(file, input.accept))
   return input.multiple ? allowed : allowed.slice(0, 1)
 }
 
@@ -66,7 +56,7 @@ export function attachFileDrop(zone: HTMLElement, input: () => HTMLInputElement 
     setDragging(false)
     if (!field || field.disabled || !hasFiles(event)) return
     event.preventDefault()
-    const files = acceptedFiles(field, [...(event.dataTransfer?.files ?? [])])
+    const files = acceptedFiles(field, [...(event.dataTransfer?.files ?? [])], callbacks.keepRefused?.() ?? false)
     if (files.length === 0) return
     const transfer = new DataTransfer()
     for (const file of files) transfer.items.add(file)

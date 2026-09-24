@@ -1,0 +1,165 @@
+/* Upload: the zone (FileDrop, its own scope), then a list of files — or, as
+   tiles, the pictures before the zone. Geometry only.
+
+   A row's progress is its background: the `progress` part lies behind the row's
+   words, the whole row wide, and paints a fill from the start edge as wide as
+   --gg-progress (0 to 1, set on the item) in its own `color`. Unknown, a piece
+   of fill goes across. A painted fill cannot leave the row, as a moving box can. */
+
+[data-scope='upload'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='upload'][data-part='list'] {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+[data-scope='upload'][data-part='root'][data-empty] > [data-part='list'] {
+  display: none;
+}
+[data-scope='upload'][data-part='item'] {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  min-inline-size: 0;
+}
+/* Each part in its own column, whichever of them a row has: the buttons line up down the list. */
+[data-scope='upload'][data-part='item'][data-view='rows'] > :is([data-part='icon'], [data-part='preview']) { grid-column: 1; }
+[data-scope='upload'][data-part='item'][data-view='rows'] > [data-part='body'] { grid-column: 2; }
+[data-scope='upload'][data-part='item'][data-view='rows'] > :is([data-part='percent'], [data-part='mark']) { grid-column: 3; }
+[data-scope='upload'][data-part='item'][data-view='rows'] > [data-part='actions'] { grid-column: 4; }
+[data-scope='upload'][data-part='progress'][data-view='rows'] {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: left center;
+  background-size: calc(var(--gg-progress, 0) * 100%) 100%;
+}
+[data-scope='upload'][data-part='progress'][data-view='rows']:dir(rtl) {
+  background-position: right center;
+}
+/* A 40% piece: at -67% it stands just off the start, at 167% just off the end. */
+[data-scope='upload'][data-part='progress'][data-view='rows'][data-indeterminate] {
+  background-size: 40% 100%;
+  animation: gg-upload-slide 1.4s ease-in-out infinite;
+}
+@keyframes gg-upload-slide {
+  from { background-position-x: -67%; }
+  to { background-position-x: 167%; }
+}
+[data-scope='upload'][data-part='body'] {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  min-inline-size: 0;
+}
+[data-scope='upload'][data-part='item'][data-status='error'] > [data-part='body'] {
+  flex-direction: column;
+  align-items: stretch;
+}
+[data-scope='upload'][data-part='name'] {
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-scope='upload'][data-part='percent'] {
+  font-variant-numeric: tabular-nums;
+}
+[data-scope='upload'][data-part='actions'] {
+  display: flex;
+  align-items: center;
+}
+[data-scope='upload'][data-part='action'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+[data-scope='upload'][data-part='action']:disabled {
+  cursor: default;
+}
+/* Spoken, not shown. */
+[data-scope='upload'][data-part='status'] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Tiles: the files and the zone in one wrapping row. The list steps aside
+   (display: contents) so its tiles and the zone share the row; each tile is a
+   square over a caption, and everything drawn on the square shares its cell. */
+[data-scope='upload'][data-part='root'][data-view='tiles'] {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+[data-scope='upload'][data-part='list'][data-view='tiles'] {
+  display: contents;
+}
+[data-scope='upload'][data-part='item'][data-view='tiles'] {
+  grid-template-columns: auto;
+  grid-template-rows: auto auto;
+  align-items: stretch;
+}
+[data-scope='upload'][data-part='item'][data-view='tiles']::before {
+  content: '';
+  grid-area: 1 / 1;
+  z-index: -1;
+}
+[data-scope='upload'][data-view='tiles']:is([data-part='preview'], [data-part='progress']) {
+  grid-area: 1 / 1;
+  inline-size: 100%;
+  block-size: 100%;
+  min-inline-size: 0;
+}
+[data-scope='upload'][data-part='preview'] {
+  display: block;
+  object-fit: cover;
+}
+[data-scope='upload'][data-part='item'][data-view='tiles'] > [data-part='icon'],
+[data-scope='upload'][data-part='percent'][data-view='tiles'] {
+  grid-area: 1 / 1;
+  place-self: center;
+}
+[data-scope='upload'][data-part='body'][data-view='tiles'] {
+  grid-area: 2 / 1;
+  flex-direction: column;
+  align-items: stretch;
+  flex-wrap: nowrap;
+}
+[data-scope='upload'][data-part='actions'][data-view='tiles'] {
+  display: contents;
+}
+[data-scope='upload'][data-part='item'][data-view='tiles'] [data-part='action'] {
+  grid-area: 1 / 1;
+  z-index: 1;
+}
+[data-scope='upload'][data-part='item'][data-view='tiles'] [data-part='action']:not([data-action='retry']) {
+  place-self: start end;
+}
+[data-scope='upload'][data-part='item'][data-view='tiles'] [data-part='action'][data-action='retry'] {
+  place-self: end center;
+}
+[data-scope='upload'][data-part='hint'] {
+  flex-basis: 100%;
+  margin: 0;
+}

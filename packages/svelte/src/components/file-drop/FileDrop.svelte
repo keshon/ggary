@@ -12,7 +12,7 @@
   }
 
   let {
-    name, accept, multiple, label, hint, disabled, required, invalid,
+    name, accept, multiple, label, hint, disabled, required, invalid, listFiles, keepRefused,
     files = $bindable(), onFilesChange, ...rest
   }: Props = $props()
 
@@ -22,7 +22,7 @@
   const field = getContext<FieldContext | undefined>(FIELD_CONTEXT)
 
   const api = $derived(
-    connect({ name, accept, multiple, label, hint, disabled, required, invalid, files: files ?? [] }, svelteNormalizer, {
+    connect({ name, accept, multiple, label, hint, disabled, required, invalid, listFiles, files: files ?? [] }, svelteNormalizer, {
       dragging,
       field: field?.control,
       onFilesChange: (list) => {
@@ -43,7 +43,7 @@
 
 <label
   {...api.rootProps}
-  {@attach (zone) => attachFileDrop(zone, () => element, { onDraggingChange: (next) => (dragging = next) })}
+  {@attach (zone) => attachFileDrop(zone, () => element, { onDraggingChange: (next) => (dragging = next), keepRefused: () => Boolean(keepRefused) })}
 >
   <span {...api.iconProps}></span>
   <input bind:this={element} {...attrs} />

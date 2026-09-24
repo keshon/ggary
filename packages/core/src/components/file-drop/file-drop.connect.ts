@@ -23,7 +23,7 @@ export interface FileDropConnectOptions {
  * label.
  */
 export function connect<T = Dict>(props: FileDropProps, normalize: Normalizer<T>, options: FileDropConnectOptions = {}) {
-  const { name, accept, multiple, label = 'Drag files in or choose them', hint, disabled, required, invalid, files = [] } = props
+  const { name, accept, multiple, label = 'Drag files in or choose them', hint, disabled, required, invalid, files = [], listFiles = true } = props
   const { field, onFilesChange, dragging } = options
   const isDisabled = Boolean(disabled || field?.disabled)
   const isInvalid = Boolean(invalid || field?.['aria-invalid'] === 'true')
@@ -53,7 +53,7 @@ export function connect<T = Dict>(props: FileDropProps, normalize: Normalizer<T>
     hint,
     files,
     showHint: Boolean(hint),
-    showFiles: files.length > 0,
+    showFiles: listFiles && files.length > 0,
     filesText: files.join(', '),
     rootProps: normalize({ ...anatomy.attrs('root'), ...state }),
     iconProps: normalize({ ...anatomy.attrs('icon'), 'data-icon': 'upload', 'aria-hidden': 'true' }),

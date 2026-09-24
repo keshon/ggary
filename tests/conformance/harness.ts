@@ -955,6 +955,23 @@ export interface ContextMenuProps {
   label?: string
 }
 
+/** Upload: the zone and its list of files, sent by `upload`. */
+export interface UploadProps {
+  upload?: import('../../packages/core/src/components/upload').UploadFunction
+  view?: 'rows' | 'tiles'
+  name?: string
+  accept?: string
+  maxSize?: number
+  maxFiles?: number
+  concurrency?: number
+  disabled?: boolean
+  label?: string
+  hint?: string
+  defaultFiles?: import('../../packages/core/src/components/upload').UploadedFile[]
+  onFilesChange?: (items: import('../../packages/core/src/components/upload').UploadItem[]) => void
+  locale?: string
+}
+
 export interface TimePickerProps {
   label?: string
   value?: string | null
@@ -1238,6 +1255,7 @@ export interface Adapter {
   note(props: NoteProps, target: HTMLElement): Promise<Mounted<NoteProps>>
   divider(props: DividerProps, target: HTMLElement): Promise<Mounted<DividerProps>>
   timePicker(props: TimePickerProps, target: HTMLElement): Promise<Mounted<TimePickerProps>>
+  upload(props: UploadProps, target: HTMLElement): Promise<Mounted<UploadProps>>
   result(props: ResultProps, target: HTMLElement): Promise<Mounted<ResultProps>>
   popconfirm(props: PopconfirmProps, target: HTMLElement): Promise<Mounted<PopconfirmProps>>
   contextMenu(props: ContextMenuProps, target: HTMLElement): Promise<Mounted<ContextMenuProps>>

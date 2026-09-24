@@ -14,12 +14,12 @@ export interface FileDropProps
 }
 
 export const FileDrop = forwardRef<HTMLInputElement, FileDropProps>(function FileDrop(props, forwardedRef) {
-  const { name, accept, multiple, label, hint, disabled, required, invalid, files, onFilesChange, ...rest } = props
+  const { name, accept, multiple, label, hint, disabled, required, invalid, files, listFiles, keepRefused, onFilesChange, ...rest } = props
   const [dragging, setDragging] = useState(false)
   const [chosen, setChosen] = useState<string[]>([])
 
   const api = connect(
-    { name, accept, multiple, label, hint, disabled, required, invalid, files: files ?? chosen },
+    { name, accept, multiple, label, hint, disabled, required, invalid, listFiles, files: files ?? chosen },
     reactNormalizer,
     {
       dragging,
@@ -34,7 +34,12 @@ export const FileDrop = forwardRef<HTMLInputElement, FileDropProps>(function Fil
   const zone = useRef<HTMLLabelElement>(null)
   const element = useRef<HTMLInputElement | null>(null)
   const ref = useMergedRef(element, forwardedRef)
-  useEffect(() => (zone.current ? attachFileDrop(zone.current, () => element.current, { onDraggingChange: setDragging }) : undefined), [])
+  const keep = useRef(keepRefused)
+  keep.current = keepRefused
+  useEffect(
+    () => (zone.current ? attachFileDrop(zone.current, () => element.current, { onDraggingChange: setDragging, keepRefused: () => Boolean(keep.current) }) : undefined),
+    []
+  )
   useFormReset(element, () => setChosen([]))
 
   return (

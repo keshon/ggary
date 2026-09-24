@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, StatusDot, Timeline, Button, CodeBlock, Copyable, Inserts, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster, Divider, TimePicker, Prose, Metric, FileChange, Sparkline, Legend, Meter, Ring, Share, Heatmap, Run, Queue, History, Budget, Log, Diff, Lanes } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, StatusDot, Timeline, Button, CodeBlock, Copyable, Inserts, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster, Divider, TimePicker, Upload, Prose, Metric, FileChange, Sparkline, Legend, Meter, Ring, Share, Heatmap, Run, Queue, History, Budget, Log, Diff, Lanes } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
@@ -191,6 +191,7 @@ export const svelte: Adapter = {
   banner: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'banner' })),
   divider: (props, target) => mountSvelte(Divider as Component<any>, props, target),
   timePicker: (props, target) => mountSvelte(TimePicker as Component<any>, props, target),
+  upload: (props, target) => mountSvelte(Upload as Component<any>, props, target),
   result: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'result' })),
   popconfirm: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'popconfirm' })),
   contextMenu: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'context-menu' })),
