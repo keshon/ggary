@@ -94,6 +94,8 @@ import {
   Divider,
   TimePicker,
   Upload,
+  List,
+  ListItem,
   Result,
   Popconfirm,
   ContextMenu,
@@ -128,6 +130,7 @@ import {
   type FlexProps,
   type ResultProps,
   type PopconfirmProps,
+  type ListProps,
   type ContextMenuProps,
   type ColumnsProps,
   type PageHeaderProps,
@@ -284,6 +287,27 @@ function ReactResult(props: ResultProps) {
     actions: actions ? createElement(Fragment, null, ...actions.map((label) => createElement('button', { key: label, type: 'button' }, label))) : undefined,
     children: details ? createElement('p', null, details) : undefined,
   })
+}
+
+function ReactList(props: ListProps) {
+  const { items, onSelect, onAction, ...options } = props
+  return createElement(
+    List as ComponentType<any>,
+    options,
+    ...items.map((item) =>
+      createElement(ListItem as ComponentType<any>, {
+        key: item.title,
+        title: item.title,
+        description: item.description,
+        href: item.href,
+        onSelect: item.press ? () => onSelect?.(item.title) : undefined,
+        current: item.current,
+        disabled: item.disabled,
+        meta: item.meta ? createElement('span', null, item.meta) : undefined,
+        actions: item.action ? createElement('button', { type: 'button', onClick: () => onAction?.(item.title) }, item.action) : undefined,
+      })
+    )
+  )
 }
 
 function ReactPopconfirm(props: PopconfirmProps) {
@@ -533,6 +557,7 @@ export const react: Adapter = {
   divider: (props, target) => mount(Divider, props, target),
   timePicker: (props, target) => mount(TimePicker as ComponentType<any>, props, target),
   upload: (props, target) => mount(Upload as ComponentType<any>, props, target),
+  list: (props, target) => mount(ReactList as ComponentType<any>, props, target),
   result: (props, target) => mount(ReactResult as ComponentType<any>, props, target),
   popconfirm: (props, target) => mount(ReactPopconfirm as ComponentType<any>, props, target),
   contextMenu: (props, target) => mount(ReactContextMenu as ComponentType<any>, props, target),

@@ -482,6 +482,15 @@ export const SITEMAP: SiteCategory[] = [
     "title": "Data",
     "components": [
       {
+        "label": "List",
+        "anchors": [
+          {
+            "id": "list",
+            "label": null
+          }
+        ]
+      },
+      {
         "label": "Data grid",
         "anchors": [
           {

@@ -55,6 +55,7 @@
 @import './components/time-picker.css' layer(gg.components);
 @import './components/popconfirm.css' layer(gg.components);
 @import './components/upload.css' layer(gg.components);
+@import './components/list.css' layer(gg.components);
 @import './components/context-menu.css' layer(gg.components);
 @import './components/result.css' layer(gg.components);
 @import './components/divider.css' layer(gg.components);

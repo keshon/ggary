@@ -1,0 +1,109 @@
+/* List: a heading, rows, a footer. Geometry only.
+
+   A row is four columns — what it starts with, its title over its line, what
+   is known about it, its actions — each part pinned to its own, so a row
+   without a leading avatar or without actions keeps the rest in line with
+   its neighbours. A row that goes somewhere stretches its title's link or
+   button over itself (::after); the meta and the actions stand above the
+   stretch, so they are pressed as themselves. */
+
+[data-scope='list'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='list'][data-part='header'] {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  min-inline-size: 0;
+}
+[data-scope='list'][data-part='items'] {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+[data-scope='list'][data-part='item'] {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  min-inline-size: 0;
+}
+[data-scope='list'][data-part='item']:focus {
+  outline: none;
+}
+[data-scope='list'][data-part='leading'] { grid-column: 1; display: flex; }
+[data-scope='list'][data-part='body'] {
+  grid-column: 2;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='list'][data-part='meta'] {
+  grid-column: 3;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+[data-scope='list'][data-part='actions'] {
+  grid-column: 4;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+}
+:is([data-scope='list'][data-part='item-title'], [data-scope='list'][data-part='target'], [data-scope='list'][data-part='description']) {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+[data-scope='list'][data-part='target'] {
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: pointer;
+}
+[data-scope='list'][data-part='target']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+[data-scope='list'][data-part='target']:focus-visible {
+  outline: none;
+}
+[data-scope='list'][data-part='target']:is(:disabled, [aria-disabled='true']) {
+  cursor: default;
+}
+[data-scope='list'][data-part='footer'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+[data-scope='list'][data-part='more'] {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+[data-scope='list'][data-part='more'][aria-disabled='true'] {
+  cursor: progress;
+}
+[data-scope='list'][data-part='more-error']:empty {
+  display: none;
+}

@@ -8,6 +8,7 @@ import GridWithRows from './GridWithRows.svelte'
 import ShellWith from './ShellWith.svelte'
 import FlowWith from './FlowWith.svelte'
 import FlexWith from './FlexWith.svelte'
+import ListWith from './ListWith.svelte'
 import ColumnsWith from './ColumnsWith.svelte'
 import PageHeaderWith from './PageHeaderWith.svelte'
 import SectionWith from './SectionWith.svelte'
@@ -192,6 +193,7 @@ export const svelte: Adapter = {
   divider: (props, target) => mountSvelte(Divider as Component<any>, props, target),
   timePicker: (props, target) => mountSvelte(TimePicker as Component<any>, props, target),
   upload: (props, target) => mountSvelte(Upload as Component<any>, props, target),
+  list: (props, target) => mountSvelte(ListWith as Component<any>, props, target),
   result: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'result' })),
   popconfirm: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'popconfirm' })),
   contextMenu: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'context-menu' })),

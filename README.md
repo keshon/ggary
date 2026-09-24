@@ -2,12 +2,12 @@
 
 A UI kit scaffold: one framework-agnostic core, two sibling renderers (React 19
 and Svelte 5), and one design language, GGarry, on top of it.
-A hundred and eight components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, TimePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+A hundred and ten components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, TimePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
 Menu, Menubar, Badge, Avatar, AvatarGroup, Spinner, Skeleton, Card, Panel, Banner,
-Note, EmptyState, Divider, Prose, Text, Link, Flex, FlexItem, Columns, Column, Popconfirm, ContextMenu, Result and Upload — built end to end to prove the architecture holds.
+Note, EmptyState, Divider, Prose, Text, Link, Flex, FlexItem, Columns, Column, Popconfirm, ContextMenu, Result, Upload, List and ListItem — built end to end to prove the architecture holds.
 
 **Retired on 2026-09-18: the vanilla custom-elements adapter (`@ggary/elements`,
 the `gg-*` tags) and the Instrument theme**, a second language ported from
@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3841 tests, 1433 of them in headless Chrome
+npm test         # 3878 tests, 1451 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck   # tsc, then svelte-check over every .svelte file
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -2740,6 +2740,68 @@ Found on the way:
   from -40% to 100%, and it hung outside the row's rounded edge. It is now a
   background painted inside the progress part, which is the row's own size.
 
+## List and ListItem
+
+A list of things, each a row: what it starts with, its title over a line,
+what is known about it, and what can be done with it.
+
+```tsx
+<List label="Reviewers" count="4 of 16" variant="bordered" onLoadMore={loadMore} hasMore={more}>
+  {people.map((person) => (
+    <ListItem
+      key={person.id}
+      title={person.name}
+      description={person.status}
+      href={`/people/${person.id}`}
+      current={person.id === openId ? 'page' : undefined}
+      leading={<Avatar name={person.name} decorative />}
+      meta={<><Badge tone={person.tone}>{person.word}</Badge><span>{person.when}</span></>}
+      actions={<Menu trigger={…} items={…} />}
+    />
+  ))}
+</List>
+```
+
+**Three ways to hold the rows**, chosen from mockups. `divided` (the default):
+rows on the page, a hairline between them, a soft plate under the one pointed
+at and the current one — quiet enough to sit inside a Card or a Section.
+`bordered`: one surface with a header strip and a footer, the rows split by
+hairlines, the current one marked by an accent edge — a list that reads as one
+object. `cards`: each row its own card, lifted under the pointer, the current
+one outlined in the accent.
+
+**A row is plain, a link or a press.** Plain by default: text, and no plate
+under the pointer, which would promise a press that does nothing. With `href`
+the title is a link, with `onSelect` a button, and either way it is stretched
+over the whole row, so the row is pressed anywhere and read by its title; the
+line under the title describes it (`aria-describedby`). The meta and the
+actions stand above the stretch, so a row's own ⋯ menu is pressed as itself.
+Tab goes row, its actions, next row. `current` marks the open row
+(`aria-current`, or `'page'` for a link to the page itself); a disabled
+link loses its `href` and says so. Choosing many rows is DataGrid's.
+
+**Actions are always there**, muted until the row is pointed at: found without
+hunting, and the same on a touch screen.
+
+**A long list goes on from its footer.** `footer` takes anything — a
+Pagination, a link to all of them — and `onLoadMore` draws "Show more" (say
+how many with `words.more`). A promise keeps it busy and still focusable
+(`aria-disabled`, so the focus is not dropped under a keyboard user); a
+rejection says "Couldn't load more" in a status beside it, and the button
+offers to try again. When the rows arrive, the focus goes to the first new one
+— if it was on the button, or fell to the page when the button went.
+
+The list is a `ul` with `role="list"` said out loud (Safari drops a list's
+role once its bullets are gone), named by its heading, or by `ariaLabel`.
+
+Found on the way:
+
+- **A stretched link hides what it covers from a test's pointer.** Playwright
+  refuses to press the line under a title, because the stretched target is on
+  top of it — which is the design. The browser test asks the page what is under
+  the pointer at the line and at the icon, finds the row's button, and presses it
+  there.
+
 ## Flex and Columns
 
 Two primitives, nested to any depth, for what the four above cannot say: this
@@ -3094,16 +3156,16 @@ sandbox build prints none.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 667 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
-| contract | node | `icons.contract.test.ts` | 463 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `icons.contract.test.ts` | 468 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 5 tests. Every discovered theme — GGarry, now the only one: structure, literals, contrast, coverage. |
 | contract | node | `packages.contract.test.ts` | 9 tests. Each package's exports are its root and `./*`; every component directory has an index; both adapters have the same directories, the same components in each, and all of them at their root. |
 | contract | node | `anatomy.contract.test.ts` | 2 tests. Every element an adapter draws takes a prop bag from core — no bare `<span>` a theme could only name by its tag — and no adapter writes a class. |
 | contract | node | `sizes.contract.test.ts` | 3 tests. Every control's size is `ControlSize`, and its stylesheet draws `sm` and `lg`. |
 | contract | node | `core-shape.contract.test.ts` | 2 tests. Every component laid out as `<dir>.<role>.ts` with a re-export-only index; every connect ending at the normalizer or one `options`. |
 | contract | node | `checks.contract.test.ts` | 30 tests. The gates themselves: each rule fires on a planted defect — the literal families and their ledger among them; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1170 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1184 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 1170 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1184 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
 | browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
 | browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |
@@ -3130,6 +3192,7 @@ sandbox build prints none.
 | machine | node | `upload.machine.test.ts` | 13 tests. Sizes in the locale's decimal units and an `accept` list read as the file input reads one; files refused before sending and why; so many sent at once, in order; progress, and none when the upload does not know; what a file there submits and what is said; a failure's own words and a retry as a new try; a cancel aborting its try and its late answer ignored; a synchronous throw; one file at most replacing the last; the owner told of changes, not percents; going away aborting what is under way. |
 | machine | node | `popconfirm.machine.test.ts` | 8 tests. One attempt while one is under way; closing on success, staying and saying why on a failure (a rejection, a throw, or the words); a late answer to an abandoned attempt ignored; a new opening forgetting the failure; cancels heard for every close but the action's; the focus mark by `destructive`; the alert dialog's name and description. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
+| browser | Chrome | `list.browser.test.ts` | 4 tests. A press anywhere on a row landing on its stretched button, found by what is under the pointer at its line and its icon, and its own action pressed as itself; Tab walking a row then its actions, the ring on the whole row; the columns lined up whatever a row has and a long line cut before the meta; a bordered list one surface, cards apart. |
 | browser | Chrome | `upload.browser.test.ts` | 4 tests. A row's fill as wide as its progress and one of unknown progress kept inside its row; the buttons in one column down the list whatever a row has; a real drop listing a refused file with its reason; tiles square in a wrapping row, the zone a tile's size and the limits under them. |
 | browser | Chrome | `date-picker.browser.test.ts` | 8 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. Two months level and apart, each title centred over its grid, the real keyboard carrying the focus from one grid into the other. A time list under its field at its width, real typing walking it to the nearest time in view and Enter keeping the typed one; the list opening with its time in the middle, some rows tall, and the arrows not scrolling it needlessly; a date-time's time on the day's line inside one field-tall box. |
 | browser | Chrome | `gantt.browser.test.ts` | 9 tests. A group's summary measured to the pixel, closed by a press on its name, its chevron turned, a hidden task's arrow leaving the heading's row. An arrow out of a bar's last day, a gap out, down to the rows' seam; into a milestone at its tip; behind a bar it crosses; a conflict in another colour. A bar dragged three days' worth moving three days and the owner hearing it on release; its end resized by the grip, and Escape in the middle putting it back; a refused move springing back. Also Bars measured to the pixel at the day and the week scale, a milestone on its day; the list at the left edge and the scale at the top as the chart scrolls; a task reached by the keyboard brought into view clear of the list; the chart opening on today, a third of the way in. |
@@ -3247,6 +3310,9 @@ Real, and deliberately left open:
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that was Instrument's position, and it stays available.
+- **List is not windowed.** A few hundred rows are fine; thousands belong in
+  DataGrid, which draws only what is on screen. Nor are rows chosen, dragged
+  or grouped under headings: those are DataGrid's, Kanban's and Tree's.
 - **Upload's list is its own.** No controlled `items` for an app with a queue
   of its own, no pasting from the clipboard, no folders, and no resumable or
   chunked sending — a chunk is the owner's to send inside `upload`. A form does

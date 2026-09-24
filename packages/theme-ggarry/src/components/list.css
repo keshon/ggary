@@ -1,0 +1,192 @@
+/* ==========================================================================
+   GGarry — list
+
+   Three ways to hold the same rows. Divided: on the page itself, a hairline
+   between rows, a soft plate under the one pointed at and the current one.
+   Bordered: one surface, a header strip, hairlines, a footer, and the current
+   row marked by an accent edge. Cards: each row its own card, lifted under
+   the pointer, the current one outlined in the accent.
+
+   Only a row that goes somewhere answers the pointer: a plain row is text,
+   and a plate under it would promise a press that does nothing.
+   ========================================================================== */
+
+[data-scope='list'][data-part='root'] {
+  gap: var(--ggarry-space-1);
+  font-family: var(--ggarry-font-family-sans);
+  color: var(--ggarry-text-default);
+}
+[data-scope='list'][data-part='header'] {
+  gap: var(--ggarry-space-3);
+  padding: 0 var(--ggarry-space-3) var(--ggarry-space-1);
+}
+[data-scope='list'][data-part='title'] {
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+[data-scope='list'][data-part='count'] {
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- a row -------------------------------------------------------------------- */
+
+[data-scope='list'][data-part='item'] {
+  column-gap: var(--ggarry-space-3);
+  padding: var(--ggarry-space-2) var(--ggarry-space-2) var(--ggarry-space-2) var(--ggarry-space-3);
+  border-radius: var(--ggarry-radius-md);
+  line-height: var(--ggarry-line-height-normal);
+}
+[data-scope='list'][data-part='body'] {
+  gap: 2px;
+}
+:is([data-scope='list'][data-part='item-title'], [data-scope='list'][data-part='target']) {
+  font-size: var(--ggarry-font-size-md);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+[data-scope='list'][data-part='description'] {
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+}
+[data-scope='list'][data-part='meta'] {
+  gap: var(--ggarry-space-1);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+[data-scope='list'][data-part='actions'] {
+  gap: var(--ggarry-space-1);
+}
+
+[data-scope='list'][data-part='item'][data-interactive]:hover:not([data-disabled]) {
+  background: var(--ggarry-bg-subtle);
+}
+[data-scope='list'][data-part='item'][data-current] {
+  background: var(--ggarry-bg-accent-subtle);
+}
+[data-scope='list'][data-part='item'][data-current]:hover {
+  background: var(--ggarry-bg-accent-subtle);
+}
+[data-scope='list'][data-part='target'][data-current] {
+  color: var(--ggarry-text-accent);
+}
+[data-scope='list'][data-part='item'][data-disabled] {
+  opacity: var(--ggarry-opacity-disabled);
+}
+/* The ring is the row's, drawn inside it, so no edge of a bordered list clips it. */
+[data-scope='list'][data-part='target']:focus-visible::after {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: calc(-1 * var(--ggarry-focus-ring-width));
+}
+[data-scope='list'][data-part='item']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: calc(-1 * var(--ggarry-focus-ring-width));
+}
+
+/* --- divided: a hairline between rows, gone beside a plate ---------------------------- */
+
+[data-scope='list'][data-part='items'][data-variant='divided'] > [data-part='item'] + [data-part='item']::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: var(--ggarry-space-3);
+  border-block-start: 1px solid var(--ggarry-border-default);
+}
+[data-scope='list'][data-part='items'][data-variant='divided'] > [data-part='item']:is([data-current], [data-interactive]:hover:not([data-disabled]))::before,
+[data-scope='list'][data-part='items'][data-variant='divided'] > [data-part='item']:is([data-current], [data-interactive]:hover:not([data-disabled])) + [data-part='item']::before {
+  border-color: transparent;
+}
+
+/* --- bordered: one surface -------------------------------------------------------- */
+
+[data-scope='list'][data-part='root'][data-variant='bordered'] {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-surface);
+}
+[data-scope='list'][data-part='header'][data-variant='bordered'] {
+  padding: var(--ggarry-space-2) var(--ggarry-space-3);
+  border-block-end: 1px solid var(--ggarry-border-default);
+  background: var(--ggarry-bg-subtle);
+}
+[data-scope='list'][data-part='items'][data-variant='bordered'] > [data-part='item'] {
+  border-radius: 0;
+}
+[data-scope='list'][data-part='items'][data-variant='bordered'] > [data-part='item'] + [data-part='item'] {
+  border-block-start: 1px solid var(--ggarry-border-default);
+}
+[data-scope='list'][data-part='items'][data-variant='bordered'] > [data-part='item'][data-current] {
+  box-shadow: inset 3px 0 0 var(--ggarry-bg-accent);
+}
+[data-scope='list'][data-part='items'][data-variant='bordered'] > [data-part='item'][data-current]:dir(rtl) {
+  box-shadow: inset -3px 0 0 var(--ggarry-bg-accent);
+}
+[data-scope='list'][data-part='footer'][data-variant='bordered'] {
+  justify-content: center;
+  padding: var(--ggarry-space-2) var(--ggarry-space-3);
+  border-block-start: 1px solid var(--ggarry-border-default);
+}
+
+/* --- cards: a card a row ------------------------------------------------------------ */
+
+[data-scope='list'][data-part='items'][data-variant='cards'] {
+  gap: var(--ggarry-space-2);
+}
+[data-scope='list'][data-part='items'][data-variant='cards'] > [data-part='item'] {
+  padding: var(--ggarry-space-3) var(--ggarry-space-2) var(--ggarry-space-3) var(--ggarry-space-4);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  background: var(--ggarry-bg-surface);
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), box-shadow var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+[data-scope='list'][data-part='items'][data-variant='cards'] > [data-part='item'][data-interactive]:hover:not([data-disabled]) {
+  border-color: var(--ggarry-border-strong);
+  background: var(--ggarry-bg-surface);
+  box-shadow: var(--ggarry-shadow-sm);
+}
+[data-scope='list'][data-part='items'][data-variant='cards'] > [data-part='item'][data-current] {
+  border-color: var(--ggarry-border-accent);
+  background: var(--ggarry-bg-surface);
+}
+
+/* --- the footer ----------------------------------------------------------------- */
+
+[data-scope='list'][data-part='footer'] {
+  gap: var(--ggarry-space-2) var(--ggarry-space-3);
+  padding: var(--ggarry-space-2) var(--ggarry-space-3) 0;
+}
+[data-scope='list'][data-part='more'] {
+  border-radius: var(--ggarry-radius-sm);
+  color: var(--ggarry-text-accent);
+  font-size: var(--ggarry-font-size-sm);
+  font-weight: var(--ggarry-font-weight-medium);
+}
+[data-scope='list'][data-part='more']:hover:not([aria-disabled='true']) {
+  text-decoration: underline;
+}
+[data-scope='list'][data-part='more'][aria-disabled='true'] {
+  color: var(--ggarry-text-muted);
+}
+[data-scope='list'][data-part='more']:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+[data-scope='list'][data-part='more-error'] {
+  color: var(--ggarry-text-danger);
+  font-size: var(--ggarry-font-size-xs);
+}
+
+@media (forced-colors: active) {
+  [data-scope='list'][data-part='item'][data-current] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='list'][data-part='items'][data-variant='cards'] > [data-part='item'] {
+    transition: none;
+  }
+}

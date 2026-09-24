@@ -78,6 +78,8 @@ import {
   Fieldset,
   FileDrop,
   Upload,
+  List,
+  ListItem,
   Input,
   InputGroup,
   Menu,
@@ -148,7 +150,7 @@ import {
   Prose,
   Text,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload, stagedUpload, stagedRowFiles, stagedTileFiles, stageDrop, avatarPicture } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload, stagedUpload, stagedRowFiles, stagedTileFiles, stageDrop, avatarPicture, reviewers, reviewersLater, type Reviewer } from './demo-data'
 
 /**
  * Upload's states on the page as it loads: once the Upload inside is there, a
@@ -186,6 +188,22 @@ function App() {
   const [extras, setExtras] = useState<string[]>([])
   const [chosenFiles, setChosenFiles] = useState<File[]>([])
   const [uploadLog, setUploadLog] = useState('—')
+  const [listRows, setListRows] = useState<Reviewer[]>(reviewers)
+  const [listLog, setListLog] = useState('—')
+  const person = (who: Reviewer) => ({
+    leading: <Avatar name={who.name} size="sm" decorative />,
+    meta: (
+      <>
+        <Badge tone={who.tone}>{who.word}</Badge>
+        <span>{who.when}</span>
+      </>
+    ),
+    actions: (
+      <Button size="sm" emphasis="minimal" aria-label={`More for ${who.name}`} onClick={() => setListLog(`menu for ${who.name}`)}>
+        <span data-icon="more" aria-hidden="true" />
+      </Button>
+    ),
+  })
   const [page, setPage] = useState(8)
   const [leadGrid, setLeadGrid] = useState<DataGridController<Lead>>()
   const [leadLog, setLeadLog] = useState('—')
@@ -1461,6 +1479,39 @@ function App() {
 
       <div className="category" aria-labelledby="data">
         <h2 className="category-title" id="data"><span className="category-number" aria-hidden="true">06</span>Data</h2>
+        <section id="list">
+          <h3>List</h3>
+          <p className="note">Divided, as links: the current row marked, one disabled. Bordered, as presses, with Show more. Cards, as plain rows. Every row's ⋯ is its own button.</p>
+          <div className="panels">
+            <List label="Reviewers" count="4 of 16">
+              {reviewers.map((who) => (
+                <ListItem key={who.name} title={who.name} description={who.line} href="#list" current={who.current ? 'page' : undefined} disabled={who.disabled} {...person(who)} />
+              ))}
+            </List>
+            <List
+              variant="bordered"
+              label="Reviewers"
+              count={`${listRows.length} of 6`}
+              hasMore={listRows.length < 6}
+              onLoadMore={async () => {
+                const more = await reviewersLater()
+                setListRows((rows) => [...rows, ...more])
+              }}
+              words={{ more: `Show ${6 - listRows.length} more` }}
+            >
+              {listRows.map((who) => (
+                <ListItem key={who.name} title={who.name} description={who.line} onSelect={() => setListLog(`opened ${who.name}`)} current={who.current} disabled={who.disabled} {...person(who)} />
+              ))}
+            </List>
+            <List variant="cards" label="Reviewers" count="4 of 16">
+              {reviewers.map((who) => (
+                <ListItem key={who.name} title={who.name} description={who.line} current={who.current} disabled={who.disabled} {...person(who)} />
+              ))}
+            </List>
+          </div>
+          <pre className="state">{listLog}</pre>
+        </section>
+
         <section id="grid">
           <h3>Data grid</h3>
           <div className="row" style={{ alignItems: 'center', marginBottom: 12 }}>

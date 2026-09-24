@@ -35,6 +35,7 @@ import { typographyConformance } from './typography.spec'
 import { feedbackConformance } from './feedback.spec'
 import { timeConformance } from './time.spec'
 import { uploadConformance } from './upload.spec'
+import { listConformance } from './list.spec'
 import { meterConformance } from './meter.spec'
 import { ringConformance } from './ring.spec'
 import { codeConformance } from './code.spec'
@@ -113,6 +114,7 @@ export function runConformance() {
       feedbackConformance(adapter)
       timeConformance(adapter)
       uploadConformance(adapter)
+      listConformance(adapter)
       meterConformance(adapter)
       ringConformance(adapter)
       timelineConformance(adapter)

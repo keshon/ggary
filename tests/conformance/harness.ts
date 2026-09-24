@@ -972,6 +972,20 @@ export interface UploadProps {
   locale?: string
 }
 
+/** A List of rows described as data; the adapter's wrapper draws them as ListItems. */
+export interface ListProps {
+  variant?: 'divided' | 'bordered' | 'cards'
+  label?: string
+  count?: string
+  ariaLabel?: string
+  items: { title: string; description?: string; href?: string; press?: boolean; current?: boolean | 'page'; disabled?: boolean; meta?: string; action?: string }[]
+  onSelect?: (title: string) => void
+  onAction?: (title: string) => void
+  onLoadMore?: () => unknown
+  hasMore?: boolean
+  words?: { more?: string; loading?: string; failed?: string; retry?: string }
+}
+
 export interface TimePickerProps {
   label?: string
   value?: string | null
@@ -1256,6 +1270,7 @@ export interface Adapter {
   divider(props: DividerProps, target: HTMLElement): Promise<Mounted<DividerProps>>
   timePicker(props: TimePickerProps, target: HTMLElement): Promise<Mounted<TimePickerProps>>
   upload(props: UploadProps, target: HTMLElement): Promise<Mounted<UploadProps>>
+  list(props: ListProps, target: HTMLElement): Promise<Mounted<ListProps>>
   result(props: ResultProps, target: HTMLElement): Promise<Mounted<ResultProps>>
   popconfirm(props: PopconfirmProps, target: HTMLElement): Promise<Mounted<PopconfirmProps>>
   contextMenu(props: ContextMenuProps, target: HTMLElement): Promise<Mounted<ContextMenuProps>>

@@ -25,6 +25,8 @@
     Fieldset,
     FileDrop,
     Upload,
+    List,
+    ListItem,
     Input,
     InputGroup,
     Menu,
@@ -143,7 +145,7 @@
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
   import { rangePresets } from '@ggary/core/date-picker'
   import type { PaletteCommand } from '@ggary/core/command-palette'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload, stagedUpload, stagedRowFiles, stagedTileFiles, stageDrop, avatarPicture } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload, stagedUpload, stagedRowFiles, stagedTileFiles, stageDrop, avatarPicture, reviewers, reviewersLater, type Reviewer } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -174,6 +176,8 @@
   let leadLog = $state('—')
   let comboLog = $state('—')
   let dateLog = $state('—')
+  let listRows = $state<Reviewer[]>(reviewers)
+  let listLog = $state('—')
   let timeLog = $state('—')
   let placeLog = $state('—')
   let boardLog = $state('—')
@@ -1273,6 +1277,39 @@
 
 <div class="category" aria-labelledby="data">
   <h2 class="category-title" id="data"><span class="category-number" aria-hidden="true">06</span>Data</h2>
+  <section id="list">
+    <h3>List</h3>
+    <p class="note">Divided, as links: the current row marked, one disabled. Bordered, as presses, with Show more. Cards, as plain rows. Every row's ⋯ is its own button.</p>
+    {#snippet person(who: Reviewer, how: 'link' | 'press' | 'plain')}
+      {#snippet leading()}<Avatar name={who.name} size="sm" decorative />{/snippet}
+      {#snippet meta()}<Badge tone={who.tone}>{who.word}</Badge><span>{who.when}</span>{/snippet}
+      {#snippet actions()}<Button size="sm" emphasis="minimal" aria-label={`More for ${who.name}`} onclick={() => (listLog = `menu for ${who.name}`)}><span data-icon="more" aria-hidden="true"></span></Button>{/snippet}
+      <ListItem
+        title={who.name}
+        description={who.line}
+        href={how === 'link' ? '#list' : undefined}
+        onSelect={how === 'press' ? () => (listLog = `opened ${who.name}`) : undefined}
+        current={who.current ? (how === 'link' ? 'page' : true) : undefined}
+        disabled={who.disabled}
+        {leading}
+        {meta}
+        {actions}
+      />
+    {/snippet}
+    <div class="panels">
+      <List label="Reviewers" count="4 of 16">
+        {#each reviewers as who (who.name)}{@render person(who, 'link')}{/each}
+      </List>
+      <List variant="bordered" label="Reviewers" count={`${listRows.length} of 6`} hasMore={listRows.length < 6} onLoadMore={async () => (listRows = [...listRows, ...(await reviewersLater())])} words={{ more: `Show ${6 - listRows.length} more` }}>
+        {#each listRows as who (who.name)}{@render person(who, 'press')}{/each}
+      </List>
+      <List variant="cards" label="Reviewers" count="4 of 16">
+        {#each reviewers as who (who.name)}{@render person(who, 'plain')}{/each}
+      </List>
+    </div>
+    <pre class="state">{listLog}</pre>
+  </section>
+
   <section id="grid">
     <h3>Data grid</h3>
     <div class="row" style="align-items: center; margin-bottom: 12px">
