@@ -1,0 +1,42 @@
+/* ==========================================================================
+   GGarry — time picker
+
+   The field is DatePicker's and the list is Combobox's — date-picker.css and
+   combobox.css draw both for it. What is its own: figures that keep their
+   width, so the minutes of a list of times stand in one column and a time
+   being typed does not shuffle as it changes.
+   ========================================================================== */
+
+:is([data-scope='time-picker'][data-part='input'], [data-scope='time-picker'][data-part='item']) {
+  font-variant-numeric: tabular-nums;
+}
+
+/* A day's times run to ninety-six: the list shows eight and a half of them,
+   the half saying there is more, rather than every row the window has room for. */
+[data-scope='time-picker'][data-part='content'] {
+  max-height: min(var(--gg-available-height, 100vh), calc(8.5 * 32px + 2 * var(--ggarry-space-1) + 2px));
+}
+
+/* Inside a date's box: the date's box is the only one. A hairline parts the
+   time from the day; the ring and the danger edge are the outer box's, which
+   sees a focused or invalid input anywhere inside it. */
+[data-scope='time-picker'][data-part='root'][data-embedded] {
+  gap: 0;
+  min-inline-size: 0;
+}
+[data-scope='time-picker'][data-part='root'][data-embedded] > [data-part='control'] {
+  /* The box's height, not a field's own: it sits inside one. */
+  block-size: auto;
+  margin-inline-start: var(--ggarry-space-1);
+  padding-inline: var(--ggarry-space-2) 0;
+  border: 0;
+  border-inline-start: 1px solid var(--ggarry-border-default);
+  border-radius: 0;
+  background: none;
+}
+[data-scope='time-picker'][data-part='root'][data-embedded] > [data-part='control']:has([data-part='input']:focus-visible) {
+  outline: none;
+}
+[data-scope='date-picker'][data-part='control']:has([data-scope='time-picker'][data-part='control'][data-invalid]) {
+  border-color: var(--ggarry-border-danger);
+}

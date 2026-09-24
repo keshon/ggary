@@ -1,16 +1,33 @@
-/* The calendar: a header over a table of days. Geometry only. */
+/* The calendar: one or more months side by side, each a header over a table of days. Geometry only. */
 
 [data-scope='calendar'][data-part='root'] {
   display: inline-flex;
   flex-direction: column;
 }
-[data-scope='calendar'][data-part='header'] {
+[data-scope='calendar'][data-part='months'] {
   display: flex;
+  align-items: flex-start;
+}
+[data-scope='calendar'][data-part='month'] {
+  display: flex;
+  flex-direction: column;
+}
+/* Three columns, the way back, the title, the way on: a page that lacks one of
+   the buttons keeps its title where the other page has it. */
+[data-scope='calendar'][data-part='header'] {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
 }
+[data-scope='calendar'][data-part='prev'] {
+  grid-column: 1;
+}
 [data-scope='calendar'][data-part='title'] {
-  flex: 1;
+  grid-column: 2;
   text-align: center;
+}
+[data-scope='calendar'][data-part='next'] {
+  grid-column: 3;
 }
 [data-scope='calendar']:is([data-part='prev'], [data-part='next']) {
   display: inline-flex;
@@ -46,22 +63,22 @@
   cursor: pointer;
   user-select: none;
 }
-[data-scope='calendar'][data-part='day'][data-disabled] {
+[data-scope='calendar'][data-part='day']:is([data-disabled], [data-blank]) {
   cursor: default;
 }
 
 /* The date picker: a field with the calendar's button inside its box, and the calendar in the top layer. */
-[data-scope='date-picker'][data-part='root'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'] {
   display: inline-flex;
   flex-direction: column;
   min-inline-size: 0;
 }
-[data-scope='date-picker'][data-part='control'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='control'] {
   display: flex;
   align-items: center;
   min-inline-size: 0;
 }
-[data-scope='date-picker'][data-part='input'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='input'] {
   flex: 1 1 auto;
   min-inline-size: 0;
   margin: 0;
@@ -72,7 +89,7 @@
   font: inherit;
   outline: none;
 }
-[data-scope='date-picker'][data-part='trigger'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='trigger'] {
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -84,7 +101,7 @@
   color: inherit;
   cursor: pointer;
 }
-[data-scope='date-picker'][data-part='positioner'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='positioner'] {
   position: fixed;
   inset: 0 auto auto 0;
   margin: 0;
@@ -94,7 +111,7 @@
   color: inherit;
   overflow: visible;
 }
-[data-scope='date-picker'][data-part='positioner'][data-state='closed'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='positioner'][data-state='closed'] {
   display: none;
 }
 
@@ -120,4 +137,26 @@
 }
 [data-scope='date-picker'][data-part='preset']:disabled {
   cursor: default;
+}
+
+/* A time inside a date's box: no column of its own, just its field and button
+   in the date's row, as tall as the row. */
+[data-scope='time-picker'][data-part='root'][data-embedded] {
+  flex-direction: row;
+  flex: none;
+  align-self: stretch;
+  min-inline-size: 0;
+}
+[data-scope='time-picker'][data-part='root'][data-embedded] [data-part='input'] {
+  inline-size: 9ch;
+  flex: none;
+}
+/* Its reason stands under the whole box, where a field's reason stands. */
+[data-scope='date-picker'][data-part='root']:has([data-scope='time-picker'][data-embedded]) {
+  position: relative;
+}
+[data-scope='time-picker'][data-part='root'][data-embedded] > [data-part='error'] {
+  position: absolute;
+  inset-block-start: 100%;
+  inset-inline-start: 0;
 }

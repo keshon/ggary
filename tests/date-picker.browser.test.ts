@@ -3,12 +3,13 @@ import { userEvent } from '@vitest/browser/context'
 import '../packages/theme-ggarry/src/index.css'
 import { createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
-import { DatePicker } from '../packages/react/src/index'
+import { DatePicker, TimePicker } from '../packages/react/src/index'
 
 /**
  * The date picker where only a browser can say: the calendar under the field
  * in the top layer, real typing, the focus riding the keyboard across page
- * turns, the range drawn under a real pointer before the second press.
+ * turns, the range drawn under a real pointer before the second press; two
+ * months side by side, and the time picker's list under real typing.
  */
 
 let root: Root | null = null
@@ -25,14 +26,14 @@ const frames = (count = 2) =>
     requestAnimationFrame(tick)
   })
 
-async function mount(props: Record<string, unknown> = {}) {
+async function mount(props: Record<string, unknown> = {}, component: typeof DatePicker | typeof TimePicker = DatePicker) {
   const clip = document.createElement('div')
-  clip.style.cssText = 'overflow: hidden; block-size: 90px; inline-size: 320px; padding: 8px'
+  clip.style.cssText = 'overflow: hidden; block-size: 90px; inline-size: 420px; padding: 8px'
   const after = document.createElement('button')
   after.textContent = 'After'
   document.body.append(clip, after)
   root = createRoot(clip)
-  root.render(createElement(DatePicker, { label: 'Due', locale: 'en-GB', ...props }))
+  root.render(createElement(component as typeof DatePicker, { label: 'Due', locale: 'en-GB', ...props }))
   while (!clip.querySelector('[data-part="input"]')) await frames(1)
   return {
     clip,
@@ -94,5 +95,77 @@ describe('date picker', () => {
     expect(band.backgroundSize).toBe('100% 30px')
     await userEvent.click(day('2026-09-19'))
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
+  })
+})
+
+describe('two months', () => {
+  it('stand side by side at one height, titles level, and the keyboard carries the focus from one grid to the other', async () => {
+    const { trigger, content, day } = await mount({ mode: 'range', months: 2, defaultValue: { start: '2026-09-28', end: '2026-10-03' } })
+    await userEvent.click(trigger)
+    await frames(3)
+    const months = [...content().querySelectorAll<HTMLElement>('[data-scope="calendar"][data-part="month"]')].map((month) => month.getBoundingClientRect())
+    expect(months).toHaveLength(2)
+    expect(months[1].left).toBeGreaterThan(months[0].right + 8)
+    expect(Math.abs(months[1].top - months[0].top)).toBeLessThan(1)
+    const titles = [...content().querySelectorAll<HTMLElement>('[data-scope="calendar"][data-part="title"]')].map((title) => title.getBoundingClientRect())
+    expect(Math.abs(titles[1].top - titles[0].top)).toBeLessThan(1)
+    // Each title centred over its own grid, with a button beside it or not.
+    const grids = [...content().querySelectorAll<HTMLElement>('[data-scope="calendar"][data-part="grid"]')].map((grid) => grid.getBoundingClientRect())
+    for (const i of [0, 1]) expect(Math.abs(titles[i].left + titles[i].width / 2 - (grids[i].left + grids[i].width / 2))).toBeLessThan(2)
+    expect(document.activeElement).toBe(day('2026-09-28'))
+    await userEvent.keyboard('{ArrowDown}')
+    expect(document.activeElement).toBe(day('2026-10-05'))
+    expect(grids[1].left).toBeLessThanOrEqual(document.activeElement!.getBoundingClientRect().left)
+  })
+})
+
+describe('time', () => {
+  it('the list stands under the field at its width; typing walks it to the nearest time, in view, and Enter keeps what was typed', async () => {
+    const { clip, input, control } = await mount({ label: 'Starts at', step: 15 }, TimePicker)
+    await userEvent.click(input)
+    await userEvent.keyboard('21:37')
+    await frames(3)
+    const list = clip.querySelector<HTMLElement>('[data-scope="time-picker"][data-part="content"]')!
+    const box = list.getBoundingClientRect()
+    const field = control.getBoundingClientRect()
+    expect(box.top).toBeGreaterThanOrEqual(field.bottom)
+    expect(Math.abs(box.width - field.width)).toBeLessThan(1)
+    const highlighted = list.querySelector<HTMLElement>('[data-highlighted]')!
+    expect(highlighted.textContent).toBe('21:30')
+    const item = highlighted.getBoundingClientRect()
+    expect(item.top).toBeGreaterThanOrEqual(box.top)
+    expect(item.bottom).toBeLessThanOrEqual(box.bottom + 1)
+    await userEvent.keyboard('{Enter}')
+    await frames(2)
+    expect(input.value).toBe('21:37')
+    expect(input.getAttribute('aria-expanded')).toBe('false')
+  })
+
+  it('opens with its time in the middle of a list some rows tall, and the arrows scroll it no more than they must', async () => {
+    const { clip, input } = await mount({ label: 'Starts at', defaultValue: '12:30' }, TimePicker)
+    await userEvent.click(input)
+    await userEvent.keyboard('{ArrowDown}')
+    await frames(3)
+    const list = clip.querySelector<HTMLElement>('[data-scope="time-picker"][data-part="content"]')!
+    const box = list.getBoundingClientRect()
+    expect(box.height).toBeLessThan(300)
+    const centre = (el: Element) => { const r = el.getBoundingClientRect(); return r.top + r.height / 2 }
+    const chosen = list.querySelector<HTMLElement>('[data-selected]')!
+    expect(Math.abs(centre(chosen) - (box.top + box.height / 2))).toBeLessThan(20)
+    const scrolled = list.scrollTop
+    await userEvent.keyboard('{ArrowDown}')
+    await frames(2)
+    expect(list.scrollTop).toBe(scrolled)
+  })
+
+  it('with a date picker, the time sits in the same box on the same line, and the box is one field tall', async () => {
+    const { clip, control } = await mount({ time: true, defaultValue: '2026-09-18T09:00' })
+    const dayInput = control.querySelector<HTMLElement>('[data-scope="date-picker"][data-part="input"]')!.getBoundingClientRect()
+    const timeInput = clip.querySelector<HTMLElement>('[data-scope="time-picker"][data-part="input"]')!.getBoundingClientRect()
+    expect(timeInput.left).toBeGreaterThan(dayInput.right)
+    expect(Math.abs(timeInput.top + timeInput.height / 2 - (dayInput.top + dayInput.height / 2))).toBeLessThan(1)
+    const box = control.getBoundingClientRect()
+    expect(box.height).toBeLessThan(44)
+    expect(timeInput.right).toBeLessThanOrEqual(box.right)
   })
 })

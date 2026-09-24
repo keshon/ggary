@@ -2,7 +2,7 @@
 
 A UI kit scaffold: one framework-agnostic core, two sibling renderers (React 19
 and Svelte 5), and one design language, GGarry, on top of it.
-A hundred and six components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+A hundred and seven components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, TimePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3705 tests, 1383 of them in headless Chrome
+npm test         # 3779 tests, 1409 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck   # tsc, then svelte-check over every .svelte file
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1890,6 +1890,64 @@ take the grid's locale, so a filter is typed and read the way the rest of the
 page writes a day. The chip still reads "Sep 1, 2026 – Sep 5, 2026", and the
 query still carries two ISO days.
 
+**Two months side by side**, with `months={2}` — for a range that crosses a
+month's end, a stay or a sprint, without turning the page between the presses.
+Each month is its own grid, named by its own title, and a day spilling in from
+the other month is left blank rather than drawn twice: the 1st of October is on
+October's page only. The way back stands on the first page and the way on on
+the last, each title centred over its grid whichever button it has. Both pages
+turn together. The keyboard walks the pair as one run of weeks — the arrows
+carry the focus from September's grid into October's — and the pages follow it
+no further than they must: stepping past the last month shown brings in the
+next one, it does not jump by two. Only the first title is a live region, so a
+page turn is said once. `Calendar` takes `months` too.
+
+**A day and a time**, with `time`: one box, the day's field and then the
+time's, parted by a hairline, one label over both.
+
+```tsx
+<DatePicker label="Meeting starts" time min={todayISO()} name="meeting" onValueChange={(at) => save(at)} />
+```
+
+The value is `YYYY-MM-DDTHH:mm` — a wall-clock day and time with no zone, the
+same "18 September at 14:30" wherever it is read, as a day is. Each half keeps
+its own state; `onValueChange` hands over the pair once both are set, and null
+while either is missing, and the form submits it as one value under `name`.
+The time half is a TimePicker, embedded: it has no box or label of its own, is
+named "Time" for a screen reader (`timeLabel`), and `step` and `timeWords`
+pass through to it. A time zone is the owner's to attach: a meeting in another
+city's time is a wall clock plus a place, and that place is not a picker's to
+guess.
+
+## TimePicker
+
+A field for a time of day, typed or chosen from a list of times at a step.
+
+```tsx
+<TimePicker label="Call at" min="08:00" max="20:00" isTimeDisabled={(t) => t >= '13:00' && t < '14:00'} name="call" />
+<TimePicker label="Reminder" locale="en-US" step={30} defaultValue="09:30" />
+```
+
+**A time, not an instant.** The value is `HH:mm` on a twenty-four-hour clock,
+whatever the locale shows. The field shows it the locale's way — `14:30`,
+`2:30 PM`, `오후 2:30` — from `Intl`, twelve hours or twenty-four as the
+locale keeps them.
+
+**Typed first.** It is a combobox: typing opens the list on the nearest time and
+Enter keeps what was typed, off the step too — `9:37 pm` is `21:37`, not
+`21:30`. A day-period word is read at either end, as the locale writes it
+(`2:30 PM`, `오후 2:30`), and `930` or `9.30` is half past nine. Text that is not
+a time marks the field invalid and says how to write one, with an example in the
+locale's own form. Emptying the field clears the value.
+
+**The list** holds the times at `step` minutes (15 by default), between `min`
+and `max`; one refused by `isTimeDisabled` stays in the list, faded, and cannot
+be chosen. It opens with the chosen time in its middle, so both sides of it show,
+eight and a half rows tall — the half row says there is more; the arrows then
+scroll it no further than they must, and PageUp and PageDown move four. The
+focus never leaves the field: the list is the ARIA combobox's listbox, followed
+by `aria-activedescendant`. With a `name`, it submits `HH:mm`.
+
 ## Cascader
 
 A choice from a tree, one level to a column: country, region, city; a team
@@ -2963,7 +3021,7 @@ sandbox build prints none.
 
 | Project | Env | Files | What it covers |
 |---|---|---|---|
-| machine | node | `*.machine.test.ts` | 661 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
+| machine | node | `*.machine.test.ts` | 667 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
 | contract | node | `icons.contract.test.ts` | 399 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 5 tests. Every discovered theme — GGarry, now the only one: structure, literals, contrast, coverage. |
 | contract | node | `packages.contract.test.ts` | 9 tests. Each package's exports are its root and `./*`; every component directory has an index; both adapters have the same directories, the same components in each, and all of them at their root. |
@@ -2971,9 +3029,9 @@ sandbox build prints none.
 | contract | node | `sizes.contract.test.ts` | 3 tests. Every control's size is `ControlSize`, and its stylesheet draws `sm` and `lg`. |
 | contract | node | `core-shape.contract.test.ts` | 2 tests. Every component laid out as `<dir>.<role>.ts` with a re-export-only index; every connect ending at the normalizer or one `options`. |
 | contract | node | `checks.contract.test.ts` | 30 tests. The gates themselves: each rule fires on a planted defect — the literal families and their ledger among them; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1128 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1150 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 1128 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1150 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
 | browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
 | browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |
@@ -2996,9 +3054,10 @@ sandbox build prints none.
 | browser | Chrome | `tabs.browser.test.ts` | 4 tests. One tab stop under the real Tab key, vertical tabs beside their panel, a long strip scrolling to the focused tab, a real click closing a tab without losing focus. |
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
 | browser | Chrome | `data-grid.browser.test.ts` | 13 tests. A row's checkbox pressed by a real pointer, React and Svelte; its Open button shown under the pointer and opening the row without selecting or editing it, and Shift+Enter opening it from a cell that edits. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
+| machine | node | `time-picker.machine.test.ts` | 13 tests. Times typed in the locale's words, with the day-period word at either end; the times at a step within min and max; the nearest time; opening on the value, walking, typing, committing and clearing; a day and a time joined only when both are there, and split back. |
 | machine | node | `popconfirm.machine.test.ts` | 8 tests. One attempt while one is under way; closing on success, staying and saying why on a failure (a rejection, a throw, or the words); a late answer to an abandoned attempt ignored; a new opening forgetting the failure; cancels heard for every close but the action's; the focus mark by `destructive`; the alert dialog's name and description. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
-| browser | Chrome | `date-picker.browser.test.ts` | 4 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. |
+| browser | Chrome | `date-picker.browser.test.ts` | 8 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. Two months level and apart, each title centred over its grid, the real keyboard carrying the focus from one grid into the other. A time list under its field at its width, real typing walking it to the nearest time in view and Enter keeping the typed one; the list opening with its time in the middle, some rows tall, and the arrows not scrolling it needlessly; a date-time's time on the day's line inside one field-tall box. |
 | browser | Chrome | `gantt.browser.test.ts` | 9 tests. A group's summary measured to the pixel, closed by a press on its name, its chevron turned, a hidden task's arrow leaving the heading's row. An arrow out of a bar's last day, a gap out, down to the rows' seam; into a milestone at its tip; behind a bar it crosses; a conflict in another colour. A bar dragged three days' worth moving three days and the owner hearing it on release; its end resized by the grip, and Escape in the middle putting it back; a refused move springing back. Also Bars measured to the pixel at the day and the week scale, a milestone on its day; the list at the left edge and the scale at the top as the chart scrolls; a task reached by the keyboard brought into view clear of the list; the chart opening on today, a third of the way in. |
 | browser | Chrome | `form.browser.test.ts` | 4 tests. The real keyboard submitting and walking the summary to a field; a valid form going on to its action natively; a rule that asks a server holding the form, then letting it go; a second press while a submission is out sending nothing. |
 | browser | Chrome | `command-palette.browser.test.ts` | 4 tests. The real Ctrl+K opening it modal, high in the viewport, and closing it back to the element before; the list scrolling to keep the highlight in view; a server's records under their heading after the typing pauses; a command that opens a dialog of its own keeping the focus. |
@@ -3114,9 +3173,9 @@ Real, and deliberately left open:
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that was Instrument's position, and it stays available.
-- **The date picker has no time.** A day or a range of days; a time of day, and
-  the time zone that comes with it, are not built. Nor are two months side by
-  side.
+- **A date-time has no zone.** DatePicker's `time` is a wall clock, `YYYY-MM-DDTHH:mm`;
+  a zone, and the instant it would make, are the owner's to attach. A range of
+  date-times is not built: a range is of days.
 - **Form errors reach Field, Select, Combobox and DatePicker.** A RadioGroup or
   CheckboxGroup in a Fieldset keeps the browser's own `required`; a Cascader,
   Tree or Slider does not yet show a form's error by name. Nor is there a

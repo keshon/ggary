@@ -14,19 +14,21 @@
     max?: ISODate | null
     weekStart?: number
     isDateDisabled?: (date: ISODate) => boolean
+    /** How many months stand side by side: 1, or 2 for a range across a month's end. Default 1. */
+    months?: 1 | 2
     locale?: string
     defaultMonth?: ISODate
     words?: CalendarWords
   }
 
   /** A month to choose a day, or a range, from — on the page itself. */
-  let { value = $bindable(), defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, locale, defaultMonth, words }: Props = $props()
+  let { value = $bindable(), defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, months, locale, defaultMonth, words }: Props = $props()
 
   const machine = untrack(() =>
     createCalendarMachine({
       id: uid('gg-calendar'),
       defaultValue: value !== undefined ? value : defaultValue,
-      mode, min, max, weekStart, isDateDisabled, locale, defaultMonth,
+      mode, min, max, weekStart, isDateDisabled, months, locale, defaultMonth,
       onValueChange: (next) => {
         value = mode === 'range' ? next : next.start
         onValueChange?.(next)
@@ -37,12 +39,12 @@
   $effect(() => machine.subscribe((next) => (snapshot = next)))
   const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, locale }))
 
-  $effect(() => machine.send({ type: 'SYNC_OPTIONS', mode, min, max, weekStart, isDateDisabled }))
+  $effect(() => machine.send({ type: 'SYNC_OPTIONS', mode, min, max, weekStart, isDateDisabled, months }))
   $effect(() => {
     if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value: toRange(value) })
   })
 
-  let grid = $state<HTMLTableElement>()
+  let grid = $state<HTMLDivElement>()
   $effect(() => {
     const id = api.focusedId
     untrack(() => focusCalendarDay(grid ?? null, id))

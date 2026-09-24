@@ -46,6 +46,7 @@ import {
   Calendar,
   Combobox,
   DatePicker,
+  TimePicker,
   Cascader,
   Accordion,
   Tree,
@@ -166,6 +167,7 @@ function App() {
   const [leadLog, setLeadLog] = useState('—')
   const [comboLog, setComboLog] = useState('—')
   const [dateLog, setDateLog] = useState('—')
+  const [timeLog, setTimeLog] = useState('—')
   const [placeLog, setPlaceLog] = useState('—')
   const [boardLog, setBoardLog] = useState('—')
   const [deals, setDeals] = useState(initialDeals)
@@ -723,11 +725,22 @@ function App() {
           <div className="fields">
             <DatePicker label="Follow up on" locale="en-GB" min={todayISO()} onValueChange={(value) => setDateLog(`follow up: ${value.start ?? '—'}`)} name="follow" />
             <DatePicker label="Registered between" mode="range" locale="en-GB" presets={rangePresets()} onValueChange={(value) => setDateLog(`registered: ${value.start ?? '…'} – ${value.end ?? '…'}`)} />
+            <DatePicker label="Stay" mode="range" months={2} locale="en-GB" onValueChange={(value) => setDateLog(`stay: ${value.start ?? '…'} – ${value.end ?? '…'}`)} />
           </div>
           <div style={{ marginTop: 16 }}>
             <Calendar locale="en-GB" isDateDisabled={isWeekend} onValueChange={(value) => setDateLog(`call on: ${value.start}`)} />
           </div>
           <pre className="state">{dateLog}</pre>
+        </section>
+
+        <section id="times">
+          <h3>Time picker</h3>
+          <div className="fields">
+            <TimePicker label="Call at" locale="en-GB" min="08:00" max="20:00" isTimeDisabled={(time) => time >= '13:00' && time < '14:00'} onValueChange={(value) => setTimeLog(`call at: ${value ?? '—'}`)} name="call" />
+            <TimePicker label="Reminder (12-hour)" locale="en-US" step={30} defaultValue="09:30" onValueChange={(value) => setTimeLog(`reminder: ${value ?? '—'}`)} />
+            <DatePicker label="Meeting starts" time locale="en-GB" min={todayISO()} onValueChange={(value) => setTimeLog(`meeting: ${value ?? 'day and time both needed'}`)} name="meeting" />
+          </div>
+          <pre className="state">{timeLog}</pre>
         </section>
 
         <section id="controls">

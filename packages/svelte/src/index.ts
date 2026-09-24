@@ -65,6 +65,7 @@ export { default as EmptyState } from './components/empty-state/EmptyState.svelt
 export { default as Link } from './components/link/Link.svelte'
 export { default as Prose } from './components/prose/Prose.svelte'
 export { default as Text } from './components/text/Text.svelte'
+export { default as TimePicker } from './components/time-picker/TimePicker.svelte'
 export { default as Popconfirm } from './components/popconfirm/Popconfirm.svelte'
 export { default as ContextMenu } from './components/context-menu/ContextMenu.svelte'
 export { default as Result } from './components/result/Result.svelte'

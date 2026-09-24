@@ -32,6 +32,7 @@
     Calendar,
     Combobox,
     DatePicker,
+    TimePicker,
     Cascader,
     Accordion,
     Tree,
@@ -160,6 +161,7 @@
   let leadLog = $state('—')
   let comboLog = $state('—')
   let dateLog = $state('—')
+  let timeLog = $state('—')
   let placeLog = $state('—')
   let boardLog = $state('—')
   let deals = $state.raw(initialDeals)
@@ -692,11 +694,22 @@
     <div class="fields">
       <DatePicker label="Follow up on" locale="en-GB" min={todayISO()} onValueChange={(value) => (dateLog = `follow up: ${value.start ?? '—'}`)} name="follow" />
       <DatePicker label="Registered between" mode="range" locale="en-GB" presets={rangePresets()} onValueChange={(value) => (dateLog = `registered: ${value.start ?? '…'} – ${value.end ?? '…'}`)} />
+      <DatePicker label="Stay" mode="range" months={2} locale="en-GB" onValueChange={(value) => (dateLog = `stay: ${value.start ?? '…'} – ${value.end ?? '…'}`)} />
     </div>
     <div style="margin-top: 16px">
       <Calendar locale="en-GB" isDateDisabled={isWeekend} onValueChange={(value) => (dateLog = `call on: ${value.start}`)} />
     </div>
     <pre class="state">{dateLog}</pre>
+  </section>
+
+  <section id="times">
+    <h3>Time picker</h3>
+    <div class="fields">
+      <TimePicker label="Call at" locale="en-GB" min="08:00" max="20:00" isTimeDisabled={(time) => time >= '13:00' && time < '14:00'} onValueChange={(value) => (timeLog = `call at: ${value ?? '—'}`)} name="call" />
+      <TimePicker label="Reminder (12-hour)" locale="en-US" step={30} defaultValue="09:30" onValueChange={(value) => (timeLog = `reminder: ${value ?? '—'}`)} />
+      <DatePicker label="Meeting starts" time locale="en-GB" min={todayISO()} onValueChange={(value) => (timeLog = `meeting: ${value ?? 'day and time both needed'}`)} name="meeting" />
+    </div>
+    <pre class="state">{timeLog}</pre>
   </section>
 
   <section id="controls">

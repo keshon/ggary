@@ -427,12 +427,16 @@ export interface CalendarProps {
   min?: string
   max?: string
   locale?: string
+  months?: 1 | 2
   onValueChange?: (value: { start: string | null; end: string | null }) => void
 }
 
 export interface DatePickerProps extends CalendarProps {
   label: string
   name?: string
+  /** A day and a time in one box: the value is then `YYYY-MM-DDTHH:mm`, handed over as a string. */
+  time?: boolean
+  step?: number
   presets?: import('../../packages/core/src/components/date-picker').DatePreset[]
 }
 
@@ -951,6 +955,19 @@ export interface ContextMenuProps {
   label?: string
 }
 
+export interface TimePickerProps {
+  label?: string
+  value?: string | null
+  defaultValue?: string | null
+  onValueChange?: (value: string | null) => void
+  step?: number
+  min?: string
+  max?: string
+  isTimeDisabled?: (time: string) => boolean
+  locale?: string
+  name?: string
+}
+
 export interface DividerProps {
   orientation?: 'horizontal' | 'vertical'
   label?: string
@@ -1220,6 +1237,7 @@ export interface Adapter {
   banner(props: BannerProps, target: HTMLElement): Promise<Mounted<BannerProps>>
   note(props: NoteProps, target: HTMLElement): Promise<Mounted<NoteProps>>
   divider(props: DividerProps, target: HTMLElement): Promise<Mounted<DividerProps>>
+  timePicker(props: TimePickerProps, target: HTMLElement): Promise<Mounted<TimePickerProps>>
   result(props: ResultProps, target: HTMLElement): Promise<Mounted<ResultProps>>
   popconfirm(props: PopconfirmProps, target: HTMLElement): Promise<Mounted<PopconfirmProps>>
   contextMenu(props: ContextMenuProps, target: HTMLElement): Promise<Mounted<ContextMenuProps>>

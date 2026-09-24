@@ -1,5 +1,5 @@
 import { createMachine, withEffects, type Machine } from '../../machine'
-import { addDays, addMonths, clampDate, isISODate, startOfWeek, todayISO, weekStartOf, type ISODate } from '../../utils/calendar'
+import { addDays, addMonths, clampDate, isISODate, startOfMonth, startOfWeek, todayISO, weekStartOf, type ISODate } from '../../utils/calendar'
 import type { CalendarEvent, CalendarOptions, CalendarState, DateRange } from './calendar.types'
 
 export const EMPTY_RANGE: DateRange = { start: null, end: null }
@@ -22,14 +22,34 @@ function commit(state: CalendarState, value: DateRange): CalendarState {
   return state.controlled ? next : { ...next, value }
 }
 
+/**
+ * The months shown follow the focus, and move no more than they must: a focus
+ * that leaves them brings the page round so its month is the nearest shown —
+ * the first when it went back, the last when it went on.
+ */
+function follow(state: CalendarState): CalendarState {
+  const month = startOfMonth(state.focused)
+  const last = addMonths(state.shown, state.months - 1)
+  const shown = month < state.shown ? month : month > last ? addMonths(month, -(state.months - 1)) : state.shown
+  return shown === state.shown ? state : { ...state, shown }
+}
+
 export function reducer(state: CalendarState, event: CalendarEvent): CalendarState {
+  const next = step(state, event)
+  return next === state ? state : follow(next)
+}
+
+function step(state: CalendarState, event: CalendarEvent): CalendarState {
   switch (event.type) {
     case 'FOCUS':
       return isISODate(event.date) ? withFocus(state, event.date) : state
     case 'MOVE':
       return withFocus(state, addDays(state.focused, event.days))
-    case 'MOVE_MONTHS':
-      return withFocus(state, addMonths(state.focused, event.months))
+    case 'MOVE_MONTHS': {
+      // A page turn: the months shown and the focus move together.
+      const moved = withFocus(state, addMonths(state.focused, event.months))
+      return { ...moved, shown: addMonths(state.shown, event.months) }
+    }
     case 'WEEK_EDGE': {
       const first = startOfWeek(state.focused, state.weekStart)
       return withFocus(state, event.edge === 'start' ? first : addDays(first, 6))
@@ -63,7 +83,7 @@ export function reducer(state: CalendarState, event: CalendarEvent): CalendarSta
       return event.today === state.today ? state : { ...state, today: event.today }
     case 'SYNC_OPTIONS': {
       let next = state
-      for (const key of ['mode', 'min', 'max', 'weekStart', 'isDateDisabled'] as const) {
+      for (const key of ['mode', 'min', 'max', 'weekStart', 'isDateDisabled', 'months'] as const) {
         if (event[key] !== undefined && event[key] !== next[key]) next = { ...next, [key]: event[key] }
       }
       return next === state ? state : withFocus({ ...next, anchor: next.mode === state.mode ? next.anchor : null }, next.focused)
@@ -98,11 +118,14 @@ export function initialState(config: CalendarConfig): CalendarState {
     max: config.max ?? null,
     weekStart: config.weekStart ?? weekStartOf(config.locale),
     isDateDisabled: config.isDateDisabled ?? null,
+    months: Math.max(1, Math.min(2, Math.round(config.months ?? 1))),
   }
+  const focused = clampDate(value.start ?? config.defaultMonth ?? today, options.min, options.max)
   return {
     id: config.id,
     ...options,
-    focused: clampDate(value.start ?? config.defaultMonth ?? today, options.min, options.max),
+    focused,
+    shown: startOfMonth(focused),
     today,
     value,
     anchor: null,

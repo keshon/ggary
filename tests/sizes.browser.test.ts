@@ -28,6 +28,7 @@ const CASES: [name: string, part: string, props: Record<string, unknown>][] = [
   ['Combobox', "[data-scope='combobox'][data-part='control']", { label: 'Find', items }],
   ['Cascader', "[data-scope='cascader'][data-part='trigger']", { label: 'Place', items: tree }],
   ['DatePicker', "[data-scope='date-picker'][data-part='control']", { label: 'When' }],
+  ['TimePicker', "[data-scope='time-picker'][data-part='control']", { label: 'At' }],
 ]
 
 let cleanups: (() => void)[] = []

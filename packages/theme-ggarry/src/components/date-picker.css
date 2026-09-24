@@ -6,22 +6,22 @@
    the danger edge, and the reason under it.
    ========================================================================== */
 
-[data-scope='date-picker'][data-part='root'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'] {
   gap: var(--ggarry-space-1);
   min-inline-size: 180px;
   font-family: var(--ggarry-font-family-sans);
 }
-[data-scope='date-picker'][data-part='root'][data-mode='range'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'][data-mode='range'] {
   min-inline-size: 280px;
 }
 
-[data-scope='date-picker'][data-part='label'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='label'] {
   font-size: var(--ggarry-font-size-sm);
   font-weight: var(--ggarry-font-weight-medium);
   color: var(--ggarry-text-muted);
 }
 
-[data-scope='date-picker'][data-part='control'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='control'] {
   gap: var(--ggarry-space-1);
   block-size: var(--control-height);
   padding-inline: var(--ggarry-space-3) 3px;
@@ -32,42 +32,42 @@
   font-size: var(--control-font-size);
   transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
-[data-scope='date-picker'][data-part='control']:hover,
-[data-scope='date-picker'][data-part='control'][data-state='open'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='control']:hover,
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='control'][data-state='open'] {
   border-color: var(--ggarry-border-accent);
 }
-[data-scope='date-picker'][data-part='control']:has([data-part='input']:focus-visible) {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='control']:has([data-part='input']:focus-visible) {
   border-color: var(--ggarry-border-accent);
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
   outline-offset: var(--ggarry-focus-ring-offset);
 }
-[data-scope='date-picker'][data-part='control'][data-invalid] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='control'][data-invalid] {
   border-color: var(--ggarry-border-danger);
 }
-[data-scope='date-picker'][data-part='input']:focus-visible {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='input']:focus-visible {
   outline: none;
 }
-[data-scope='date-picker'][data-part='input']::placeholder {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='input']::placeholder {
   color: var(--ggarry-text-muted);
   opacity: 1;
 }
 
-[data-scope='date-picker'][data-part='trigger'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='trigger'] {
   inline-size: var(--ggarry-size-icon-button-sm);
   block-size: var(--ggarry-size-icon-button-sm);
   border-radius: var(--ggarry-radius-sm);
   color: var(--ggarry-text-muted);
 }
-[data-scope='date-picker'][data-part='trigger']:hover,
-[data-scope='date-picker'][data-part='trigger'][data-state='open'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='trigger']:hover,
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='trigger'][data-state='open'] {
   background: var(--ggarry-bg-subtle);
   color: var(--ggarry-text-default);
 }
-[data-scope='date-picker'][data-part='trigger']:focus-visible {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='trigger']:focus-visible {
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
   outline-offset: 0;
 }
-[data-scope='date-picker'][data-part='trigger-icon'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='trigger-icon'] {
   inline-size: 16px;
   block-size: 16px;
 }
@@ -79,7 +79,7 @@
   box-shadow: var(--ggarry-shadow-popover);
 }
 
-[data-scope='date-picker'][data-part='error'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='error'] {
   color: var(--ggarry-text-danger);
   font-size: var(--ggarry-font-size-sm);
 }
@@ -116,17 +116,17 @@
 
 /* --- sizes: Input's three, set on the root and read by the control ---------- */
 
-[data-scope='date-picker'][data-part='root'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'] {
   --control-height: var(--ggarry-size-control-md);
   --control-font-size: var(--ggarry-font-size-md);
   --control-radius: var(--ggarry-radius-control-md);
 }
-[data-scope='date-picker'][data-part='root'][data-size='sm'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'][data-size='sm'] {
   --control-height: var(--ggarry-size-control-sm);
   --control-font-size: var(--ggarry-font-size-sm);
   --control-radius: var(--ggarry-radius-control-sm);
 }
-[data-scope='date-picker'][data-part='root'][data-size='lg'] {
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'][data-size='lg'] {
   --control-height: var(--ggarry-size-control-lg);
   --control-font-size: var(--ggarry-font-size-lg);
   --control-radius: var(--ggarry-radius-control-lg);

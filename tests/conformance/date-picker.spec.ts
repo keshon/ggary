@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { setInputValue } from '../../packages/core/src/index'
-import { type Adapter, type CalendarProps, type DatePickerProps, click, freshTarget, part, parts } from './harness'
+import { type Adapter, type CalendarProps, type DatePickerProps, click, freshTarget, part, parts, typeInto } from './harness'
 
 type Range = { start: string | null; end: string | null }
 
@@ -189,6 +189,81 @@ export function datePickerConformance(adapter: Adapter) {
       expect(values).toEqual([{ start: '2026-09-01', end: '2026-09-18' }])
       expect(input().value).toBe('Sep 1, 2026 – Sep 18, 2026')
       expect(m.root.querySelector<HTMLInputElement>('input[type="hidden"][name="period"]')!.value).toBe('2026-09-01/2026-09-18')
+    })
+  })
+
+  run('two months', () => {
+    it('stand side by side, one grid each, the other month’s days blank, one way back and one way on', async () => {
+      const m = await adapter.calendar({ locale: 'en-GB', defaultValue: '2026-09-18', months: 2 }, freshTarget())
+      const titles = () => parts(m.root, 'calendar', 'title').map((title) => title.textContent)
+      expect(titles()).toEqual(['September 2026', 'October 2026'])
+      const grids = parts(m.root, 'calendar', 'grid')
+      expect(grids).toHaveLength(2)
+      expect(grids.map((grid) => grid.getAttribute('aria-labelledby'))).toEqual(parts(m.root, 'calendar', 'title').map((title) => title.id))
+      expect(parts(m.root, 'calendar', 'prev')).toHaveLength(1)
+      expect(parts(m.root, 'calendar', 'next')).toHaveLength(1)
+      const blanks = parts(grids[0], 'calendar', 'day').filter((day) => day.hasAttribute('data-blank'))
+      expect(blanks.length).toBeGreaterThan(0)
+      expect(blanks.every((day) => day.textContent === '' && !day.dataset.date && day.getAttribute('aria-hidden') === 'true')).toBe(true)
+      expect(m.root.querySelectorAll('[data-date="2026-10-01"]')).toHaveLength(1)
+      await adapter.act(() => click(part(m.root, 'calendar', 'next')!))
+      expect(titles()).toEqual(['October 2026', 'November 2026'])
+    })
+
+    it('the keyboard crosses from one grid into the other, and the focus goes with it', async () => {
+      const m = await adapter.calendar({ locale: 'en-GB', defaultValue: '2026-09-30', months: 2 }, freshTarget())
+      const titles = () => parts(m.root, 'calendar', 'title').map((title) => title.textContent)
+      await adapter.act(() => dayOf(m.root, '2026-09-30').focus())
+      await adapter.act(() => void key(document.activeElement!, 'ArrowRight'))
+      expect(document.activeElement).toBe(dayOf(m.root, '2026-10-01'))
+      expect(parts(m.root, 'calendar', 'grid')[1].contains(document.activeElement)).toBe(true)
+      expect(titles()).toEqual(['September 2026', 'October 2026'])
+      for (let i = 0; i < 5; i++) await adapter.act(() => void key(document.activeElement!, 'ArrowDown'))
+      expect(document.activeElement).toBe(dayOf(m.root, '2026-11-05'))
+      expect(titles()).toEqual(['October 2026', 'November 2026'])
+    })
+
+    it('a range picker opens on two months', async () => {
+      const m = await adapter.datePicker({ label: 'Stay', locale: 'en-GB', mode: 'range', defaultValue: { start: '2026-09-28', end: '2026-10-03' }, months: 2 }, freshTarget())
+      await adapter.act(() => click(part(m.root, 'date-picker', 'trigger')!))
+      await adapter.wait(0)
+      expect(parts(m.root, 'calendar', 'grid')).toHaveLength(2)
+      expect(dayOf(m.root, '2026-10-01').hasAttribute('data-in-range')).toBe(true)
+    })
+  })
+
+  run('date picker with time', () => {
+    const setup = async (props: Partial<DatePickerProps> = {}) => {
+      const values: unknown[] = []
+      const onValueChange = ((value: unknown) => values.push(value)) as DatePickerProps['onValueChange']
+      const m = await adapter.datePicker({ label: 'Starts', locale: 'en-GB', time: true, name: 'starts', onValueChange, ...props }, freshTarget())
+      const dateInput = () => part(m.root, 'date-picker', 'input') as HTMLInputElement
+      const timeInput = () => part(m.root, 'time-picker', 'input') as HTMLInputElement
+      const hidden = () => m.root.querySelector<HTMLInputElement>('input[type="hidden"][name="starts"]')!
+      return { m, dateInput, timeInput, hidden, values }
+    }
+
+    it('is one labelled box: the day’s field, then the time’s, named for a screen reader', async () => {
+      const { m, dateInput, timeInput } = await setup({ defaultValue: '2026-09-18T14:30' as never })
+      expect(part(m.root, 'date-picker', 'label')!.getAttribute('for')).toBe(dateInput().id)
+      expect(part(m.root, 'date-picker', 'control')!.contains(timeInput())).toBe(true)
+      expect(part(m.root, 'time-picker', 'label')).toBeNull()
+      expect(timeInput().getAttribute('aria-label')).toBe('Time')
+      expect(timeInput().value).toBe('14:30')
+      expect(dateInput().value).not.toBe('')
+      expect(m.root.querySelectorAll('input[type="hidden"][name="starts"]')).toHaveLength(1)
+    })
+
+    it('reports the pair once both halves are set, and submits it as one value', async () => {
+      const { dateInput, timeInput, hidden, values } = await setup()
+      await adapter.act(() => typeInto(dateInput(), '18/09/2026'))
+      await adapter.act(() => void key(dateInput(), 'Enter'))
+      expect(values.at(-1)).toBeNull()
+      expect(hidden().value).toBe('')
+      await adapter.act(() => typeInto(timeInput(), '9:05'))
+      await adapter.act(() => void key(timeInput(), 'Enter'))
+      expect(values.at(-1)).toBe('2026-09-18T09:05')
+      expect(hidden().value).toBe('2026-09-18T09:05')
     })
   })
 }

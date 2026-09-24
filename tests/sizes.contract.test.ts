@@ -12,10 +12,10 @@ import { expect, it } from 'vitest'
 const root = join(__dirname, '..')
 const CONTROLS = [
   'button', 'button-group', 'input', 'textarea', 'input-group', 'search', 'number-field', 'chip',
-  'segmented-control', 'slider', 'select', 'combobox', 'cascader', 'date-picker', 'pagination', 'tabs',
+  'segmented-control', 'slider', 'select', 'combobox', 'cascader', 'date-picker', 'time-picker', 'pagination', 'tabs',
 ]
 /** Drawn by another control's stylesheet. */
-const DRAWN_BY: Record<string, string> = { search: 'input', textarea: 'input' }
+const DRAWN_BY: Record<string, string> = { search: 'input', textarea: 'input', 'time-picker': 'date-picker' }
 
 const core = (name: string) =>
   readdirSync(join(root, 'packages/core/src/components', name))

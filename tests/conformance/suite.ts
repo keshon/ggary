@@ -33,6 +33,7 @@ import { toastConformance } from './toast.spec'
 import { displayConformance } from './display.spec'
 import { typographyConformance } from './typography.spec'
 import { feedbackConformance } from './feedback.spec'
+import { timeConformance } from './time.spec'
 import { meterConformance } from './meter.spec'
 import { ringConformance } from './ring.spec'
 import { codeConformance } from './code.spec'
@@ -109,6 +110,7 @@ export function runConformance() {
       displayConformance(adapter)
       typographyConformance(adapter)
       feedbackConformance(adapter)
+      timeConformance(adapter)
       meterConformance(adapter)
       ringConformance(adapter)
       timelineConformance(adapter)

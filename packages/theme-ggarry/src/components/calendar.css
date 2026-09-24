@@ -19,7 +19,16 @@
   color: var(--ggarry-text-default);
 }
 
+/* Two months stand a gutter apart; each keeps its own header. */
+[data-scope='calendar'][data-part='months'] {
+  gap: var(--ggarry-space-5);
+}
+[data-scope='calendar'][data-part='month'] {
+  gap: var(--ggarry-space-2);
+}
 [data-scope='calendar'][data-part='header'] {
+  /* Both pages give the buttons their column, drawn or not: the titles line up. */
+  grid-template-columns: var(--ggarry-size-icon-button-md) 1fr var(--ggarry-size-icon-button-md);
   gap: var(--ggarry-space-1);
 }
 [data-scope='calendar'][data-part='title'] {
@@ -79,7 +88,7 @@
   margin: auto;
   border-radius: var(--ggarry-radius-full);
 }
-[data-scope='calendar'][data-part='day']:hover:not([data-disabled]):not([data-selected])::before {
+[data-scope='calendar'][data-part='day']:hover:not([data-disabled], [data-selected], [data-blank])::before {
   background: var(--ggarry-bg-subtle);
 }
 [data-scope='calendar'][data-part='day'][data-outside] {

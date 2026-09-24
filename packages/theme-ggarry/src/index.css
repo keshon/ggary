@@ -52,6 +52,7 @@
 @import './components/menu.css' layer(gg.components);
 @import './components/menubar.css' layer(gg.components);
 @import './components/nav.css' layer(gg.components);
+@import './components/time-picker.css' layer(gg.components);
 @import './components/popconfirm.css' layer(gg.components);
 @import './components/context-menu.css' layer(gg.components);
 @import './components/result.css' layer(gg.components);

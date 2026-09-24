@@ -113,7 +113,7 @@
 
 /* --- the list: Select's ----------------------------------------------------- */
 
-[data-scope='combobox'][data-part='content'] {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='content'] {
   --listbox-radius: var(--ggarry-radius-lg);
   padding: var(--ggarry-space-1);
   border: 1px solid var(--ggarry-border-default);
@@ -124,11 +124,11 @@
   transition: opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 /* The last answer, while the next is on its way: still there, plainly not current. */
-[data-scope='combobox'][data-part='content'][data-stale] {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='content'][data-stale] {
   opacity: var(--ggarry-opacity-stale);
 }
 
-[data-scope='combobox'][data-part='item'] {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='item'] {
   column-gap: var(--ggarry-space-2);
   /* 32 pixels a row, with the field's corner, as the select's options. */
   padding: 6px var(--ggarry-space-2);
@@ -139,21 +139,21 @@
   cursor: pointer;
   user-select: none;
 }
-[data-scope='combobox'][data-part='item'][data-highlighted] {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='item'][data-highlighted] {
   background: var(--ggarry-bg-accent);
   color: var(--ggarry-text-on-accent);
 }
 /* "Create …": an action at the list's end, in the accent's ink until it is highlighted. */
-[data-scope='combobox'][data-part='item'][data-create]:not([data-highlighted]) {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='item'][data-create]:not([data-highlighted]) {
   color: var(--ggarry-text-accent);
 }
-[data-scope='combobox'][data-part='item'][aria-busy='true'] {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='item'][aria-busy='true'] {
   opacity: var(--ggarry-opacity-stale);
 }
-[data-scope='combobox'][data-part='item'][data-selected] {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='item'][data-selected] {
   font-weight: var(--ggarry-font-weight-semibold);
 }
-[data-scope='combobox'][data-part='item'][data-disabled] {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='item'][data-disabled] {
   color: var(--ggarry-text-subtle);
   cursor: not-allowed;
 }
@@ -162,7 +162,7 @@
   font-size: var(--ggarry-font-size-sm);
   font-weight: var(--ggarry-font-weight-normal);
 }
-[data-scope='combobox'][data-part='item'][data-highlighted] > [data-part='item-description'] {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='item'][data-highlighted] > [data-part='item-description'] {
   color: inherit;
 }
 [data-scope='combobox'][data-part='item-indicator'] {
@@ -170,7 +170,7 @@
   block-size: 14px;
   opacity: 0;
 }
-[data-scope='combobox'][data-part='item'][data-selected] > [data-part='item-indicator'] {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='item'][data-selected] > [data-part='item-indicator'] {
   opacity: 1;
 }
 

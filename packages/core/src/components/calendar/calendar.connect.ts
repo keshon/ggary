@@ -9,6 +9,9 @@ export const calendarIds = (id: string) => ({
   root: id,
   title: `${id}-title`,
   grid: `${id}-grid`,
+  /** The second month's title and grid, and so on: the first keeps the plain ids. */
+  pageTitle: (page: number) => (page === 0 ? `${id}-title` : `${id}-title-${page + 1}`),
+  pageGrid: (page: number) => (page === 0 ? `${id}-grid` : `${id}-grid-${page + 1}`),
   day: (date: ISODate) => `${id}-day-${date}`,
 })
 
@@ -37,8 +40,10 @@ export function connect<T = Dict>(state: CalendarState, send: (event: CalendarEv
   const words = options
   const ids = calendarIds(state.id)
   const locale = words.locale
-  const month = startOfMonth(state.focused)
+  const month = state.shown
   const weeks = monthWeeks(month, state.weekStart)
+  const months = Array.from({ length: state.months }, (_, page) => addMonths(month, page))
+  const lastMonth = months[months.length - 1]
 
   // The range drawn: the chosen one, or the one a second press would make.
   const pendingEnd = state.anchor !== null ? (state.hovered ?? state.focused) : null
@@ -50,7 +55,7 @@ export function connect<T = Dict>(state: CalendarState, send: (event: CalendarEv
       : [state.value.start, state.value.end]
 
   const prevMonth = addMonths(month, -1)
-  const nextMonth = addMonths(month, 1)
+  const nextMonth = addMonths(lastMonth, 1)
   const canPrev = !state.min || prevMonth.slice(0, 7) >= state.min.slice(0, 7)
   const canNext = !state.max || nextMonth.slice(0, 7) <= state.max.slice(0, 7)
 
@@ -91,7 +96,8 @@ export function connect<T = Dict>(state: CalendarState, send: (event: CalendarEv
         return
     }
     // Only a key the grid acted on: a Tab out must not pull the focus back in later.
-    if (typeof Element !== 'undefined' && target instanceof Element) movedByKeyboard.add(target)
+    // Recorded on the months together: the new focused day may be in the other grid.
+    if (typeof Element !== 'undefined' && target instanceof Element) movedByKeyboard.add(target.closest("[data-scope='calendar'][data-part='months']") ?? target)
     event.preventDefault()
   }
 
@@ -101,6 +107,37 @@ export function connect<T = Dict>(state: CalendarState, send: (event: CalendarEv
     ids,
     month,
     title: formatMonth(month, locale),
+    /**
+     * The months shown, side by side, each with its title and its weeks. With
+     * more than one, a day that spills over from a neighbouring month is left
+     * blank: it is that month's day, and is drawn there.
+     */
+    pages: months.map((first, page) => ({
+      page,
+      month: first,
+      title: formatMonth(first, locale),
+      weeks: monthWeeks(first, state.weekStart),
+      first: page === 0,
+      last: page === months.length - 1,
+    })),
+    monthsProps: normalize({ ...anatomy.attrs('months'), 'data-count': state.months }),
+    getMonthProps: (page: number) => normalize({ ...anatomy.attrs('month'), 'data-page': page }),
+    getHeaderProps: (page: number) => normalize({ ...anatomy.attrs('header'), 'data-page': page }),
+    getTitleProps: (page: number) =>
+      // One live title: turning the page is said once, by the first.
+      normalize({ ...anatomy.attrs('title'), id: ids.pageTitle(page), 'aria-live': page === 0 ? 'polite' : undefined }),
+    getGridProps: (page: number) =>
+      normalize({
+        ...anatomy.attrs('grid'),
+        id: ids.pageGrid(page),
+        role: 'grid',
+        'aria-labelledby': ids.pageTitle(page),
+        'aria-multiselectable': state.mode === 'range' ? 'true' : undefined,
+        onKeyDown,
+        onPointerLeave: () => send({ type: 'HOVER', date: null }),
+      }),
+    /** A day spilling into a page from a neighbouring month, when several are shown: an empty cell. */
+    isBlank: (date: ISODate, page: number) => state.months > 1 && !sameMonth(date, months[page]),
     focusedId: ids.day(state.focused),
     weeks,
     weekdays,
@@ -138,8 +175,9 @@ export function connect<T = Dict>(state: CalendarState, send: (event: CalendarEv
     getWeekdayProps: (index: number) =>
       normalize({ ...anatomy.attrs('weekday'), role: 'columnheader', abbr: weekdays[index].long, 'aria-label': weekdays[index].long }),
     weekProps: normalize({ ...anatomy.attrs('week'), role: 'row' }),
-    getDayProps: (date: ISODate) => {
-      const outside = !sameMonth(date, month)
+    getDayProps: (date: ISODate, page = 0) => {
+      const outside = !sameMonth(date, months[page] ?? month)
+      if (outside && state.months > 1) return normalize({ ...anatomy.attrs('day'), role: 'gridcell', 'data-outside': '', 'data-blank': '', 'aria-hidden': 'true' })
       const unavailable = isUnavailable(state, date)
       const edge = date === rangeStart || date === rangeEnd
       const inRange = rangeStart !== null && rangeEnd !== null && date > rangeStart && date < rangeEnd
@@ -179,12 +217,13 @@ export function connect<T = Dict>(state: CalendarState, send: (event: CalendarEv
 
 export type CalendarApi<T = Dict> = ReturnType<typeof connect<T>>
 
-/** Grids a key was just pressed in: their focus follows the focused day even across a page turn. */
+/** Calendars (their months together) a key was just pressed in: their focus follows the focused day even across a page turn. */
 const movedByKeyboard = new WeakSet<Element>()
 
 /**
  * After the keyboard moved the focused day, put the real focus on it — but
- * only if the focus is in the grid already: a calendar that re-renders must
+ * only if the focus is in the calendar already. Given the months part, which
+ * holds every grid shown: a calendar that re-renders must
  * not pull the focus from wherever the person is.
  */
 export function focusCalendarDay(grid: HTMLElement | null, id: string): void {

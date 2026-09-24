@@ -123,3 +123,9 @@ export function scrollIntoViewIfNeeded(item: HTMLElement | null, container: HTML
     container.scrollTop = itemBottom - container.clientHeight
   }
 }
+
+/** Stand the option in the middle of the scroll viewport: a list opening on its choice shows what lies either side of it. */
+export function scrollIntoCenter(item: HTMLElement | null, container: HTMLElement | null): void {
+  if (!item || !container) return
+  container.scrollTop = Math.max(0, item.offsetTop - (container.clientHeight - item.offsetHeight) / 2)
+}

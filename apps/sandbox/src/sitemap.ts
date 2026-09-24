@@ -221,6 +221,15 @@ export const SITEMAP: SiteCategory[] = [
         ]
       },
       {
+        "label": "Time picker",
+        "anchors": [
+          {
+            "id": "times",
+            "label": null
+          }
+        ]
+      },
+      {
         "label": "Segmented control",
         "anchors": [
           {

@@ -16,12 +16,16 @@ export interface CalendarOptions {
   weekStart: number
   /** Days that cannot be chosen, besides the ones outside min and max: weekends, holidays. */
   isDateDisabled: ((date: ISODate) => boolean) | null
+  /** How many months stand side by side: 1, or 2 for a range across a month's end. Default 1. */
+  months: number
 }
 
 export interface CalendarState extends CalendarOptions {
   id: string
-  /** The day the keyboard is on; the month shown is its month. */
+  /** The day the keyboard is on; it is always in one of the months shown. */
   focused: ISODate
+  /** The first day of the first month shown. */
+  shown: ISODate
   today: ISODate
   /** The chosen day, or the chosen range. A single calendar uses `start` alone. */
   value: DateRange

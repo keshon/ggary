@@ -158,6 +158,85 @@ describe('the calendar', () => {
   })
 })
 
+describe('two months', () => {
+  const same = (props: Record<string, unknown>) => props
+  const calendar = (config: Partial<CalendarConfig> = {}) => {
+    const values: DateRange[] = []
+    const machine = createCalendarMachine({ id: 'c', locale: 'en-GB', today: '2026-09-18', months: 2, onValueChange: (value) => values.push(value), ...config })
+    const api = () => connectCalendar(machine.getState(), machine.send, same, { locale: 'en-GB' })
+    const key = (name: string, shiftKey = false) =>
+      (api().getGridProps(0).onKeyDown as (e: unknown) => void)({ key: name, shiftKey, preventDefault() {}, currentTarget: null })
+    return { machine, api, values, key }
+  }
+  const titles = (api: () => ReturnType<typeof connectCalendar>) => api().pages.map((page) => page.title)
+
+  it('stand side by side, each a grid named by its own title, one of them live', () => {
+    const { api } = calendar()
+    expect(titles(api)).toEqual(['September 2026', 'October 2026'])
+    expect(api().pages.map((page) => [page.first, page.last])).toEqual([[true, false], [false, true]])
+    expect(api().monthsProps['data-count']).toBe(2)
+    const grids = [api().getGridProps(0), api().getGridProps(1)]
+    expect(grids[0]['aria-labelledby']).toBe(api().getTitleProps(0).id)
+    expect(grids[1]['aria-labelledby']).toBe(api().getTitleProps(1).id)
+    expect(grids[0].id).not.toBe(grids[1].id)
+    expect(api().getTitleProps(0)['aria-live']).toBe('polite')
+    expect(api().getTitleProps(1)['aria-live']).toBeUndefined()
+  })
+
+  it('a day spilling into the other month’s page is blank there, and a day on its own', () => {
+    const { api } = calendar()
+    expect(api().pages[0].weeks.flat()).toContain('2026-10-01')
+    expect(api().isBlank('2026-10-01', 0)).toBe(true)
+    expect(api().getDayProps('2026-10-01', 0)).toMatchObject({ 'data-blank': '', 'aria-hidden': 'true' })
+    expect(api().getDayProps('2026-10-01', 0)['data-date']).toBeUndefined()
+    expect(api().getDayProps('2026-10-01', 0).tabIndex).toBeUndefined()
+    expect(api().isBlank('2026-10-01', 1)).toBe(false)
+    expect(api().getDayProps('2026-10-01', 1)['data-date']).toBe('2026-10-01')
+    // One month alone still draws its neighbours' days, muted.
+    const single = calendar({ months: 1 })
+    expect(single.api().isBlank('2026-10-01', 0)).toBe(false)
+  })
+
+  it('the keyboard walks across the pair as one run of weeks, and the pages follow it no further than they must', () => {
+    const { machine, api, key } = calendar()
+    for (let i = 0; i < 3; i++) key('ArrowDown')
+    expect(machine.getState().focused).toBe('2026-10-09')
+    expect(titles(api)).toEqual(['September 2026', 'October 2026'])
+    for (let i = 0; i < 4; i++) key('ArrowDown')
+    expect(machine.getState().focused).toBe('2026-11-06')
+    expect(titles(api)).toEqual(['October 2026', 'November 2026'])
+    for (let i = 0; i < 6; i++) key('ArrowUp')
+    expect(machine.getState().focused).toBe('2026-09-25')
+    expect(titles(api)).toEqual(['September 2026', 'October 2026'])
+  })
+
+  it('both pages turn together, and the buttons stop where the months shown reach the bounds', () => {
+    const { machine, api } = calendar({ max: '2026-11-20' })
+    expect(api().nextProps.disabled).toBeUndefined()
+    machine.send({ type: 'MOVE_MONTHS', months: 1 })
+    expect(titles(api)).toEqual(['October 2026', 'November 2026'])
+    expect(machine.getState().focused).toBe('2026-10-18')
+    expect(api().nextProps.disabled).toBe(true)
+    machine.send({ type: 'MOVE_MONTHS', months: -1 })
+    expect(titles(api)).toEqual(['September 2026', 'October 2026'])
+  })
+
+  it('a range runs from one page into the other', () => {
+    const { machine, api, values } = calendar({ mode: 'range' })
+    machine.send({ type: 'SELECT', date: '2026-09-28' })
+    machine.send({ type: 'SELECT', date: '2026-10-03' })
+    expect(values).toEqual([{ start: '2026-09-28', end: '2026-10-03' }])
+    expect(api().getDayProps('2026-09-30', 0)['data-in-range']).toBe('')
+    expect(api().getDayProps('2026-10-01', 1)['data-in-range']).toBe('')
+    expect(api().getDayProps('2026-10-01', 0)['data-in-range']).toBeUndefined()
+  })
+
+  it('is one or two: a wider ask is two', () => {
+    expect(calendar({ months: 5 }).api().pages).toHaveLength(2)
+    expect(calendar({ months: 0 }).api().pages).toHaveLength(1)
+  })
+})
+
 describe('the date picker', () => {
   const same = (props: Record<string, unknown>) => props
   const picker = (config: Partial<DatePickerConfig> = {}) => {

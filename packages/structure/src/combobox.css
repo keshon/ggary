@@ -66,16 +66,16 @@
 [data-scope='combobox'][data-part='positioner'][data-state='closed'] {
   display: none;
 }
-[data-scope='combobox'][data-part='content'] {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='content'] {
   max-height: var(--gg-available-height, 320px);
   overflow-y: auto;
   margin: 0;
   list-style: none;
 }
-[data-scope='combobox'][data-part='content']:focus-visible {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='content']:focus-visible {
   outline: none;
 }
-[data-scope='combobox'][data-part='item'] {
+:is([data-scope='combobox'], [data-scope='time-picker'])[data-part='item'] {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
