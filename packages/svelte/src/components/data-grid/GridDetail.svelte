@@ -51,7 +51,7 @@
   description={api.row === undefined || !description ? undefined : description(api.row)}
 >
   {#if api.row === undefined || api.index === null}
-    <p>{loadingText}</p>
+    <p {...api.loadingProps}>{loadingText}</p>
   {:else}
     {@render children(api.row, api.index)}
   {/if}

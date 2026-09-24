@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Tabs } from '../../../packages/svelte/src/index'
 
-  let { panels = true, ...rest }: Record<string, any> = $props()
+  let { panels = true, ...rest }: any = $props()
 </script>
 
 {#snippet panel(item: { label: string })}

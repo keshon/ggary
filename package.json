@@ -12,7 +12,7 @@
     "test": "npm run assets && vitest run",
     "test:fast": "npm run assets && vitest run --project machine --project contract --project dom",
     "test:watch": "vitest",
-    "typecheck": "npm run assets && tsc -p tsconfig.json --noEmit",
+    "typecheck": "npm run assets && tsc -p tsconfig.json --noEmit && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings --threshold warning",
     "check:themes": "npm run assets && node packages/checks/src/cli.ts"
   },
   "devDependencies": {
@@ -26,6 +26,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "svelte": "^5.57.0",
+    "svelte-check": "^4.7.6",
     "typescript": "^5.7.0",
     "vitest": "^3.0.0"
   }

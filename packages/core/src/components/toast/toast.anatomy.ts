@@ -12,6 +12,7 @@ export const toastAnatomy = createAnatomy('toast', [
   'close',
   'close-icon',
   'announcer',
+  'announcement',
 ] as const)
 
 export type ToastPart = (typeof toastAnatomy.parts)[number]

@@ -24,7 +24,8 @@
   }: Props = $props()
 
   const id = uid('gg-choice-cards')
-  const empty = type === 'checkbox' ? [] : null
+  // What nothing chosen is, fixed at mount: a group does not change its type.
+  const empty = untrack(() => (type === 'checkbox' ? [] : null))
 
   untrack(() => {
     if (value === undefined) value = defaultValue ?? empty

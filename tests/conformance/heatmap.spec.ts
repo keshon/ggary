@@ -12,10 +12,10 @@ const fortnight = run('2026-01-01', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 1
  * cell, and one name on the whole field.
  */
 export function heatmapConformance(adapter: Adapter) {
-  const test = adapter.heatmap ? it : it.skip
+  const test = it
   describe('heatmap', () => {
     test('is one picture with one name: the quantity in words', async () => {
-      const m = await adapter.heatmap!({ days: fortnight, weekStart: 1, unit: 'runs', label: 'Runs a day', locale: 'en-GB' }, freshTarget())
+      const m = await adapter.heatmap({ days: fortnight, weekStart: 1, unit: 'runs', label: 'Runs a day', locale: 'en-GB' }, freshTarget())
       const root = part(m.root, 'heatmap', 'root')!
       expect(root.getAttribute('role')).toBe('img')
       expect(root.getAttribute('aria-label')).toBe('Runs a day: 91 runs over 3 weeks, the busiest 13 on 14 January')
@@ -26,7 +26,7 @@ export function heatmapConformance(adapter: Adapter) {
     })
 
     test('a column a week, seven days in each, the blanks kept', async () => {
-      const m = await adapter.heatmap!({ days: fortnight, weekStart: 1, locale: 'en-GB' }, freshTarget())
+      const m = await adapter.heatmap({ days: fortnight, weekStart: 1, locale: 'en-GB' }, freshTarget())
       const weeks = parts(m.root, 'heatmap', 'week')
       expect(weeks).toHaveLength(3)
       expect(weeks.every((week) => parts(week, 'heatmap', 'day').length === 7)).toBe(true)
@@ -37,7 +37,7 @@ export function heatmapConformance(adapter: Adapter) {
     })
 
     test('every cell carries its step and its title, and is hidden from assistive tech', async () => {
-      const m = await adapter.heatmap!({ days: fortnight, weekStart: 1, unit: 'runs', locale: 'en-GB' }, freshTarget())
+      const m = await adapter.heatmap({ days: fortnight, weekStart: 1, unit: 'runs', locale: 'en-GB' }, freshTarget())
       const days = parts(m.root, 'heatmap', 'day').filter((day) => !day.hasAttribute('data-empty'))
       expect(days).toHaveLength(14)
       expect(days.every((day) => day.getAttribute('aria-hidden') === 'true')).toBe(true)
@@ -49,14 +49,14 @@ export function heatmapConformance(adapter: Adapter) {
     })
 
     test('follows new days', async () => {
-      const m = await adapter.heatmap!({ days: fortnight, weekStart: 1, locale: 'en-GB' }, freshTarget())
+      const m = await adapter.heatmap({ days: fortnight, weekStart: 1, locale: 'en-GB' }, freshTarget())
       await m.update({ days: run('2026-01-01', [1, 1, 1]), weekStart: 1, locale: 'en-GB' })
       expect(parts(m.root, 'heatmap', 'week')).toHaveLength(1)
       expect(parts(m.root, 'heatmap', 'day').filter((day) => !day.hasAttribute('data-empty'))).toHaveLength(3)
     })
 
     test('an empty field keeps its name and draws no cells', async () => {
-      const m = await adapter.heatmap!({ days: [], words: { empty: 'No runs yet' } }, freshTarget())
+      const m = await adapter.heatmap({ days: [], words: { empty: 'No runs yet' } }, freshTarget())
       expect(part(m.root, 'heatmap', 'root')!.getAttribute('aria-label')).toBe('No runs yet')
       expect(parts(m.root, 'heatmap', 'week')).toHaveLength(0)
     })

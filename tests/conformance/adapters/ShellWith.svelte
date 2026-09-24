@@ -3,7 +3,7 @@
   import type { ShellProps } from '../harness'
 
   let { collapse, brand, links, header, footer, body, defaultOpen, onOpenChange }: ShellProps = $props()
-  const column = links.length > 0
+  const column = $derived(links.length > 0)
 </script>
 
 {#snippet brandSnippet()}<a href="/">{brand}</a>{/snippet}

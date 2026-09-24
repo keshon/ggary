@@ -23,9 +23,12 @@ export const dataGridAnatomy = createAnatomy('data-grid', [
   'open',
   'open-icon',
   'editor',
+  'editor-option',
   'editor-error',
   'placeholder',
   'status',
   'overlay',
+  'overlay-text',
+  'retry',
 ] as const)
 export type DataGridPart = (typeof dataGridAnatomy.parts)[number]

@@ -8,14 +8,14 @@ import { commands } from './commands'
  * command run after the palette has closed and the focus given back.
  */
 export function commandPaletteConformance(adapter: Adapter) {
-  const run = adapter.commandPalette ? describe : describe.skip
+  const run = describe
   run('command palette', () => {
     const setup = async (props: Partial<CommandPaletteProps> = {}) => {
       const ran: string[] = []
       const before = document.createElement('button')
       before.textContent = 'Before'
       document.body.append(before)
-      const m = await adapter.commandPalette!({ commands, onRun: (command) => void ran.push(command.id), ...props }, freshTarget())
+      const m = await adapter.commandPalette({ commands, onRun: (command) => void ran.push(command.id), ...props }, freshTarget())
       const content = () => part(m.root, 'command-palette', 'content') as HTMLDialogElement
       const input = () => part(m.root, 'command-palette', 'input') as HTMLInputElement
       const texts = () => parts(m.root, 'command-palette', 'item').map((item) => item.firstElementChild!.firstChild!.textContent)

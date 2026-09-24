@@ -14,9 +14,9 @@ import { type Adapter, click, freshTarget, keydown, part, parts } from './harnes
 export function turnConformance(adapter: Adapter) {
   const { turn } = adapter
 
-  ;(turn ? describe : describe.skip)('turn', () => {
+  ;describe('turn', () => {
     it('reads who, when and what it cost, then the body, in that order', async () => {
-      const t = await turn!({ who: 'Agent', time: '14:02', tokens: 1284, duration: 4.1, locale: 'en-GB', body: 'Added.' }, freshTarget())
+      const t = await turn({ who: 'Agent', time: '14:02', tokens: 1284, duration: 4.1, locale: 'en-GB', body: 'Added.' }, freshTarget())
       const root = part(t.root, 'turn', 'root')!
       expect([...root.children].map((el) => (el as HTMLElement).dataset.part)).toEqual(['head', 'body'])
       const head = part(root, 'turn', 'head')!
@@ -29,14 +29,14 @@ export function turnConformance(adapter: Adapter) {
     })
 
     it('marks the person and leaves the machine bare', async () => {
-      const t = await turn!({ who: 'You', from: 'user', body: 'Add a share bar.' }, freshTarget())
+      const t = await turn({ who: 'You', from: 'user', body: 'Add a share bar.' }, freshTarget())
       expect(part(t.root, 'turn', 'root')!.dataset.from).toBe('user')
       await t.update({ from: 'agent' })
       expect(part(t.root, 'turn', 'root')!.hasAttribute('data-from')).toBe(false)
     })
 
     it('a turn still arriving is busy and carries the kit’s caret inside its body', async () => {
-      const t = await turn!({ who: 'Agent', body: 'Working on it', streaming: true }, freshTarget())
+      const t = await turn({ who: 'Agent', body: 'Working on it', streaming: true }, freshTarget())
       const root = part(t.root, 'turn', 'root')!
       expect(root.getAttribute('aria-busy')).toBe('true')
       const caret = part(root, 'caret', 'root')!
@@ -51,7 +51,7 @@ export function turnConformance(adapter: Adapter) {
     })
 
     it('draws no head fact it was not given, and no actions row without actions', async () => {
-      const t = await turn!({ who: 'Agent', body: 'Done.' }, freshTarget())
+      const t = await turn({ who: 'Agent', body: 'Done.' }, freshTarget())
       expect(part(t.root, 'turn', 'time')).toBeNull()
       expect(part(t.root, 'turn', 'cost')).toBeNull()
       expect(part(t.root, 'turn', 'actions')).toBeNull()
@@ -64,11 +64,11 @@ export function turnConformance(adapter: Adapter) {
 export function composerConformance(adapter: Adapter) {
   const { composer } = adapter
 
-  ;(composer ? describe : describe.skip)('composer', () => {
+  ;describe('composer', () => {
     const field = (root: HTMLElement) => part(root, 'textarea', 'root') as HTMLTextAreaElement
 
     it('is one frame: the field is a Textarea inside it, named, and the frame is not', async () => {
-      const c = await composer!({ label: 'Describe a task', placeholder: 'Describe a task or ask a question' }, freshTarget())
+      const c = await composer({ label: 'Describe a task', placeholder: 'Describe a task or ask a question' }, freshTarget())
       const root = part(c.root, 'composer', 'root')!
       expect(field(root).getAttribute('aria-label')).toBe('Describe a task')
       expect(field(root).getAttribute('placeholder')).toBe('Describe a task or ask a question')
@@ -79,7 +79,7 @@ export function composerConformance(adapter: Adapter) {
     })
 
     it('rests at one line and grows to eight', async () => {
-      const c = await composer!({ label: 'Ask' }, freshTarget())
+      const c = await composer({ label: 'Ask' }, freshTarget())
       expect(field(c.root).rows).toBe(1)
       expect(field(c.root).dataset.autoresize).toBe('')
       // Auto-resize turns the handle off: a grip that fights the height is undone on the next keystroke.
@@ -87,7 +87,7 @@ export function composerConformance(adapter: Adapter) {
     })
 
     it('the bar stands at the field’s edge or on its own row, and says which', async () => {
-      const c = await composer!({ label: 'Ask' }, freshTarget())
+      const c = await composer({ label: 'Ask' }, freshTarget())
       expect(part(c.root, 'composer', 'root')!.dataset.bar).toBe('edge')
       expect(part(c.root, 'composer', 'bar')!.dataset.bar).toBe('edge')
       await c.update({ bar: 'row' })
@@ -97,7 +97,7 @@ export function composerConformance(adapter: Adapter) {
 
     it('sends what is in the field, and Shift+Enter does not', async () => {
       const onSend = vi.fn()
-      const c = await composer!({ label: 'Ask', defaultValue: 'Add a share bar', onSend }, freshTarget())
+      const c = await composer({ label: 'Ask', defaultValue: 'Add a share bar', onSend }, freshTarget())
       await adapter.act(() => keydown(field(c.root), 'Enter'))
       expect(onSend).toHaveBeenCalledWith('Add a share bar')
 
@@ -110,7 +110,7 @@ export function composerConformance(adapter: Adapter) {
 
     it('sends nothing when there is nothing but space in the field', async () => {
       const onSend = vi.fn()
-      const c = await composer!({ label: 'Ask', defaultValue: '   ', onSend }, freshTarget())
+      const c = await composer({ label: 'Ask', defaultValue: '   ', onSend }, freshTarget())
       await adapter.act(() => keydown(field(c.root), 'Enter'))
       await adapter.act(() => click(part(c.root, 'composer', 'send')!))
       expect(onSend).not.toHaveBeenCalled()
@@ -119,7 +119,7 @@ export function composerConformance(adapter: Adapter) {
     it('one control sends and stops; while it stops it is not disabled', async () => {
       const onSend = vi.fn()
       const onStop = vi.fn()
-      const c = await composer!({ label: 'Ask', defaultValue: 'go', onSend, onStop }, freshTarget())
+      const c = await composer({ label: 'Ask', defaultValue: 'go', onSend, onStop }, freshTarget())
       const send = () => part(c.root, 'composer', 'send') as HTMLButtonElement
       expect(send().getAttribute('aria-label')).toBe('Send')
       expect(part(c.root, 'composer', 'send-icon')!.dataset.icon).toBe('arrow-up')
@@ -139,7 +139,7 @@ export function composerConformance(adapter: Adapter) {
     })
 
     it('holds the message’s other controls in the bar, before the send', async () => {
-      const c = await composer!({ label: 'Ask', extra: true }, freshTarget())
+      const c = await composer({ label: 'Ask', extra: true }, freshTarget())
       const bar = part(c.root, 'composer', 'bar')!
       expect(bar.textContent).toContain('Draft')
       expect(bar.lastElementChild).toBe(part(c.root, 'composer', 'send'))
@@ -150,12 +150,12 @@ export function composerConformance(adapter: Adapter) {
 export function thinkingConformance(adapter: Adapter) {
   const { thinking } = adapter
 
-  ;(thinking ? describe : describe.skip)('thinking', () => {
+  ;describe('thinking', () => {
     const trigger = (root: HTMLElement) => part(root, 'thinking', 'trigger') as HTMLButtonElement
     const content = (root: HTMLElement) => part(root, 'thinking', 'content')!
 
     it('is a disclosure that owns its region, collapsed by default', async () => {
-      const t = await thinking!({ body: 'One legend can key both.', duration: 4 }, freshTarget())
+      const t = await thinking({ body: 'One legend can key both.', duration: 4 }, freshTarget())
       expect(trigger(t.root).getAttribute('aria-expanded')).toBe('false')
       expect(trigger(t.root).getAttribute('aria-controls')).toBe(content(t.root).id)
       expect(content(t.root).getAttribute('aria-labelledby')).toBe(trigger(t.root).id)
@@ -165,7 +165,7 @@ export function thinkingConformance(adapter: Adapter) {
 
     it('opens and closes on a press, and says so to the owner', async () => {
       const onOpenChange = vi.fn()
-      const t = await thinking!({ body: 'Working.', onOpenChange }, freshTarget())
+      const t = await thinking({ body: 'Working.', onOpenChange }, freshTarget())
       await adapter.act(() => click(trigger(t.root)))
       expect(trigger(t.root).getAttribute('aria-expanded')).toBe('true')
       expect(content(t.root).hasAttribute('hidden')).toBe(false)
@@ -178,7 +178,7 @@ export function thinkingConformance(adapter: Adapter) {
     })
 
     it('names a duration, or says it is still coming and goes busy', async () => {
-      const t = await thinking!({ body: 'x', duration: 4.2, locale: 'en-GB', defaultOpen: true }, freshTarget())
+      const t = await thinking({ body: 'x', duration: 4.2, locale: 'en-GB', defaultOpen: true }, freshTarget())
       expect(part(t.root, 'thinking', 'label')!.textContent).toBe('Thought for 4.2 s')
       expect(content(t.root).hasAttribute('aria-busy')).toBe(false)
       expect(part(t.root, 'caret', 'root')).toBeNull()
@@ -190,7 +190,7 @@ export function thinkingConformance(adapter: Adapter) {
     })
 
     it('carries no tone and no dot: nothing here can fail', async () => {
-      const t = await thinking!({ body: 'x' }, freshTarget())
+      const t = await thinking({ body: 'x' }, freshTarget())
       const root = part(t.root, 'thinking', 'root')!
       expect(root.hasAttribute('data-tone')).toBe(false)
       expect(part(root, 'dot', 'root')).toBeNull()
@@ -199,7 +199,7 @@ export function thinkingConformance(adapter: Adapter) {
     })
 
     it('a disabled one does not open', async () => {
-      const t = await thinking!({ body: 'x', disabled: true }, freshTarget())
+      const t = await thinking({ body: 'x', disabled: true }, freshTarget())
       expect(trigger(t.root).disabled).toBe(true)
       await adapter.act(() => click(trigger(t.root)))
       expect(trigger(t.root).getAttribute('aria-expanded')).toBe('false')
@@ -215,9 +215,9 @@ export function approvalConformance(adapter: Adapter) {
     { text: 'chunks.bin — deletion', tone: 'error' as const },
   ]
 
-  ;(approval ? describe : describe.skip)('approval', () => {
+  ;describe('approval', () => {
     it('states what will be done and what it will touch BEFORE the answers', async () => {
-      const a = await approval!({ what: 'rm -rf build/', effects }, freshTarget())
+      const a = await approval({ what: 'rm -rf build/', effects }, freshTarget())
       const root = part(a.root, 'approval', 'root')!
       expect([...root.children].map((el) => (el as HTMLElement).dataset.part)).toEqual(['head', 'what', 'effects', 'actions'])
       expect(part(root, 'approval', 'title')!.textContent).toBe('Confirmation is required')
@@ -226,7 +226,7 @@ export function approvalConformance(adapter: Adapter) {
     })
 
     it('is a group named by its heading, and reaches a live region while it waits', async () => {
-      const a = await approval!({ what: 'rm -rf build/' }, freshTarget())
+      const a = await approval({ what: 'rm -rf build/' }, freshTarget())
       const root = part(a.root, 'approval', 'root')!
       expect(root.getAttribute('role')).toBe('group')
       expect(root.getAttribute('aria-labelledby')).toBe(part(root, 'approval', 'title')!.id)
@@ -236,7 +236,7 @@ export function approvalConformance(adapter: Adapter) {
     })
 
     it('marks the irreversible by tone and by word, and names the count', async () => {
-      const a = await approval!({ what: 'rm -rf build/', effects }, freshTarget())
+      const a = await approval({ what: 'rm -rf build/', effects }, freshTarget())
       const list = part(a.root, 'approval', 'effects')!
       expect(list.tagName).toBe('UL')
       expect(list.getAttribute('aria-label')).toBe('It will touch 3')
@@ -248,7 +248,7 @@ export function approvalConformance(adapter: Adapter) {
 
     it('answers in one press; denial is a button beside allow, never in a menu', async () => {
       const onDecide = vi.fn()
-      const a = await approval!({ what: 'rm -rf build/', onDecide }, freshTarget())
+      const a = await approval({ what: 'rm -rf build/', onDecide }, freshTarget())
       const buttons = [...part(a.root, 'approval', 'actions')!.querySelectorAll('button')]
       expect(buttons.map((b) => b.textContent?.trim())).toEqual(['Allow', 'Deny'])
       // Allow is the principal one, and it stands first.
@@ -258,7 +258,7 @@ export function approvalConformance(adapter: Adapter) {
     })
 
     it('steps back once answered: the actions go, the record stays, the question does not', async () => {
-      const a = await approval!({ what: 'rm -rf build/', effects, decidedBy: 'Anna', decidedAt: '14:32' }, freshTarget())
+      const a = await approval({ what: 'rm -rf build/', effects, decidedBy: 'Anna', decidedAt: '14:32' }, freshTarget())
       await a.update({ state: 'approved' })
       const root = part(a.root, 'approval', 'root')!
       expect(root.dataset.state).toBe('approved')
@@ -270,7 +270,7 @@ export function approvalConformance(adapter: Adapter) {
     })
 
     it('takes a third way out without losing the second', async () => {
-      const a = await approval!({ what: 'rm -rf build/', extra: true }, freshTarget())
+      const a = await approval({ what: 'rm -rf build/', extra: true }, freshTarget())
       const buttons = [...part(a.root, 'approval', 'actions')!.querySelectorAll('button')]
       expect(buttons.map((b) => b.textContent?.trim())).toEqual(['Allow', 'Deny', 'Always allow'])
     })
@@ -282,9 +282,9 @@ export function failureConformance(adapter: Adapter) {
   const base = { title: 'Could not read terrain/chunks.bin', code: 'EBUSY', reason: 'The file is locked by another process' }
   const tried = ['A retry after 1 s — the same code', 'A retry after 4 s — the same code']
 
-  ;(failure ? describe : describe.skip)('failure', () => {
+  ;describe('failure', () => {
     it('says what failed, why with its code, what was tried and the way out', async () => {
-      const f = await failure!({ ...base, tried }, freshTarget())
+      const f = await failure({ ...base, tried }, freshTarget())
       const root = part(f.root, 'failure', 'root')!
       expect([...root.children].map((el) => (el as HTMLElement).dataset.part)).toEqual(['head', 'reason', 'tried', 'actions'])
       expect(part(root, 'failure', 'title')!.textContent).toBe(base.title)
@@ -293,7 +293,7 @@ export function failureConformance(adapter: Adapter) {
     })
 
     it('interrupts while it is pending, with a glyph as well as a colour', async () => {
-      const f = await failure!(base, freshTarget())
+      const f = await failure(base, freshTarget())
       const root = part(f.root, 'failure', 'root')!
       expect(root.getAttribute('role')).toBe('alert')
       expect(part(root, 'failure', 'icon')!.dataset.icon).toBe('status-error')
@@ -303,7 +303,7 @@ export function failureConformance(adapter: Adapter) {
     })
 
     it('names how many attempts there already were', async () => {
-      const f = await failure!({ ...base, tried }, freshTarget())
+      const f = await failure({ ...base, tried }, freshTarget())
       const list = part(f.root, 'failure', 'tried')!
       expect(list.tagName).toBe('UL')
       expect(list.getAttribute('aria-label')).toBe('Already tried: 2')
@@ -314,7 +314,7 @@ export function failureConformance(adapter: Adapter) {
 
     it('always offers a way out while pending', async () => {
       const onRetry = vi.fn()
-      const f = await failure!({ ...base, onRetry, extra: true }, freshTarget())
+      const f = await failure({ ...base, onRetry, extra: true }, freshTarget())
       const buttons = [...part(f.root, 'failure', 'actions')!.querySelectorAll('button')]
       expect(buttons.map((b) => b.textContent?.trim())).toEqual(['Retry', 'Skip the file'])
       expect(buttons[0].dataset.emphasis).toBe('high')
@@ -323,7 +323,7 @@ export function failureConformance(adapter: Adapter) {
     })
 
     it('steps back once resolved or given up, and the reason stays readable', async () => {
-      const f = await failure!({ ...base, tried, resolvedAt: '14:33' }, freshTarget())
+      const f = await failure({ ...base, tried, resolvedAt: '14:33' }, freshTarget())
       await f.update({ state: 'resolved' })
       let root = part(f.root, 'failure', 'root')!
       expect(root.dataset.state).toBe('resolved')

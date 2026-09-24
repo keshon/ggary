@@ -1078,37 +1078,36 @@ export interface Adapter {
   flow(props: FlowProps, target: HTMLElement): Promise<Mounted<FlowProps>>
   pageHeader(props: PageHeaderProps, target: HTMLElement): Promise<Mounted<PageHeaderProps>>
   section(props: SectionProps, target: HTMLElement): Promise<Mounted<SectionProps>>
-  /** Optional: an adapter without it skips the combobox spec. */
-  combobox?(props: ComboboxProps, target: HTMLElement): Promise<Mounted<ComboboxProps>>
-  calendar?(props: CalendarProps, target: HTMLElement): Promise<Mounted<CalendarProps>>
-  cascader?(props: CascaderProps, target: HTMLElement): Promise<Mounted<CascaderProps>>
-  accordion?(props: AccordionProps, target: HTMLElement): Promise<Mounted<AccordionProps>>
-  tree?(props: TreeProps, target: HTMLElement): Promise<Mounted<TreeProps>>
-  progress?(props: ProgressProps, target: HTMLElement): Promise<Mounted<ProgressProps>>
-  meter?(props: MeterProps, target: HTMLElement): Promise<Mounted<MeterProps>>
-  ring?(props: RingProps, target: HTMLElement): Promise<Mounted<RingProps>>
-  kanban?(props: KanbanProps, target: HTMLElement): Promise<Mounted<KanbanProps>>
-  commandPalette?(props: CommandPaletteProps, target: HTMLElement): Promise<Mounted<CommandPaletteProps>>
-  form?(props: FormProps, target: HTMLElement): Promise<Mounted<FormProps>>
-  gantt?(props: GanttProps, target: HTMLElement): Promise<Mounted<GanttProps>>
-  codeBlock?(props: CodeBlockProps, target: HTMLElement): Promise<Mounted<CodeBlockProps>>
-  copyable?(props: CopyableProps, target: HTMLElement): Promise<Mounted<CopyableProps>>
-  inserts?(props: InsertsProps, target: HTMLElement): Promise<Mounted<InsertsProps>>
-  metric?(props: MetricProps, target: HTMLElement): Promise<Mounted<MetricProps>>
-  metricRow?(props: MetricRowProps, target: HTMLElement): Promise<Mounted<MetricRowProps>>
-  keyValueList?(props: KeyValueListProps, target: HTMLElement): Promise<Mounted<KeyValueListProps>>
-  fileChange?(props: FileChangeProps, target: HTMLElement): Promise<Mounted<FileChangeProps>>
-  share?(props: ShareProps, target: HTMLElement): Promise<Mounted<ShareProps>>
-  heatmap?(props: HeatmapProps, target: HTMLElement): Promise<Mounted<HeatmapProps>>
-  run?(props: RunProps, target: HTMLElement): Promise<Mounted<RunProps>>
-  queue?(props: QueueProps, target: HTMLElement): Promise<Mounted<QueueProps>>
-  history?(props: HistoryProps, target: HTMLElement): Promise<Mounted<HistoryProps>>
-  budget?(props: BudgetProps, target: HTMLElement): Promise<Mounted<BudgetProps>>
-  step?(props: StepProps, target: HTMLElement): Promise<Mounted<StepProps>>
-  log?(props: LogProps, target: HTMLElement): Promise<Mounted<LogProps>>
-  diff?(props: DiffProps, target: HTMLElement): Promise<Mounted<DiffProps>>
-  lanes?(props: LanesProps, target: HTMLElement): Promise<Mounted<LanesProps>>
-  datePicker?(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
+  combobox(props: ComboboxProps, target: HTMLElement): Promise<Mounted<ComboboxProps>>
+  calendar(props: CalendarProps, target: HTMLElement): Promise<Mounted<CalendarProps>>
+  cascader(props: CascaderProps, target: HTMLElement): Promise<Mounted<CascaderProps>>
+  accordion(props: AccordionProps, target: HTMLElement): Promise<Mounted<AccordionProps>>
+  tree(props: TreeProps, target: HTMLElement): Promise<Mounted<TreeProps>>
+  progress(props: ProgressProps, target: HTMLElement): Promise<Mounted<ProgressProps>>
+  meter(props: MeterProps, target: HTMLElement): Promise<Mounted<MeterProps>>
+  ring(props: RingProps, target: HTMLElement): Promise<Mounted<RingProps>>
+  kanban(props: KanbanProps, target: HTMLElement): Promise<Mounted<KanbanProps>>
+  commandPalette(props: CommandPaletteProps, target: HTMLElement): Promise<Mounted<CommandPaletteProps>>
+  form(props: FormProps, target: HTMLElement): Promise<Mounted<FormProps>>
+  gantt(props: GanttProps, target: HTMLElement): Promise<Mounted<GanttProps>>
+  codeBlock(props: CodeBlockProps, target: HTMLElement): Promise<Mounted<CodeBlockProps>>
+  copyable(props: CopyableProps, target: HTMLElement): Promise<Mounted<CopyableProps>>
+  inserts(props: InsertsProps, target: HTMLElement): Promise<Mounted<InsertsProps>>
+  metric(props: MetricProps, target: HTMLElement): Promise<Mounted<MetricProps>>
+  metricRow(props: MetricRowProps, target: HTMLElement): Promise<Mounted<MetricRowProps>>
+  keyValueList(props: KeyValueListProps, target: HTMLElement): Promise<Mounted<KeyValueListProps>>
+  fileChange(props: FileChangeProps, target: HTMLElement): Promise<Mounted<FileChangeProps>>
+  share(props: ShareProps, target: HTMLElement): Promise<Mounted<ShareProps>>
+  heatmap(props: HeatmapProps, target: HTMLElement): Promise<Mounted<HeatmapProps>>
+  run(props: RunProps, target: HTMLElement): Promise<Mounted<RunProps>>
+  queue(props: QueueProps, target: HTMLElement): Promise<Mounted<QueueProps>>
+  history(props: HistoryProps, target: HTMLElement): Promise<Mounted<HistoryProps>>
+  budget(props: BudgetProps, target: HTMLElement): Promise<Mounted<BudgetProps>>
+  step(props: StepProps, target: HTMLElement): Promise<Mounted<StepProps>>
+  log(props: LogProps, target: HTMLElement): Promise<Mounted<LogProps>>
+  diff(props: DiffProps, target: HTMLElement): Promise<Mounted<DiffProps>>
+  lanes(props: LanesProps, target: HTMLElement): Promise<Mounted<LanesProps>>
+  datePicker(props: DatePickerProps, target: HTMLElement): Promise<Mounted<DatePickerProps>>
   gridRows(props: GridRowsProps, target: HTMLElement): Promise<Mounted<GridRowsProps>>
   checkboxGroup(props: CheckboxGroupProps, target: HTMLElement): Promise<Mounted<CheckboxGroupProps>>
   /** Updates apply to the Fieldset's own props; the group inside is read at mount only. */
@@ -1121,11 +1120,11 @@ export interface Adapter {
   tabs(props: TabsProps, target: HTMLElement): Promise<Mounted<TabsProps>>
   toaster(props: ToasterProps, target: HTMLElement): Promise<Mounted<ToasterProps>>
   badge(props: BadgeProps, target: HTMLElement): Promise<Mounted<BadgeProps>>
-  timeline?(props: TimelineProps, target: HTMLElement): Promise<Mounted<TimelineProps>>
-  sparkline?(props: SparklineProps, target: HTMLElement): Promise<Mounted<SparklineProps>>
-  legend?(props: LegendProps, target: HTMLElement): Promise<Mounted<LegendProps>>
-  statusDot?(props: StatusDotProps, target: HTMLElement): Promise<Mounted<StatusDotProps>>
-  caret?(props: CaretProps, target: HTMLElement): Promise<Mounted<CaretProps>>
+  timeline(props: TimelineProps, target: HTMLElement): Promise<Mounted<TimelineProps>>
+  sparkline(props: SparklineProps, target: HTMLElement): Promise<Mounted<SparklineProps>>
+  legend(props: LegendProps, target: HTMLElement): Promise<Mounted<LegendProps>>
+  statusDot(props: StatusDotProps, target: HTMLElement): Promise<Mounted<StatusDotProps>>
+  caret(props: CaretProps, target: HTMLElement): Promise<Mounted<CaretProps>>
   avatar(props: AvatarProps, target: HTMLElement): Promise<Mounted<AvatarProps>>
   avatarGroup(props: AvatarGroupProps, target: HTMLElement): Promise<Mounted<AvatarGroupProps>>
   spinner(props: SpinnerProps, target: HTMLElement): Promise<Mounted<SpinnerProps>>
@@ -1137,11 +1136,11 @@ export interface Adapter {
   emptyState(props: EmptyStateProps, target: HTMLElement): Promise<Mounted<EmptyStateProps>>
   /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>
-  turn?(props: TurnProps, target: HTMLElement): Promise<Mounted<TurnProps>>
-  composer?(props: ComposerProps, target: HTMLElement): Promise<Mounted<ComposerProps>>
-  thinking?(props: ThinkingProps, target: HTMLElement): Promise<Mounted<ThinkingProps>>
-  approval?(props: ApprovalProps, target: HTMLElement): Promise<Mounted<ApprovalProps>>
-  failure?(props: FailureProps, target: HTMLElement): Promise<Mounted<FailureProps>>
+  turn(props: TurnProps, target: HTMLElement): Promise<Mounted<TurnProps>>
+  composer(props: ComposerProps, target: HTMLElement): Promise<Mounted<ComposerProps>>
+  thinking(props: ThinkingProps, target: HTMLElement): Promise<Mounted<ThinkingProps>>
+  approval(props: ApprovalProps, target: HTMLElement): Promise<Mounted<ApprovalProps>>
+  failure(props: FailureProps, target: HTMLElement): Promise<Mounted<FailureProps>>
 }
 
 // --- lifecycle -----------------------------------------------------------------

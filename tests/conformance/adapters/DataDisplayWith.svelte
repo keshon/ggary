@@ -1,7 +1,7 @@
 <script lang="ts">
   import { KeyValueList, Metric, MetricRow } from '../../../packages/svelte/src/index'
 
-  let { component, ...props }: Record<string, any> = $props()
+  let { component, ...props }: any = $props()
 </script>
 
 {#snippet strong(item: { value?: string })}<strong>{item.value}</strong>{/snippet}

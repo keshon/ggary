@@ -8,7 +8,7 @@ import { type Adapter, type FormProps, click, freshTarget, part, parts, typeInto
  * valid form handed to the owner.
  */
 export function formConformance(adapter: Adapter) {
-  const run = adapter.form ? describe : describe.skip
+  const run = describe
   run('form', () => {
     const rules = (data: FormData) => ({
       confirm: data.get('confirm') !== data.get('password') ? 'The passwords differ' : null,
@@ -17,7 +17,7 @@ export function formConformance(adapter: Adapter) {
 
     const setup = async (props: Partial<FormProps> = {}) => {
       const sent: Record<string, string>[] = []
-      const m = await adapter.form!({ validate: rules, onSubmit: (data) => void sent.push(Object.fromEntries([...data.entries()].map(([k, v]) => [k, String(v)]))), ...props }, freshTarget())
+      const m = await adapter.form({ validate: rules, onSubmit: (data) => void sent.push(Object.fromEntries([...data.entries()].map(([k, v]) => [k, String(v)]))), ...props }, freshTarget())
       const form = () => m.root.querySelector('form') ?? (m.root as HTMLFormElement)
       const input = (name: string) => form().querySelector<HTMLInputElement>(`input[name="${name}"]:not([type="hidden"])`)!
       const summary = () => part(m.root, 'form-summary', 'root')

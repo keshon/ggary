@@ -114,7 +114,7 @@
                 {#if item.editor.kind === 'select'}
                   <select {...item.editor.inputProps} {@attach takeFocus}>
                     {#each item.editor.options as option (option.value)}
-                      <option value={option.value}>{option.label}</option>
+                      <option {...item.editor.optionProps} value={option.value}>{option.label}</option>
                     {/each}
                   </select>
                 {:else}
@@ -135,12 +135,12 @@
   {#if api.overlay}
     <div {...api.overlayProps}>
       {#if api.overlay === 'error'}
-        <p>{api.errorText}</p>
-        <button type="button" onclick={api.retry}>{api.retryText}</button>
+        <p {...api.overlayTextProps}>{api.errorText}</p>
+        <button {...api.retryProps}>{api.retryText}</button>
       {:else if empty}
         {@render empty()}
       {:else}
-        <p>{api.emptyText}</p>
+        <p {...api.overlayTextProps}>{api.emptyText}</p>
       {/if}
     </div>
   {/if}

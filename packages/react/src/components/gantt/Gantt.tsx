@@ -90,14 +90,14 @@ export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
           <div {...api.getScaleRowProps('top')}>
             {api.top.map((cell) => (
               <div key={cell.start} {...api.getScaleCellProps(cell)}>
-                <span>{cell.label}</span>
+                <span {...api.scaleLabelProps}>{cell.label}</span>
               </div>
             ))}
           </div>
           <div {...api.getScaleRowProps('bottom')}>
             {api.bottom.map((cell) => (
               <div key={cell.start} {...api.getScaleCellProps(cell)}>
-                <span>{cell.label}</span>
+                <span {...api.scaleLabelProps}>{cell.label}</span>
               </div>
             ))}
           </div>
@@ -124,7 +124,7 @@ export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
               <div key={`group:${row.id}`} {...api.getGroupRowProps(row.group)}>
                 <div {...api.getGroupTitleProps(row.group)}>
                   <span {...api.getGroupToggleProps(row.group)} />
-                  <span>{row.group.title}</span>
+                  <span {...api.titleTextProps}>{row.group.title}</span>
                 </div>
                 <div {...api.getGroupScheduleProps(row.group)}>
                   <span {...api.scheduleTextProps}>{api.describeGroup(row.group)}</span>

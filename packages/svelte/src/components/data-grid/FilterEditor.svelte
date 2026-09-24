@@ -22,7 +22,7 @@
 
   let { columns, column: fixed, filter, onApply, words = {}, parts }: Props = $props()
 
-  let columnId = $state(untrack(() => fixed?.id ?? columns[0]?.id))
+  let columnId = $state<string | undefined>(untrack(() => fixed?.id ?? columns[0]?.id))
   const column = $derived(fixed ?? columns.find((candidate) => candidate.id === columnId))
   let draft = $state<FilterDraft | undefined>(untrack(() => (column ? draftFor(column, filter) : undefined)))
   const current = $derived(draft && column && draft.kind === filterKindOf(column) ? draft : column ? draftFor(column) : undefined)

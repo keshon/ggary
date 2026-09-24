@@ -34,10 +34,10 @@
 
 <section bind:this={region} {...api.regionProps}>
   <div {...api.politeProps}>
-    {#key snapshot.announcement.nonce}{#if api.politeText}<p>{api.politeText}</p>{/if}{/key}
+    {#key snapshot.announcement.nonce}{#if api.politeText}<p {...api.announcementProps}>{api.politeText}</p>{/if}{/key}
   </div>
   <div {...api.assertiveProps}>
-    {#key snapshot.announcement.nonce}{#if api.assertiveText}<p>{api.assertiveText}</p>{/if}{/key}
+    {#key snapshot.announcement.nonce}{#if api.assertiveText}<p {...api.announcementProps}>{api.assertiveText}</p>{/if}{/key}
   </div>
   <ol {...api.listProps}>
     {#each api.toasts as toast (toast.id)}

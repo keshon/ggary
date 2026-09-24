@@ -14,14 +14,14 @@ const items = [
  */
 export function insertsConformance(adapter: Adapter) {
   const mount = adapter.inserts
-  ;(mount ? describe : describe.skip)('inserts', () => {
+  ;describe('inserts', () => {
     const setup = async (props: Partial<Parameters<NonNullable<Adapter['inserts']>>[0]> = {}) => {
       const target = freshTarget()
       const field = document.createElement('textarea')
       field.id = `tpl-${Math.random().toString(36).slice(2)}`
       field.value = '{{name}} has failed'
       target.append(field)
-      const m = await mount!({ items, target: field.id, ...props }, target)
+      const m = await mount({ items, target: field.id, ...props }, target)
       const button = (label: string) => parts(m.root, 'inserts', 'item').find((b) => b.textContent === label)!
       return { m, field, button }
     }

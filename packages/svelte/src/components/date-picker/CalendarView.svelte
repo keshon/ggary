@@ -13,12 +13,12 @@
     <button {...api.nextProps}><span {...api.nextIconProps}></span></button>
   </div>
   <table bind:this={grid} {...api.gridProps}>
-    <thead>
+    <thead {...api.headProps}>
       <tr {...api.headRowProps}>
         {#each api.weekdays as day, index (day.long)}<th {...api.getWeekdayProps(index)}>{day.short}</th>{/each}
       </tr>
     </thead>
-    <tbody>
+    <tbody {...api.bodyProps}>
       {#each api.weeks as week (week[0])}
         <tr {...api.weekProps}>
           {#each week as date (date)}<td {...api.getDayProps(date)}>{api.dayText(date)}</td>{/each}

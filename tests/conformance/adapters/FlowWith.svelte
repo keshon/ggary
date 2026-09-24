@@ -3,7 +3,7 @@
   import type { FlowProps } from '../harness'
 
   let { kind, items, spacerAfter, ...options }: FlowProps = $props()
-  const Component = { stack: Stack, cluster: Cluster, grid: Grid, container: Container }[kind] as any
+  const Component = $derived({ stack: Stack, cluster: Cluster, grid: Grid, container: Container }[kind] as any)
 </script>
 
 <Component {...options}>

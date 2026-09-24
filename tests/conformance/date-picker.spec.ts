@@ -15,11 +15,11 @@ const dayOf = (root: ParentNode, date: string) => root.querySelector<HTMLElement
  * that reads a typed day in the locale's order and opens the calendar on it.
  */
 export function calendarConformance(adapter: Adapter) {
-  const run = adapter.calendar ? describe : describe.skip
+  const run = describe
   run('calendar', () => {
     const setup = async (props: Partial<CalendarProps> = {}) => {
       const values: Range[] = []
-      const m = await adapter.calendar!({ locale: 'en-GB', defaultValue: '2026-09-18', onValueChange: (value) => values.push(value), ...props }, freshTarget())
+      const m = await adapter.calendar({ locale: 'en-GB', defaultValue: '2026-09-18', onValueChange: (value) => values.push(value), ...props }, freshTarget())
       const grid = () => part(m.root, 'calendar', 'grid')!
       const title = () => part(m.root, 'calendar', 'title')!.textContent
       const press = (name: string, init: KeyboardEventInit = {}) => adapter.act(() => void key(document.activeElement ?? grid(), name, init))
@@ -87,11 +87,11 @@ export function calendarConformance(adapter: Adapter) {
 }
 
 export function datePickerConformance(adapter: Adapter) {
-  const run = adapter.datePicker ? describe : describe.skip
+  const run = describe
   run('date picker', () => {
     const setup = async (props: Partial<DatePickerProps> = {}) => {
       const values: Range[] = []
-      const m = await adapter.datePicker!({ label: 'Due', locale: 'ru-RU', onValueChange: (value) => values.push(value), ...props }, freshTarget())
+      const m = await adapter.datePicker({ label: 'Due', locale: 'ru-RU', onValueChange: (value) => values.push(value), ...props }, freshTarget())
       const input = () => part(m.root, 'date-picker', 'input') as HTMLInputElement
       const trigger = () => part(m.root, 'date-picker', 'trigger') as HTMLButtonElement
       const content = () => part(m.root, 'date-picker', 'content')!

@@ -173,7 +173,7 @@
   padding: var(--ggarry-space-6);
   color: var(--ggarry-text-muted);
 }
-[data-scope='data-grid'][data-part='overlay'] > p {
+[data-scope='data-grid'][data-part='overlay-text'] {
   margin: 0;
 }
 [data-scope='data-grid'][data-part='overlay'][data-kind='error'] {

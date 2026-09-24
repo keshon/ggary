@@ -31,9 +31,9 @@
       if (target) onSelect(value, target, details)
     },
   })
-  let state = $state.raw(machine.getState())
-  machine.subscribe(() => (state = machine.getState()))
-  const api = $derived(connect(state, machine.send, svelteNormalizer, { label }))
+  let snapshot = $state.raw(machine.getState())
+  machine.subscribe(() => (snapshot = machine.getState()))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label }))
 
   $effect(() => grid.provide('menu'))
 

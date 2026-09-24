@@ -88,6 +88,8 @@ export function connect<T = Dict>(state: CascaderState, send: (event: CascaderEv
       },
     }),
     valueProps: normalize({ ...anatomy.attrs('value'), id: ids.value }),
+    /** One level of the chosen path in the trigger. */
+    valueItemProps: normalize({ ...anatomy.attrs('value-item') }),
     separatorProps: normalize({ ...anatomy.attrs('separator'), 'aria-hidden': 'true', 'data-icon': 'chevron-right' satisfies IconName }),
     indicatorProps: normalize({ ...anatomy.attrs('indicator'), 'aria-hidden': 'true', 'data-icon': 'chevron-down' satisfies IconName, 'data-state': state.open ? 'open' : 'closed' }),
     positionerProps: normalize({ ...anatomy.attrs('positioner'), popover: 'manual', 'data-state': state.open ? 'open' : 'closed' }),

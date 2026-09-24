@@ -21,9 +21,9 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3507 tests, 1309 of them in headless Chrome
+npm test         # 3537 tests, 1309 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
-npm run typecheck
+npm run typecheck   # tsc, then svelte-check over every .svelte file
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
 ```
 
@@ -36,23 +36,23 @@ pages.
 
 ```
 packages/
-  core/              machine + connect + anatomy. No framework imports. One dependency.
+  core/              machine + connect + anatomy. No framework imports. One runtime dependency.
   structure/         CSS a component needs to WORK, shared by every theme
   theme-ggarry/      GGarry: JSON tokens -> CSS, component CSS, the --gg-* contract
   icons/             glyph SVGs -> --gg-icon-* tokens; the shared glyph compiler
-  checks/            the theme gates: structure and contrast, run on every theme
-  react/             <Button>, <Chip>, <ChipGroup>, <Select>, <Field>, <Input>, <Textarea>,
-                     <Checkbox>, <Switch>, <RadioGroup>, <Dialog>, <Sheet>, <Popover>, <Tooltip>,
-                     <Menu>, <Menubar>, <Fieldset>, <CheckboxGroup>, <Tabs>, <Toaster>,
-                     <Badge>, <Avatar>, <AvatarGroup>, <Spinner>, <Skeleton>, <Card>,
-                     <Panel>, <Banner>, <Note>, <EmptyState>, <SegmentedControl>,
-                     <Slider>, <NumberField>, <ChoiceCardGroup>, <Search>, <InputGroup>,
-                     <FileDrop>, <ButtonGroup>, <Breadcrumbs>, <Nav>, <Pagination>,
-                     <Steps>, <Toolbar>
-  svelte/            the same components as React
+  checks/            the theme gates: structure, literals and contrast, run on every theme
+  react/             every component, as React 19 components
+  svelte/            every component, as Svelte 5 components, from the same directories
 apps/sandbox/        the two demo pages, React and Svelte
 tests/               machine (node) · contract (node) · conformance (jsdom and Chrome) · browser (Chrome)
 ```
+
+Each of `@ggary/core`, `@ggary/react` and `@ggary/svelte` exports its root and
+one pattern, `./*` → `src/components/*/index.ts`: `import { Gantt } from
+'@ggary/react'` or `from '@ggary/react/gantt'`. A per-component list fell 35
+directories behind the code it named; the pattern cannot, and
+`tests/packages.contract.test.ts` holds it, with an index in every directory
+and the same components in each adapter's.
 
 ## How one component reaches two frameworks
 
@@ -2735,6 +2735,10 @@ A machine is built once, from the props as they are at mount. Every prop that ca
 change afterwards reaches it as a `SYNC_*` event — never by the machine reading
 props — and each component documents which props those are:
 
+Every component with a machine follows it — twenty of them — and a
+`default…` prop is the one kind read only once, by definition. The two where
+the rule was first worked out:
+
 | Component | Synced after mount | Read once, by definition |
 |---|---|---|
 | Select | `items`, `disabled`, `value` | `defaultValue` |
@@ -2758,6 +2762,8 @@ sandbox build prints none.
 | machine | node | `*.machine.test.ts` | 661 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
 | contract | node | `icons.contract.test.ts` | 399 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 5 tests. Every discovered theme — GGarry, now the only one: structure, literals, contrast, coverage. |
+| contract | node | `packages.contract.test.ts` | 9 tests. Each package's exports are its root and `./*`; every component directory has an index; both adapters have the same directories, the same components in each, and all of them at their root. |
+| contract | node | `anatomy.contract.test.ts` | 2 tests. Every element an adapter draws takes a prop bag from core — no bare `<span>` a theme could only name by its tag — and no adapter writes a class. |
 | contract | node | `core-shape.contract.test.ts` | 2 tests. Every component laid out as `<dir>.<role>.ts` with a re-export-only index; every connect ending at the normalizer or one `options`. |
 | contract | node | `checks.contract.test.ts` | 30 tests. The gates themselves: each rule fires on a planted defect — the literal families and their ledger among them; the colour engine. |
 | dom | jsdom | `conformance.dom.test.ts` | 1078 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
@@ -2879,9 +2885,10 @@ Real, and deliberately left open:
 - **Platform close requests** (a back gesture) are cancelled through the `cancel`
   event, which browsers may refuse to let a page cancel without recent user
   activation; the dialog then closes natively and reports `native`.
-- **No prose styles, charts (meter, sparkline, ring, heatmap), agent components
-  (including a composer, a textarea with a toolbar in one frame) or print
-  styles.** Instrument had them; they were never ported.
+- **No prose styles or print styles.** Instrument had them; they were never
+  ported. (Its charts and agent components were, in batches B and C.)
+- **Svelte exports no prop types.** React exports each component's `…Props`;
+  a Svelte project reads them with `ComponentProps<typeof Gantt>`.
 - **One cell at a time.** No pasting a block of cells, no fill-down, and no undo
   beyond the rollback of a failed save.
 - **An edit to `rows` is yours to keep.** With an array in the page, the grid

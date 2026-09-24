@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Button, Dialog, Sheet } from '../../../packages/svelte/src/index'
 
-  let { trigger: triggerLabel, triggerIsButton, body = 'Body', footer: footerLabel, sheet, ...rest }: Record<string, any> = $props()
+  let { trigger: triggerLabel, triggerIsButton, body = 'Body', footer: footerLabel, sheet, ...rest }: any = $props()
   const Component = $derived(sheet ? Sheet : Dialog)
   const side = $derived(sheet && sheet !== true ? { side: sheet } : {})
 </script>

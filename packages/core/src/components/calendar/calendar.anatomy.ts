@@ -9,6 +9,8 @@ export const calendarAnatomy = createAnatomy('calendar', [
   'next',
   'nav-icon',
   'grid',
+  'head',
+  'body',
   'head-row',
   'weekday',
   'week',

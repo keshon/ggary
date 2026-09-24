@@ -53,7 +53,7 @@
   gap: var(--ggarry-space-1);
 }
 /* The levels above the last are the way there, not the answer. */
-[data-scope='cascader'][data-part='value'] > span:not(:last-child):not([data-part='separator']) {
+[data-scope='cascader'][data-part='value'] > [data-part='value-item']:not(:last-child) {
   color: var(--ggarry-text-muted);
 }
 [data-scope='cascader'][data-part='separator'] {

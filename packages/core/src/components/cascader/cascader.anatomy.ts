@@ -20,6 +20,7 @@ export const cascaderAnatomy = createAnatomy('cascader', [
   'label',
   'trigger',
   'value',
+  'value-item',
   'separator',
   'indicator',
   'positioner',

@@ -16,9 +16,9 @@ const items: TimelineItem[] = [
  * tone on the item, and the marks hidden beside the words that name them.
  */
 export function timelineConformance(adapter: Adapter) {
-  ;(adapter.timeline ? describe : describe.skip)('timeline', () => {
+  ;(describe)('timeline', () => {
     it('is an ordered list of items: a hidden dot, the body, the time at the end', async () => {
-      const m = await adapter.timeline!({ items, label: 'Run history', locale: 'en-GB', timeFormat: utc }, freshTarget())
+      const m = await adapter.timeline({ items, label: 'Run history', locale: 'en-GB', timeFormat: utc }, freshTarget())
       const root = part(m.root, 'timeline', 'root')!
       expect(root.localName).toBe('ol')
       expect(root.getAttribute('aria-label')).toBe('Run history')
@@ -35,7 +35,7 @@ export function timelineConformance(adapter: Adapter) {
     })
 
     it('says when in a real <time>: the machine value, and the label in the locale', async () => {
-      const m = await adapter.timeline!({ items, locale: 'en-GB', timeFormat: utc }, freshTarget())
+      const m = await adapter.timeline({ items, locale: 'en-GB', timeFormat: utc }, freshTarget())
       const times = parts(m.root, 'timeline', 'time')
       expect(times.map((time) => time.localName)).toEqual(['time', 'time', 'time'])
       expect(times.map((time) => time.getAttribute('datetime'))).toEqual(['2026-09-22T14:36:00Z', '2026-09-22T14:32:00Z', null])
@@ -43,13 +43,13 @@ export function timelineConformance(adapter: Adapter) {
     })
 
     it('an item with no time has no time element', async () => {
-      const m = await adapter.timeline!({ items: [{ id: 'a', title: 'Created' }] }, freshTarget())
+      const m = await adapter.timeline({ items: [{ id: 'a', title: 'Created' }] }, freshTarget())
       expect(part(m.root, 'timeline', 'time')).toBeNull()
       expect(part(m.root, 'timeline', 'root')!.hasAttribute('aria-label')).toBe(false)
     })
 
     it('a rich body replaces the title and the detail, and keeps the dot and the time', async () => {
-      const m = await adapter.timeline!({ items, rich: true, locale: 'en-GB', timeFormat: utc }, freshTarget())
+      const m = await adapter.timeline({ items, rich: true, locale: 'en-GB', timeFormat: utc }, freshTarget())
       const first = parts(m.root, 'timeline', 'item')[0]
       const body = part(first, 'timeline', 'body')!
       expect([...body.children].map((child) => child.localName)).toEqual(['strong'])
@@ -59,7 +59,7 @@ export function timelineConformance(adapter: Adapter) {
     })
 
     it('follows new items', async () => {
-      const m = await adapter.timeline!({ items, timeFormat: utc }, freshTarget())
+      const m = await adapter.timeline({ items, timeFormat: utc }, freshTarget())
       await m.update({ items: [...items, { id: 'new', title: 'Failed', tone: 'error' }] })
       const rows = parts(m.root, 'timeline', 'item')
       expect(rows).toHaveLength(4)
@@ -67,9 +67,9 @@ export function timelineConformance(adapter: Adapter) {
     })
   })
 
-  ;(adapter.statusDot ? describe : describe.skip)('status dot', () => {
+  ;(describe)('status dot', () => {
     it('is a hidden mark, and carries a tone only when given one', async () => {
-      const m = await adapter.statusDot!({ tone: 'warn' }, freshTarget())
+      const m = await adapter.statusDot({ tone: 'warn' }, freshTarget())
       const dot = part(m.root, 'dot', 'root')!
       expect(dot.localName).toBe('span')
       expect(dot.getAttribute('aria-hidden')).toBe('true')
@@ -80,9 +80,9 @@ export function timelineConformance(adapter: Adapter) {
     })
   })
 
-  ;(adapter.caret ? describe : describe.skip)('caret', () => {
+  ;(describe)('caret', () => {
     it('is a hidden mark flush after the text', async () => {
-      const m = await adapter.caret!({}, freshTarget())
+      const m = await adapter.caret({}, freshTarget())
       const caret = part(m.root, 'caret', 'root')!
       expect(caret.getAttribute('aria-hidden')).toBe('true')
       expect(caret.childNodes).toHaveLength(0)

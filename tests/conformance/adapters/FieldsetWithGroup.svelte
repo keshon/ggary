@@ -1,7 +1,7 @@
 <script lang="ts">
   import { CheckboxGroup, Fieldset, RadioGroup } from '../../../packages/svelte/src/index'
 
-  let { group, items, name, defaultValue, ...fieldset }: Record<string, any> = $props()
+  let { group, items, name, defaultValue, ...fieldset }: any = $props()
 </script>
 
 <Fieldset {...fieldset}>

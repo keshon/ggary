@@ -89,7 +89,7 @@
   {#if label}<label {...api.labelProps}>{label}</label>{/if}
   <button bind:this={triggerEl} {...api.triggerProps}>
     <!-- One line: whitespace between the segments would be read out and drawn. -->
-    <span {...api.valueProps}>{#if api.chosen.length === 0}{api.placeholder}{:else}{#each api.chosen as node, i (node.value)}{#if i > 0}<span {...api.separatorProps}></span>{/if}<span>{node.label}</span>{/each}{/if}</span>
+    <span {...api.valueProps}>{#if api.chosen.length === 0}{api.placeholder}{:else}{#each api.chosen as node, i (node.value)}{#if i > 0}<span {...api.separatorProps}></span>{/if}<span {...api.valueItemProps}>{node.label}</span>{/each}{/if}</span>
     <span {...api.indicatorProps}></span>
   </button>
   <div bind:this={positionerEl} {...api.positionerProps}>

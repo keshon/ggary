@@ -55,6 +55,8 @@ export function connect<T = Dict>(state: ToasterState, toaster: Toaster, normali
 
     listProps: normalize({ ...toastAnatomy.attrs('list'), 'data-placement': placement }),
 
+    /** One thing said in a live region; re-keyed per announcement so the same words are said again. */
+    announcementProps: normalize({ ...toastAnatomy.attrs('announcement') }),
     politeProps: normalize({ ...toastAnatomy.attrs('announcer'), 'aria-live': 'polite', 'aria-atomic': 'true', 'data-urgency': 'polite' }),
     assertiveProps: normalize({ ...toastAnatomy.attrs('announcer'), 'aria-live': 'assertive', 'aria-atomic': 'true', 'data-urgency': 'assertive' }),
 

@@ -20,11 +20,11 @@ const key = (target: Element, name: string, init: KeyboardEventInit = {}) =>
  * values as chips, a server list, and the form.
  */
 export function comboboxConformance(adapter: Adapter) {
-  const run = adapter.combobox ? describe : describe.skip
+  const run = describe
   run('combobox', () => {
     const setup = async (props: Partial<ComboboxProps> = {}) => {
       const changes: string[][] = []
-      const m = await adapter.combobox!({ label: 'Manager', items: managers, onValueChange: (value) => changes.push(value), ...props }, freshTarget())
+      const m = await adapter.combobox({ label: 'Manager', items: managers, onValueChange: (value) => changes.push(value), ...props }, freshTarget())
       const input = () => part(m.root, 'combobox', 'input') as HTMLInputElement
       const content = () => part(m.root, 'combobox', 'content')!
       const options = () => parts(m.root, 'combobox', 'item')

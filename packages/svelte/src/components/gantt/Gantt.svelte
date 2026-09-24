@@ -96,10 +96,10 @@
     <div {...api.cornerProps}>{api.words.task}</div>
     <div {...api.scaleProps}>
       <div {...api.getScaleRowProps('top')}>
-        {#each api.top as cell (cell.start)}<div {...api.getScaleCellProps(cell)}><span>{cell.label}</span></div>{/each}
+        {#each api.top as cell (cell.start)}<div {...api.getScaleCellProps(cell)}><span {...api.scaleLabelProps}>{cell.label}</span></div>{/each}
       </div>
       <div {...api.getScaleRowProps('bottom')}>
-        {#each api.bottom as cell (cell.start)}<div {...api.getScaleCellProps(cell)}><span>{cell.label}</span></div>{/each}
+        {#each api.bottom as cell (cell.start)}<div {...api.getScaleCellProps(cell)}><span {...api.scaleLabelProps}>{cell.label}</span></div>{/each}
       </div>
     </div>
   </div>
@@ -119,7 +119,7 @@
       {#if row.kind === 'group'}
         {@const summary = api.getSummaryProps(row.group)}
         <div {...api.getGroupRowProps(row.group)}>
-          <div {...api.getGroupTitleProps(row.group)}><span {...api.getGroupToggleProps(row.group)}></span><span>{row.group.title}</span></div>
+          <div {...api.getGroupTitleProps(row.group)}><span {...api.getGroupToggleProps(row.group)}></span><span {...api.titleTextProps}>{row.group.title}</span></div>
           <div {...api.getGroupScheduleProps(row.group)}>
             <span {...api.scheduleTextProps}>{api.describeGroup(row.group)}</span>
             {#if summary}<div {...summary}><div {...api.getSummaryProgressProps(row.group)}></div></div>{/if}

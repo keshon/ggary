@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Popover } from '../../../packages/svelte/src/index'
 
-  let { trigger: triggerLabel, body = 'Body', ...rest }: Record<string, any> = $props()
+  let { trigger: triggerLabel, body = 'Body', ...rest }: any = $props()
 </script>
 
 {#snippet trigger(props: Record<string, unknown>)}

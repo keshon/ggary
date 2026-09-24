@@ -2,7 +2,7 @@
   import { Step } from '../../../packages/svelte/src/index'
 
   /** The spec hands plain text; Svelte wants snippets, and only where there is something to render. */
-  let { input, output, ...rest }: { input?: string; output?: string; [key: string]: unknown } = $props()
+  let { input, output, ...rest }: any = $props()
 </script>
 
 {#snippet outputBody()}{output}{/snippet}

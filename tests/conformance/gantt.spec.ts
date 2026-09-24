@@ -8,11 +8,11 @@ import { plan, planRange } from './plan'
  * in days, one tab stop the arrows move, and Enter opening a task.
  */
 export function ganttConformance(adapter: Adapter) {
-  const run = adapter.gantt ? describe : describe.skip
+  const run = describe
   run('gantt', () => {
     const setup = async (props: Partial<GanttProps> = {}) => {
       const opened: string[] = []
-      const m = await adapter.gantt!({ tasks: plan, range: planRange, locale: 'en-GB', onOpen: (task) => void opened.push(task.id), ...props }, freshTarget())
+      const m = await adapter.gantt({ tasks: plan, range: planRange, locale: 'en-GB', onOpen: (task) => void opened.push(task.id), ...props }, freshTarget())
       const root = () => part(m.root, 'gantt', 'root') ?? m.root
       const schedule = (id: string) => m.root.querySelector<HTMLElement>(`[data-part="schedule"][data-task="${id}"]`)!
       const press = (key: string) => adapter.act(() => void keydown(document.activeElement!, key))

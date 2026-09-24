@@ -9,12 +9,12 @@ import type { KanbanMove } from '../../packages/core/src/components/kanban'
  * following it across re-renders, and what the live region says.
  */
 export function kanbanConformance(adapter: Adapter) {
-  const run = adapter.kanban ? describe : describe.skip
+  const run = describe
   run('kanban', () => {
     const setup = async (props: Partial<KanbanProps> = {}) => {
       const moves: KanbanMove[] = []
       const opened: string[] = []
-      const m = await adapter.kanban!({ columns, cards: tasks, onMove: (move) => void moves.push(move), onOpen: (card) => void opened.push(card.id), ...props }, freshTarget())
+      const m = await adapter.kanban({ columns, cards: tasks, onMove: (move) => void moves.push(move), onOpen: (card) => void opened.push(card.id), ...props }, freshTarget())
       const card = (id: string) => m.root.querySelector<HTMLElement>(`[data-part="card"][data-card="${id}"]`)!
       const column = (id: string) => parts(m.root, 'kanban', 'list').find((list) => list.dataset.column === id)!
       const titles = (id: string) => parts(column(id), 'kanban', 'card-title').map((title) => title.textContent)

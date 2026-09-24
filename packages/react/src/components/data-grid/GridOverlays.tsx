@@ -128,7 +128,7 @@ export function GridDetail<Row>(props: GridDetailProps<Row>) {
         </>
       }
     >
-      {row === undefined || api.index === null ? <p>{loadingText}</p> : children(row, api.index)}
+      {row === undefined || api.index === null ? <p {...api.loadingProps}>{loadingText}</p> : children(row, api.index)}
     </Sheet>
   )
 }

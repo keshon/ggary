@@ -132,6 +132,8 @@ export function connect<T = Dict>(state: CalendarState, send: (event: CalendarEv
       onKeyDown,
       onPointerLeave: () => send({ type: 'HOVER', date: null }),
     }),
+    headProps: normalize({ ...anatomy.attrs('head') }),
+    bodyProps: normalize({ ...anatomy.attrs('body') }),
     headRowProps: normalize({ ...anatomy.attrs('head-row'), role: 'row' }),
     getWeekdayProps: (index: number) =>
       normalize({ ...anatomy.attrs('weekday'), role: 'columnheader', abbr: weekdays[index].long, 'aria-label': weekdays[index].long }),

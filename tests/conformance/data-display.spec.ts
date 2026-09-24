@@ -9,9 +9,9 @@ import { type Adapter, freshTarget, part, parts } from './harness'
 export function dataDisplayConformance(adapter: Adapter) {
   const { metric, metricRow, keyValueList, fileChange } = adapter
 
-  ;(metric ? describe : describe.skip)('metric', () => {
+  ;describe('metric', () => {
     it('reads label, number, unit and change in that order, the arrow hidden', async () => {
-      const m = await metric!(
+      const m = await metric(
         { label: 'Run time', value: 1234, unit: 's', delta: '18% down on the last', direction: 'down', tone: 'ok', locale: 'en-US' },
         freshTarget()
       )
@@ -35,7 +35,7 @@ export function dataDisplayConformance(adapter: Adapter) {
     })
 
     it('draws no unit, no delta and no arrow it was not given', async () => {
-      const m = await metric!({ label: 'Duration p95', value: '4:12' }, freshTarget())
+      const m = await metric({ label: 'Duration p95', value: '4:12' }, freshTarget())
       expect(part(m.root, 'metric', 'value')!.textContent).toBe('4:12')
       expect(part(m.root, 'metric', 'unit')).toBeNull()
       expect(part(m.root, 'metric', 'delta')).toBeNull()
@@ -48,7 +48,7 @@ export function dataDisplayConformance(adapter: Adapter) {
     })
 
     it('follows a new value, direction and tone independently', async () => {
-      const m = await metric!({ label: 'Warnings', value: 5, delta: '5 new', direction: 'up', tone: 'error', locale: 'en-US' }, freshTarget())
+      const m = await metric({ label: 'Warnings', value: 5, delta: '5 new', direction: 'up', tone: 'error', locale: 'en-US' }, freshTarget())
       await m.update({ value: 12000, tone: 'warn' })
       expect(part(m.root, 'metric', 'value')!.textContent).toBe('12,000')
       const delta = part(m.root, 'metric', 'delta')!
@@ -59,7 +59,7 @@ export function dataDisplayConformance(adapter: Adapter) {
     })
   })
 
-  ;(metricRow ? describe : describe.skip)('metric row', () => {
+  ;describe('metric row', () => {
     const metrics = [
       { label: 'Total', value: '128' },
       { label: 'Succeeded', value: '121' },
@@ -67,7 +67,7 @@ export function dataDisplayConformance(adapter: Adapter) {
     ]
 
     it('holds its metrics; tiles by default', async () => {
-      const m = await metricRow!({ metrics }, freshTarget())
+      const m = await metricRow({ metrics }, freshTarget())
       const row = part(m.root, 'metric-row', 'root')!
       expect(parts(row, 'metric', 'label').map((el) => el.textContent)).toEqual(['Total', 'Succeeded', 'Failed'])
       expect(row.hasAttribute('data-joined')).toBe(false)
@@ -75,7 +75,7 @@ export function dataDisplayConformance(adapter: Adapter) {
     })
 
     it('joined and headline are attributes a theme reads', async () => {
-      const m = await metricRow!({ metrics, joined: true }, freshTarget())
+      const m = await metricRow({ metrics, joined: true }, freshTarget())
       const row = part(m.root, 'metric-row', 'root')!
       expect(row.hasAttribute('data-joined')).toBe(true)
       await m.update({ headline: true })
@@ -85,7 +85,7 @@ export function dataDisplayConformance(adapter: Adapter) {
     })
   })
 
-  ;(keyValueList ? describe : describe.skip)('key–value list', () => {
+  ;describe('key–value list', () => {
     const items = [
       { label: 'Model', value: 'opus' },
       { label: 'Started', value: '14:32:07' },
@@ -93,7 +93,7 @@ export function dataDisplayConformance(adapter: Adapter) {
     ]
 
     it('is a real <dl>: each name a <dt>, each value the <dd> after it', async () => {
-      const m = await keyValueList!({ items }, freshTarget())
+      const m = await keyValueList({ items }, freshTarget())
       const root = part(m.root, 'kv', 'root')!
       expect(root.tagName).toBe('DL')
       expect([...root.children].map((el) => el.tagName)).toEqual(['DT', 'DD', 'DT', 'DD', 'DT', 'DD'])
@@ -104,13 +104,13 @@ export function dataDisplayConformance(adapter: Adapter) {
     })
 
     it('a rich value is markup inside its <dd>', async () => {
-      const m = await keyValueList!({ items, rich: true }, freshTarget())
+      const m = await keyValueList({ items, rich: true }, freshTarget())
       const details = parts(m.root, 'kv', 'detail')
       expect(details.map((el) => el.querySelector('strong')?.textContent)).toEqual(['opus', '14:32:07', '4'])
     })
 
     it('tight is an attribute; new items redraw the pairs', async () => {
-      const m = await keyValueList!({ items, tight: true }, freshTarget())
+      const m = await keyValueList({ items, tight: true }, freshTarget())
       expect(part(m.root, 'kv', 'root')!.hasAttribute('data-tight')).toBe(true)
       await m.update({ items: [{ label: 'Sent', value: '1' }, { label: 'Suppressed', value: '0' }] })
       expect(parts(m.root, 'kv', 'term').map((el) => el.textContent)).toEqual(['Sent', 'Suppressed'])
@@ -118,9 +118,9 @@ export function dataDisplayConformance(adapter: Adapter) {
     })
   })
 
-  ;(fileChange ? describe : describe.skip)('file change', () => {
+  ;describe('file change', () => {
     it('shows the sign, hidden from assistive tech, and says the word', async () => {
-      const m = await fileChange!({ change: 'deleted' }, freshTarget())
+      const m = await fileChange({ change: 'deleted' }, freshTarget())
       const root = part(m.root, 'file-change', 'root')!
       expect(root.dataset.change).toBe('deleted')
       const sign = part(root, 'file-change', 'sign')!
@@ -133,7 +133,7 @@ export function dataDisplayConformance(adapter: Adapter) {
     })
 
     it('follows a new change, and takes other words', async () => {
-      const m = await fileChange!({ change: 'added' }, freshTarget())
+      const m = await fileChange({ change: 'added' }, freshTarget())
       await m.update({ change: 'conflict' })
       expect(part(m.root, 'file-change', 'root')!.dataset.change).toBe('conflict')
       expect(part(m.root, 'file-change', 'sign')!.textContent).toBe('!')

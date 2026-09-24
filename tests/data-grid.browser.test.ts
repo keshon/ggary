@@ -227,7 +227,8 @@ describe('every adapter scrolls the whole list', () => {
     document.body.append(host)
     const instance = mountSvelte(SvelteGrid, {
       target: host,
-      props: { columns, rows: leads, rowKey: (row: Lead) => row.id, label: 'Leads', locale: 'en-US', style: 'block-size: 480px' },
+      // mount() cannot name a generic component's type argument, so Row is unknown to it.
+      props: { columns, rows: leads, rowKey: (row: Lead) => row.id, label: 'Leads', locale: 'en-US', style: 'block-size: 480px' } as never,
     })
     flushSync()
     const last = await scrollToEnd(host)

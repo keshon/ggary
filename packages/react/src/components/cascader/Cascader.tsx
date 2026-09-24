@@ -76,7 +76,7 @@ export function Cascader(props: CascaderProps) {
             : api.chosen.map((node, i) => (
                 <Fragment key={node.value}>
                   {i > 0 && <span {...api.separatorProps} />}
-                  <span>{node.label}</span>
+                  <span {...api.valueItemProps}>{node.label}</span>
                 </Fragment>
               ))}
         </span>

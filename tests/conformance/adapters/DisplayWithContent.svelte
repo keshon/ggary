@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Banner, Card, EmptyState, Note, Panel } from '../../../packages/svelte/src/index'
 
-  let { component, ...props }: Record<string, any> = $props()
+  let { component, ...props }: any = $props()
 </script>
 
 {#snippet refresh()}<button type="button">Refresh</button>{/snippet}

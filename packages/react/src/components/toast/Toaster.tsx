@@ -28,8 +28,8 @@ export function Toaster({ toaster = pageToaster, placement, label, closeLabel }:
 
   return (
     <section ref={region} {...api.regionProps}>
-      <div {...api.politeProps}>{api.politeText && <p key={state.announcement.nonce}>{api.politeText}</p>}</div>
-      <div {...api.assertiveProps}>{api.assertiveText && <p key={state.announcement.nonce}>{api.assertiveText}</p>}</div>
+      <div {...api.politeProps}>{api.politeText && <p key={state.announcement.nonce} {...api.announcementProps}>{api.politeText}</p>}</div>
+      <div {...api.assertiveProps}>{api.assertiveText && <p key={state.announcement.nonce} {...api.announcementProps}>{api.assertiveText}</p>}</div>
       <ol {...api.listProps}>
         {api.toasts.map((toast) => (
           <li key={toast.id} {...api.getToastProps(toast)}>

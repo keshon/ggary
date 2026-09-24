@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Button, Field, Form, FormSummary, Input, Select } from '../../../packages/svelte/src/index'
 
-  let { summary = true, validate, onSubmit }: Record<string, any> = $props()
+  let { summary = true, validate, onSubmit }: any = $props()
   const roles = [
     { value: 'admin', label: 'Admin' },
     { value: 'member', label: 'Member' },

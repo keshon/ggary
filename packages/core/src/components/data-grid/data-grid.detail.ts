@@ -9,7 +9,7 @@ import type { ColumnDef, SelectionPayload } from './data-grid.types'
  * which a right click, Shift+F10 or the menu key opens.
  */
 
-export const gridDetailAnatomy = createAnatomy('grid-detail', ['nav', 'position', 'prev', 'next', 'icon'] as const)
+export const gridDetailAnatomy = createAnatomy('grid-detail', ['nav', 'position', 'prev', 'next', 'icon', 'loading'] as const)
 
 export interface DetailWords {
   locale?: string
@@ -42,6 +42,8 @@ export function connectDetail<Row, T = Dict>(snapshot: DataGridSnapshot, control
     onOpenChange: (next: boolean) => {
       if (!next) controller.closeDetail()
     },
+    /** Said while the row the sheet shows is on its way. */
+    loadingProps: normalize({ ...gridDetailAnatomy.attrs('loading'), role: 'status' }),
     navProps: normalize({ ...gridDetailAnatomy.attrs('nav'), role: 'group', 'aria-label': 'Rows' }),
     positionProps: normalize({ ...gridDetailAnatomy.attrs('position'), 'aria-live': 'polite' }),
     prevProps: normalize({

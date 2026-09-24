@@ -11,11 +11,11 @@ const key = (target: Element, name: string, init: KeyboardEventInit = {}) =>
  * coming back, and the leaf's value in the form.
  */
 export function cascaderConformance(adapter: Adapter) {
-  const run = adapter.cascader ? describe : describe.skip
+  const run = describe
   run('cascader', () => {
     const setup = async (props: Partial<CascaderProps> = {}) => {
       const changes: string[][] = []
-      const m = await adapter.cascader!({ label: 'Place', items: places, onValueChange: (value) => changes.push(value), ...props }, freshTarget())
+      const m = await adapter.cascader({ label: 'Place', items: places, onValueChange: (value) => changes.push(value), ...props }, freshTarget())
       const trigger = () => part(m.root, 'cascader', 'trigger') as HTMLButtonElement
       const content = () => part(m.root, 'cascader', 'content')!
       const columns = () => parts(m.root, 'cascader', 'column')

@@ -40,6 +40,8 @@ export interface CellEditor<T> {
   options: { value: string; label: string }[]
   /** An input, or a select for `kind: 'select'`. */
   inputProps: T
+  /** Each of a select editor's `<option>`s, beside its `value`. */
+  optionProps: T
   /** Why the draft cannot be saved, or undefined. */
   error: string | undefined
   errorProps: T
@@ -271,6 +273,7 @@ export function connect<Row, T = Dict>(
         // Clicking elsewhere keeps what was typed, as a spreadsheet does.
         onFocusOut: () => controller.commitEdit({ refocus: false }),
       }),
+      optionProps: normalize({ ...dataGridAnatomy.attrs('editor-option') }),
       errorProps: normalize({ ...dataGridAnatomy.attrs('editor-error'), id: errorId }),
     }
   }
@@ -476,6 +479,9 @@ export function connect<Row, T = Dict>(
     openIconProps: normalize({ ...dataGridAnatomy.attrs('open-icon'), 'aria-hidden': 'true', 'data-icon': 'expand' }),
     checkboxIndicatorProps: normalize({ ...dataGridAnatomy.attrs('checkbox-indicator'), 'aria-hidden': 'true', 'data-icon': 'check' }),
     statusProps: normalize({ ...dataGridAnatomy.attrs('status'), role: 'status', 'aria-live': 'polite' }),
+    /** What the overlay says: nothing matches, or the request failed. */
+    overlayTextProps: normalize({ ...dataGridAnatomy.attrs('overlay-text') }),
+    retryProps: normalize({ ...dataGridAnatomy.attrs('retry'), type: 'button', onClick: () => controller.data.retry() }),
     overlayProps: normalize({
       ...dataGridAnatomy.attrs('overlay'),
       'data-kind': data.error ? 'error' : 'empty',

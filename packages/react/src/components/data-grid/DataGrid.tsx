@@ -150,13 +150,11 @@ export function DataGrid<Row>(props: DataGridProps<Row>) {
         <div {...api.overlayProps}>
           {api.overlay === 'error' ? (
             <>
-              <p>{api.errorText}</p>
-              <button type="button" onClick={api.retry}>
-                {api.retryText}
-              </button>
+              <p {...api.overlayTextProps}>{api.errorText}</p>
+              <button {...api.retryProps}>{api.retryText}</button>
             </>
           ) : (
-            (empty ?? <p>{api.emptyText}</p>)
+            (empty ?? <p {...api.overlayTextProps}>{api.emptyText}</p>)
           )}
         </div>
       )}
@@ -182,7 +180,7 @@ function CellEditorView({ editor }: { editor: CellEditor<Dict> }) {
       {editor.kind === 'select' ? (
         <select ref={ref} {...editor.inputProps}>
           {editor.options.map((option) => (
-            <option key={option.value} value={option.value}>
+            <option key={option.value} {...editor.optionProps} value={option.value}>
               {option.label}
             </option>
           ))}

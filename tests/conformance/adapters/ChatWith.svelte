@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Approval, Composer, Failure, Thinking, Turn } from '../../../packages/svelte/src/index'
 
-  let { component, ...props }: Record<string, any> = $props()
+  let { component, ...props }: any = $props()
 </script>
 
 {#snippet copy()}<button type="button">Copy</button>{/snippet}

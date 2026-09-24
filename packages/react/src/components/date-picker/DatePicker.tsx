@@ -38,7 +38,7 @@ function CalendarView({ api, gridRef }: { api: CalendarApi<Dict>; gridRef: RefOb
         </button>
       </div>
       <table ref={gridRef} {...api.gridProps}>
-        <thead>
+        <thead {...api.headProps}>
           <tr {...api.headRowProps}>
             {api.weekdays.map((day, index) => (
               <th key={day.long} {...api.getWeekdayProps(index)}>
@@ -47,7 +47,7 @@ function CalendarView({ api, gridRef }: { api: CalendarApi<Dict>; gridRef: RefOb
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody {...api.bodyProps}>
           {api.weeks.map((week) => (
             <tr key={week[0]} {...api.weekProps}>
               {week.map((date) => (

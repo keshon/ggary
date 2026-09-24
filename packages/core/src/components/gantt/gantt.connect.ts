@@ -263,6 +263,10 @@ export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, sen
         // The heading's name opens and closes it, as the keys do.
         onClick: () => send({ type: 'TOGGLE', group: group.id }),
       }),
+    /** The words inside a scale cell, apart from the cell, so a narrow one can hide them. */
+    scaleLabelProps: normalize({ ...ganttAnatomy.attrs('scale-label') }),
+    /** A group's name beside its chevron. */
+    titleTextProps: normalize({ ...ganttAnatomy.attrs('title-text') }),
     getGroupToggleProps: (group: GanttGroup) =>
       normalize({
         ...ganttAnatomy.attrs('group-toggle'),

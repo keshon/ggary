@@ -160,7 +160,7 @@
   cursor: pointer;
   user-select: none;
 }
-[data-scope='gantt'][data-part='title'][data-group] > span:last-child {
+[data-scope='gantt'][data-part='title'][data-group] > [data-part='title-text'] {
   min-inline-size: 0;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -10,11 +10,11 @@ import { files, sections } from './files'
 export function disclosureConformance(adapter: Adapter) {
   const press = (key: string) => adapter.act(() => void keydown(document.activeElement!, key))
 
-  const accordion = adapter.accordion ? describe : describe.skip
+  const accordion = describe
   accordion('accordion', () => {
     const setup = async (props: Partial<AccordionProps> = {}) => {
       const changes: string[][] = []
-      const m = await adapter.accordion!({ items: sections, onValueChange: (value) => changes.push(value), ...props }, freshTarget())
+      const m = await adapter.accordion({ items: sections, onValueChange: (value) => changes.push(value), ...props }, freshTarget())
       const triggers = () => parts(m.root, 'accordion', 'trigger') as HTMLButtonElement[]
       const contents = () => parts(m.root, 'accordion', 'content')
       return { m, triggers, contents, changes }
@@ -70,12 +70,12 @@ export function disclosureConformance(adapter: Adapter) {
     })
   })
 
-  const tree = adapter.tree ? describe : describe.skip
+  const tree = describe
   tree('tree', () => {
     const setup = async (props: Partial<TreeProps> = {}) => {
       const changes: string[][] = []
       const opened: string[][] = []
-      const m = await adapter.tree!({ items: files, label: 'Files', onValueChange: (value) => changes.push(value), onExpandedChange: (value) => opened.push(value), ...props }, freshTarget())
+      const m = await adapter.tree({ items: files, label: 'Files', onValueChange: (value) => changes.push(value), onExpandedChange: (value) => opened.push(value), ...props }, freshTarget())
       const items = () => parts(m.root, 'tree', 'item')
       const item = (value: string) => items().find((row) => row.dataset.value === value)!
       const texts = () => items().map((row) => part(row, 'tree', 'item-text')!.textContent)
@@ -150,9 +150,9 @@ export function disclosureConformance(adapter: Adapter) {
     })
   })
 
-  const progress = adapter.progress ? describe : describe.skip
+  const progress = describe
   progress('progress', () => {
-    const setup = (props: ProgressProps) => adapter.progress!(props, freshTarget())
+    const setup = (props: ProgressProps) => adapter.progress(props, freshTarget())
     const track = (root: Element) => part(root, 'progress', 'track')!
 
     it('is a progressbar named by its label, with its value in words', async () => {

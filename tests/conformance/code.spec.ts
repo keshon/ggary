@@ -26,11 +26,11 @@ function restore() {
  */
 export function codeConformance(adapter: Adapter) {
   const mountCode = adapter.codeBlock
-  ;(mountCode ? describe : describe.skip)('code block', () => {
+  ;describe('code block', () => {
     afterEach(restore)
 
     it('is a named region with a tab stop, so the sideways scroll is reachable', async () => {
-      const m = await mountCode!({ code: 'go -C tools run ./cmd/contrast' }, freshTarget())
+      const m = await mountCode({ code: 'go -C tools run ./cmd/contrast' }, freshTarget())
       const content = part(m.root, 'code', 'content')!
       expect(content.getAttribute('role')).toBe('region')
       expect(content.getAttribute('aria-label')).toBe('Code')
@@ -40,7 +40,7 @@ export function codeConformance(adapter: Adapter) {
     })
 
     it('the copy button is always there, named with what it copies; the live region starts empty', async () => {
-      const m = await mountCode!({ code: 'x', label: 'the command' }, freshTarget())
+      const m = await mountCode({ code: 'x', label: 'the command' }, freshTarget())
       const copy = part(m.root, 'code', 'copy') as HTMLButtonElement
       expect(copy.tagName).toBe('BUTTON')
       expect(copy.type).toBe('button')
@@ -55,7 +55,7 @@ export function codeConformance(adapter: Adapter) {
     })
 
     it('numbered: a line per line, counted from start, the numbers hidden from assistive tech', async () => {
-      const m = await mountCode!({ code: 'const size = 256;\nlet seed = 1;\nreturn size;\n', numbered: true, start: 41 }, freshTarget())
+      const m = await mountCode({ code: 'const size = 256;\nlet seed = 1;\nreturn size;\n', numbered: true, start: 41 }, freshTarget())
       const lines = parts(m.root, 'code', 'line')
       expect(lines).toHaveLength(3)
       const numbers = parts(m.root, 'code', 'line-number')
@@ -69,7 +69,7 @@ export function codeConformance(adapter: Adapter) {
     it('a press copies, shows it, says it, and lets go after a moment', async () => {
       const writeText = vi.fn(async () => {})
       stubClipboard(writeText)
-      const m = await mountCode!({ code: 'npm test' }, freshTarget())
+      const m = await mountCode({ code: 'npm test' }, freshTarget())
       const copy = () => part(m.root, 'code', 'copy')!
       await adapter.act(() => click(copy()))
       await adapter.wait(20)
@@ -87,7 +87,7 @@ export function codeConformance(adapter: Adapter) {
       const writeText = vi.fn(async () => {})
       stubClipboard(writeText)
       const onCopy = vi.fn(() => false as const)
-      const m = await mountCode!({ code: 'short', copyValue: 'the long one', onCopy }, freshTarget())
+      const m = await mountCode({ code: 'short', copyValue: 'the long one', onCopy }, freshTarget())
       await adapter.act(() => click(part(m.root, 'code', 'copy')!))
       await adapter.wait(20)
       expect(onCopy).toHaveBeenCalledWith('the long one')
@@ -98,11 +98,11 @@ export function codeConformance(adapter: Adapter) {
   })
 
   const mountCopyable = adapter.copyable
-  ;(mountCopyable ? describe : describe.skip)('copyable', () => {
+  ;describe('copyable', () => {
     afterEach(restore)
 
     it('a value and a button in the flow, the button named with the value', async () => {
-      const m = await mountCopyable!({ value: 'a4f7c2e' }, freshTarget())
+      const m = await mountCopyable({ value: 'a4f7c2e' }, freshTarget())
       expect(part(m.root, 'copyable', 'value')!.textContent).toBe('a4f7c2e')
       const copy = part(m.root, 'copyable', 'copy') as HTMLButtonElement
       expect(copy.type).toBe('button')
@@ -116,7 +116,7 @@ export function codeConformance(adapter: Adapter) {
     it('copies the full value behind an abbreviation', async () => {
       const writeText = vi.fn(async () => {})
       stubClipboard(writeText)
-      const m = await mountCopyable!({ value: 'a4f7c2e', copyValue: 'a4f7c2e91b0d5537' }, freshTarget())
+      const m = await mountCopyable({ value: 'a4f7c2e', copyValue: 'a4f7c2e91b0d5537' }, freshTarget())
       await adapter.act(() => click(part(m.root, 'copyable', 'copy')!))
       await adapter.wait(20)
       expect(writeText).toHaveBeenCalledWith('a4f7c2e91b0d5537')
@@ -127,7 +127,7 @@ export function codeConformance(adapter: Adapter) {
     it('a refused write that the fallback cannot save is shown and said as a failure', async () => {
       stubClipboard(async () => Promise.reject(new Error('denied')))
       const execCommand = stubExecCommand(false)
-      const m = await mountCopyable!({ value: 'v', words: { failed: 'Не скопировано' } }, freshTarget())
+      const m = await mountCopyable({ value: 'v', words: { failed: 'Не скопировано' } }, freshTarget())
       await adapter.act(() => click(part(m.root, 'copyable', 'copy')!))
       await adapter.wait(20)
       expect(execCommand).toHaveBeenCalledWith('copy')
