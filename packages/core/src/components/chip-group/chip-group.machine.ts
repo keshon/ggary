@@ -181,7 +181,7 @@ export interface ChipGroupConfig {
   /** Controlled. Omit and use `defaultValue` for uncontrolled. */
   value?: string[]
   defaultValue?: string[]
-  onSelectionChange?: (selection: string[], items: ChipItem[]) => void
+  onValueChange?: (selection: string[], items: ChipItem[]) => void
   onRemove?: (value: string, item: ChipItem | null) => void
 }
 
@@ -214,7 +214,7 @@ export function createChipGroupMachine(config: ChipGroupConfig): Machine<ChipGro
   return withEffects(base, (previous, next) => {
     if (previous.intent.nonce !== next.intent.nonce) {
       const chosen = new Set(next.intent.selection)
-      config.onSelectionChange?.(
+      config.onValueChange?.(
         next.intent.selection,
         next.items.filter((item) => chosen.has(item.value))
       )

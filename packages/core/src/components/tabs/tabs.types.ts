@@ -18,8 +18,12 @@ export type TabsOrientation = 'horizontal' | 'vertical'
  */
 export type TabsActivation = 'automatic' | 'manual'
 
-/** `line`: sections, marked by a bar. `chips`: open documents, marked by a raised fill. */
-export type TabsVariant = 'line' | 'chips'
+/**
+ * What the tabs hold, not how they look. `sections`: views of one thing, the
+ * chosen one marked by a bar. `documents`: open items, each closable, the
+ * chosen one raised off a track.
+ */
+export type TabsVariant = 'sections' | 'documents'
 
 export interface TabsOptions {
   orientation: TabsOrientation

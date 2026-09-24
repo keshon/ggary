@@ -1,7 +1,7 @@
 export { dataGridAnatomy } from './data-grid.anatomy'
 export type { DataGridPart } from './data-grid.anatomy'
 export { connect } from './data-grid.connect'
-export type { CellEditor, DataGridApi, DataGridConnectOptions } from './data-grid.connect'
+export type { CellEditor, DataGridApi, DataGridConnectOptions, DataGridWords } from './data-grid.connect'
 export { createDataGrid, SELECT_COLUMN, SELECT_WIDTH } from './data-grid.controller'
 export type { DataGridController, DataGridOptions, DataGridSnapshot, GridFeature, GridLayout, GridViewport, LaidColumn } from './data-grid.controller'
 export { alignOf, createFormatter, EMPTY_CELL } from './data-grid.format'

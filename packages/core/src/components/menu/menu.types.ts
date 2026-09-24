@@ -19,7 +19,8 @@ interface MenuItemBase {
 export interface MenuActionItem extends MenuItemBase {
   type?: 'item'
   href?: string
-  tone?: 'danger'
+  /** It destroys: red, and named by its word. */
+  destructive?: boolean
 }
 
 /** A toggle. The owner holds `checked`; selecting reports the next state. */

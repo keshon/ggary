@@ -104,7 +104,7 @@ export const documentMenu: MenuEntry[] = [
   { type: 'separator' },
   { value: 'docs', label: 'Open the docs', href: '#menu' },
   { type: 'separator' },
-  { value: 'delete', label: 'Delete', tone: 'danger', shortcut: 'Del' },
+  { value: 'delete', label: 'Delete', destructive: true, shortcut: 'Del' },
 ]
 
 export function viewMenu(view: ViewState): MenuEntry[] {
@@ -470,7 +470,7 @@ export const dueOf = (due: string) => {
 
 export const dealMenu = [
   { value: 'copy-link', label: 'Copy link' },
-  { value: 'archive', label: 'Archive', tone: 'danger' as const },
+  { value: 'archive', label: 'Archive', destructive: true },
 ]
 
 /** The pretend server: a new deal takes a moment, and a title in capitals is refused. */

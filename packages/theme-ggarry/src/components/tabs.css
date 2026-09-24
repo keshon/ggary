@@ -2,10 +2,10 @@
    GGarry — tabs
 
    Two jobs, two looks (as Instrument has them):
-     line   sections of one screen: a bar under the selected tab
-     chips  open documents: a raised chip on a track, a close button, a dot
-            for unsaved changes
-   The label keeps its weight when selected in the line variant, so choosing
+     sections   views of one screen: a bar under the selected tab
+     documents  open items: a raised chip on a track, a close button, a dot
+                for unsaved changes
+   The label keeps its weight when selected among sections, so choosing
    a tab does not shift the ones after it.
    ========================================================================== */
 
@@ -15,14 +15,14 @@
   color: var(--ggarry-text-default);
 }
 
-/* --- line ---------------------------------------------------------------- */
+/* --- sections ------------------------------------------------------------ */
 
-[data-scope='tabs'][data-part='list'][data-variant='line'] {
+[data-scope='tabs'][data-part='list'][data-variant='sections'] {
   gap: var(--ggarry-space-5);
   border-block-end: 1px solid var(--ggarry-border-default);
 }
 
-[data-scope='tabs'][data-part='list'][data-variant='line'] > [data-part='tab'] {
+[data-scope='tabs'][data-part='list'][data-variant='sections'] > [data-part='tab'] {
   gap: var(--ggarry-space-2);
   padding-block: var(--ggarry-space-2);
   /* The bar covers the list's line rather than sitting under it. */
@@ -32,39 +32,39 @@
   transition: color var(--ggarry-duration-fast) var(--ggarry-easing-standard), border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
-[data-scope='tabs'][data-part='list'][data-variant='line'] > [data-part='tab']:hover:not([data-disabled]) {
+[data-scope='tabs'][data-part='list'][data-variant='sections'] > [data-part='tab']:hover:not([data-disabled]) {
   color: var(--ggarry-text-default);
   border-block-end-color: var(--ggarry-border-strong);
 }
 
-[data-scope='tabs'][data-part='list'][data-variant='line'] > [data-part='tab'][data-state='active'] {
+[data-scope='tabs'][data-part='list'][data-variant='sections'] > [data-part='tab'][data-state='active'] {
   color: var(--ggarry-text-default);
   border-block-end-color: var(--ggarry-bg-accent);
 }
 
 /* Vertical: the bar stands at the inline end, beside the panel. */
-[data-scope='tabs'][data-part='list'][data-variant='line'][data-orientation='vertical'] {
+[data-scope='tabs'][data-part='list'][data-variant='sections'][data-orientation='vertical'] {
   gap: 0;
   border-block-end: 0;
   border-inline-end: 1px solid var(--ggarry-border-default);
 }
-[data-scope='tabs'][data-part='list'][data-variant='line'][data-orientation='vertical'] > [data-part='tab'] {
+[data-scope='tabs'][data-part='list'][data-variant='sections'][data-orientation='vertical'] > [data-part='tab'] {
   padding: var(--ggarry-space-2) var(--ggarry-space-4) var(--ggarry-space-2) 0;
   margin-block-end: 0;
   margin-inline-end: -1px;
   border-block-end: 0;
   border-inline-end: var(--ggarry-size-indicator) solid transparent;
 }
-[data-scope='tabs'][data-part='list'][data-variant='line'][data-orientation='vertical'] > [data-part='tab']:hover:not([data-disabled]) {
+[data-scope='tabs'][data-part='list'][data-variant='sections'][data-orientation='vertical'] > [data-part='tab']:hover:not([data-disabled]) {
   border-inline-end-color: var(--ggarry-border-strong);
 }
-[data-scope='tabs'][data-part='list'][data-variant='line'][data-orientation='vertical'] > [data-part='tab'][data-state='active'] {
+[data-scope='tabs'][data-part='list'][data-variant='sections'][data-orientation='vertical'] > [data-part='tab'][data-state='active'] {
   border-inline-end-color: var(--ggarry-bg-accent);
 }
 
-/* --- chips --------------------------------------------------------------- */
+/* --- documents ----------------------------------------------------------- */
 
-[data-scope='tabs'][data-part='list'][data-variant='chips'] {
+[data-scope='tabs'][data-part='list'][data-variant='documents'] {
   --tabs-track-radius: var(--ggarry-radius-lg);
   --tabs-track-inset: var(--ggarry-space-1);
 
@@ -75,7 +75,7 @@
   border-radius: var(--tabs-track-radius);
 }
 
-[data-scope='tabs'][data-part='list'][data-variant='chips'] > [data-part='tab'] {
+[data-scope='tabs'][data-part='list'][data-variant='documents'] > [data-part='tab'] {
   gap: var(--ggarry-space-1);
   min-block-size: var(--ggarry-size-control-sm);
   padding-inline: var(--ggarry-space-3);
@@ -85,17 +85,17 @@
   color: var(--ggarry-text-muted);
   font-size: var(--ggarry-font-size-sm);
 }
-[data-scope='tabs'][data-part='list'][data-variant='chips'] > [data-part='tab'][data-closable] {
+[data-scope='tabs'][data-part='list'][data-variant='documents'] > [data-part='tab'][data-closable] {
   padding-inline-end: var(--ggarry-space-1);
 }
 
-[data-scope='tabs'][data-part='list'][data-variant='chips'] > [data-part='tab']:hover:not([data-disabled]):not([data-state='active']) {
+[data-scope='tabs'][data-part='list'][data-variant='documents'] > [data-part='tab']:hover:not([data-disabled]):not([data-state='active']) {
   background: var(--ggarry-bg-muted);
   color: var(--ggarry-text-default);
 }
 
 /* Raised on the track: a surface, a border and weight — never colour alone. */
-[data-scope='tabs'][data-part='list'][data-variant='chips'] > [data-part='tab'][data-state='active'] {
+[data-scope='tabs'][data-part='list'][data-variant='documents'] > [data-part='tab'][data-state='active'] {
   background: var(--ggarry-bg-surface);
   border-color: var(--ggarry-border-default);
   box-shadow: var(--ggarry-shadow-sm);

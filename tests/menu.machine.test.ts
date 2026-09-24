@@ -17,7 +17,7 @@ const items: MenuEntry[] = [
       { type: 'radio', value: 'compact', label: 'Compact', checked: false },
     ],
   },
-  { value: 'delete', label: 'Delete', tone: 'danger' },
+  { value: 'delete', label: 'Delete', destructive: true },
 ]
 
 const run = (state: MenuState, ...events: MenuEvent[]) => events.reduce(reducer, state)
@@ -167,7 +167,7 @@ describe('menu connect', () => {
     expect(duplicate).toMatchObject({ 'aria-disabled': 'true', 'data-disabled': '' })
     expect(grid).toMatchObject({ role: 'menuitemcheckbox', 'aria-checked': 'true', 'data-state': 'checked' })
     expect(compact).toMatchObject({ role: 'menuitemradio', 'aria-checked': 'false', 'data-state': 'unchecked' })
-    expect(remove).toMatchObject({ 'data-tone': 'danger' })
+    expect(remove).toMatchObject({ 'data-destructive': '' })
   })
 
   it('a link item keeps its href unless disabled', () => {

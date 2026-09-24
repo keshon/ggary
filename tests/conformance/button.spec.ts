@@ -10,16 +10,16 @@ export function buttonConformance(adapter: Adapter) {
     }
 
     describe('intent attributes', () => {
-      it('defaults to medium emphasis and emits no tone for neutral', async () => {
+      it('defaults to medium emphasis and emits nothing for an action that destroys nothing', async () => {
         const { button } = await setup()
         expect(button().dataset.emphasis).toBe('medium')
-        expect(button().hasAttribute('data-tone')).toBe(false)
+        expect(button().hasAttribute('data-destructive')).toBe(false)
       })
 
-      it('emits emphasis and tone as data attributes', async () => {
-        const { button } = await setup({ label: 'Go', emphasis: 'high', tone: 'danger' })
+      it('emits emphasis and destructive as data attributes', async () => {
+        const { button } = await setup({ label: 'Go', emphasis: 'high', destructive: true })
         expect(button().dataset.emphasis).toBe('high')
-        expect(button().dataset.tone).toBe('danger')
+        expect(button().dataset.destructive).toBe('')
       })
 
       // Named by intent so a theme that forbids a LOOK can still honour every

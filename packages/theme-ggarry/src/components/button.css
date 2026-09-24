@@ -96,20 +96,20 @@
    accent's privilege there. Same markup, same API, different design language:
    exactly the kind of decision a theme is supposed to own. */
 
-[data-scope='button'][data-part='root'][data-tone='danger'] {
+[data-scope='button'][data-part='root'][data-destructive] {
   --button-fg: var(--ggarry-text-danger);
   --button-bg-hover: color-mix(in oklab, var(--ggarry-bg-danger) 10%, transparent);
 }
-[data-scope='button'][data-part='root'][data-tone='danger'][data-emphasis='medium'] {
+[data-scope='button'][data-part='root'][data-destructive][data-emphasis='medium'] {
   --button-border: var(--ggarry-border-danger);
 }
 /* Low emphasis is a tinted fill; the tint has to follow the tone, or a red
    label sits on the accent's blue. */
-[data-scope='button'][data-part='root'][data-tone='danger'][data-emphasis='low'] {
+[data-scope='button'][data-part='root'][data-destructive][data-emphasis='low'] {
   --button-bg: color-mix(in oklab, var(--ggarry-bg-danger) 10%, transparent);
   --button-bg-hover: color-mix(in oklab, var(--ggarry-bg-danger) 18%, transparent);
 }
-[data-scope='button'][data-part='root'][data-tone='danger'][data-emphasis='high'] {
+[data-scope='button'][data-part='root'][data-destructive][data-emphasis='high'] {
   --button-bg: var(--ggarry-bg-danger);
   --button-bg-hover: var(--ggarry-bg-danger-hover);
   --button-fg: var(--ggarry-text-on-danger);

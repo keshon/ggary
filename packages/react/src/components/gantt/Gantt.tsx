@@ -18,7 +18,7 @@ export interface GanttProps<T extends GanttTask> {
    * at its new dates at once; return a promise to say whether it holds, and
    * apply it to `tasks` when it does. Without it, bars stay put.
    */
-  onChange?: (change: GanttChange<T>) => Promise<unknown> | unknown
+  onTaskChange?: (change: GanttChange<T>) => Promise<unknown> | unknown
   /** Headings to list tasks under; a task names its own in `group`. */
   groups?: GanttGroup[]
   /** The ids of the closed groups. Controlled; `defaultCollapsed` for uncontrolled. */
@@ -34,10 +34,10 @@ const NO_GROUPS: GanttGroup[] = []
 
 /** Tasks as bars on a time scale, their names beside them, under headings when there are groups. */
 export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
-  const { tasks, scale, defaultScale, onScaleChange, range, locale, onOpen, onChange, groups, collapsed, defaultCollapsed, onCollapsedChange, children, words } = props
+  const { tasks, scale, defaultScale, onScaleChange, range, locale, onOpen, onTaskChange, groups, collapsed, defaultCollapsed, onCollapsedChange, children, words } = props
   const id = `gg-gantt-${useId().replace(/:/g, '')}`
-  const callbacks = useRef({ onScaleChange, onOpen, onChange, onCollapsedChange })
-  callbacks.current = { onScaleChange, onOpen, onChange, onCollapsedChange }
+  const callbacks = useRef({ onScaleChange, onOpen, onTaskChange, onCollapsedChange })
+  callbacks.current = { onScaleChange, onOpen, onTaskChange, onCollapsedChange }
   const [machine] = useState(() =>
     createGanttMachine<T>({
       id,
@@ -48,8 +48,8 @@ export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
       locale,
       onScaleChange: (next) => callbacks.current.onScaleChange?.(next),
       onOpen: (task) => callbacks.current.onOpen?.(task),
-      editable: onChange !== undefined,
-      onChange: (change) => callbacks.current.onChange?.(change),
+      editable: onTaskChange !== undefined,
+      onTaskChange: (change) => callbacks.current.onTaskChange?.(change),
       groups,
       collapsed,
       defaultCollapsed,
@@ -67,7 +67,7 @@ export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
   useEffect(() => {
     if (scale !== undefined) machine.send({ type: 'SYNC_SCALE', scale })
   }, [machine, scale])
-  const editable = onChange !== undefined
+  const editable = onTaskChange !== undefined
   useEffect(() => machine.send({ type: 'SYNC_OPTIONS', range: range ?? null, locale, editable }), [machine, range, locale, editable])
 
   const lastFocus = useRef(0)

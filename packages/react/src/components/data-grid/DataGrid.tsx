@@ -8,7 +8,7 @@ import {
   type ColumnDef,
   type DataGridController,
   type DataGridOptions,
-  type EditWords,
+  type DataGridWords,
   type GridQuery,
   type GridSource,
   type RowKey,
@@ -38,16 +38,12 @@ export interface DataGridProps<Row> {
    * row to show the server's version.
    */
   onCellEdit?: (edit: CellEdit<Row>) => Promise<Row | void> | Row | void
-  editWords?: EditWords
-  /** "Could not save Paid: the deal is closed". */
-  saveFailedText?: (column: string, message: string) => string
   /** A cell of your own; `text` is the formatted value, for when you only wrap it. */
   renderCell?: (row: Row, column: ColumnDef<Row>, text: string) => ReactNode
   /** Shown when the query matches nothing — an EmptyState, usually. */
   empty?: ReactNode
-  emptyText?: string
-  errorText?: string
-  retryLabel?: string
+  /** Everything the grid says: empty, error, retry, saveFailed, notANumber, … */
+  words?: DataGridWords
   locale?: string
   rowHeight?: number
   blockSize?: number
@@ -59,8 +55,8 @@ export interface DataGridProps<Row> {
 export function DataGrid<Row>(props: DataGridProps<Row>) {
   const {
     columns, rows, rowKey, label, selectable, initialQuery, onQueryChange, onSelectionChange, onRowActivate,
-    renderCell, empty, emptyText, errorText, retryLabel = 'Try again', locale, rowHeight, blockSize, controllerRef, style,
-    onCellEdit, editWords, saveFailedText,
+    renderCell, empty, words, locale, rowHeight, blockSize, controllerRef, style,
+    onCellEdit,
   } = props
   const id = `gg-grid-${useId().replace(/:/g, '')}`
 
@@ -71,7 +67,7 @@ export function DataGrid<Row>(props: DataGridProps<Row>) {
   const [controller] = useState(() =>
     createDataGrid<Row>({
       columns, source, rowKey, selectable, rowHeight, blockSize, query: initialQuery,
-      onQueryChange, onSelectionChange, onRowActivate, onCellEdit, editWords,
+      onQueryChange, onSelectionChange, onRowActivate, onCellEdit, words,
     } satisfies DataGridOptions<Row>)
   )
 
@@ -89,7 +85,7 @@ export function DataGrid<Row>(props: DataGridProps<Row>) {
   // flight; the controller itself is collected with the component.
 
   const snapshot = useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getSnapshot)
-  const api = connect(snapshot, controller, reactNormalizer, { id, label, emptyText, errorText, locale, saveFailedText })
+  const api = connect(snapshot, controller, reactNormalizer, { id, label, locale, words })
 
   const root = useRef<HTMLDivElement>(null)
   useLayoutEffect(() => (root.current ? controller.attach(root.current) : undefined), [controller])
@@ -156,7 +152,7 @@ export function DataGrid<Row>(props: DataGridProps<Row>) {
             <>
               <p>{api.errorText}</p>
               <button type="button" onClick={api.retry}>
-                {retryLabel}
+                {api.retryText}
               </button>
             </>
           ) : (

@@ -185,7 +185,7 @@ export async function expectSheetLayout() {
 export async function expectConcentricChipTabs() {
   const unmount = await render(
     h(Tabs, {
-      variant: 'chips',
+      variant: 'documents',
       label: 'Open files',
       items: [
         { value: 'a', label: 'tokens.css', closable: true },

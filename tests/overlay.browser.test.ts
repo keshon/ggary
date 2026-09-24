@@ -252,7 +252,7 @@ describe('menu in a real browser', () => {
     { value: 'edit', label: 'Edit', shortcut: 'E' },
     { value: 'duplicate', label: 'Duplicate' },
     { type: 'separator' as const },
-    { value: 'delete', label: 'Delete', tone: 'danger' as const },
+    { value: 'delete', label: 'Delete', destructive: true },
   ]
 
   const item = (host: Element, label: string) =>

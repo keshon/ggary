@@ -41,10 +41,10 @@
 /* A destructive action is red AND named by its word. Highlighted, it takes the
    danger fill rather than the accent, so the row does not turn blue at the
    moment it is about to be pressed. */
-[data-scope='menu'][data-part='item'][data-tone='danger'] {
+[data-scope='menu'][data-part='item'][data-destructive] {
   color: var(--ggarry-text-danger);
 }
-[data-scope='menu'][data-part='item'][data-tone='danger'][data-highlighted] {
+[data-scope='menu'][data-part='item'][data-destructive][data-highlighted] {
   background: var(--ggarry-bg-danger);
   color: var(--ggarry-text-on-danger);
 }

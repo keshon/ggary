@@ -85,7 +85,7 @@ describe('tabs in a real browser', () => {
   it('a long strip scrolls to keep the focused tab in sight', async () => {
     await page.viewport(600, 400)
     const items = Array.from({ length: 30 }, (_, i) => ({ value: `f${i}`, label: `file-${i}.css`, closable: true }))
-    const host = mount(h(Tabs, { variant: 'chips', label: 'Open files', items, children: panelText }), 'inline-size: 400px')
+    const host = mount(h(Tabs, { variant: 'documents', label: 'Open files', items, children: panelText }), 'inline-size: 400px')
     const list = host.querySelector('[data-part="list"]') as HTMLElement
     expect(list.scrollWidth).toBeGreaterThan(list.clientWidth)
     tabByText(host, 'file-0.css').focus()
@@ -108,7 +108,7 @@ describe('tabs in a real browser', () => {
         { value: 'c', label: 'c.css', closable: true },
       ])
       return h(Tabs, {
-        variant: 'chips',
+        variant: 'documents',
         label: 'Open files',
         items,
         onClose: (value: string) => setItems((current) => current.filter((item) => item.value !== value)),

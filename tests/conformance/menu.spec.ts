@@ -19,7 +19,7 @@ const items: MenuEntry[] = [
     items: [{ type: 'checkbox', value: 'grid', label: 'Show grid', checked: false }],
   },
   { value: 'docs', label: 'Docs', href: '#docs' },
-  { value: 'delete', label: 'Delete', tone: 'danger' },
+  { value: 'delete', label: 'Delete', destructive: true },
 ]
 
 /**
@@ -79,7 +79,7 @@ export function menuConformance(adapter: Adapter) {
         expect(row('Show grid').getAttribute('aria-checked')).toBe('false')
         expect(part(row('Show grid'), 'menu', 'item-indicator')!.dataset.icon).toBe('check')
         expect(row('Archive').getAttribute('aria-disabled')).toBe('true')
-        expect(row('Delete').dataset.tone).toBe('danger')
+        expect(row('Delete').dataset.destructive).toBe('')
         // A link is a link: middle-click and "open in new tab" keep working.
         expect(row('Docs').localName).toBe('a')
         expect(row('Docs').getAttribute('href')).toBe('#docs')

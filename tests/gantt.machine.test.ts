@@ -84,9 +84,9 @@ describe('gantt', () => {
 })
 
 describe('gantt: moving and resizing', () => {
-  const edit = (onChange: (change: { task: { id: string }; from: unknown; to: unknown }) => unknown = () => undefined) => {
+  const edit = (onTaskChange: (change: { task: { id: string }; from: unknown; to: unknown }) => unknown = () => undefined) => {
     const changes: unknown[] = []
-    const machine = createGanttMachine({ id: 'g', tasks: plan, range: planRange, locale: 'en-GB', onChange: (change) => { changes.push([change.task.id, change.from, change.to]); return onChange(change) } })
+    const machine = createGanttMachine({ id: 'g', tasks: plan, range: planRange, locale: 'en-GB', onTaskChange: (change) => { changes.push([change.task.id, change.from, change.to]); return onTaskChange(change) } })
     return { machine, send: machine.send, changes, said: () => connect(machine.getState(), machine.send, same).announcement }
   }
 
@@ -149,11 +149,11 @@ describe('gantt: moving and resizing', () => {
     expect(machine.getState().pending).toEqual([])
   })
 
-  it('a milestone only moves; a locked task and a chart without onChange do not change', () => {
+  it('a milestone only moves; a locked task and a chart without onTaskChange do not change', () => {
     const { send, machine } = edit()
     send({ type: 'DRAG', task: 'review', edge: 'end', offset: 2 })
     expect(datesFor(machine.getState(), plan[2])).toEqual({ start: '2026-09-23', end: '2026-09-23' })
-    const locked = createGanttMachine({ id: 'g', tasks: [{ ...plan[0], locked: true }], onChange: () => undefined })
+    const locked = createGanttMachine({ id: 'g', tasks: [{ ...plan[0], locked: true }], onTaskChange: () => undefined })
     locked.send({ type: 'DRAG', task: 'brief', edge: 'move', offset: 2 })
     expect(locked.getState().draft).toBeNull()
     const still = createGanttMachine({ id: 'g', tasks: plan })
@@ -205,7 +205,7 @@ describe('gantt: dependencies', () => {
   })
 
   it('says what a task waits for, and which it starts too early for; its arrows stand out while it has the keyboard; a change moves them', () => {
-    const machine = createGanttMachine({ id: 'g', tasks: [plan[0], { ...plan[1], start: '2026-09-09', dependsOn: ['brief'] }], range: planRange, locale: 'en-GB', onChange: () => undefined })
+    const machine = createGanttMachine({ id: 'g', tasks: [plan[0], { ...plan[1], start: '2026-09-09', dependsOn: ['brief'] }], range: planRange, locale: 'en-GB', onTaskChange: () => undefined })
     const api = () => connect(machine.getState(), machine.send, same)
     expect(api().describe(machine.getState().tasks[1])).toBe('9 Sept – 18 Sept 2026, 10 days, 40% done, after Write the brief; starts before Write the brief ends')
     expect(api().linksProps).toMatchObject({ 'aria-hidden': 'true' })
@@ -257,7 +257,7 @@ describe('gantt: groups', () => {
   })
 
   it('a group’s summary runs from its first task’s start to its last one’s end, each task weighed by its days, and follows a change', () => {
-    const { api, send } = make({ onChange: () => undefined, tasks: tasks.map((task) => (task.id === 'qa' ? { ...task, progress: 0.5 } : task)) })
+    const { api, send } = make({ onTaskChange: () => undefined, tasks: tasks.map((task) => (task.id === 'qa' ? { ...task, progress: 0.5 } : task)) })
     expect(api().getSummaryProps(groups[1])).toMatchObject({ style: { '--gg-gantt-start': 20, '--gg-gantt-span': 22 } })
     // 19 days at none, 8 at half.
     expect(api().describeGroup(groups[1])).toBe('2 tasks, 21 Sept – 12 Oct 2026, 22 days, 15% done')
@@ -290,7 +290,7 @@ describe('gantt: groups', () => {
 
   it('closing the group the keyboard is in takes the keyboard to its heading, and keeps a change being made', () => {
     const changes: string[] = []
-    const { api, send, machine } = make({ onChange: (change) => void changes.push(change.task.id) })
+    const { api, send, machine } = make({ onTaskChange: (change) => void changes.push(change.task.id) })
     send({ type: 'FOCUS', task: 'design' })
     send({ type: 'NUDGE', edge: 'move', days: 1 })
     send({ type: 'TOGGLE', group: 'discovery' })

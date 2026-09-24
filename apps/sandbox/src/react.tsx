@@ -273,12 +273,12 @@ function App() {
         </section>
 
         <section id="button-tone">
-          <h3>Button — tone danger, across emphasis</h3>
+          <h3>Button — destructive, across emphasis</h3>
           <div className="row">
-            <Button emphasis="high" tone="danger">high</Button>
-            <Button emphasis="medium" tone="danger">medium</Button>
-            <Button emphasis="low" tone="danger">low</Button>
-            <Button emphasis="minimal" tone="danger">minimal</Button>
+            <Button emphasis="high" destructive>high</Button>
+            <Button emphasis="medium" destructive>medium</Button>
+            <Button emphasis="low" destructive>low</Button>
+            <Button emphasis="minimal" destructive>minimal</Button>
           </div>
         </section>
 
@@ -329,7 +329,7 @@ function App() {
             removable
             name="tags"
             defaultValue={['design']}
-            onSelectionChange={(next) => setSelection(next)}
+            onValueChange={(next) => setSelection(next)}
             onRemove={(value) => setItems((current) => current.filter((i) => i.value !== value))}
           />
           <pre className="state">
@@ -875,7 +875,7 @@ function App() {
                 logDialog('delete')(open, details)
               }}
               trigger={(props) => (
-                <Button tone="danger" {...props}>
+                <Button destructive {...props}>
                   Delete project…
                 </Button>
               )}
@@ -884,7 +884,7 @@ function App() {
                   <Button emphasis="minimal" onClick={() => (setDeleteOpen(false), setDialogLog('delete  closed  by Cancel'))}>
                     Cancel
                   </Button>
-                  <Button emphasis="high" tone="danger" onClick={() => (setDeleteOpen(false), setDialogLog('delete  closed  by Delete'))}>
+                  <Button emphasis="high" destructive onClick={() => (setDeleteOpen(false), setDialogLog('delete  closed  by Delete'))}>
                     Delete
                   </Button>
                 </>
@@ -1068,7 +1068,7 @@ function App() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <Tabs
                 items={files}
-                variant="chips"
+                variant="documents"
                 label="Open files"
                 onValueChange={(value) => setTabsLog(`selected ${value}`)}
                 onClose={(value) => {
@@ -1362,7 +1362,7 @@ function App() {
                   {deal.labels && (
                     <div className="deal-labels">
                       {deal.labels.map((label) => (
-                        <Badge key={label} variant="outline">
+                        <Badge key={label} emphasis="low">
                           {label}
                         </Badge>
                       ))}
@@ -1400,7 +1400,7 @@ function App() {
               onScaleChange={setGanttScale}
               locale="en-GB"
               onOpen={(task) => setGanttLog(`open: ${task.title}`)}
-              onChange={async ({ task, to }) => {
+              onTaskChange={async ({ task, to }) => {
                 await saveTaskDates(task.id, to)
                 setRolloutTasks((current) => current.map((item) => (item.id === task.id ? { ...item, ...to } : item)))
                 setGanttLog(`changed: ${task.title} → ${to.start} – ${to.end}`)
@@ -1444,8 +1444,8 @@ function App() {
                 {label}
               </Badge>
             ))}
-            <Badge variant="outline">v2.4</Badge>
-            <Badge variant="count" tone="running">
+            <Badge emphasis="low">v2.4</Badge>
+            <Badge count tone="running">
               12
             </Badge>
           </div>

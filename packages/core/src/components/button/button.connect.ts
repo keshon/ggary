@@ -10,7 +10,7 @@ import type { ButtonProps } from './button.types'
 export function connect<T = Dict>(props: ButtonProps, normalize: Normalizer<T>) {
   const {
     emphasis = 'medium',
-    tone = 'neutral',
+    destructive = false,
     size = 'md',
     disabled = false,
     loading = false,
@@ -25,7 +25,7 @@ export function connect<T = Dict>(props: ButtonProps, normalize: Normalizer<T>) 
       disabled: disabled || undefined,
       'aria-busy': loading ? 'true' : undefined,
       'data-emphasis': emphasis,
-      'data-tone': tone === 'neutral' ? undefined : tone,
+      'data-destructive': destructive ? '' : undefined,
       'data-size': size,
       'data-disabled': disabled ? '' : undefined,
       'data-loading': loading ? '' : undefined,

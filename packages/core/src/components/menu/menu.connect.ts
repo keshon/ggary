@@ -258,7 +258,7 @@ export function connect<T = Dict>(
         'data-value': item.value,
         'data-type': item.type ?? 'item',
         'data-state': submenu ? (submenuOpen ? 'open' : 'closed') : checkedState(item),
-        'data-tone': item.type === undefined || item.type === 'item' ? item.tone : undefined,
+        'data-destructive': (item.type === undefined || item.type === 'item') && item.destructive ? '' : undefined,
         'data-highlighted': highlighted ? '' : undefined,
         'data-disabled': item.disabled ? '' : undefined,
         onClick: (event: MouseEvent) => {

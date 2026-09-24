@@ -33,7 +33,7 @@ export const SITEMAP: SiteCategory[] = [
           },
           {
             "id": "button-tone",
-            "label": "Tone danger, across emphasis"
+            "label": "Destructive, across emphasis"
           },
           {
             "id": "button-sizes",

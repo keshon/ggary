@@ -38,7 +38,7 @@ export function connect<T = Dict>(
   options: TabsConnectOptions = {}
 ) {
   const ids = tabsIds(state.id)
-  const { variant = 'line', panels = true, closeLabel = (label: string) => `Close ${label}` } = options
+  const { variant = 'sections', panels = true, closeLabel = (label: string) => `Close ${label}` } = options
   const vertical = state.orientation === 'vertical'
   const selectedItem = state.items.find((item) => item.value === state.value) ?? null
   // The tab stop: the focused tab, or the selected one, or the first that exists.

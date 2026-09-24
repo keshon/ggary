@@ -94,9 +94,20 @@ participate without importing any JS:
    Per-component custom properties (`--button-height`, `--btn-bg`) are the
    override surface.
 4. Variants are named by **intent**, never by look: `emphasis: high | medium |
-   low | minimal`, `tone: neutral | danger`. A look-named variant like `outline`
+   low | minimal`, `destructive` for what an action does. A look-named variant like `outline`
    is a lie in any theme whose language forbids outlines; an intent is a question
    every theme can answer its own way.
+
+Names follow three more rules, so a new component's API is predictable:
+
+- **A state prop `x` pairs with `defaultX` and `onXChange`**: `value`,
+  `open`, `checked`, `page`, `scale`, `collapsed`. An event about a thing
+  is named for the thing: `onTaskChange`, `onCellEdit`, `onMove`.
+- **`tone` is a state** — `neutral | running | ok | warn | error` — and only a
+  state. What an action does is its own flag: `destructive` on a button or a
+  menu item.
+- **Everything a component says is in one `words` object**, each entry with
+  an English default: `words.empty`, `words.retry`, `words.saveFailed`.
 
 No shadow DOM. `data-scope` gives most of the encapsulation without breaking
 theming, global CSS, or SSR.
@@ -586,11 +597,11 @@ after Instrument:
 
 | Variant | For | Marked by |
 |---|---|---|
-| `line` | sections of one screen: few, fixed, never closed | a bar under the selected tab; its weight does not change, so the tabs after it do not shift |
-| `chips` | open documents: any number, opened and closed as work goes on | a raised chip on a recessed track, and weight |
+| `sections` | views of one screen: few, fixed, never closed | a bar under the selected tab; its weight does not change, so the tabs after it do not shift |
+| `documents` | open items: any number, opened and closed as work goes on | a raised chip on a recessed track, and weight |
 
 ```tsx
-<Tabs items={files} variant="chips" label="Open files" onClose={(value) => setFiles(files.filter((f) => f.value !== value))}>
+<Tabs items={files} variant="documents" label="Open files" onClose={(value) => setFiles(files.filter((f) => f.value !== value))}>
   {(item) => <Editor file={item.value} />}
 </Tabs>
 ```
@@ -657,7 +668,7 @@ they would overwrite the button's own and it would lose its styling.
 
 ```tsx
 <Dialog title="Delete project?" role="alertdialog" closeOnEscape={false} closeOnOutside={false}
-  trigger={(props) => <Button tone="danger" {...props}>Delete…</Button>}
+  trigger={(props) => <Button destructive {...props}>Delete…</Button>}
   footer={<form method="dialog"><Button type="submit" value="delete">Delete</Button></form>}
   onOpenChange={(open, { reason, returnValue }) => …}>
   Everything in "Atlas" goes.
@@ -786,7 +797,7 @@ and labelled groups one level deep.
   items={[
     { value: 'rename', label: 'Rename', shortcut: 'F2' },
     { type: 'separator' },
-    { value: 'delete', label: 'Delete', tone: 'danger' },
+    { value: 'delete', label: 'Delete', destructive: true },
   ]}
   onSelect={(value, { item, checked }) => …}
   trigger={(props) => <Button {...props}>Actions</Button>}
@@ -936,8 +947,10 @@ ok · warn · error`, and the glyph for each. Toast, Badge, Banner and Note all 
 it, so a warning looks the same wherever it is said.
 
 - **Badge.** A status in words. The dot is decoration and hidden from assistive
-  technology, and the label alone must carry the meaning. Variants: `solid`
-  (a subtle plate), `outline`, and `count`. A running badge's dot pulses.
+  technology, and the label alone must carry the meaning. `emphasis` is
+  `medium` (a subtle plate) or `low` (the tone on the border alone), in
+  Button's words; `count` makes it a round number over a glyph. A running
+  badge's dot pulses.
 - **Avatar.** The initials are drawn first, and the picture covers them once it has
   loaded. A picture that fails is removed, so there is never a broken image. The
   avatar is `role="img"` named by the person, unless `decorative` is set because the
@@ -2075,7 +2088,7 @@ foot.
     const deal = await api.createDeal(column, title)
     setDeals((current) => [...current, deal])
   }}
-  cardMenu={(deal) => [{ value: 'archive', label: 'Archive', tone: 'danger' }]}
+  cardMenu={(deal) => [{ value: 'archive', label: 'Archive', destructive: true }]}
   onCardMenuSelect={(value, deal) => archive(deal)}
 >
   {(deal) => <DealMeta deal={deal} />}
@@ -2350,7 +2363,7 @@ const [scale, setScale] = useState<GanttScale>('day')
   scale={scale}
   onScaleChange={setScale}
   onOpen={(task) => openTask(task)}
-  onChange={async ({ task, to }) => {
+  onTaskChange={async ({ task, to }) => {
     await api.reschedule(task.id, to)   // a rejection puts the bar back
     setPlan((current) => current.map((item) => (item.id === task.id ? { ...item, ...to } : item)))
   }}
@@ -2388,7 +2401,7 @@ Enter or a double press opens one. The row the keyboard is on is tinted,
 name and all, its bar ringed, and a bar out of sight is scrolled into view
 clear of the list — the theme's scroll padding keeps it from landing under.
 
-**With `onChange`, the bars move.** A pointer takes a bar's body to move it
+**With `onTaskChange`, the bars move.** A pointer takes a bar's body to move it
 and either end — a grip eight pixels wide — to resize it, in whole days, a
 day's width read off the page; Escape in the middle puts it back, and the
 release that ends a drag is not a press. The keyboard does the same on the
@@ -2400,7 +2413,7 @@ one change, not twenty; Escape puts it back. An end never passes the other,
 a milestone only moves, and a `locked` task has no grips and ignores the
 keys. The schedule cell describes the keys to a screen reader.
 
-A change stands at once, faded until `onChange` answers. A rejection puts
+A change stands at once, faded until `onTaskChange` answers. A rejection puts
 that task back — that change only — and reads out why; one that holds waits
 for your tasks to show it, so the bar never jumps back for a frame. The
 Kanban's moves and the DataGrid's cell saves work the same way.

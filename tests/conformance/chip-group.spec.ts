@@ -123,10 +123,10 @@ export function chipGroupConformance(adapter: Adapter) {
       })
 
       it('reports the selection with its resolved items', async () => {
-        const onSelectionChange = vi.fn()
-        const { chips, click } = await setup({ onSelectionChange })
+        const onValueChange = vi.fn()
+        const { chips, click } = await setup({ onValueChange })
         await click(chips()[1])
-        expect(onSelectionChange).toHaveBeenCalledWith(['code'], [expect.objectContaining(items[1])])
+        expect(onValueChange).toHaveBeenCalledWith(['code'], [expect.objectContaining(items[1])])
       })
 
       it('submits one hidden input per selected value', async () => {
@@ -148,11 +148,11 @@ export function chipGroupConformance(adapter: Adapter) {
 
       it('removes from the dismiss affordance without also toggling selection', async () => {
         const onRemove = vi.fn()
-        const onSelectionChange = vi.fn()
-        const { chips, click } = await setup({ onRemove, onSelectionChange })
+        const onValueChange = vi.fn()
+        const { chips, click } = await setup({ onRemove, onValueChange })
         await click(part(chips()[0], 'chip', 'remove')!)
         expect(onRemove).toHaveBeenCalledTimes(1)
-        expect(onSelectionChange).not.toHaveBeenCalled()
+        expect(onValueChange).not.toHaveBeenCalled()
       })
 
       it('advertises the keyboard shortcut on removable chips', async () => {
@@ -200,13 +200,13 @@ export function chipGroupConformance(adapter: Adapter) {
       })
 
       it('follows a mode change: single mode replaces instead of accumulating', async () => {
-        const onSelectionChange = vi.fn()
-        const { m, chips, click } = await setup({ mode: 'multi', onSelectionChange })
+        const onValueChange = vi.fn()
+        const { m, chips, click } = await setup({ mode: 'multi', onValueChange })
         await m.update({ mode: 'single' })
 
         await click(chips()[0])
         await click(chips()[1])
-        expect(onSelectionChange).toHaveBeenLastCalledWith(['code'], [expect.objectContaining(items[1])])
+        expect(onValueChange).toHaveBeenLastCalledWith(['code'], [expect.objectContaining(items[1])])
         expect(chips().filter((c) => c.getAttribute('aria-pressed') === 'true')).toEqual([chips()[1]])
       })
     })

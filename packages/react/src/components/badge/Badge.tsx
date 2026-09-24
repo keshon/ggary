@@ -7,8 +7,8 @@ export interface BadgeProps extends CoreBadgeProps, HTMLAttributes<HTMLSpanEleme
   children?: ReactNode
 }
 
-export function Badge({ tone, variant, dot, children, ...rest }: BadgeProps) {
-  const api = connect({ tone, variant, dot }, reactNormalizer)
+export function Badge({ tone, emphasis, count, dot, children, ...rest }: BadgeProps) {
+  const api = connect({ tone, emphasis, count, dot }, reactNormalizer)
   return (
     <span {...api.rootProps} {...rest}>
       {api.showDot && <span {...api.dotProps} />}

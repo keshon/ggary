@@ -15,7 +15,7 @@
  */
 import type { ChipGroupMode, ChipGroupOrientation, ChipItem } from '../../packages/core/src/components/chip-group'
 import type { SelectItem } from '../../packages/core/src/components/select'
-import type { ButtonEmphasis, ButtonSize, ButtonTone } from '../../packages/core/src/components/button'
+import type { ButtonEmphasis, ButtonSize } from '../../packages/core/src/components/button'
 import type { InputSize, InputType } from '../../packages/core/src/components/input'
 import type { TextareaResize, TextareaSize } from '../../packages/core/src/components/textarea'
 import type { CheckedState } from '../../packages/core/src/components/checkbox'
@@ -24,7 +24,7 @@ import type { MenuEntry, MenuItem } from '../../packages/core/src/components/men
 import type { MenubarMenu } from '../../packages/core/src/components/menubar'
 import type { TabItem, TabsActivation, TabsOrientation, TabsVariant } from '../../packages/core/src/components/tabs'
 import type { Toaster, ToastPlacement } from '../../packages/core/src/components/toast'
-import type { BadgeVariant } from '../../packages/core/src/components/badge'
+import type { BadgeEmphasis } from '../../packages/core/src/components/badge'
 import type { AvatarPerson, AvatarSize } from '../../packages/core/src/components/avatar'
 import type { StatusTone } from '../../packages/core/src/utils/tone'
 import type { HeadingLevel, LiveMode, RegionRank } from '../../packages/core/src/utils/region'
@@ -37,7 +37,7 @@ import type { ChartSeries } from '../../packages/core/src/utils/series'
 export interface ButtonProps {
   label: string
   emphasis?: ButtonEmphasis
-  tone?: ButtonTone
+  destructive?: boolean
   size?: ButtonSize
   disabled?: boolean
   loading?: boolean
@@ -64,7 +64,7 @@ export interface ChipGroupProps {
   name?: string
   value?: string[]
   defaultValue?: string[]
-  onSelectionChange?: (selection: string[], items: ChipItem[]) => void
+  onValueChange?: (selection: string[], items: ChipItem[]) => void
   onRemove?: (value: string, item: ChipItem | null) => void
 }
 
@@ -490,7 +490,7 @@ export interface GanttProps {
   range?: import('../../packages/core/src/components/gantt').GanttRange
   locale?: string
   onOpen?: (task: import('../../packages/core/src/components/gantt').GanttTask) => void
-  onChange?: (change: import('../../packages/core/src/components/gantt').GanttChange) => unknown
+  onTaskChange?: (change: import('../../packages/core/src/components/gantt').GanttChange) => unknown
   groups?: import('../../packages/core/src/components/gantt').GanttGroup[]
   collapsed?: string[]
   defaultCollapsed?: string[]
@@ -634,7 +634,8 @@ export interface BadgeProps {
   /** The word inside. */
   label: string
   tone?: StatusTone
-  variant?: BadgeVariant
+  emphasis?: BadgeEmphasis
+  count?: boolean
   dot?: boolean
 }
 
@@ -1186,7 +1187,7 @@ export const click = (target: Element) => (target as HTMLElement).click()
  * is written through the prototype's setter, not the element's own property:
  * React tracks the last value it rendered on the instance, and a plain
  * `el.value = x` would update that tracker too, so React would see no change and
- * never call onChange.
+ * never call onTaskChange.
  */
 export function typeInto(input: HTMLInputElement | HTMLTextAreaElement, text: string) {
   const prototype = input instanceof HTMLTextAreaElement ? HTMLTextAreaElement.prototype : HTMLInputElement.prototype

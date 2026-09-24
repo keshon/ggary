@@ -139,14 +139,14 @@ export function tabsConformance(adapter: Adapter) {
 
     describe('closable tabs', () => {
       it('a closable tab carries a named close button out of the tab order; a modified one is marked', async () => {
-        const { tab } = await setup({ items: documents, variant: 'chips' })
+        const { tab } = await setup({ items: documents, variant: 'documents' })
         const close = part(tab('tokens.css'), 'tabs', 'close')!
         expect(close.localName).toBe('button')
         expect(close.getAttribute('aria-label')).toBe('Close tokens.css')
         expect(close.tabIndex).toBe(-1)
         expect(part(close, 'tabs', 'close-icon')!.dataset.icon).toBe('close')
         expect(tab('layout.css').hasAttribute('data-modified')).toBe(true)
-        expect(part(tab('layout.css').closest('[data-part="root"]')!, 'tabs', 'list')!.dataset.variant).toBe('chips')
+        expect(part(tab('layout.css').closest('[data-part="root"]')!, 'tabs', 'list')!.dataset.variant).toBe('documents')
       })
 
       it('the close button asks to close without selecting; Delete and a middle click ask too', async () => {

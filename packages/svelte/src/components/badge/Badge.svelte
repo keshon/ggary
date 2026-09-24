@@ -9,8 +9,8 @@
     [key: string]: unknown
   }
 
-  let { tone, variant, dot, children, ...rest }: Props = $props()
-  const api = $derived(connect({ tone, variant, dot }, svelteNormalizer))
+  let { tone, emphasis, count, dot, children, ...rest }: Props = $props()
+  const api = $derived(connect({ tone, emphasis, count, dot }, svelteNormalizer))
 </script>
 
 <span {...api.rootProps} {...rest}>{#if api.showDot}<span {...api.dotProps}></span>{/if}{@render children?.()}</span>

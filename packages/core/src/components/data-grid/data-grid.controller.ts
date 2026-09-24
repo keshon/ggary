@@ -42,7 +42,8 @@ export interface DataGridOptions<Row> {
    * the row as the server has it to show that instead.
    */
   onCellEdit?: (edit: CellEdit<Row>) => Promise<Row | void> | Row | void
-  editWords?: EditWords
+  /** What an edit says when it cannot be read. The adapters pass the grid's `words`. */
+  words?: EditWords
 }
 
 /** Parts that live outside the grid and change what it does: a row menu, a detail sheet. */
@@ -366,7 +367,7 @@ export function createDataGrid<Row>(initialOptions: DataGridOptions<Row>): DataG
       machine.send({ type: 'EDIT_END' })
       return true
     }
-    const parsed = parseDraft(def, editing.draft, options.editWords)
+    const parsed = parseDraft(def, editing.draft, options.words)
     const problem = 'error' in parsed ? parsed.error : def.validate?.(parsed.value, row)
     if (problem) {
       machine.send({ type: 'EDIT_ERROR', error: problem })

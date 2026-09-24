@@ -17,26 +17,27 @@ export interface ChipGroupProps {
   /** Controlled. Omit and use `defaultValue` for uncontrolled. */
   value?: string[]
   defaultValue?: string[]
-  onSelectionChange?: (selection: string[], items: ChipItem[]) => void
+  onValueChange?: (selection: string[], items: ChipItem[]) => void
   onRemove?: (value: string, item: ChipItem | null) => void
-  emptyLabel?: string
+  /** What the group says: `empty` when it holds no chips. */
+  words?: { empty?: string }
 }
 
 export function ChipGroup(props: ChipGroupProps) {
   const {
     items, label, mode, orientation, emphasis, size, removable, disabled = false,
-    name, value, defaultValue, onSelectionChange, onRemove, emptyLabel = 'Nothing here',
+    name, value, defaultValue, onValueChange, onRemove, words = {},
   } = props
 
   const id = `gg-chips-${useId().replace(/:/g, '')}`
 
-  const callbacks = useRef({ onSelectionChange, onRemove })
-  callbacks.current = { onSelectionChange, onRemove }
+  const callbacks = useRef({ onValueChange, onRemove })
+  callbacks.current = { onValueChange, onRemove }
 
   const [machine] = useState(() =>
     createChipGroupMachine({
       id, items, mode, orientation, disabled, removable, value, defaultValue,
-      onSelectionChange: (selection, selected) => callbacks.current.onSelectionChange?.(selection, selected),
+      onValueChange: (selection, selected) => callbacks.current.onValueChange?.(selection, selected),
       onRemove: (removedValue, item) => callbacks.current.onRemove?.(removedValue, item),
     })
   )
@@ -81,7 +82,7 @@ export function ChipGroup(props: ChipGroupProps) {
       {label && <span {...api.labelProps}>{label}</span>}
 
       <div {...api.listProps}>
-        {api.items.length === 0 && <span {...api.emptyProps}>{emptyLabel}</span>}
+        {api.items.length === 0 && <span {...api.emptyProps}>{words.empty ?? 'Nothing here'}</span>}
         {api.items.map((item, index) => (
           <button key={item.value} {...api.getChipProps(item, index)}>
             <span {...api.getChipLabelProps()}>{item.label}</span>

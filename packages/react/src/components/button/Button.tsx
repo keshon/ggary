@@ -13,8 +13,8 @@ export interface ButtonProps
  * a screen, logic has leaked out of core.
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
-  const { emphasis, tone, size, disabled, loading, fullWidth, type, children, ...rest } = props
-  const api = connect({ emphasis, tone, size, disabled, loading, fullWidth, type }, reactNormalizer)
+  const { emphasis, destructive, size, disabled, loading, fullWidth, type, children, ...rest } = props
+  const api = connect({ emphasis, destructive, size, disabled, loading, fullWidth, type }, reactNormalizer)
 
   return (
     <button ref={ref} {...api.rootProps} {...rest}>

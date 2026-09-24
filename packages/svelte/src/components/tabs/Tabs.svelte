@@ -22,7 +22,7 @@
     label?: string
     orientation?: TabsOrientation
     activation?: TabsActivation
-    /** `line` for sections, `chips` for open documents. Default `line`. */
+    /** `sections` for views of one thing, `documents` for open, closable items. Default `sections`. */
     variant?: TabsVariant
     /** The panel for a tab. Omit it for tabs that switch something rendered elsewhere. */
     panel?: Snippet<[TabItem]>

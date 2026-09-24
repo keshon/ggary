@@ -23,9 +23,10 @@
     /** Bindable: `bind:value`. A one-way `value` works too. */
     value?: string[]
     defaultValue?: string[]
-    onSelectionChange?: (selection: string[], items: ChipItem[]) => void
+    onValueChange?: (selection: string[], items: ChipItem[]) => void
     onRemove?: (value: string, item: ChipItem | null) => void
-    emptyLabel?: string
+    /** What the group says: `empty` when it holds no chips. */
+  words?: { empty?: string }
   }
 
   let {
@@ -40,9 +41,9 @@
     name,
     value = $bindable(),
     defaultValue,
-    onSelectionChange,
+    onValueChange,
     onRemove,
-    emptyLabel = 'Nothing here',
+    words = {},
   }: Props = $props()
 
   const id = uid('gg-chips')
@@ -63,9 +64,9 @@
       disabled,
       removable,
       defaultValue: initial,
-      onSelectionChange: (selection, selected) => {
+      onValueChange: (selection, selected) => {
         value = selection
-        onSelectionChange?.(selection, selected)
+        onValueChange?.(selection, selected)
       },
       onRemove: (removedValue, item) => onRemove?.(removedValue, item),
     })
@@ -111,7 +112,7 @@
 
   <div {...api.listProps}>
     {#if api.items.length === 0}
-      <span {...api.emptyProps}>{emptyLabel}</span>
+      <span {...api.emptyProps}>{words.empty ?? 'Nothing here'}</span>
     {/if}
     {#each api.items as item, index (item.value)}
       <button {...api.getChipProps(item, index)}>

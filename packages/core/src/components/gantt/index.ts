@@ -617,8 +617,8 @@ export interface GanttConfig<T extends GanttTask> {
    * a promise to say whether it holds — a rejection puts it back and reads
    * out why. Apply it to your tasks when it holds. Without it, bars stay put.
    */
-  onChange?: (change: GanttChange<T>) => Promise<unknown> | unknown
-  /** Whether bars may change. Default: when there is an `onChange`. */
+  onTaskChange?: (change: GanttChange<T>) => Promise<unknown> | unknown
+  /** Whether bars may change. Default: when there is an `onTaskChange`. */
   editable?: boolean
   /** Headings to list tasks under; a task names its own in `group`. */
   groups?: GanttGroup[]
@@ -644,7 +644,7 @@ export function initialState<T extends GanttTask>(config: GanttConfig<T>): Gantt
     openIntent: { value: null, nonce: 0 },
     scaleIntent: { value: scale, nonce: 0 },
     scaleControlled: config.scale !== undefined,
-    editable: config.editable ?? config.onChange !== undefined,
+    editable: config.editable ?? config.onTaskChange !== undefined,
     draft: null,
     pending: [],
     changeIntent: { value: null, nonce: 0 },
@@ -670,7 +670,7 @@ export function createGanttMachine<T extends GanttTask>(config: GanttConfig<T>):
       const task = next.tasks.find((candidate) => candidate.id === change.task)
       if (task) {
         Promise.resolve()
-          .then(() => config.onChange?.({ task, from: change.from, to: change.to }))
+          .then(() => config.onTaskChange?.({ task, from: change.from, to: change.to }))
           .then(
             () => wrapped.send({ type: 'SETTLE', change: change.id, ok: true }),
             (error) => wrapped.send({ type: 'SETTLE', change: change.id, ok: false, message: error instanceof Error ? error.message : String(error ?? '') })

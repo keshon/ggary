@@ -13,7 +13,7 @@ export function displayConformance(adapter: Adapter) {
       const m = await adapter.badge({ label: 'Running', tone: 'running' }, freshTarget())
       const root = part(m.root, 'badge', 'root')!
       expect(root.dataset.tone).toBe('running')
-      expect(root.dataset.variant).toBe('solid')
+      expect(root.dataset.emphasis).toBe('medium')
       expect(root.textContent).toBe('Running')
       expect(part(root, 'badge', 'dot')!.getAttribute('aria-hidden')).toBe('true')
       expect(m.root.querySelector('[class]')).toBeNull()
@@ -23,9 +23,9 @@ export function displayConformance(adapter: Adapter) {
       const plain = await adapter.badge({ label: 'terrain_chunk_04' }, freshTarget())
       expect(part(plain.root, 'badge', 'root')!.hasAttribute('data-tone')).toBe(false)
       expect(part(plain.root, 'badge', 'dot')).toBeNull()
-      const count = await adapter.badge({ label: '7', tone: 'ok', variant: 'count' }, freshTarget())
+      const count = await adapter.badge({ label: '7', tone: 'ok', count: true }, freshTarget())
       expect(part(count.root, 'badge', 'dot')).toBeNull()
-      expect(part(count.root, 'badge', 'root')!.dataset.variant).toBe('count')
+      expect(part(count.root, 'badge', 'root')!.hasAttribute('data-count')).toBe(true)
     })
 
     it('follows a new tone', async () => {

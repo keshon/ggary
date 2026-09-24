@@ -284,12 +284,12 @@
   </section>
 
   <section id="button-tone">
-    <h3>Button — tone danger, across emphasis</h3>
+    <h3>Button — destructive, across emphasis</h3>
     <div class="row">
-      <Button emphasis="high" tone="danger">high</Button>
-      <Button emphasis="medium" tone="danger">medium</Button>
-      <Button emphasis="low" tone="danger">low</Button>
-      <Button emphasis="minimal" tone="danger">minimal</Button>
+      <Button emphasis="high" destructive>high</Button>
+      <Button emphasis="medium" destructive>medium</Button>
+      <Button emphasis="low" destructive>low</Button>
+      <Button emphasis="minimal" destructive>minimal</Button>
     </div>
   </section>
 
@@ -340,7 +340,7 @@
       removable
       name="tags"
       defaultValue={['design']}
-      onSelectionChange={(next) => (selection = next)}
+      onValueChange={(next) => (selection = next)}
       onRemove={(value) => (items = items.filter((i) => i.value !== value))}
     />
     <pre class="state">{`selection  ${JSON.stringify(selection)}
@@ -809,12 +809,12 @@
         onOpenChange={logDialog('delete')}
       >
         {#snippet trigger(props)}
-          <Button tone="danger" {...props}>Delete project…</Button>
+          <Button destructive {...props}>Delete project…</Button>
         {/snippet}
         <p>Everything in “Atlas” goes, including its run history and settings.</p>
         {#snippet footer()}
           <Button emphasis="minimal" onclick={() => ((deleteOpen = false), (dialogLog = 'delete  closed  by Cancel'))}>Cancel</Button>
-          <Button emphasis="high" tone="danger" onclick={() => ((deleteOpen = false), (dialogLog = 'delete  closed  by Delete'))}>Delete</Button>
+          <Button emphasis="high" destructive onclick={() => ((deleteOpen = false), (dialogLog = 'delete  closed  by Delete'))}>Delete</Button>
         {/snippet}
       </Dialog>
   
@@ -948,7 +948,7 @@
       <div style="flex: 1; min-width: 0">
         <Tabs
           items={files}
-          variant="chips"
+          variant="documents"
           label="Open files"
           onValueChange={(value) => (tabsLog = `selected ${value}`)}
           onClose={(value) => {
@@ -1197,7 +1197,7 @@
             <div class="deal-company">{deal.company}</div>
             {#if deal.labels}
               <div class="deal-labels">
-                {#each deal.labels as label (label)}<Badge variant="outline">{label}</Badge>{/each}
+                {#each deal.labels as label (label)}<Badge emphasis="low">{label}</Badge>{/each}
               </div>
             {/if}
             {#if deal.checklist}
@@ -1227,7 +1227,7 @@
         bind:scale={ganttScale}
         locale="en-GB"
         onOpen={(task) => (ganttLog = `open: ${task.title}`)}
-        onChange={async ({ task, to }) => {
+        onTaskChange={async ({ task, to }) => {
           await saveTaskDates(task.id, to)
           rolloutTasks = rolloutTasks.map((item) => (item.id === task.id ? { ...item, ...to } : item))
           ganttLog = `changed: ${task.title} → ${to.start} – ${to.end}`
@@ -1269,8 +1269,8 @@
       {#each badgeTones as { tone, label } (tone)}
         <Badge {tone}>{label}</Badge>
       {/each}
-      <Badge variant="outline">v2.4</Badge>
-      <Badge variant="count" tone="running">12</Badge>
+      <Badge emphasis="low">v2.4</Badge>
+      <Badge count tone="running">12</Badge>
     </div>
     <div class="row" style="align-items: center; margin-top: 16px">
       <Avatar name="Ada Lovelace" size="sm" />

@@ -2,7 +2,7 @@ import type { Dict, Normalizer } from '../../types'
 import { dataGridAnatomy } from './data-grid.anatomy'
 import { SELECT_COLUMN, type DataGridController, type DataGridSnapshot, type LaidColumn } from './data-grid.controller'
 import { alignOf, createFormatter, type FormatOptions } from './data-grid.format'
-import { cellKey, editorKindOf, editorOptions, isEditable, type EditorKind } from './data-grid.edit'
+import { cellKey, editorKindOf, editorOptions, isEditable, type EditorKind, type EditWords } from './data-grid.edit'
 import { cellValue } from './data-grid.query'
 import { isAllSelected, isSelected, selectedCount } from './data-grid.selection'
 import type { ColumnDef } from './data-grid.types'
@@ -11,20 +11,27 @@ export interface DataGridConnectOptions extends FormatOptions {
   id: string
   /** The grid's name: every grid on a page needs one. */
   label: string
+  words?: DataGridWords
+}
+
+/** Everything the grid says, each with an English default. */
+export interface DataGridWords extends EditWords {
   /** Said when the query matches nothing. */
-  emptyText?: string
+  empty?: string
   /** Said when a request failed. */
-  errorText?: string
+  error?: string
+  /** The button under a failed request. */
+  retry?: string
   /** "3 selected"; receives the count. */
-  selectedText?: (count: number) => string
+  selected?: (count: number) => string
   /** "12,400 rows"; receives the total. */
-  totalText?: (total: number) => string
-  selectAllLabel?: string
-  selectRowLabel?: string
+  total?: (total: number) => string
+  selectAll?: string
+  selectRow?: string
   /** The button that opens a row, in its first column: "Open". */
-  openRowLabel?: string
+  openRow?: string
   /** "Could not save Paid: the deal is closed"; receives the column's header and the reason. */
-  saveFailedText?: (column: string, message: string) => string
+  saveFailed?: (column: string, message: string) => string
 }
 
 export interface CellEditor<T> {
@@ -56,6 +63,7 @@ export function connect<Row, T = Dict>(
   normalize: Normalizer<T>,
   options: DataGridConnectOptions
 ) {
+  const words = options.words ?? {}
   const { grid, data, viewport } = snapshot
   const { id, label } = options
   const selectable = Boolean(controller.options.selectable)
@@ -165,7 +173,7 @@ export function connect<Row, T = Dict>(
         ...dataGridAnatomy.attrs('checkbox'),
         type: 'checkbox',
         tabIndex: -1,
-        'aria-label': options.selectAllLabel ?? 'Select all matching rows',
+        'aria-label': words.selectAll ?? 'Select all matching rows',
         checked: all,
         'data-state': all ? 'checked' : count > 0 ? 'indeterminate' : 'unchecked',
         onClick: (event: MouseEvent) => {
@@ -216,7 +224,7 @@ export function connect<Row, T = Dict>(
   // A row opens from its first column's Open button when there is something to open it into.
   const firstData = layout.columns.findIndex((column) => column.state.id !== SELECT_COLUMN)
   const opensRows = controller.provides('detail') || controller.options.onRowActivate !== undefined
-  const openLabel = options.openRowLabel ?? 'Open'
+  const openLabel = words.openRow ?? 'Open'
 
   const editing = grid.editing
   const anyEditable = layout.columns.some((column) => column.def?.editable)
@@ -372,7 +380,7 @@ export function connect<Row, T = Dict>(
             ...dataGridAnatomy.attrs('checkbox'),
             type: 'checkbox',
             tabIndex: -1,
-            'aria-label': options.selectRowLabel ?? 'Select row',
+            'aria-label': words.selectRow ?? 'Select row',
             checked: selected,
             disabled: row === undefined || undefined,
             'data-state': selected ? 'checked' : 'unchecked',
@@ -393,15 +401,15 @@ export function connect<Row, T = Dict>(
   const notice = grid.notice
   const noticeHeader = notice ? (controller.options.columns.find((column) => column.id === notice.column)?.header ?? notice.column) : ''
   const noticeText = notice
-    ? options.saveFailedText
-      ? options.saveFailedText(noticeHeader, notice.message)
+    ? words.saveFailed
+      ? words.saveFailed(noticeHeader, notice.message)
       : `Could not save ${noticeHeader}: ${notice.message}`
     : ''
   const listText = data.error
-    ? (options.errorText ?? 'The rows could not be loaded.')
+    ? (words.error ?? 'The rows could not be loaded.')
     : total === undefined
       ? 'Loading…'
-      : [options.totalText ? options.totalText(total) : `${total.toLocaleString(options.locale)} rows`, count > 0 ? (options.selectedText ? options.selectedText(count) : `${count.toLocaleString(options.locale)} selected`) : '']
+      : [words.total ? words.total(total) : `${total.toLocaleString(options.locale)} rows`, count > 0 ? (words.selected ? words.selected(count) : `${count.toLocaleString(options.locale)} selected`) : '']
           .filter(Boolean)
           .join(', ')
   // A failed save is said first: it is news, and the old value is back.
@@ -416,8 +424,9 @@ export function connect<Row, T = Dict>(
     rows,
     overlay: data.error ? ('error' as const) : empty ? ('empty' as const) : null,
     statusText,
-    emptyText: options.emptyText ?? 'Nothing matches.',
-    errorText: options.errorText ?? 'The rows could not be loaded.',
+    emptyText: words.empty ?? 'Nothing matches.',
+    errorText: words.error ?? 'The rows could not be loaded.',
+    retryText: words.retry ?? 'Try again',
     retry: () => controller.data.retry(),
 
     frameProps: normalize({

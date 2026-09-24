@@ -6,7 +6,7 @@
     type CellEdit,
     type ColumnDef,
     type DataGridController,
-    type EditWords,
+    type DataGridWords,
     type GridQuery,
     type GridSource,
     type RowKey,
@@ -30,16 +30,12 @@
     onRowActivate?: (row: Row, index: number) => void
     /** Save an edited cell (columns opt in with `editable`); a rejection puts the old value back. */
     onCellEdit?: (edit: CellEdit<Row>) => Promise<Row | void> | Row | void
-    editWords?: EditWords
-    /** "Could not save Paid: the deal is closed". */
-    saveFailedText?: (column: string, message: string) => string
     /** A cell of your own; `text` is the formatted value. */
     cell?: Snippet<[Row, ColumnDef<Row>, string]>
     /** Shown when the query matches nothing. */
     empty?: Snippet
-    emptyText?: string
-    errorText?: string
-    retryLabel?: string
+    /** Everything the grid says: empty, error, retry, saveFailed, notANumber, … */
+    words?: DataGridWords
     locale?: string
     rowHeight?: number
     blockSize?: number
@@ -50,8 +46,8 @@
 
   let {
     columns, rows, source, rowKey, label, selectable, initialQuery, onQueryChange, onSelectionChange, onRowActivate,
-    cell, empty, emptyText, errorText, retryLabel = 'Try again', locale, rowHeight, blockSize,
-    controller = $bindable(), style, onCellEdit, editWords, saveFailedText,
+    cell, empty, words, locale, rowHeight, blockSize,
+    controller = $bindable(), style, onCellEdit,
   }: Props = $props()
 
   const id = uid('gg-grid')
@@ -65,7 +61,7 @@
   const grid = untrack(() =>
     createDataGrid<Row>({
       columns, source: sourceFor(source, rows), rowKey, selectable, rowHeight, blockSize, query: initialQuery,
-      onQueryChange, onSelectionChange, onRowActivate, onCellEdit, editWords,
+      onQueryChange, onSelectionChange, onRowActivate, onCellEdit, words,
     })
   )
   untrack(() => (controller = grid))
@@ -81,7 +77,7 @@
     grid.destroy()
   })
 
-  const api = $derived(connect(snapshot, grid, svelteNormalizer, { id, label, emptyText, errorText, locale, saveFailedText }))
+  const api = $derived(connect(snapshot, grid, svelteNormalizer, { id, label, locale, words }))
 
   // The editor takes the focus when it appears, the caret after what it holds.
   const takeFocus = (field: HTMLInputElement | HTMLSelectElement) => {
@@ -140,7 +136,7 @@
     <div {...api.overlayProps}>
       {#if api.overlay === 'error'}
         <p>{api.errorText}</p>
-        <button type="button" onclick={api.retry}>{retryLabel}</button>
+        <button type="button" onclick={api.retry}>{api.retryText}</button>
       {:else if empty}
         {@render empty()}
       {:else}

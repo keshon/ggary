@@ -108,7 +108,7 @@ describe('gantt by pointer', () => {
 
   it('a bar dragged three days’ worth moves three days, and the owner hears it on release', async () => {
     const changes: unknown[] = []
-    const { schedule } = await mountAtStart({ tasks: plan, range: planRange, onChange: (change: { task: { id: string }; to: unknown }) => void changes.push([change.task.id, change.to]) }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const { schedule } = await mountAtStart({ tasks: plan, range: planRange, onTaskChange: (change: { task: { id: string }; to: unknown }) => void changes.push([change.task.id, change.to]) }, 'inline-size: 1200px; block-size: 260px; display: flex')
     const bar = schedule('design').querySelector<HTMLElement>('[data-part="bar"]')!
     const box = bar.getBoundingClientRect()
     const y = box.top + box.height / 2
@@ -125,7 +125,7 @@ describe('gantt by pointer', () => {
 
   it('its end, taken by the grip, resizes it; Escape in the middle puts it back', async () => {
     const changes: unknown[] = []
-    const { schedule } = await mountAtStart({ tasks: plan, range: planRange, onChange: (change: unknown) => void changes.push(change) }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const { schedule } = await mountAtStart({ tasks: plan, range: planRange, onTaskChange: (change: unknown) => void changes.push(change) }, 'inline-size: 1200px; block-size: 260px; display: flex')
     const bar = schedule('design').querySelector<HTMLElement>('[data-part="bar"]')!
     const grip = bar.querySelector<HTMLElement>('[data-part="bar-end"]')!.getBoundingClientRect()
     const x = grip.left + grip.width / 2
@@ -143,7 +143,7 @@ describe('gantt by pointer', () => {
   })
 
   it('a refused move springs back', async () => {
-    const { schedule } = await mountAtStart({ tasks: plan, range: planRange, onChange: () => Promise.reject(new Error('locked by the client')) }, 'inline-size: 1200px; block-size: 260px; display: flex')
+    const { schedule } = await mountAtStart({ tasks: plan, range: planRange, onTaskChange: () => Promise.reject(new Error('locked by the client')) }, 'inline-size: 1200px; block-size: 260px; display: flex')
     const bar = schedule('build').querySelector<HTMLElement>('[data-part="bar"]')!
     const box = bar.getBoundingClientRect()
     pointer('pointerdown', box.left + 40, box.top + 5)

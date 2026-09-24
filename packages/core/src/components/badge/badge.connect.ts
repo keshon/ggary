@@ -7,11 +7,11 @@ import type { BadgeProps } from './badge.types'
  * is the badge's content and the dot repeats the tone as a mark. No machine.
  */
 export function connect<T = Dict>(props: BadgeProps, normalize: Normalizer<T>) {
-  const { tone, variant = 'solid' } = props
-  const dot = props.dot ?? (tone !== undefined && variant !== 'count')
+  const { tone, emphasis = 'medium', count = false } = props
+  const dot = props.dot ?? (tone !== undefined && !count)
   return {
     showDot: dot,
-    rootProps: normalize({ ...badgeAnatomy.attrs('root'), 'data-tone': tone, 'data-variant': variant }),
+    rootProps: normalize({ ...badgeAnatomy.attrs('root'), 'data-tone': tone, 'data-emphasis': emphasis, 'data-count': count ? '' : undefined }),
     dotProps: normalize({ ...badgeAnatomy.attrs('dot'), 'aria-hidden': 'true' }),
   }
 }

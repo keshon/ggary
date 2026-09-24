@@ -67,9 +67,9 @@ export function ganttConformance(adapter: Adapter) {
       expect(schedule('review').tabIndex).toBe(0)
     })
 
-    it('with onChange, the arrows move the focused bar and say where; Enter hands the change over, Escape puts one back', async () => {
+    it('with onTaskChange, the arrows move the focused bar and say where; Enter hands the change over, Escape puts one back', async () => {
       const changes: unknown[] = []
-      const { m, schedule, press } = await setup({ onChange: (change) => void changes.push([change.task.id, change.to]) })
+      const { m, schedule, press } = await setup({ onTaskChange: (change) => void changes.push([change.task.id, change.to]) })
       const design = schedule('design')
       expect(document.getElementById(design.getAttribute('aria-describedby')!)!.textContent).toContain('Left and Right move the task')
       const bar = () => part(schedule('design'), 'gantt', 'bar')!
@@ -93,7 +93,7 @@ export function ganttConformance(adapter: Adapter) {
       expect(part(m.root, 'gantt', 'live')!.textContent).toBe('Design the flow put back: 12 Sept – 20 Sept 2026')
     })
 
-    it('without onChange the bars stay put and say nothing of moving', async () => {
+    it('without onTaskChange the bars stay put and say nothing of moving', async () => {
       const { schedule, press } = await setup()
       expect(schedule('design').hasAttribute('aria-describedby')).toBe(false)
       schedule('design').focus()

@@ -15,7 +15,7 @@
     /** Enter on a task, or a double press on its row. */
     onOpen?: (task: T) => void
     /** A task was moved or resized: it stands at its new dates at once; a rejection puts it back. Without it, bars stay put. */
-    onChange?: (change: GanttChange<T>) => Promise<unknown> | unknown
+    onTaskChange?: (change: GanttChange<T>) => Promise<unknown> | unknown
     /** Headings to list tasks under; a task names its own in `group`. */
     groups?: GanttGroup[]
     /** Bindable: the ids of the closed groups. */
@@ -30,7 +30,7 @@
   const NO_GROUPS: GanttGroup[] = []
 
   /** Tasks as bars on a time scale, their names beside them, under headings when there are groups. */
-  let { tasks, scale = $bindable(), defaultScale, onScaleChange, range, locale, onOpen, onChange, groups, collapsed = $bindable(), defaultCollapsed, onCollapsedChange, title, words }: Props = $props()
+  let { tasks, scale = $bindable(), defaultScale, onScaleChange, range, locale, onOpen, onTaskChange, groups, collapsed = $bindable(), defaultCollapsed, onCollapsedChange, title, words }: Props = $props()
 
   const machine = untrack(() =>
     createGanttMachine<T>({
@@ -44,8 +44,8 @@
         onScaleChange?.(next)
       },
       onOpen: (task) => onOpen?.(task),
-      editable: onChange !== undefined,
-      onChange: (change) => onChange?.(change),
+      editable: onTaskChange !== undefined,
+      onTaskChange: (change) => onTaskChange?.(change),
       groups,
       defaultCollapsed: collapsed ?? defaultCollapsed,
       onCollapsedChange: (next) => {
@@ -67,7 +67,7 @@
   $effect(() => {
     if (scale !== undefined) machine.send({ type: 'SYNC_SCALE', scale })
   })
-  $effect(() => machine.send({ type: 'SYNC_OPTIONS', range: range ?? null, locale, editable: onChange !== undefined }))
+  $effect(() => machine.send({ type: 'SYNC_OPTIONS', range: range ?? null, locale, editable: onTaskChange !== undefined }))
 
   let lastFocus = 0
   $effect(() => {

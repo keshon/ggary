@@ -15,17 +15,16 @@
  */
 export type ButtonEmphasis = 'high' | 'medium' | 'low' | 'minimal'
 
-/**
- * What the action MEANS, independent of how loud it is. A destructive action
- * can be a primary or a quiet one; the two questions do not share an axis.
- */
-export type ButtonTone = 'neutral' | 'danger'
-
 export type ButtonSize = 'sm' | 'md' | 'lg'
 
 export interface ButtonProps {
   emphasis?: ButtonEmphasis
-  tone?: ButtonTone
+  /**
+   * What the action DOES, independent of how loud it is: it destroys. A
+   * destructive action can be a primary or a quiet one; the two questions do
+   * not share an axis. (`tone` is the kit's word for a state, not an action.)
+   */
+  destructive?: boolean
   size?: ButtonSize
   disabled?: boolean
   /**
