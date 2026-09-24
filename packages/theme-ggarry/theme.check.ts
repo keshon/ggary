@@ -157,6 +157,17 @@ const pairs: Pair[] = [
   { label: 'toolbar: its line under the strip', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
   // A divider is a line and no more; its label is muted text, measured with every muted label.
   // A mark in text: the default ink on the warning ground.
+  // A result's glyph is a mark on the page it fills.
+  { label: 'result: an ok glyph on the page', fg: '--ggarry-text-success', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'result: a warn glyph on the page', fg: '--ggarry-text-warning', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'result: an error glyph on the page', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'result: a neutral glyph or a code on the page', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-canvas'], min: LARGE },
+  { label: 'result: its details on their plate', fg: '--ggarry-text-default', bg: ['--ggarry-bg-canvas', '--ggarry-bg-subtle'], min: TEXT },
+  // A popconfirm: the muted line and a failure, on the floating surface.
+  { label: 'popconfirm: what follows, on its surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
+  { label: 'popconfirm: a failure, on its surface', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: TEXT },
+  // A context menu's target keeps an accent edge while its menu is out.
+  { label: 'context menu: the edge of an open target', fg: '--ggarry-border-accent', bg: ['--ggarry-bg-surface'], min: STEP },
   { label: 'text: a mark on the highlight', fg: '--ggarry-text-default', bg: ['--ggarry-bg-highlight'], min: TEXT },
   { label: 'text: the highlight off the surface', fg: '--ggarry-bg-highlight', bg: ['--ggarry-bg-surface'], min: STEP },
   { label: 'divider: the line off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },

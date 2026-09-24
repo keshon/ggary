@@ -7,7 +7,7 @@
 
    `display: none` while closed is the platform's own
    ([popover]:not(:popover-open)); nothing here overrides it. */
-:is([data-scope='popover'], [data-scope='tooltip'])[data-part='content'] {
+:is([data-scope='popover'], [data-scope='popconfirm'], [data-scope='tooltip'])[data-part='content'] {
   position: fixed;
   inset: 0 auto auto 0;
   margin: 0;
@@ -23,4 +23,13 @@
 /* A tooltip is text; a long one wraps instead of running off the screen. */
 [data-scope='tooltip'][data-part='content'] {
   max-inline-size: min(320px, var(--gg-available-width, 100vw));
+}
+
+/* A popconfirm's answers stand at the end, the safe one first. */
+[data-scope='popconfirm'][data-part='actions'] {
+  display: flex;
+  justify-content: flex-end;
+}
+[data-scope='popconfirm'][data-part='content'] :is([data-part='title'], [data-part='description'], [data-part='error']) {
+  margin: 0;
 }

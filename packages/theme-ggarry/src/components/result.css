@@ -1,0 +1,60 @@
+/* ==========================================================================
+   GGarry — result
+
+   How something ended, centred in the space the work was in. The glyph is a
+   mark in the tone's ink (the tone map in card.css), large enough to be seen
+   before it is read; an error page's code takes its place, drawn large and
+   light in the muted ink, and the title says what the code means. The title
+   stands a step above an empty state's: a result is news.
+   ========================================================================== */
+
+[data-scope='result'][data-part='root'] {
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-8) var(--ggarry-space-6);
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  line-height: var(--ggarry-line-height-normal);
+}
+
+[data-scope='result'][data-part='icon'] {
+  inline-size: var(--ggarry-size-control-lg);
+  block-size: var(--ggarry-size-control-lg);
+  margin-block-end: var(--ggarry-space-2);
+  color: var(--tone-ink, var(--ggarry-text-muted));
+}
+
+[data-scope='result'][data-part='code'] {
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-heading-1);
+  font-weight: var(--ggarry-font-weight-normal);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--ggarry-line-height-tight);
+}
+
+[data-scope='result'][data-part='title'] {
+  font-size: var(--ggarry-font-size-lg);
+  font-weight: var(--ggarry-font-weight-semibold);
+  line-height: var(--ggarry-line-height-tight);
+  text-wrap: balance;
+}
+
+[data-scope='result'][data-part='description'] {
+  max-inline-size: 48ch;
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-sm);
+}
+
+[data-scope='result'][data-part='actions'] {
+  gap: var(--ggarry-space-2);
+  margin-block-start: var(--ggarry-space-3);
+}
+
+/* Detail under the next step: a recessed plate, read at the interface's size. */
+[data-scope='result'][data-part='details'] {
+  margin-block-start: var(--ggarry-space-4);
+  padding: var(--ggarry-space-3) var(--ggarry-space-4);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-subtle);
+  font-size: var(--ggarry-font-size-sm);
+}

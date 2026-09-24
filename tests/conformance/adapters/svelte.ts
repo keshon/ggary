@@ -17,6 +17,7 @@ import DialogWithContent from './DialogWithContent.svelte'
 import PopoverWithContent from './PopoverWithContent.svelte'
 import TooltipWithTrigger from './TooltipWithTrigger.svelte'
 import MenuWithTrigger from './MenuWithTrigger.svelte'
+import OverlayWithTrigger from './OverlayWithTrigger.svelte'
 import TabsWithPanels from './TabsWithPanels.svelte'
 import AccordionWithPanels from './AccordionWithPanels.svelte'
 import FormWithFields from './FormWithFields.svelte'
@@ -189,6 +190,9 @@ export const svelte: Adapter = {
   panel: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'panel' })),
   banner: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'banner' })),
   divider: (props, target) => mountSvelte(Divider as Component<any>, props, target),
+  result: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'result' })),
+  popconfirm: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'popconfirm' })),
+  contextMenu: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'context-menu' })),
   text: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'text' })),
   link: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'link' })),
   prose: (props, target) => mountSvelte(Prose as Component<any>, props, target),

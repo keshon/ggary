@@ -20,6 +20,7 @@
   /* Surfaces a shadow lifted: the shadow is gone, so an edge holds them apart. */
   [data-scope='tooltip'][data-part='content'],
   [data-scope='popover'][data-part='content'],
+  [data-scope='popconfirm'][data-part='content'],
   [data-scope='menu'][data-part='content'],
   [data-scope='select'][data-part='content'],
   [data-scope='combobox'][data-part='content'],

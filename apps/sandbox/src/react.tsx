@@ -135,6 +135,9 @@ import {
   Approval,
   Failure,
   Divider,
+  ContextMenu,
+  Popconfirm,
+  Result,
   Flex,
   FlexItem,
   Columns,
@@ -143,7 +146,7 @@ import {
   Prose,
   Text,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -248,6 +251,8 @@ function App() {
   const [files, setFiles] = useState(openFiles)
   const [tabsLog, setTabsLog] = useState('pick a tab')
   const [menuLog, setMenuLog] = useState('choose something')
+  const [fileLog, setFileLog] = useState('right-click a file, or Shift+F10 on one')
+  const [confirmLog, setConfirmLog] = useState('—')
 
   const [taken, setTaken] = useState(false)
   const [username, setUsername] = useState('garry')
@@ -404,6 +409,28 @@ function App() {
             }}
           />
           <pre className="state">{menuLog}</pre>
+        </section>
+
+        <section id="context-menu">
+          <h3>Context menu</h3>
+          <ul className="demo" style={{ listStyle: 'none', padding: 0, maxWidth: 360 }}>
+            {fileRows.map((file) => (
+              <ContextMenu
+                key={file}
+                items={fileMenu}
+                label={`Actions for ${file}`}
+                onSelect={(value) => setFileLog(`${value} ${file}`)}
+                trigger={(props) => (
+                  <li>
+                    <button type="button" className="file-row" {...props} onClick={() => setFileLog(`open ${file}`)}>
+                      {file}
+                    </button>
+                  </li>
+                )}
+              />
+            ))}
+          </ul>
+          <pre className="state">{fileLog}</pre>
         </section>
 
         <section id="palette">
@@ -1065,6 +1092,32 @@ function App() {
           <pre className="state">{overlayLog}</pre>
         </section>
 
+        <section id="popconfirm">
+          <h3>Popconfirm</h3>
+          <div className="row" style={{ alignItems: 'center' }}>
+            <Popconfirm
+              title="Delete this lead?"
+              description="Its history goes with it. This cannot be undone."
+              destructive
+              confirmLabel="Delete"
+              onConfirm={() => slowDelete().then(() => setConfirmLog('deleted'))}
+              onCancel={() => setConfirmLog('kept')}
+              trigger={(props) => (
+                <Button {...props} destructive>
+                  Delete lead
+                </Button>
+              )}
+            />
+            <Popconfirm
+              title="Publish the page now?"
+              confirmLabel="Publish"
+              onConfirm={() => setConfirmLog('published')}
+              trigger={(props) => <Button {...props}>Publish</Button>}
+            />
+          </div>
+          <pre className="state">{confirmLog}</pre>
+        </section>
+
         <section id="toast">
           <h3>Toast</h3>
           <div className="row">
@@ -1580,6 +1633,16 @@ function App() {
             <Button emphasis="minimal" onClick={() => setDiskBanner(true)}>
               Show the banner again
             </Button>
+          </div>
+        </section>
+
+        <section id="result">
+          <h3>Result</h3>
+          <div className="tiles">
+            <Result tone="ok" title="Payment sent" description="€420 to Acme GmbH. A receipt is on its way to finance@acme.example." actions={<Button emphasis="high">Back to invoices</Button>}>
+              Reference 2026-0915-A
+            </Result>
+            <Result tone="error" code="404" title="Page not found" description="The link may be old, or the page moved." actions={<Button>Go home</Button>} />
           </div>
         </section>
 

@@ -1,0 +1,44 @@
+/* ==========================================================================
+   GGarry — popconfirm
+
+   A popover's surface with a question in it: the same border, radius and
+   shadow as everything that floats, narrower, and read at the interface's
+   size. The question is the strong line, what follows it the muted one; a
+   failure is said in the danger ink above the answers, which stand at the
+   end at the small size, the safe one first.
+   ========================================================================== */
+
+[data-scope='popconfirm'][data-part='content'] {
+  min-inline-size: 220px;
+  max-inline-size: min(320px, var(--gg-available-width, 100vw));
+  padding: var(--ggarry-space-3) var(--ggarry-space-4);
+  background: var(--ggarry-bg-surface);
+  color: var(--ggarry-text-default);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  box-shadow: var(--ggarry-shadow-popover);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  line-height: var(--ggarry-line-height-normal);
+}
+
+[data-scope='popconfirm'][data-part='title'] {
+  font-size: var(--ggarry-font-size-md);
+  font-weight: var(--ggarry-font-weight-semibold);
+  line-height: var(--ggarry-line-height-tight);
+}
+
+[data-scope='popconfirm'][data-part='description'] {
+  margin-block-start: var(--ggarry-space-1);
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='popconfirm'][data-part='error'] {
+  margin-block-start: var(--ggarry-space-2);
+  color: var(--ggarry-text-danger);
+}
+
+[data-scope='popconfirm'][data-part='actions'] {
+  gap: var(--ggarry-space-2);
+  margin-block-start: var(--ggarry-space-3);
+}

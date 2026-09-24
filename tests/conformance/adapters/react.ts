@@ -92,6 +92,9 @@ import {
   EmptyState,
   Note,
   Divider,
+  Result,
+  Popconfirm,
+  ContextMenu,
   Text,
   Link,
   Prose,
@@ -121,6 +124,9 @@ import {
   type GridRowsProps,
   type FlowProps,
   type FlexProps,
+  type ResultProps,
+  type PopconfirmProps,
+  type ContextMenuProps,
   type ColumnsProps,
   type PageHeaderProps,
   type SectionProps,
@@ -267,6 +273,25 @@ function ReactStatusBar(props: StatusBarProps) {
     ...props.items.map((item, i) => createElement(StatusBarItem as ComponentType<any>, { key: `s${i}`, tone: item.tone }, item.text)),
     ...(props.end ? [createElement(StatusBarSpacer, { key: 'spacer' }), ...props.end.map((item, i) => createElement(StatusBarItem as ComponentType<any>, { key: `e${i}` }, item.text))] : [])
   )
+}
+
+function ReactResult(props: ResultProps) {
+  const { actions, details, ...rest } = props
+  return createElement(Result as ComponentType<any>, {
+    ...rest,
+    actions: actions ? createElement(Fragment, null, ...actions.map((label) => createElement('button', { key: label, type: 'button' }, label))) : undefined,
+    children: details ? createElement('p', null, details) : undefined,
+  })
+}
+
+function ReactPopconfirm(props: PopconfirmProps) {
+  const { triggerLabel, ...rest } = props
+  return createElement(Popconfirm as ComponentType<any>, { ...rest, trigger: (bag: object) => createElement('button', { type: 'button', ...bag }, triggerLabel) })
+}
+
+function ReactContextMenu(props: ContextMenuProps) {
+  const { targetLabel, ...rest } = props
+  return createElement(ContextMenu as ComponentType<any>, { ...rest, trigger: (bag: object) => createElement('button', { type: 'button', ...bag }, targetLabel) })
 }
 
 function ReactFlex(props: FlexProps) {
@@ -504,6 +529,9 @@ export const react: Adapter = {
       ...(text === undefined ? [] : [text]),
     ]),
   divider: (props, target) => mount(Divider, props, target),
+  result: (props, target) => mount(ReactResult as ComponentType<any>, props, target),
+  popconfirm: (props, target) => mount(ReactPopconfirm as ComponentType<any>, props, target),
+  contextMenu: (props, target) => mount(ReactContextMenu as ComponentType<any>, props, target),
   text: (props, target) => mount(Text, props, target, ({ text, ...rest }: { text: string }) => [rest, text]),
   link: (props, target) => mount(Link, props, target, ({ text, ...rest }: { text: string }) => [rest, text]),
   prose: (props, target) => mount(Prose, props, target, ({ html, ...rest }: { html: string }) => [{ ...rest, dangerouslySetInnerHTML: { __html: html } }]),

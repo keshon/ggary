@@ -28,6 +28,22 @@ export const proseSample = `<h2>Deploying a preview</h2>
 <hr>
 <p>Previews older than their plan allows are removed at night, <mark>without notice</mark>.</p>`
 
+/** A file row's context menu. */
+export const fileMenu = [
+  { value: 'open', label: 'Open' },
+  { value: 'rename', label: 'Rename', shortcut: 'F2' },
+  { type: 'separator' as const },
+  { value: 'delete', label: 'Delete', destructive: true, shortcut: 'Del' },
+]
+export const fileRows = ['report.pdf', 'budget.xlsx', 'notes.md']
+/** A delete that takes a moment, and fails every other time, so both answers can be seen. */
+let deletes = 0
+export function slowDelete(): Promise<void> {
+  deletes += 1
+  const fails = deletes % 2 === 0
+  return new Promise((resolve, reject) => setTimeout(() => (fails ? reject(new Error('The lead is locked by another editor.')) : resolve()), 900))
+}
+
 export const frameworks: SelectItem[] = [
   { value: 'vanilla', label: 'Vanilla JS' },
   { value: 'react', label: 'React' },

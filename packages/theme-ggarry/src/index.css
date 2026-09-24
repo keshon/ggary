@@ -52,6 +52,9 @@
 @import './components/menu.css' layer(gg.components);
 @import './components/menubar.css' layer(gg.components);
 @import './components/nav.css' layer(gg.components);
+@import './components/popconfirm.css' layer(gg.components);
+@import './components/context-menu.css' layer(gg.components);
+@import './components/result.css' layer(gg.components);
 @import './components/divider.css' layer(gg.components);
 @import './components/text.css' layer(gg.components);
 @import './components/link.css' layer(gg.components);

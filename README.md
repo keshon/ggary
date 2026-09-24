@@ -2,12 +2,12 @@
 
 A UI kit scaffold: one framework-agnostic core, two sibling renderers (React 19
 and Svelte 5), and one design language, GGarry, on top of it.
-A hundred and three components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+A hundred and six components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
 Menu, Menubar, Badge, Avatar, AvatarGroup, Spinner, Skeleton, Card, Panel, Banner,
-Note, EmptyState, Divider, Prose, Text, Link, Flex, FlexItem, Columns and Column — built end to end to prove the architecture holds.
+Note, EmptyState, Divider, Prose, Text, Link, Flex, FlexItem, Columns, Column, Popconfirm, ContextMenu and Result — built end to end to prove the architecture holds.
 
 **Retired on 2026-09-18: the vanilla custom-elements adapter (`@ggary/elements`,
 the `gg-*` tags) and the Instrument theme**, a second language ported from
@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3637 tests, 1357 of them in headless Chrome
+npm test         # 3705 tests, 1383 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck   # tsc, then svelte-check over every .svelte file
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -2543,6 +2543,73 @@ Found on the way:
   wide as its column; the cap is gone, and a browser test checks the line is
   under the heading.
 
+## Popconfirm, ContextMenu and Result
+
+**Popconfirm** asks before an action, on the button that starts it: "Delete this
+lead?". It is an alert dialog in the popover layer — the page stays live — named
+by its question and described by the line under it.
+
+```tsx
+<Popconfirm
+  title="Delete this lead?"
+  description="Its history goes with it."
+  destructive
+  confirmLabel="Delete"
+  onConfirm={() => api.delete(id)}
+  trigger={(props) => <Button {...props} destructive>Delete</Button>}
+/>
+```
+
+- **The focus lands on the safe answer when the action destroys**, and on the
+  action otherwise, so a stray Enter never deletes. The two answers are the
+  kit's Buttons — Cancel a neutral outline, the action at high emphasis, red when
+  `destructive` — and `data-answer` says which is which.
+- **A slow action keeps the question open.** When `onConfirm` returns a promise,
+  the action's button is busy (focusable, `aria-busy`) and a second press does
+  nothing; it closes when the promise resolves. A rejection keeps it open and
+  says why — the error's message, or `words.failed` — as an alert the dialog is
+  described by, so the failure is not lost with the popover.
+- Escape, a press outside and Cancel all close it and are heard through
+  `onCancel`; closing abandons an attempt under way, and its late answer is not
+  taken for the next one.
+
+**ContextMenu** puts a Menu on any element, opened the ways a desktop opens one.
+
+```tsx
+<ContextMenu
+  items={[{ value: 'rename', label: 'Rename' }, { value: 'delete', label: 'Delete', destructive: true }]}
+  onSelect={(value) => …}
+  trigger={(props) => <button {...props}>report.pdf</button>}
+/>
+```
+
+A right click stands the menu at the pointer, on the menu itself; Shift+F10 or
+the menu key stands it under the focused target, on its first item; the focus
+comes back to the target when it closes. Shift and a right click still give the
+browser's own menu. The keys are taken on keydown, with the default prevented,
+so the `contextmenu` event the browser fires after them never opens it a second
+time. The target stays the caller's element: it takes no scope of the kit's,
+only `data-context-menu` (open or closed), which the theme draws as a quiet
+accent edge while the menu is out. Give it a focusable element — a button — so
+the keyboard can reach it.
+
+**Result** says how something ended, in the space the work was in: a tone's
+glyph (`ok`, `warn`, `error`, `neutral` — a result has ended, so not
+`running`), a heading, a line, the next step (`actions`) and any detail under
+it (children, on a recessed plate). An error page's `code` — "404" — is drawn
+large in place of the glyph and hidden from a screen reader: the title says what
+the code means. Where EmptyState says there is nothing here yet, a Result says
+what happened.
+
+Found on the way:
+
+- **A Button dropped its own look when a part was spread onto it.** Button
+  spreads what it is given after its own props, so a popconfirm part on it
+  replaced `data-scope="button"`. The answers carry `data-answer` instead, and
+  keep Button's anatomy.
+- **React focuses an `autoFocus` element itself and writes no attribute**, so the
+  popover's first focus never saw it. It reads `data-autofocus` as well now.
+
 ## Flex and Columns
 
 Two primitives, nested to any depth, for what the four above cannot say: this
@@ -2904,9 +2971,9 @@ sandbox build prints none.
 | contract | node | `sizes.contract.test.ts` | 3 tests. Every control's size is `ControlSize`, and its stylesheet draws `sm` and `lg`. |
 | contract | node | `core-shape.contract.test.ts` | 2 tests. Every component laid out as `<dir>.<role>.ts` with a re-export-only index; every connect ending at the normalizer or one `options`. |
 | contract | node | `checks.contract.test.ts` | 30 tests. The gates themselves: each rule fires on a planted defect — the literal families and their ledger among them; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1106 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1128 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 1106 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1128 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
 | browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
 | browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |
@@ -2918,6 +2985,7 @@ sandbox build prints none.
 | browser | Chrome | `agent.browser.test.ts` | 6 tests. A history clipped at its leading edge, batches dividing the width they were given, a queue's dots on one vertical whatever the titles, one Tab into the queue and the arrows moving real focus, a run's room drawn before it begins. |
 | browser | Chrome | `agent-stream.browser.test.ts` | 11 tests. A log holding the bottom as lines arrive and letting go the moment the reader scrolls up; a diff copying clean code with no numbers or signs in the text, its sign drawn in the gutter, a long line scrolling rather than wrapping; a step opened by find-in-page; lanes measured against one axis. |
 | browser | Chrome | `chat.browser.test.ts` | 8 tests. The composer's field growing and its frame holding one line at rest, Enter sending and Shift+Enter breaking the line, nothing sent while busy; a turn's actions appearing under the pointer; an approval and a failure keeping their record once answered. |
+| browser | Chrome | `feedback.browser.test.ts` | 4 tests. A destructive popconfirm focusing Cancel, Escape closing it and handing the focus back; a plain one focusing the action, under its trigger. A context menu at the pointer on a real right click; Shift+F10 opening it under the target on its first item, and Escape giving the focus back. |
 | browser | Chrome | `flex.browser.test.ts` | 8 tests. Shares of a row by grow, a field narrowing beside a button, a column keeping a button's width unless told to stretch, both ends; spans at a Columns' width, a nested Columns answering to its column, a start line, one gutter across and down. |
 | browser | Chrome | `sizes.browser.test.ts` | 6 tests. Input, Button, NumberField, Select, Combobox, Cascader and DatePicker at 28, 34 and 40 pixels, in both adapters. |
 | browser | Chrome | `typography.browser.test.ts` | 6 tests. Prose's ladder and its step down, the reading measure, a heading nearer what follows it; a text cut to two lines and to one; a divider's line on either side of its label, and a vertical one a line tall. |
@@ -2928,6 +2996,7 @@ sandbox build prints none.
 | browser | Chrome | `tabs.browser.test.ts` | 4 tests. One tab stop under the real Tab key, vertical tabs beside their panel, a long strip scrolling to the focused tab, a real click closing a tab without losing focus. |
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
 | browser | Chrome | `data-grid.browser.test.ts` | 13 tests. A row's checkbox pressed by a real pointer, React and Svelte; its Open button shown under the pointer and opening the row without selecting or editing it, and Shift+Enter opening it from a cell that edits. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
+| machine | node | `popconfirm.machine.test.ts` | 8 tests. One attempt while one is under way; closing on success, staying and saying why on a failure (a rejection, a throw, or the words); a late answer to an abandoned attempt ignored; a new opening forgetting the failure; cancels heard for every close but the action's; the focus mark by `destructive`; the alert dialog's name and description. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
 | browser | Chrome | `date-picker.browser.test.ts` | 4 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. |
 | browser | Chrome | `gantt.browser.test.ts` | 9 tests. A group's summary measured to the pixel, closed by a press on its name, its chevron turned, a hidden task's arrow leaving the heading's row. An arrow out of a bar's last day, a gap out, down to the rows' seam; into a milestone at its tip; behind a bar it crosses; a conflict in another colour. A bar dragged three days' worth moving three days and the owner hearing it on release; its end resized by the grip, and Escape in the middle putting it back; a refused move springing back. Also Bars measured to the pixel at the day and the week scale, a milestone on its day; the list at the left edge and the scale at the top as the chart scrolls; a task reached by the keyboard brought into view clear of the list; the chart opening on today, a third of the way in. |
@@ -3137,8 +3206,9 @@ Real, and deliberately left open:
   a modal holds above a popover opened later (Instrument measured the same). Report a
   result inside the dialog, or show the toast after it closes.
 - **One `Toaster` per toaster.** Two regions on one queue render every toast twice.
-- **The only context menu is the grid's row menu.** Menu content can stand at a
-  point now (`anchor`), but there is no general `ContextMenu` for any element yet.
+- **ContextMenu does not open on iOS.** Safari on iOS fires no `contextmenu`
+  event for a long press; Android's does. Give a touch screen a visible menu
+  button beside the target, as the board's cards have.
 - **No option descriptions on a plain radio or checkbox.** A second line of help
   text is ChoiceCards' alone.
 - **No character counter.** `maxLength` is enforced by the browser, silently; a

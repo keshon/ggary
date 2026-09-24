@@ -105,6 +105,9 @@
     Approval,
     Failure,
     Divider,
+    ContextMenu,
+    Popconfirm,
+    Result,
     Flex,
     FlexItem,
     Columns,
@@ -138,7 +141,7 @@
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
   import { rangePresets } from '@ggary/core/date-picker'
   import type { PaletteCommand } from '@ggary/core/command-palette'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -255,6 +258,8 @@
   let files = $state(openFiles)
   let tabsLog = $state('pick a tab')
   let menuLog = $state('choose something')
+  let fileLog = $state('right-click a file, or Shift+F10 on one')
+  let confirmLog = $state('—')
 
   let taken = $state(false)
   let username = $state('garry')
@@ -410,6 +415,18 @@
       }}
     />
     <pre class="state">{menuLog}</pre>
+  </section>
+
+  <section id="context-menu">
+    <h3>Context menu</h3>
+    <ul class="demo" style="list-style: none; padding: 0; max-width: 360px">
+      {#each fileRows as file (file)}
+        <ContextMenu items={fileMenu} label={`Actions for ${file}`} onSelect={(value) => (fileLog = `${value} ${file}`)}>
+          {#snippet trigger(props)}<li><button type="button" class="file-row" {...props} onclick={() => (fileLog = `open ${file}`)}>{file}</button></li>{/snippet}
+        </ContextMenu>
+      {/each}
+    </ul>
+    <pre class="state">{fileLog}</pre>
   </section>
 
   <section id="palette">
@@ -941,6 +958,26 @@
     <pre class="state">{overlayLog}</pre>
   </section>
 
+  <section id="popconfirm">
+    <h3>Popconfirm</h3>
+    <div class="row" style="align-items: center">
+      <Popconfirm
+        title="Delete this lead?"
+        description="Its history goes with it. This cannot be undone."
+        destructive
+        confirmLabel="Delete"
+        onConfirm={() => slowDelete().then(() => (confirmLog = 'deleted'))}
+        onCancel={() => (confirmLog = 'kept')}
+      >
+        {#snippet trigger(props)}<Button {...props} destructive>Delete lead</Button>{/snippet}
+      </Popconfirm>
+      <Popconfirm title="Publish the page now?" confirmLabel="Publish" onConfirm={() => (confirmLog = 'published')}>
+        {#snippet trigger(props)}<Button {...props}>Publish</Button>{/snippet}
+      </Popconfirm>
+    </div>
+    <pre class="state">{confirmLog}</pre>
+  </section>
+
   <section id="toast">
     <h3>Toast</h3>
     <div class="row">
@@ -1389,6 +1426,19 @@
     </div>
     <div class="row" style="margin-top: 12px">
       <Button emphasis="minimal" onclick={() => (diskBanner = true)}>Show the banner again</Button>
+    </div>
+  </section>
+
+  <section id="result">
+    <h3>Result</h3>
+    <div class="tiles">
+      <Result tone="ok" title="Payment sent" description="€420 to Acme GmbH. A receipt is on its way to finance@acme.example.">
+        {#snippet actions()}<Button emphasis="high">Back to invoices</Button>{/snippet}
+        Reference 2026-0915-A
+      </Result>
+      <Result tone="error" code="404" title="Page not found" description="The link may be old, or the page moved.">
+        {#snippet actions()}<Button>Go home</Button>{/snippet}
+      </Result>
     </div>
   </section>
 

@@ -325,3 +325,7 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
 .changes { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .changes li { display: flex; align-items: center; gap: 8px; }
 .dot-line { display: inline-flex; align-items: center; gap: 8px; }
+
+/* A file row in the context-menu demo: a button that reads as a row. */
+.file-row { inline-size: 100%; padding: 6px 8px; border: 0; border-radius: 6px; background: none; color: var(--gg-text); font: inherit; text-align: start; cursor: default; }
+.file-row:hover { background: var(--gg-surface-sunken); }

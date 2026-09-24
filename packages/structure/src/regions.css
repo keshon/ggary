@@ -117,3 +117,22 @@
   [data-scope='banner'][data-part='root'],
   [data-scope='note'][data-part='root'] { break-inside: avoid; }
 }
+
+[data-scope='result'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+:is([data-scope='result'][data-part='title'], [data-scope='result'][data-part='description']) {
+  margin: 0;
+}
+[data-scope='result'][data-part='actions'] {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+[data-scope='result'][data-part='details'] {
+  align-self: stretch;
+  text-align: start;
+}

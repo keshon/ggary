@@ -918,6 +918,39 @@ export interface ProseProps {
   size?: 'sm' | 'md'
 }
 
+/** A Result; `actions` are buttons with these labels, `details` a paragraph under them. */
+export interface ResultProps {
+  tone?: 'neutral' | 'ok' | 'warn' | 'error'
+  title: string
+  description?: string
+  code?: string
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
+  live?: 'off' | 'polite' | 'alert'
+  actions?: string[]
+  details?: string
+}
+
+/** A Popconfirm on a button labelled `triggerLabel`. */
+export interface PopconfirmProps {
+  triggerLabel: string
+  title: string
+  description?: string
+  destructive?: boolean
+  confirmLabel?: string
+  cancelLabel?: string
+  onConfirm?: () => unknown
+  onCancel?: () => void
+  onOpenChange?: (open: boolean, details: { reason: string }) => void
+}
+
+/** A ContextMenu on a focusable element holding `targetLabel`. */
+export interface ContextMenuProps {
+  targetLabel: string
+  items: MenuEntry[]
+  onSelect?: (value: string) => void
+  label?: string
+}
+
 export interface DividerProps {
   orientation?: 'horizontal' | 'vertical'
   label?: string
@@ -1187,6 +1220,9 @@ export interface Adapter {
   banner(props: BannerProps, target: HTMLElement): Promise<Mounted<BannerProps>>
   note(props: NoteProps, target: HTMLElement): Promise<Mounted<NoteProps>>
   divider(props: DividerProps, target: HTMLElement): Promise<Mounted<DividerProps>>
+  result(props: ResultProps, target: HTMLElement): Promise<Mounted<ResultProps>>
+  popconfirm(props: PopconfirmProps, target: HTMLElement): Promise<Mounted<PopconfirmProps>>
+  contextMenu(props: ContextMenuProps, target: HTMLElement): Promise<Mounted<ContextMenuProps>>
   text(props: TextProps, target: HTMLElement): Promise<Mounted<TextProps>>
   link(props: LinkProps, target: HTMLElement): Promise<Mounted<LinkProps>>
   prose(props: ProseProps, target: HTMLElement): Promise<Mounted<ProseProps>>

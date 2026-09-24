@@ -91,6 +91,15 @@ export const SITEMAP: SiteCategory[] = [
         ]
       },
       {
+        "label": "Context menu",
+        "anchors": [
+          {
+            "id": "context-menu",
+            "label": null
+          }
+        ]
+      },
+      {
         "label": "Command palette",
         "anchors": [
           {
@@ -312,6 +321,15 @@ export const SITEMAP: SiteCategory[] = [
         ]
       },
       {
+        "label": "Popconfirm",
+        "anchors": [
+          {
+            "id": "popconfirm",
+            "label": null
+          }
+        ]
+      },
+      {
         "label": "Toast",
         "anchors": [
           {
@@ -493,6 +511,15 @@ export const SITEMAP: SiteCategory[] = [
         "anchors": [
           {
             "id": "banners",
+            "label": null
+          }
+        ]
+      },
+      {
+        "label": "Result",
+        "anchors": [
+          {
+            "id": "result",
             "label": null
           }
         ]
