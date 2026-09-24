@@ -2,10 +2,12 @@ import type { HTMLAttributes } from 'react'
 import { connect, type CodeBlockProps as CoreCodeBlockProps } from '@ggary/core/code'
 import { reactNormalizer } from '@ggary/core'
 import { useCopier } from '../../utils/use-copier'
+import { useConfigured } from '../config-provider'
 
 export interface CodeBlockProps extends CoreCodeBlockProps, Omit<HTMLAttributes<HTMLDivElement>, 'onCopy'> {}
 
-export function CodeBlock({ code, numbered, start, label, copyValue, onCopy, words, ...rest }: CodeBlockProps) {
+export function CodeBlock(own: CodeBlockProps) {
+  const { code, numbered, start, label, copyValue, onCopy, words, ...rest } = useConfigured(own, { words: 'codeBlock' })
   const [copy, runCopy] = useCopier()
   const api = connect({ code, numbered, start, label, copyValue, words, copy }, reactNormalizer, { onCopyPress: (): void =>
     runCopy(api.copyText, { onCopy, words }) })

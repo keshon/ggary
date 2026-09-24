@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { applyConfig } from '@ggary/core/config-provider'
+  import { getConfig } from '../config-provider/context'
   import { connect, type ProgressProps } from '@ggary/core/progress'
   import { svelteNormalizer, uid } from '@ggary/core'
 
@@ -8,13 +10,16 @@
   }
 
   /** How far along: a bar, or a ring. No value: busy, the amount unknown. */
-  let props: Props = $props()
+  let own: Props = $props()
+  const kit = getConfig()
+  // The locale in force: the percentage is written in its form.
+  const progress = $derived(applyConfig(own, kit(), { locale: true }))
 
   const id = uid('gg-progress')
-  const api = $derived(connect({ ...props, id }, svelteNormalizer))
-  const shape = $derived(props.shape ?? 'bar')
-  const label = $derived(props.hideLabel ? undefined : props.label)
-  const showValue = $derived(!api.indeterminate && (props.showValue ?? (shape === 'bar' ? label !== undefined : props.size === 'lg')))
+  const api = $derived(connect({ ...progress, id }, svelteNormalizer))
+  const shape = $derived(progress.shape ?? 'bar')
+  const label = $derived(progress.hideLabel ? undefined : progress.label)
+  const showValue = $derived(!api.indeterminate && (progress.showValue ?? (shape === 'bar' ? label !== undefined : progress.size === 'lg')))
 </script>
 
 {#if shape === 'ring'}

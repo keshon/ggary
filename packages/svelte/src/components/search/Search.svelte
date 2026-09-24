@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import { connect, type SearchProps } from '@ggary/core/search'
   import { mergeProps, onFormReset, svelteNormalizer } from '@ggary/core'
   import { getContext, untrack } from 'svelte'
@@ -13,9 +14,11 @@
   }
 
   let {
-    size, name, placeholder, label, disabled, readOnly, required, invalid,
+    size: ownSize, name, placeholder, label, disabled, readOnly, required, invalid,
     value = $bindable(), defaultValue, onValueChange, ...rest
   }: Props = $props()
+  const kit = getConfig()
+  const size = $derived(ownSize ?? kit().size)
 
   untrack(() => {
     if (value === undefined && defaultValue !== undefined) value = defaultValue

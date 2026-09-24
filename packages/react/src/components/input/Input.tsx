@@ -4,6 +4,7 @@ import { mergeProps, reactNormalizer } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
 import { useMergedRef } from '../../utils/use-merged-ref'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useConfigured } from '../config-provider'
 
 export interface InputProps
   extends CoreInputProps,
@@ -15,6 +16,7 @@ export interface InputProps
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(props, forwardedRef) {
+  props = useConfigured(props, { size: true })
   const {
     type, size, name, placeholder, autoComplete, inputMode, disabled, readOnly, required, invalid,
     value, defaultValue, onValueChange, ...rest

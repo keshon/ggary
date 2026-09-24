@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import {
     connect,
     createUploadMachine,
@@ -43,7 +45,10 @@
   }
 
   /** Files sent as they are chosen, each with how far it has gone, a way to cancel, and a way to try again. */
-  let { upload, view = 'rows', name, accept, maxSize, maxFiles, concurrency, disabled, label, hint, defaultFiles, onFilesChange, locale, words }: Props = $props()
+  let { upload, view = 'rows', name, accept, maxSize, maxFiles, concurrency, disabled, label, hint, defaultFiles, onFilesChange, locale: ownLocale, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'upload', ownWords))
 
   const machine = untrack(() =>
     createUploadMachine({

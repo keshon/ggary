@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type LanesProps, type LanesWords } from '@ggary/core/lanes'
   import { svelteNormalizer } from '@ggary/core'
 
@@ -8,7 +10,10 @@
     [key: string]: unknown
   }
 
-  let { lanes, label, start, end, locale, words, ...rest }: Props = $props()
+  let { lanes, label, start, end, locale: ownLocale, words: ownWords, ...rest }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'lanes', ownWords))
   const api = $derived(connect({ lanes, label, start, end, locale }, svelteNormalizer, { words }))
 </script>
 

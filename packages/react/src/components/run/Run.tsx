@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from 'react'
 import { connect, type RunProps as CoreRunProps, type RunWords } from '@ggary/core/run'
 import { reactNormalizer } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface RunProps extends CoreRunProps, Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
   /** The fixed text of the reading. */
@@ -8,7 +9,8 @@ export interface RunProps extends CoreRunProps, Omit<HTMLAttributes<HTMLSpanElem
 }
 
 /** The countable units of one run: phases, attempts or shards, each carrying its own outcome. */
-export function Run({ units, label, showValue, locale, words, ...rest }: RunProps) {
+export function Run(own: RunProps) {
+  const { units, label, showValue, locale, words, ...rest } = useConfigured(own, { locale: true, words: 'run' })
   const api = connect({ units, label, showValue, locale }, reactNormalizer, { words })
   return (
     <span {...rest} {...api.rootProps}>

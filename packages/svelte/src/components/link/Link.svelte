@@ -1,9 +1,13 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type LinkProps, type LinkWords } from '@ggary/core/link'
   import { svelteNormalizer } from '@ggary/core'
   import type { Snippet } from 'svelte'
 
-  let { external, words, children, ...rest }: LinkProps & { words?: LinkWords; children?: Snippet; [key: string]: unknown } = $props()
+  let { external, words: ownWords, children, ...rest }: LinkProps & { words?: LinkWords; children?: Snippet; [key: string]: unknown } = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'link', ownWords))
   const api = $derived(connect({ external }, svelteNormalizer, { words }))
 </script>
 

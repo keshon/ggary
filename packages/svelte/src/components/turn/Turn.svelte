@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type TurnProps, type TurnWords } from '@ggary/core/turn'
   import { svelteNormalizer } from '@ggary/core'
   import type { Snippet } from 'svelte'
@@ -17,7 +19,10 @@
     words?: TurnWords
   }
 
-  let { who, from, time, tokens, duration, locale, streaming, children, before, after, actions, words }: Props = $props()
+  let { who, from, time, tokens, duration, locale: ownLocale, streaming, children, before, after, actions, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'turn', ownWords))
   const api = $derived(connect({ who, from, time, tokens, duration, locale, streaming }, svelteNormalizer, { words }))
 </script>
 

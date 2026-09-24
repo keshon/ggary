@@ -78,6 +78,7 @@ import {
   Fieldset,
   FileDrop,
   Upload,
+  ConfigProvider,
   RangeSlider,
   List,
   ListItem,
@@ -151,7 +152,7 @@ import {
   Prose,
   Text,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload, stagedUpload, stagedRowFiles, stagedTileFiles, stageDrop, avatarPicture, reviewers, reviewersLater, type Reviewer } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample, fileMenu, fileRows, slowDelete, demoUpload, stagedUpload, stagedRowFiles, stagedTileFiles, stageDrop, avatarPicture, reviewers, reviewersLater, type Reviewer, configSamples } from './demo-data'
 
 /**
  * Upload's states on the page as it loads: once the Upload inside is there, a
@@ -1328,6 +1329,30 @@ function App() {
 
       <div className="category" aria-labelledby="layout-group">
         <h2 className="category-title" id="layout-group"><span className="category-number" aria-hidden="true">05</span>Layout</h2>
+        <section id="config">
+          <h3>Config provider</h3>
+          <p className="note">The same components three times. The labels are the app's; the locale of the time and the day, the size, the direction, the mode and the kit's own words come from the provider around each.</p>
+          <div className="panels">
+            {configSamples.map((each) => (
+              <ConfigProvider key={each.title} {...each.config}>
+                <Panel title={each.title}>
+                  <div className="stack" style={{ marginTop: 0 }}>
+                    <Button>{each.text.save}</Button>
+                    <Input aria-label={each.text.name} placeholder={each.text.name} />
+                    <TimePicker label={each.text.starts} defaultValue="14:30" />
+                    <DatePicker label={each.text.due} defaultValue="2026-09-18" />
+                    <RangeSlider label={each.text.price} valueDisplay="bubbles" min={0} max={200} step={5} defaultValue={[20, 80]} formatValue={(n) => `€${n}`} />
+                    <List label={each.text.files} onLoadMore={() => {}}>
+                      <ListItem title={each.text.first} />
+                      <ListItem title={each.text.second} />
+                    </List>
+                  </div>
+                </Panel>
+              </ConfigProvider>
+            ))}
+          </div>
+        </section>
+
         <section id="layout">
           <h3>Shell and split</h3>
           <div className="shell-demo">

@@ -2,6 +2,7 @@ import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalSto
 import { connect, createPopconfirmMachine, type PopconfirmChangeDetails, type PopconfirmWords } from '@ggary/core/popconfirm'
 import { attachPopover, reactNormalizer, type AttachedPopover, type Dict, type Placement } from '@ggary/core'
 import { Button } from '../button'
+import { useConfigured } from '../config-provider'
 
 export interface PopconfirmProps {
   /** The question: "Delete this lead?" */
@@ -25,6 +26,7 @@ export interface PopconfirmProps {
 }
 
 export function Popconfirm(props: PopconfirmProps) {
+  props = useConfigured(props, { words: 'popconfirm' })
   const { title, description, destructive = false, confirmLabel, cancelLabel, onConfirm, onCancel, onOpenChange, trigger, placement, words } = props
   const id = `gg-popconfirm-${useId().replace(/:/g, '')}`
   const callbacks = useRef({ onConfirm, onCancel, onOpenChange })

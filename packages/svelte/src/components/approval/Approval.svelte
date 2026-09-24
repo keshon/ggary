@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type ApprovalDecision, type ApprovalProps, type ApprovalWords } from '@ggary/core/approval'
   import { svelteNormalizer, uid } from '@ggary/core'
   import type { Snippet } from 'svelte'
@@ -12,7 +14,9 @@
     words?: ApprovalWords
   }
 
-  let { what, state, title, effects, decidedBy, decidedAt, live, onDecide, actions, words }: Props = $props()
+  let { what, state, title, effects, decidedBy, decidedAt, live, onDecide, actions, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'approval', ownWords))
 
   const id = uid('gg-approval')
   const api = $derived(connect({ id, what, state, title, effects, decidedBy, decidedAt, live }, svelteNormalizer, { onDecide, words }))

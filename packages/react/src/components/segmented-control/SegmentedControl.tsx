@@ -2,6 +2,7 @@ import { useId, useRef, useState } from 'react'
 import { connect, type SegmentedControlSize, type SegmentedItem } from '@ggary/core/segmented-control'
 import { reactNormalizer } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useConfigured } from '../config-provider'
 
 export interface SegmentedControlProps {
   items: SegmentedItem[]
@@ -19,6 +20,7 @@ export interface SegmentedControlProps {
 }
 
 export function SegmentedControl(props: SegmentedControlProps) {
+  props = useConfigured(props, { size: true })
   const { items, label, name, value, defaultValue = null, onValueChange, size, disabled, required, fullWidth } = props
   const id = `gg-segmented-${useId().replace(/:/g, '')}`
   const [uncontrolled, setUncontrolled] = useState(defaultValue)

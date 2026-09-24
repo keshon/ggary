@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { attachLogTail, connect, type LogProps, type LogWords } from '@ggary/core/log'
   import { svelteNormalizer } from '@ggary/core'
 
@@ -13,7 +15,10 @@
     [key: string]: unknown
   }
 
-  let { lines, label, locale, timeZone, announce, words, tail = true, ...rest }: Props = $props()
+  let { lines, label, locale: ownLocale, timeZone, announce, words: ownWords, tail = true, ...rest }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'log', ownWords))
   const api = $derived(connect({ lines, label, locale, timeZone, announce }, svelteNormalizer, { words }))
 
   let root = $state<HTMLDivElement | null>(null)

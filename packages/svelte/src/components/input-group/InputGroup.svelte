@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import { connect, type InputGroupProps } from '@ggary/core/input-group'
   import { svelteNormalizer } from '@ggary/core'
   import type { Snippet } from 'svelte'
 
-  let { prefix, suffix, size, disabled, invalid, children }: InputGroupProps & { children: Snippet } = $props()
+  let { prefix, suffix, size: ownSize, disabled, invalid, children }: InputGroupProps & { children: Snippet } = $props()
+  const kit = getConfig()
+  const size = $derived(ownSize ?? kit().size)
 
   const api = $derived(connect({ prefix, suffix, size, disabled, invalid }, svelteNormalizer))
 </script>

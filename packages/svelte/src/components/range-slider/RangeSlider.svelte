@@ -1,6 +1,8 @@
 <script lang="ts">
   import { connect, type RangeSliderProps, type RangeSliderWords, type RangeValue } from '@ggary/core/range-slider'
   import { onFormReset, svelteNormalizer, uid } from '@ggary/core'
+  import { applyConfig } from '@ggary/core/config-provider'
+  import { getConfig } from '../config-provider/context'
   import { untrack } from 'svelte'
   import Input from '../input/Input.svelte'
   import InputGroup from '../input-group/InputGroup.svelte'
@@ -17,7 +19,12 @@
   }
 
   /** A range between two ends, each a thumb on one track: a price from and to, a run time from and to. */
-  let { value = $bindable(), defaultValue, onValueChange, formatValue, words, ...rest }: Props = $props()
+  let { value = $bindable(), defaultValue, onValueChange, formatValue, words: ownWords, ...own }: Props = $props()
+  const kit = getConfig()
+  // The size travels with the rest of the props to core; the words are laid over the provider's.
+  const configured = $derived(applyConfig({ ...own, words: ownWords }, kit(), { size: true, words: 'rangeSlider' }))
+  const rest = $derived({ ...configured, words: undefined })
+  const words = $derived(configured.words)
 
   const id = uid('gg-range')
   untrack(() => {

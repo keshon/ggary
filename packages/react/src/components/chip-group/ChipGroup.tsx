@@ -3,6 +3,7 @@ import { connect, createChipGroupMachine, type ChipGroupMode, type ChipGroupOrie
 import type { ChipEmphasis, ChipSize } from '@ggary/core/chip'
 import { reactNormalizer, rovingFocus } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useConfigured } from '../config-provider'
 
 export interface ChipGroupProps {
   items: ChipItem[]
@@ -24,6 +25,7 @@ export interface ChipGroupProps {
 }
 
 export function ChipGroup(props: ChipGroupProps) {
+  props = useConfigured(props, { words: 'chipGroup' })
   const {
     items, label, mode, orientation, emphasis, size, removable, disabled = false,
     name, value, defaultValue, onValueChange, onRemove, words = {},

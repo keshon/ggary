@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import type { ControlSize } from '@ggary/core'
   import { focusCalendarDay, toRange, type CalendarMode, type DateRange } from '@ggary/core/calendar'
   import { connect, createDatePickerMachine, type DatePickerWords, type DatePreset } from '@ggary/core/date-picker'
@@ -38,9 +40,13 @@
 
   /** A field for a day or a range of days, typed or chosen from a calendar. DatePicker's, and DateTimeField's day. */
   let {
-    size,
-    label, value = $bindable(), defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, months, locale, name, placeholder, presets, words, timeSlot, submitAs, onReset,
+    size: ownSize,
+    label, value = $bindable(), defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, months, locale: ownLocale, name, placeholder, presets, words: ownWords, timeSlot, submitAs, onReset,
   }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const size = $derived(ownSize ?? kit().size)
+  const words = $derived(configWords(kit(), 'datePicker', ownWords))
 
   const initial = untrack(() => (value !== undefined ? value : (defaultValue ?? null)))
   const machine = untrack(() =>

@@ -1023,3 +1023,36 @@ export const moreReviewers: Reviewer[] = [
 ]
 /** "Show more" as a server would answer it: a moment later. */
 export const reviewersLater = () => new Promise<Reviewer[]>((resolve) => setTimeout(() => resolve(moreReviewers), 900))
+
+/** The same few components under three providers: the labels are the app's, in each column's language; the rest is the provider's. */
+export interface ConfigSample {
+  title: string
+  config: import('@ggary/core/config-provider').KitConfig
+  text: { save: string; name: string; starts: string; due: string; price: string; files: string; first: string; second: string }
+}
+export const configSamples: ConfigSample[] = [
+  {
+    title: 'No provider',
+    config: {},
+    text: { save: 'Save', name: 'Name', starts: 'Starts at', due: 'Due', price: 'Price', files: 'Files', first: 'Report', second: 'Brief' },
+  },
+  {
+    title: 'ru-RU · sm · Russian words',
+    config: {
+      locale: 'ru-RU',
+      size: 'sm',
+      words: {
+        list: { more: 'Показать ещё', loading: 'Загрузка…' },
+        rangeSlider: { start: 'Минимум', end: 'Максимум' },
+        timePicker: { choose: 'Выбрать время' },
+        datePicker: { choose: 'Выбрать день' },
+      },
+    },
+    text: { save: 'Сохранить', name: 'Имя', starts: 'Начало', due: 'Срок', price: 'Цена', files: 'Файлы', first: 'Отчёт', second: 'Бриф' },
+  },
+  {
+    title: 'ar-EG · rtl · lg · dark',
+    config: { locale: 'ar-EG', dir: 'rtl', size: 'lg', mode: 'dark', words: { list: { more: 'عرض المزيد' } } },
+    text: { save: 'حفظ', name: 'الاسم', starts: 'يبدأ', due: 'الموعد', price: 'السعر', files: 'الملفات', first: 'تقرير', second: 'موجز' },
+  },
+]

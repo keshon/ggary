@@ -1,0 +1,7 @@
+/* ConfigProvider: an element for the attributes the DOM understands — lang,
+   dir, data-mode — and nothing else. It draws no box, so wrapping a subtree
+   in one changes no layout: a flex or grid parent still lays out its children. */
+
+[data-scope='config-provider'][data-part='root'] {
+  display: contents;
+}

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import type { ControlSize } from '@ggary/core'
   import {
     attachComboboxSource,
@@ -38,10 +40,13 @@
   }
 
   let {
-    size,
+    size: ownSize,
     label, items, load, debounce, minLength, multiple = false, value = $bindable(), defaultValue, selectedItems, onValueChange, onCreate,
-    placeholder, disabled = false, limit, name, words,
+    placeholder, disabled = false, limit, name, words: ownWords,
   }: Props = $props()
+  const kit = getConfig()
+  const size = $derived(ownSize ?? kit().size)
+  const words = $derived(configWords(kit(), 'combobox', ownWords))
 
   const initial = untrack(() => (value !== undefined ? value : (defaultValue ?? null)))
   // Uncontrolled at heart, as `bind:value` is: a choice moves it and writes the binding.
@@ -69,7 +74,7 @@
   // Effects that attach on open read this, not the snapshot: a new snapshot on every
   // change would detach and attach them again on each key.
   const isOpen = $derived(snapshot.open)
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, placeholder: placeholder ?? words?.placeholder, name, size }))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, placeholder: placeholder ?? words?.placeholder, name, size, locale: kit().locale }))
   // Inside a Form, by name: the error its rules hold for this choice.
   const form = useFormField(() => name, () => api.ids.input, () => label)
 

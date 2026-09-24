@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import { connect, type SliderProps } from '@ggary/core/slider'
   import { mergeProps, onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { getContext, untrack } from 'svelte'
@@ -15,9 +16,11 @@
   }
 
   let {
-    min, max, step, name, label, valueText, showValue, size, disabled, required, invalid, marks,
+    min, max, step, name, label, valueText, showValue, size: ownSize, disabled, required, invalid, marks,
     value = $bindable(), defaultValue, onValueChange, formatValue, ...rest
   }: Props = $props()
+  const kit = getConfig()
+  const size = $derived(ownSize ?? kit().size)
 
   const id = uid('gg-slider')
 

@@ -97,6 +97,7 @@ import {
   List,
   ListItem,
   RangeSlider,
+  ConfigProvider,
   Result,
   Popconfirm,
   ContextMenu,
@@ -132,6 +133,7 @@ import {
   type ResultProps,
   type PopconfirmProps,
   type ListProps,
+  type ConfigHarnessProps,
   type ContextMenuProps,
   type ColumnsProps,
   type PageHeaderProps,
@@ -288,6 +290,19 @@ function ReactResult(props: ResultProps) {
     actions: actions ? createElement(Fragment, null, ...actions.map((label) => createElement('button', { key: label, type: 'button' }, label))) : undefined,
     children: details ? createElement('p', null, details) : undefined,
   })
+}
+
+function ReactConfig({ config, inner = {} }: ConfigHarnessProps) {
+  return createElement(
+    ConfigProvider as ComponentType<any>,
+    config,
+    createElement(Button as ComponentType<any>, null, 'Save'),
+    createElement(Input as ComponentType<any>, { 'aria-label': 'Name' }),
+    createElement(TimePicker as ComponentType<any>, { label: 'Starts', defaultValue: '14:30' }),
+    createElement(List as ComponentType<any>, { label: 'Files', onLoadMore: () => {} }, createElement(ListItem as ComponentType<any>, { title: 'Report' })),
+    createElement(Button as ComponentType<any>, { size: 'lg' }, 'Own'),
+    createElement(ConfigProvider as ComponentType<any>, inner, createElement(Button as ComponentType<any>, null, 'Inner'))
+  )
 }
 
 function ReactList(props: ListProps) {
@@ -560,6 +575,7 @@ export const react: Adapter = {
   upload: (props, target) => mount(Upload as ComponentType<any>, props, target),
   list: (props, target) => mount(ReactList as ComponentType<any>, props, target),
   rangeSlider: (props, target) => mount(RangeSlider as ComponentType<any>, props, target),
+  configProvider: (props, target) => mount(ReactConfig as ComponentType<any>, props, target),
   result: (props, target) => mount(ReactResult as ComponentType<any>, props, target),
   popconfirm: (props, target) => mount(ReactPopconfirm as ComponentType<any>, props, target),
   contextMenu: (props, target) => mount(ReactContextMenu as ComponentType<any>, props, target),

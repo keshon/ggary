@@ -164,6 +164,12 @@ export interface SliderProps {
   formatValue?: (value: number) => string
 }
 
+/** A ConfigProvider around a Button, an Input, a TimePicker at 14:30, a List with Show more, a Button sized "lg", and a provider inside it round one more Button. */
+export interface ConfigHarnessProps {
+  config: import('../../packages/core/src/components/config-provider').KitConfig
+  inner?: import('../../packages/core/src/components/config-provider').KitConfig
+}
+
 /** RangeSlider: two thumbs on one track. */
 export interface RangeSliderProps {
   label: string
@@ -1294,6 +1300,7 @@ export interface Adapter {
   upload(props: UploadProps, target: HTMLElement): Promise<Mounted<UploadProps>>
   list(props: ListProps, target: HTMLElement): Promise<Mounted<ListProps>>
   rangeSlider(props: RangeSliderProps, target: HTMLElement): Promise<Mounted<RangeSliderProps>>
+  configProvider(props: ConfigHarnessProps, target: HTMLElement): Promise<Mounted<ConfigHarnessProps>>
   result(props: ResultProps, target: HTMLElement): Promise<Mounted<ResultProps>>
   popconfirm(props: PopconfirmProps, target: HTMLElement): Promise<Mounted<PopconfirmProps>>
   contextMenu(props: ContextMenuProps, target: HTMLElement): Promise<Mounted<ContextMenuProps>>

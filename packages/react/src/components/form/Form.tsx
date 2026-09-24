@@ -14,6 +14,7 @@ import {
   type FormSummaryWords,
 } from '@ggary/core/form'
 import { reactNormalizer, type Machine } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 type FormMachine = Machine<FormState, FormEvent>
 const FormContext = createContext<FormMachine | null>(null)
@@ -92,7 +93,8 @@ export interface FormSummaryProps {
 }
 
 /** The form's errors in one place, each a link to its field. Shown after a submit that found some. */
-export function FormSummary({ words, headingLevel }: FormSummaryProps) {
+export function FormSummary(own: FormSummaryProps) {
+  const { words, headingLevel } = useConfigured(own, { words: 'formSummary' })
   const machine = useContext(FormContext)
   const state = useFormState()
   useEffect(() => {

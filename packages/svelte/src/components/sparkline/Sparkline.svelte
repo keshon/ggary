@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type SparklineProps, type SparklineWords } from '@ggary/core/sparkline'
   import { svelteNormalizer } from '@ggary/core'
 
@@ -8,7 +10,10 @@
     [key: string]: unknown
   }
 
-  let { values, area, last, series, label, describe, locale, words, ...rest }: Props = $props()
+  let { values, area, last, series, label, describe, locale: ownLocale, words: ownWords, ...rest }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'sparkline', ownWords))
   const api = $derived(connect({ values, area, last, series, label, describe, locale }, svelteNormalizer, { words }))
 </script>
 

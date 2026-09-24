@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import {
     attachPaletteHotkey,
     attachPaletteSource,
@@ -32,7 +34,9 @@
   }
 
   /** Ctrl+K from anywhere: a field that finds what to do, and Enter does it. */
-  let { commands, open = $bindable(), defaultOpen, onOpenChange, onRun, load, loadOptions, hotkey = 'k', trigger, words }: Props = $props()
+  let { commands, open = $bindable(), defaultOpen, onOpenChange, onRun, load, loadOptions, hotkey = 'k', trigger, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'commandPalette', ownWords))
 
   const machine = untrack(() =>
     createPaletteMachine({

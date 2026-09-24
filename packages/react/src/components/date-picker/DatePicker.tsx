@@ -16,6 +16,7 @@ import { TimePicker } from '../time-picker'
 import type { ControlSize } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 import { useFormField } from '../form/Form'
+import { useConfigured } from '../config-provider'
 
 interface CalendarOptionsProps {
   mode?: CalendarMode
@@ -90,6 +91,7 @@ export interface CalendarProps extends CalendarOptionsProps {
 
 /** A month to choose a day, or a range, from — on the page itself. */
 export function Calendar(props: CalendarProps) {
+  props = useConfigured(props, { locale: true, words: 'calendar' })
   const { value, defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, months, locale, defaultMonth, words } = props
   const id = `gg-calendar-${useId().replace(/:/g, '')}`
   const callbacks = useRef({ onValueChange })
@@ -147,6 +149,7 @@ export type DatePickerProps = (DateFieldProps & { time?: false }) | DateTimePick
 
 /** A field for a day or a range of days, typed or chosen from a calendar; with `time`, a day and a time. */
 export function DatePicker(props: DatePickerProps) {
+  props = useConfigured(props, { locale: true, size: true, words: 'datePicker' })
   if (props.time) return <DateTimeField {...props} />
   const { time: _time, ...rest } = props
   return <DateField {...rest} />

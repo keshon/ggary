@@ -1,4 +1,6 @@
 <script lang="ts" generics="Row">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connectColumns, type DataGridController } from '@ggary/core/data-grid'
   import { svelteNormalizer } from '@ggary/core'
   import { untrack } from 'svelte'
@@ -6,7 +8,9 @@
   import CheckboxGroup from '../checkbox-group/CheckboxGroup.svelte'
   import Popover from '../popover/Popover.svelte'
 
-  let { grid, words = {} }: { grid: DataGridController<Row>; words?: { label?: string; reset?: string } } = $props()
+  let { grid, words: ownWords = {} }: { grid: DataGridController<Row>; words?: { label?: string; reset?: string } } = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'gridColumns', ownWords))
 
   let snapshot = $state.raw(untrack(() => grid.getSnapshot()))
   $effect(() => {

@@ -2,6 +2,7 @@ import { createElement, type HTMLAttributes } from 'react'
 import { connect, type PaginationProps as CorePaginationProps } from '@ggary/core/pagination'
 import { reactNormalizer } from '@ggary/core'
 import type { ControlSize } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface PaginationProps extends CorePaginationProps, Omit<HTMLAttributes<HTMLElement>, 'children'> {
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
@@ -10,7 +11,8 @@ export interface PaginationProps extends CorePaginationProps, Omit<HTMLAttribute
   onPageChange?: (page: number, event: Event) => void
 }
 
-export function Pagination({ items, label, onPageChange, size, ...rest }: PaginationProps) {
+export function Pagination(own: PaginationProps) {
+  const { items, label, onPageChange, size, ...rest } = useConfigured(own, { size: true })
   const api = connect({ items, label }, reactNormalizer, { onPageChange, size })
   return (
     <nav {...rest} {...api.rootProps}>

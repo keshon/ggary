@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { draftFor, filterKindOf, setOptions, type ColumnDef, type Filter, type FilterDraft } from '@ggary/core/data-grid'
+  import { draftFor, filterKindOf, setOptions, type ColumnDef, type Filter, type FilterDraft, type FilterEditorWords } from '@ggary/core/data-grid'
   import Button from '../button/Button.svelte'
   import CheckboxGroup from '../checkbox-group/CheckboxGroup.svelte'
   import DatePicker from '../date-picker/DatePicker.svelte'
@@ -9,7 +9,7 @@
   import Select from '../select/Select.svelte'
   import { untrack } from 'svelte'
 
-  type Words = { locale?: string; apply?: string; clear?: string; column?: string; from?: string; to?: string; contains?: string }
+  type Words = FilterEditorWords
   type Props = {
     columns: ColumnDef[]
     /** The column being edited; absent, the editor starts by asking which. */

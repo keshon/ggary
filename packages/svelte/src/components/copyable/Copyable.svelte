@@ -1,10 +1,14 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { COPY_IDLE, connect, createCopier, type CopyableProps, type CopyState } from '@ggary/core/copyable'
   import { svelteNormalizer } from '@ggary/core'
 
   type Props = CopyableProps & { [key: string]: unknown }
 
-  let { value, copyValue, onCopy, words, ...rest }: Props = $props()
+  let { value, copyValue, onCopy, words: ownWords, ...rest }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'copyable', ownWords))
 
   let copy = $state<CopyState>(COPY_IDLE)
   const copier = createCopier((next) => (copy = next))

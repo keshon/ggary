@@ -1,6 +1,7 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from 'react'
 import { connect, type ButtonProps as CoreButtonProps } from '@ggary/core/button'
 import { reactNormalizer } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface ButtonProps
   extends CoreButtonProps,
@@ -13,6 +14,7 @@ export interface ButtonProps
  * a screen, logic has leaked out of core.
  */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(props, ref) {
+  props = useConfigured(props, { size: true })
   const { emphasis, destructive, size, disabled, loading, fullWidth, type, children, ...rest } = props
   const api = connect({ emphasis, destructive, size, disabled, loading, fullWidth, type }, reactNormalizer)
 

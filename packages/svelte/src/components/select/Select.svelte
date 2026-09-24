@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import type { ControlSize } from '@ggary/core'
   import { connect, createSelectMachine, type SelectItem } from '@ggary/core/select'
   import { attachPopover, mergeProps, onFormReset, scrollIntoViewIfNeeded, svelteNormalizer, uid } from '@ggary/core'
@@ -20,7 +21,7 @@
   }
 
   let {
-    size,
+    size: ownSize,
     items,
     label,
     placeholder,
@@ -30,6 +31,8 @@
     name,
     onValueChange,
   }: Props = $props()
+  const kit = getConfig()
+  const size = $derived(ownSize ?? kit().size)
 
   const id = uid('gg-select')
 

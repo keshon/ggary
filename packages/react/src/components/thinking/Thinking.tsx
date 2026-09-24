@@ -2,6 +2,7 @@ import { useId, useState, type ReactNode } from 'react'
 import { connect, type ThinkingProps as CoreThinkingProps, type ThinkingWords } from '@ggary/core/thinking'
 import { reactNormalizer } from '@ggary/core'
 import { Caret } from '../states'
+import { useConfigured } from '../config-provider'
 
 export interface ThinkingProps extends Omit<CoreThinkingProps, 'id' | 'open'> {
   /** The reasoning. */
@@ -16,6 +17,7 @@ export interface ThinkingProps extends Omit<CoreThinkingProps, 'id' | 'open'> {
 
 /** What the machine worked out before it answered, collapsed by default. */
 export function Thinking(props: ThinkingProps) {
+  props = useConfigured(props, { locale: true, words: 'thinking' })
   const { children, open, defaultOpen = false, onOpenChange, streaming, duration, locale, disabled, words } = props
   const id = `gg-thinking-${useId().replace(/:/g, '')}`
   const [uncontrolled, setUncontrolled] = useState(defaultOpen)

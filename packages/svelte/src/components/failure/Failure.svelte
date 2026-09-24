@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type FailureProps, type FailureWords } from '@ggary/core/failure'
   import { svelteNormalizer } from '@ggary/core'
   import type { Snippet } from 'svelte'
@@ -12,7 +14,9 @@
     words?: FailureWords
   }
 
-  let { title, code, reason, state, tried, resolvedAt, live, onRetry, actions, words }: Props = $props()
+  let { title, code, reason, state, tried, resolvedAt, live, onRetry, actions, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'failure', ownWords))
   const api = $derived(connect({ title, code, reason, state, tried, resolvedAt, live }, svelteNormalizer, { onRetry, words }))
 </script>
 

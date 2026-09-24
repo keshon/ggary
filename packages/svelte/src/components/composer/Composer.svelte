@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type ComposerProps, type ComposerWords } from '@ggary/core/composer'
   import { svelteNormalizer } from '@ggary/core'
   import type { Snippet } from 'svelte'
@@ -33,8 +35,10 @@
     onSend,
     onStop,
     children,
-    words,
+    words: ownWords,
   }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'composer', ownWords))
 
   // The value is the field's own; it is read at the moment of sending, which is
   // also what a send from the keyboard has to do.

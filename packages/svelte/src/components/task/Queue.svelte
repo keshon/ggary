@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, createQueueMachine, type QueueWordsInput, type TaskItem } from '@ggary/core/task'
   import { rovingFocus, svelteNormalizer, uid } from '@ggary/core'
   import { untrack } from 'svelte'
@@ -19,7 +21,9 @@
    * The queue of an agent's tasks: flat rows, hundreds of them, one tab stop
    * for the list and the arrows inside it. The selection follows the focus.
    */
-  let { tasks, label, value = $bindable(), defaultValue, onValueChange, words }: Props = $props()
+  let { tasks, label, value = $bindable(), defaultValue, onValueChange, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'queue', ownWords))
 
   const id = uid('gg-queue')
 

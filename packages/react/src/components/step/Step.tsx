@@ -2,6 +2,7 @@ import type { HTMLAttributes, ReactNode } from 'react'
 import { connect, type StepProps as CoreStepProps, type StepWords } from '@ggary/core/step'
 import { reactNormalizer } from '@ggary/core'
 import { Caret, StatusDot } from '../states'
+import { useConfigured } from '../config-provider'
 
 export interface StepProps extends CoreStepProps, Omit<HTMLAttributes<HTMLElement>, 'children' | 'onToggle'> {
   /** The step's fixed text: the phases in words, the button over a cut output, the units of time. */
@@ -12,7 +13,8 @@ export interface StepProps extends CoreStepProps, Omit<HTMLAttributes<HTMLElemen
   output?: ReactNode
 }
 
-export function Step({
+export function Step(own: StepProps) {
+  const {
   name,
   argument,
   state,
@@ -28,7 +30,7 @@ export function Step({
   children,
   output,
   ...rest
-}: StepProps) {
+} = useConfigured(own, { locale: true, words: 'step' })
   const api = connect(
     { name, argument, state, detail, duration, locale, defaultOpen, outputLines, onShowAll, streaming, onOpenChange },
     reactNormalizer,

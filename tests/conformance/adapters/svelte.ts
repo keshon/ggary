@@ -9,6 +9,7 @@ import ShellWith from './ShellWith.svelte'
 import FlowWith from './FlowWith.svelte'
 import FlexWith from './FlexWith.svelte'
 import ListWith from './ListWith.svelte'
+import ConfigWith from './ConfigWith.svelte'
 import ColumnsWith from './ColumnsWith.svelte'
 import PageHeaderWith from './PageHeaderWith.svelte'
 import SectionWith from './SectionWith.svelte'
@@ -195,6 +196,7 @@ export const svelte: Adapter = {
   upload: (props, target) => mountSvelte(Upload as Component<any>, props, target),
   list: (props, target) => mountSvelte(ListWith as Component<any>, props, target),
   rangeSlider: (props, target) => mountSvelte(RangeSlider as Component<any>, props, target),
+  configProvider: (props, target) => mountSvelte(ConfigWith as Component<any>, props, target),
   result: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'result' })),
   popconfirm: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'popconfirm' })),
   contextMenu: (props, target) => mountSvelte(OverlayWithTrigger as Component<any>, props, target, (p) => ({ ...p, component: 'context-menu' })),

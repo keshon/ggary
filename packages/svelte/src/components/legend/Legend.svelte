@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type LegendProps, type LegendWords } from '@ggary/core/legend'
   import { svelteNormalizer } from '@ggary/core'
 
@@ -8,7 +10,9 @@
     [key: string]: unknown
   }
 
-  let { items, direction, label, words, ...rest }: Props = $props()
+  let { items, direction, label, words: ownWords, ...rest }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'legend', ownWords))
   const api = $derived(connect({ items, direction, label }, svelteNormalizer, { words }))
 </script>
 

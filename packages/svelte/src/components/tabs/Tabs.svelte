@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import type { ControlSize } from '@ggary/core'
   import {
     connect,
@@ -35,7 +36,7 @@
   }
 
   let {
-    size,
+    size: ownSize,
     items,
     value = $bindable(),
     defaultValue,
@@ -49,6 +50,8 @@
     keepMounted = false,
     closeLabel,
   }: Props = $props()
+  const kit = getConfig()
+  const size = $derived(ownSize ?? kit().size)
 
   const id = uid('gg-tabs')
 

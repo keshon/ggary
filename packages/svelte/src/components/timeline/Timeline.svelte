@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import { connect, type TimelineItem, type TimelineProps } from '@ggary/core/timeline'
   import { svelteNormalizer } from '@ggary/core'
   import type { Snippet } from 'svelte'
@@ -12,7 +13,9 @@
     [key: string]: unknown
   }
 
-  let { items, label, locale, timeFormat, item: body, ...rest }: Props = $props()
+  let { items, label, locale: ownLocale, timeFormat, item: body, ...rest }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
 
   const api = $derived(connect({ items, label, locale, timeFormat }, svelteNormalizer))
 </script>

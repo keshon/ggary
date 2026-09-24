@@ -1,6 +1,7 @@
 import type { HTMLAttributes, ReactNode } from 'react'
 import { connect, type TimelineItem, type TimelineProps as CoreTimelineProps } from '@ggary/core/timeline'
 import { reactNormalizer } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface TimelineProps extends CoreTimelineProps, Omit<HTMLAttributes<HTMLOListElement>, 'children'> {
   /**
@@ -10,7 +11,8 @@ export interface TimelineProps extends CoreTimelineProps, Omit<HTMLAttributes<HT
   children?: (item: TimelineItem) => ReactNode
 }
 
-export function Timeline({ items, label, locale, timeFormat, children, ...rest }: TimelineProps) {
+export function Timeline(own: TimelineProps) {
+  const { items, label, locale, timeFormat, children, ...rest } = useConfigured(own, { locale: true })
   const api = connect({ items, label, locale, timeFormat }, reactNormalizer)
   return (
     <ol {...rest} {...api.rootProps}>

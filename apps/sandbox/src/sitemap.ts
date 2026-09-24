@@ -431,6 +431,15 @@ export const SITEMAP: SiteCategory[] = [
     "title": "Layout",
     "components": [
       {
+        "label": "Config provider",
+        "anchors": [
+          {
+            "id": "config",
+            "label": null
+          }
+        ]
+      },
+      {
         "label": "Shell and split",
         "anchors": [
           {

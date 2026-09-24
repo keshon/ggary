@@ -4,6 +4,7 @@ import { attachScrub, mergeProps, reactNormalizer } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
 import { useMergedRef } from '../../utils/use-merged-ref'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useConfigured } from '../config-provider'
 
 export interface NumberFieldProps
   extends Omit<CoreNumberFieldProps, 'id' | 'inputId'>,
@@ -18,6 +19,7 @@ export interface NumberFieldProps
 const text = (value: number | null | undefined) => (value === null || value === undefined ? '' : String(value))
 
 export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(function NumberField(props, forwardedRef) {
+  props = useConfigured(props, { size: true })
   const {
     min, max, step, name, label, axis, placeholder, size, disabled, readOnly, required, invalid,
     value, defaultValue, onValueChange, ...rest

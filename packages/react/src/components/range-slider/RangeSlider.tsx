@@ -4,6 +4,7 @@ import { reactNormalizer } from '@ggary/core'
 import { Input } from '../input'
 import { InputGroup } from '../input-group'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useConfigured } from '../config-provider'
 
 export interface RangeSliderProps extends Omit<CoreRangeSliderProps, 'id' | 'value'> {
   /** Controlled: `[lower, upper]`. Omit and use `defaultValue` for uncontrolled. */
@@ -18,6 +19,7 @@ export interface RangeSliderProps extends Omit<CoreRangeSliderProps, 'id' | 'val
 
 /** A range between two ends, each a thumb on one track: a price from and to, a run time from and to. */
 export function RangeSlider(props: RangeSliderProps) {
+  props = useConfigured(props, { size: true, words: 'rangeSlider' })
   const { value, defaultValue, onValueChange, formatValue, words, ...rest } = props
   const id = `gg-range-${useId().replace(/:/g, '')}`
   const [own, setOwn] = useState(defaultValue)

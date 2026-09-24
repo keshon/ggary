@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connectSummary, type FormSummaryWords } from '@ggary/core/form'
   import { svelteNormalizer } from '@ggary/core'
   import { getContext } from 'svelte'
@@ -10,7 +12,9 @@
   }
 
   /** The form's errors in one place, each a link to its field. Shown after a submit that found some. */
-  let { words, headingLevel }: Props = $props()
+  let { words: ownWords, headingLevel }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'formSummary', ownWords))
 
   const machine = getContext<FormMachine | undefined>(FORM_CONTEXT)
   const form = useFormState()

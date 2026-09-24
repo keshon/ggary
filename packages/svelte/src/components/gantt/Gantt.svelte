@@ -1,4 +1,6 @@
 <script lang="ts" generics="T extends GanttTask">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { attachGanttDrag, connect, createGanttMachine, focusGanttTask, revealGanttDay, type GanttChange, type GanttGroup, type GanttRange, type GanttScale, type GanttTask, type GanttWords } from '@ggary/core/gantt'
   import { svelteNormalizer, uid } from '@ggary/core'
   import { untrack, type Snippet } from 'svelte'
@@ -30,7 +32,10 @@
   const NO_GROUPS: GanttGroup[] = []
 
   /** Tasks as bars on a time scale, their names beside them, under headings when there are groups. */
-  let { tasks, scale = $bindable(), defaultScale, onScaleChange, range, locale, onOpen, onTaskChange, groups, collapsed = $bindable(), defaultCollapsed, onCollapsedChange, title, words }: Props = $props()
+  let { tasks, scale = $bindable(), defaultScale, onScaleChange, range, locale: ownLocale, onOpen, onTaskChange, groups, collapsed = $bindable(), defaultCollapsed, onCollapsedChange, title, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'gantt', ownWords))
 
   const machine = untrack(() =>
     createGanttMachine<T>({

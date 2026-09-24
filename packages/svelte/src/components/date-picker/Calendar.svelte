@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, createCalendarMachine, focusCalendarDay, toRange, type CalendarMode, type CalendarWords, type DateRange } from '@ggary/core/calendar'
   import { svelteNormalizer, uid, type ISODate } from '@ggary/core'
   import { untrack } from 'svelte'
@@ -22,7 +24,10 @@
   }
 
   /** A month to choose a day, or a range, from — on the page itself. */
-  let { value = $bindable(), defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, months, locale, defaultMonth, words }: Props = $props()
+  let { value = $bindable(), defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, months, locale: ownLocale, defaultMonth, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'calendar', ownWords))
 
   const machine = untrack(() =>
     createCalendarMachine({

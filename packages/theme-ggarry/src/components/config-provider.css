@@ -1,0 +1,14 @@
+/* ==========================================================================
+   GGarry — config provider
+
+   Nothing of its own to draw: it has no box (display: contents). Given a
+   mode, the theme's colours are declared again on it, so every component
+   under it takes the island's; the page's own text under it takes the
+   island's text colour here, which inherits through an element with no box.
+   It draws no ground, having no box to paint: an island that needs its own
+   surface stands on a Panel or a Card inside the provider.
+   ========================================================================== */
+
+[data-scope='config-provider'][data-part='root'][data-mode] {
+  color: var(--ggarry-text-default);
+}

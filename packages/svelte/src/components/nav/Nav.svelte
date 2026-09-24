@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type NavItem, type NavProps } from '@ggary/core/nav'
   import { svelteNormalizer, uid } from '@ggary/core'
 
@@ -7,7 +9,9 @@
    * by the button beside it; which are open is kept here unless `open` is
    * given, and follows the reading until the reader sets it.
    */
-  let { label, groups, open, onOpenChange, words, ...rest }: Omit<NavProps, 'id'> & { [key: string]: unknown } = $props()
+  let { label, groups, open, onOpenChange, words: ownWords, ...rest }: Omit<NavProps, 'id'> & { [key: string]: unknown } = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'nav', ownWords))
 
   const id = uid('gg-nav')
   let chosen = $state<Record<string, boolean>>({})

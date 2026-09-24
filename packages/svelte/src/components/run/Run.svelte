@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type RunProps, type RunWords } from '@ggary/core/run'
   import { svelteNormalizer } from '@ggary/core'
 
@@ -9,7 +11,10 @@
   }
 
   /** The countable units of one run: phases, attempts or shards, each carrying its own outcome. */
-  let { units, label, showValue, locale, words, ...rest }: Props = $props()
+  let { units, label, showValue, locale: ownLocale, words: ownWords, ...rest }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'run', ownWords))
   const api = $derived(connect({ units, label, showValue, locale }, svelteNormalizer, { words }))
 </script>
 

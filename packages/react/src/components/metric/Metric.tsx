@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { connect, connectRow, type MetricProps, type MetricRowProps as CoreMetricRowProps } from '@ggary/core/metric'
 import { reactNormalizer } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export type { MetricProps }
 
@@ -9,7 +10,8 @@ export interface MetricRowProps extends CoreMetricRowProps {
   children?: ReactNode
 }
 
-export function Metric({ label, value, unit, delta, direction, tone, locale }: MetricProps) {
+export function Metric(own: MetricProps) {
+  const { label, value, unit, delta, direction, tone, locale } = useConfigured(own, { locale: true })
   const api = connect({ label, value, unit, delta, direction, tone, locale }, reactNormalizer)
   return (
     <div {...api.rootProps}>

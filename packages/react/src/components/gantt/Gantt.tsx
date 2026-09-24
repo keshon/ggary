@@ -1,6 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
 import { attachGanttDrag, connect, createGanttMachine, focusGanttTask, revealGanttDay, type GanttChange, type GanttGroup, type GanttRange, type GanttScale, type GanttTask, type GanttWords } from '@ggary/core/gantt'
 import { reactNormalizer } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface GanttProps<T extends GanttTask> {
   tasks: T[]
@@ -34,6 +35,7 @@ const NO_GROUPS: GanttGroup[] = []
 
 /** Tasks as bars on a time scale, their names beside them, under headings when there are groups. */
 export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
+  props = useConfigured(props, { locale: true, words: 'gantt' })
   const { tasks, scale, defaultScale, onScaleChange, range, locale, onOpen, onTaskChange, groups, collapsed, defaultCollapsed, onCollapsedChange, children, words } = props
   const id = `gg-gantt-${useId().replace(/:/g, '')}`
   const callbacks = useRef({ onScaleChange, onOpen, onTaskChange, onCollapsedChange })

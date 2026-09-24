@@ -13,6 +13,7 @@ import type { DialogSize } from '@ggary/core/dialog'
 import { reactNormalizer } from '@ggary/core'
 import { MenuContent } from '../menu/MenuContent'
 import { Sheet } from '../dialog/Sheet'
+import { useConfigured } from '../config-provider'
 
 export interface GridRowMenuProps<Row> {
   grid: DataGridController<Row>
@@ -96,6 +97,7 @@ export interface GridDetailProps<Row> {
  * grid: arrow keys or a press on another row show that row.
  */
 export function GridDetail<Row>(props: GridDetailProps<Row>) {
+  props = useConfigured(props, { words: 'gridDetail' })
   const { grid, title, description, children, footer, words, loadingText = 'Loading…', side, size, modal = false } = props
 
   useEffect(() => grid.provide('detail'), [grid])

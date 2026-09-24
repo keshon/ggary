@@ -2,13 +2,15 @@ import type { HTMLAttributes } from 'react'
 import { connect, type DiffProps as CoreDiffProps, type DiffWords } from '@ggary/core/diff'
 import { reactNormalizer } from '@ggary/core'
 import { FileChange } from '../file-change'
+import { useConfigured } from '../config-provider'
 
 export interface DiffProps extends CoreDiffProps, Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /** The diff's fixed text: the statistics, a folded stretch, the name of the body. */
   words?: DiffWords
 }
 
-export function Diff({ path, change, rows, before, after, context, locale, words, ...rest }: DiffProps) {
+export function Diff(own: DiffProps) {
+  const { path, change, rows, before, after, context, locale, words, ...rest } = useConfigured(own, { locale: true, words: 'diff' })
   const api = connect({ path, change, rows, before, after, context, locale }, reactNormalizer, { words })
   return (
     <div {...rest} {...api.rootProps}>

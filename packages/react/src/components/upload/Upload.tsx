@@ -12,6 +12,7 @@ import {
 import { reactNormalizer } from '@ggary/core'
 import { FileDrop } from '../file-drop'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useConfigured } from '../config-provider'
 
 export interface UploadProps {
   /** Sends one file: `(file, { signal, onProgress }) => Promise`. Resolve with what the form submits for it. Without one, a file is there once chosen. */
@@ -75,6 +76,7 @@ function usePreviews(items: UploadItem[]) {
 
 /** Files sent as they are chosen, each with how far it has gone, a way to cancel, and a way to try again. */
 export function Upload(props: UploadProps) {
+  props = useConfigured(props, { locale: true, words: 'upload' })
   const { view = 'rows', name, accept, maxSize, maxFiles, concurrency, disabled, label, hint, defaultFiles, locale, words } = props
   const id = `gg-upload-${useId().replace(/:/g, '')}`
   const latest = useRef(props)

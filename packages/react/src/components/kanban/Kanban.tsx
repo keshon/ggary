@@ -15,6 +15,7 @@ import {
 import { connect as connectMenu, createMenuMachine, type MenuEntry } from '@ggary/core/menu'
 import { reactNormalizer, type VirtualElement } from '@ggary/core'
 import { MenuContent } from '../menu/MenuContent'
+import { useConfigured } from '../config-provider'
 
 export interface KanbanProps<T extends KanbanCard> {
   columns: KanbanColumn[]
@@ -49,6 +50,7 @@ export interface KanbanProps<T extends KanbanCard> {
 
 /** Columns of cards, a card moved by the keyboard, a pointer or its menu. */
 export function Kanban<T extends KanbanCard>(props: KanbanProps<T>) {
+  props = useConfigured(props, { words: 'kanban' })
   const { columns, cards, onMove, onOpen, onAdd, cardMenu, onCardMenuSelect, canDrag, children, headingLevel, words } = props
   const id = `gg-kanban-${useId().replace(/:/g, '')}`
   const callbacks = useRef({ onMove, onOpen, onAdd, canDrag, cardMenu, onCardMenuSelect, words })

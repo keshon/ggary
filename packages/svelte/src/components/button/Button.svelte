@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import { connect, type ButtonProps } from '@ggary/core/button'
   import { svelteNormalizer } from '@ggary/core'
   import type { Snippet } from 'svelte'
@@ -12,7 +13,7 @@
   let {
     emphasis = 'medium',
     destructive = false,
-    size = 'md',
+    size: ownSize,
     disabled = false,
     loading = false,
     fullWidth = false,
@@ -20,6 +21,9 @@
     children,
     ...rest
   }: Props = $props()
+  const kit = getConfig()
+  // The default comes after the provider's, so a provider can set it.
+  const size = $derived(ownSize ?? kit().size ?? 'md')
 
   // Same `connect()` React uses; only the normalizer differs.
   const api = $derived(connect({ emphasis, destructive, size, disabled, loading, fullWidth, type }, svelteNormalizer))

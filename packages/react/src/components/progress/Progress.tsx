@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import { connect, type ProgressProps as CoreProgressProps } from '@ggary/core/progress'
 import { reactNormalizer } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export type ProgressProps = CoreProgressProps & {
   /** Show the value text. Default: over a bar with a label, and inside a large ring. */
@@ -9,6 +10,7 @@ export type ProgressProps = CoreProgressProps & {
 
 /** How far along: a bar, or a ring. No value: busy, the amount unknown. */
 export function Progress(props: ProgressProps) {
+  props = useConfigured(props, { locale: true })
   const id = `gg-progress-${useId().replace(/:/g, '')}`
   const api = connect({ ...props, id }, reactNormalizer)
   const { shape = 'bar', size = 'md' } = props

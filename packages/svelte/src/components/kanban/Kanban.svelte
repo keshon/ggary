@@ -1,4 +1,6 @@
 <script lang="ts" generics="T extends KanbanCard">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import {
     attachKanbanDrag,
     cardMenuItems,
@@ -49,7 +51,9 @@
   }
 
   /** Columns of cards, a card moved by the keyboard, a pointer or its menu. */
-  let { columns, cards, onMove, onOpen, onAdd, cardMenu, onCardMenuSelect, canDrag, card: body, headingLevel, words }: Props = $props()
+  let { columns, cards, onMove, onOpen, onAdd, cardMenu, onCardMenuSelect, canDrag, card: body, headingLevel, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'kanban', ownWords))
 
   const id = uid('gg-kanban')
   const machine = untrack(() =>

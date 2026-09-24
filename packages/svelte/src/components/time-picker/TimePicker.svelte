@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import type { ControlSize } from '@ggary/core'
   import { connect, createTimePickerMachine, type TimePickerWords } from '@ggary/core/time-picker'
   import { attachPopover, mergeProps, onFormReset, scrollIntoCenter, scrollIntoViewIfNeeded, svelteNormalizer, uid, type ISOTime } from '@ggary/core'
@@ -30,7 +32,11 @@
   }
 
   /** A field for a time of day, typed or chosen from a list of times at a step. */
-  let { size, label, value = $bindable(), defaultValue, onValueChange, step, min, max, isTimeDisabled, locale, name, placeholder, words, embedded }: Props = $props()
+  let { size: ownSize, label, value = $bindable(), defaultValue, onValueChange, step, min, max, isTimeDisabled, locale: ownLocale, name, placeholder, words: ownWords, embedded }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const size = $derived(ownSize ?? kit().size)
+  const words = $derived(configWords(kit(), 'timePicker', ownWords))
 
   const initial = untrack(() => (value !== undefined ? value : (defaultValue ?? null)))
   const machine = untrack(() =>

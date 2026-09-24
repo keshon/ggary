@@ -9,6 +9,7 @@ import {
   type ListWords,
 } from '@ggary/core/list'
 import { reactNormalizer } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface ListProps extends CoreListProps {
   /** The rows: ListItems. */
@@ -28,6 +29,7 @@ export interface ListProps extends CoreListProps {
 
 /** A list of things, each a row with what it is, what is known about it, and what can be done with it. */
 export function List(props: ListProps) {
+  props = useConfigured(props, { words: 'list' })
   const { variant, label, count, ariaLabel, children, footer, onLoadMore, hasMore, words } = props
   const id = `gg-list-${useId().replace(/:/g, '')}`
   const [more, setMore] = useState<ListMoreState>('idle')

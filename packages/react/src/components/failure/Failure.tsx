@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { connect, type FailureProps as CoreFailureProps, type FailureWords } from '@ggary/core/failure'
 import { reactNormalizer } from '@ggary/core'
 import { Button } from '../button'
+import { useConfigured } from '../config-provider'
 
 export interface FailureProps extends CoreFailureProps {
   /** Try again. Sending it, and moving the block into a resolved state, are the owner's. */
@@ -13,6 +14,7 @@ export interface FailureProps extends CoreFailureProps {
 
 /** A breakdown: what failed, why in words that can be acted on, and the way back. */
 export function Failure(props: FailureProps) {
+  props = useConfigured(props, { words: 'failure' })
   const { title, code, reason, state, tried, resolvedAt, live, onRetry, actions, words } = props
   const api = connect({ title, code, reason, state, tried, resolvedAt, live }, reactNormalizer, { onRetry, words })
 

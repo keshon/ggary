@@ -4,6 +4,7 @@ import { mergeProps, reactNormalizer } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
 import { useMergedRef } from '../../utils/use-merged-ref'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useConfigured } from '../config-provider'
 
 export interface SearchProps
   extends CoreSearchProps,
@@ -15,6 +16,7 @@ export interface SearchProps
 }
 
 export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(props, forwardedRef) {
+  props = useConfigured(props, { size: true })
   const { size, name, placeholder, label, disabled, readOnly, required, invalid, value, defaultValue, onValueChange, ...rest } = props
 
   const api = connect(

@@ -11,6 +11,7 @@ import { attachPopover, mergeProps, reactNormalizer, scrollIntoViewIfNeeded } fr
 import type { ControlSize } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 import { useFormField } from '../form/Form'
+import { useConfig, useConfigured } from '../config-provider'
 
 export interface ComboboxProps {
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
@@ -48,6 +49,9 @@ export interface ComboboxProps {
 
 /** A text field with a list of options: type to narrow it, arrows and Enter to choose. */
 export function Combobox(props: ComboboxProps) {
+  props = useConfigured(props, { size: true, words: 'combobox' })
+  // The count of matches is written in the locale in force; the combobox takes no locale of its own.
+  const { locale } = useConfig()
   const {
     size,
     label, items, load, debounce, minLength, multiple = false, value, defaultValue, selectedItems, onValueChange, onCreate,
@@ -76,7 +80,7 @@ export function Combobox(props: ComboboxProps) {
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { ...words, placeholder: placeholder ?? words?.placeholder, name, size })
+  const api = connect(state, machine.send, reactNormalizer, { ...words, placeholder: placeholder ?? words?.placeholder, name, size, locale })
   // Inside a Form, by name: the error its rules hold for this choice.
   const form = useFormField(name, api.ids.input, label)
   callbacks.current.edited = () => form.edited(document.getElementById(api.ids.input))

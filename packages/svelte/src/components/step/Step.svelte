@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type StepProps, type StepWords } from '@ggary/core/step'
   import { svelteNormalizer } from '@ggary/core'
   import type { Snippet } from 'svelte'
@@ -21,17 +23,20 @@
     state,
     detail,
     duration,
-    locale,
+    locale: ownLocale,
     defaultOpen,
     outputLines,
     onShowAll,
     streaming,
     onOpenChange,
-    words,
+    words: ownWords,
     children,
     output,
     ...rest
   }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'step', ownWords))
 
   const api = $derived(
     connect(

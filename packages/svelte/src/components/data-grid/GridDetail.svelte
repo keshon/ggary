@@ -1,4 +1,6 @@
 <script lang="ts" generics="Row">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connectDetail, type DataGridController, type DetailWords } from '@ggary/core/data-grid'
   import type { DialogSize } from '@ggary/core/dialog'
   import { svelteNormalizer } from '@ggary/core'
@@ -23,7 +25,9 @@
     modal?: boolean
   }
 
-  let { grid, title, description, children, footer: footerSlot, words, loadingText = 'Loading…', side, size, modal = false }: Props = $props()
+  let { grid, title, description, children, footer: footerSlot, words: ownWords, loadingText = 'Loading…', side, size, modal = false }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'gridDetail', ownWords))
 
   /*
    * One row in a sheet beside the grid. It opens on Enter or a double click on

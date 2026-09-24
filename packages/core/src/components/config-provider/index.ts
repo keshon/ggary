@@ -1,0 +1,5 @@
+export { configProviderAnatomy } from './config-provider.anatomy'
+export type { ConfigProviderPart } from './config-provider.anatomy'
+export { applyConfig, configWords, connect, resolveConfig } from './config-provider.connect'
+export type { ConfigPick } from './config-provider.connect'
+export type { KitConfig, KitWords } from './config-provider.types'

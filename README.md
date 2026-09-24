@@ -2,12 +2,12 @@
 
 A UI kit scaffold: one framework-agnostic core, two sibling renderers (React 19
 and Svelte 5), and one design language, GGarry, on top of it.
-A hundred and eleven components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, TimePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+A hundred and twelve components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, TimePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, RangeSlider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
 Menu, Menubar, Badge, Avatar, AvatarGroup, Spinner, Skeleton, Card, Panel, Banner,
-Note, EmptyState, Divider, Prose, Text, Link, Flex, FlexItem, Columns, Column, Popconfirm, ContextMenu, Result, Upload, List and ListItem — built end to end to prove the architecture holds.
+Note, EmptyState, Divider, Prose, Text, Link, Flex, FlexItem, Columns, Column, Popconfirm, ContextMenu, Result, Upload, List, ListItem and ConfigProvider — built end to end to prove the architecture holds.
 
 **Retired on 2026-09-18: the vanilla custom-elements adapter (`@ggary/elements`,
 the `gg-*` tags) and the Instrument theme**, a second language ported from
@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3936 tests, 1476 of them in headless Chrome
+npm test         # 3966 tests, 1486 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck   # tsc, then svelte-check over every .svelte file
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -2997,6 +2997,56 @@ Found on the way:
   new `bg.highlight` — amber-100 in light, amber-950 in dark — held a step off
   the surface.
 
+## ConfigProvider
+
+Settings for everything under it, set once instead of on every component.
+
+```tsx
+<ConfigProvider locale="ru-RU" size="sm" words={{ list: { more: 'Показать ещё' }, upload: { retry: 'Повторить' } }}>
+  <App />
+</ConfigProvider>
+<ConfigProvider dir="rtl" locale="ar-EG" mode="dark">…</ConfigProvider>
+```
+
+| Setting | What it reaches |
+|---|---|
+| `locale` | The default `locale` of every component that writes a date, a time, a number or a size — 22 of them — and the element's `lang`, so a screen reader speaks the right language. |
+| `size` | The default `sm` / `md` / `lg` of every control. Not Avatar, Prose or a chart: `size` there is not a control's. |
+| `words` | The kit's own words, by component — `words.upload`, `words.list`, `words.dataGrid` … — typed, one key per component that has words. A component's own `words` are laid over them, a key at a time. |
+| `dir` | The element's `dir`. Everything under it already follows the direction the DOM says: the arrows, the fills, the marks, the calendar. |
+| `mode` | The element's `data-mode`: a light or dark island, as the theme draws one. It recolours everything under it, loose text included; it draws no ground of its own, so an island that needs a surface stands on a Panel or a Card. |
+
+**A component's own prop always wins**, and a provider inside another changes
+only what it sets: `resolveConfig` in core merges the two the same way for both
+frameworks, words a component and a key at a time. The provider renders one
+element with `display: contents` — no box, so a flex or grid parent still lays out
+what it wraps — carrying the `lang`, `dir` and `data-mode` it sets, which reach
+popovers and dialogs too: they are drawn in the top layer but stay in the DOM
+under it. A change of locale, size or words reaches every component under it
+without a remount (React's context; Svelte's context holds a getter read inside
+`$derived`).
+
+**Components cannot forget it.** Each component fills its props through core's
+`applyConfig(props, config, { locale, size, words: 'upload' })` — which touches
+only what the component takes, since a `size` added to a link that spreads its
+props onto an `<a>` would become an attribute — and `config.contract.test.ts`
+fails for any component, in either adapter, that takes a `locale`, `words` or a
+control's `size` and does not read the settings in force.
+
+The kit's words stay English by default. A translation is the app's, passed
+through the provider once; no language pack ships.
+
+Found on the way:
+
+- **A default in the props hid the provider.** Svelte's Button destructured
+  `size = 'md'`, so its own size was never missing and the provider's never
+  applied. The default now comes after the provider: `own ?? provider ?? 'md'`.
+- **`props` is not a name a Svelte component can use for its settings.** Svelte
+  read `$props` as a subscription to a store called `props`; Metric's filled
+  props are `metric`.
+- **Two filter editors defined the same words.** FilterEditorWords lived in each
+  adapter; it is core's now, and the provider's type points at one definition.
+
 ## Layering inside core
 
 ```
@@ -3214,16 +3264,17 @@ sandbox build prints none.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 667 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
-| contract | node | `icons.contract.test.ts` | 472 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `icons.contract.test.ts` | 477 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 5 tests. Every discovered theme — GGarry, now the only one: structure, literals, contrast, coverage. |
 | contract | node | `packages.contract.test.ts` | 9 tests. Each package's exports are its root and `./*`; every component directory has an index; both adapters have the same directories, the same components in each, and all of them at their root. |
 | contract | node | `anatomy.contract.test.ts` | 2 tests. Every element an adapter draws takes a prop bag from core — no bare `<span>` a theme could only name by its tag — and no adapter writes a class. |
 | contract | node | `sizes.contract.test.ts` | 3 tests. Every control's size is `ControlSize`, and its stylesheet draws `sm` and `lg`. |
 | contract | node | `core-shape.contract.test.ts` | 2 tests. Every component laid out as `<dir>.<role>.ts` with a re-export-only index; every connect ending at the normalizer or one `options`. |
+| contract | node | `config.contract.test.ts` | 2 tests. Every component in either adapter that takes a `locale` or `words`, or a control that takes a `size` — declared in the adapter or in its core types — reads the settings in force. |
 | contract | node | `checks.contract.test.ts` | 30 tests. The gates themselves: each rule fires on a planted defect — the literal families and their ledger among them; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1202 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1210 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 1202 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1210 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
 | browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
 | browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |
@@ -3247,10 +3298,12 @@ sandbox build prints none.
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
 | browser | Chrome | `data-grid.browser.test.ts` | 13 tests. A row's checkbox pressed by a real pointer, React and Svelte; its Open button shown under the pointer and opening the row without selecting or editing it, and Shift+Enter opening it from a cell that edits. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `time-picker.machine.test.ts` | 13 tests. Times typed in the locale's words, with the day-period word at either end; the times at a step within min and max; the nearest time; opening on the value, walking, typing, committing and clearing; a day and a time joined only when both are there, and split back. |
+| machine | node | `config-provider.machine.test.ts` | 5 tests. An inner provider changing only what it sets, words merged a component and a key at a time; props filled only where left out and only with what the component takes; a component handed its own props back when there is nothing to fill; its element saying only the language, direction and mode it sets. |
 | machine | node | `range-slider.machine.test.ts` | 11 tests. An end kept on the step and the track, meeting the other but never crossing it, the gap asked for kept; the group and its two named sliders; a value given backwards put right; a thumb pushed past the other written back; which thumb is in front; bubbles apart and shared; a field's draft committed on Enter or when left, Escape putting it back; marks in range and at the ends; a slider's marks passed. |
 | machine | node | `upload.machine.test.ts` | 13 tests. Sizes in the locale's decimal units and an `accept` list read as the file input reads one; files refused before sending and why; so many sent at once, in order; progress, and none when the upload does not know; what a file there submits and what is said; a failure's own words and a retry as a new try; a cancel aborting its try and its late answer ignored; a synchronous throw; one file at most replacing the last; the owner told of changes, not percents; going away aborting what is under way. |
 | machine | node | `popconfirm.machine.test.ts` | 8 tests. One attempt while one is under way; closing on success, staying and saying why on a failure (a rejection, a throw, or the words); a late answer to an abandoned attempt ignored; a new opening forgetting the failure; cancels heard for every close but the action's; the focus mark by `destructive`; the alert dialog's name and description. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
+| browser | Chrome | `config-provider.browser.test.ts` | 2 tests. No box: a flex row lays out what it wraps; its direction reaching a component under it; a dark island recolouring the page's own text. |
 | browser | Chrome | `range-slider.browser.test.ts` | 7 tests. A press on the track moving the nearer thumb and giving it the focus, a drag carrying it; the real keys by the step and End stopping against the other end; two thumbs met at the top, the lower under the pointer; the fill and the bubbles at the thumbs' real centres; a mark's tick under its thumb and the end marks inside the track; the ring on the thumb, not the track; a slider's marks under its thumb. |
 | browser | Chrome | `list.browser.test.ts` | 4 tests. A press anywhere on a row landing on its stretched button, found by what is under the pointer at its line and its icon, and its own action pressed as itself; Tab walking a row then its actions, the ring on the whole row; the columns lined up whatever a row has and a long line cut before the meta; a bordered list one surface, cards apart. |
 | browser | Chrome | `upload.browser.test.ts` | 4 tests. A row's fill as wide as its progress and one of unknown progress kept inside its row; the buttons in one column down the list whatever a row has; a real drop listing a refused file with its reason; tiles square in a wrapping row, the zone a tile's size and the limits under them. |

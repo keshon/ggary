@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import { connect, type SegmentedControlSize, type SegmentedItem } from '@ggary/core/segmented-control'
   import { onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { untrack } from 'svelte'
@@ -17,7 +18,9 @@
     fullWidth?: boolean
   }
 
-  let { items, label, name, value = $bindable(), defaultValue, onValueChange, size, disabled, required, fullWidth }: Props = $props()
+  let { items, label, name, value = $bindable(), defaultValue, onValueChange, size: ownSize, disabled, required, fullWidth }: Props = $props()
+  const kit = getConfig()
+  const size = $derived(ownSize ?? kit().size)
 
   const id = uid('gg-segmented')
 

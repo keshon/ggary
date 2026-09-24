@@ -1,6 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { connect, createQueueMachine, type QueueWordsInput, type TaskItem } from '@ggary/core/task'
 import { reactNormalizer, rovingFocus } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface QueueProps {
   tasks: TaskItem[]
@@ -19,7 +20,8 @@ export interface QueueProps {
  * the list and the arrows inside it. The selection follows the focus, because
  * what a queue is for is choosing the task to look at.
  */
-export function Queue({ tasks, label, value, defaultValue, onValueChange, words }: QueueProps) {
+export function Queue(own: QueueProps) {
+  const { tasks, label, value, defaultValue, onValueChange, words } = useConfigured(own, { words: 'queue' })
   const id = `gg-queue-${useId().replace(/:/g, '')}`
   const callbacks = useRef({ onValueChange })
   callbacks.current = { onValueChange }

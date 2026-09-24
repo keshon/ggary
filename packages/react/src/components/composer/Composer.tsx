@@ -2,6 +2,7 @@ import { useRef, type ReactNode } from 'react'
 import { connect, type ComposerProps as CoreComposerProps, type ComposerWords } from '@ggary/core/composer'
 import { reactNormalizer } from '@ggary/core'
 import { Textarea } from '../textarea'
+import { useConfigured } from '../config-provider'
 
 export interface ComposerProps extends CoreComposerProps {
   /** Controlled. Omit and use `defaultValue` for uncontrolled. */
@@ -22,6 +23,7 @@ export interface ComposerProps extends CoreComposerProps {
  * inside it is the kit's Textarea with its border handed outwards.
  */
 export function Composer(props: ComposerProps) {
+  props = useConfigured(props, { words: 'composer' })
   const { label, placeholder, bar, busy, disabled, submitOnEnter, rows, maxRows, value, defaultValue, onValueChange, onSend, onStop, children, words } = props
   const field = useRef<HTMLTextAreaElement>(null)
 

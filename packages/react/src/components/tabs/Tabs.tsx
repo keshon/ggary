@@ -9,6 +9,7 @@ import {
 } from '@ggary/core/tabs'
 import { focusTab, reactNormalizer } from '@ggary/core'
 import type { ControlSize } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface TabsProps {
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
@@ -34,6 +35,7 @@ export interface TabsProps {
 }
 
 export function Tabs(props: TabsProps) {
+  props = useConfigured(props, { size: true })
   const {
     size,
     items, value, defaultValue, onValueChange, onClose, label, orientation, activation, variant,

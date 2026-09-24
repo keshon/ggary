@@ -3,6 +3,7 @@ import { connect, createTimePickerMachine, type TimePickerWords } from '@ggary/c
 import { attachPopover, mergeProps, reactNormalizer, scrollIntoCenter, scrollIntoViewIfNeeded, type ControlSize, type ISOTime } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 import { useFormField } from '../form/Form'
+import { useConfigured } from '../config-provider'
 
 export interface TimePickerProps {
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
@@ -30,6 +31,7 @@ export interface TimePickerProps {
 
 /** A field for a time of day, typed or chosen from a list of times at a step. */
 export function TimePicker(props: TimePickerProps) {
+  props = useConfigured(props, { locale: true, size: true, words: 'timePicker' })
   const { size, label, value, defaultValue, onValueChange, step, min, max, isTimeDisabled, locale, name, placeholder, words, embedded } = props
   const id = `gg-time-${useId().replace(/:/g, '')}`
   const callbacks = useRef<{ onValueChange?: typeof onValueChange; edited?: () => void }>({ onValueChange })

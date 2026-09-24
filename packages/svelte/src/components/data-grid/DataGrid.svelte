@@ -1,4 +1,6 @@
 <script lang="ts" generics="Row">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import {
     connect,
     createArraySource,
@@ -46,9 +48,12 @@
 
   let {
     columns, rows, source, rowKey, label, selectable, initialQuery, onQueryChange, onSelectionChange, onRowActivate,
-    cell, empty, words, locale, rowHeight, blockSize,
+    cell, empty, words: ownWords, locale: ownLocale, rowHeight, blockSize,
     controller = $bindable(), style, onCellEdit,
   }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'dataGrid', ownWords))
 
   const id = uid('gg-grid')
 

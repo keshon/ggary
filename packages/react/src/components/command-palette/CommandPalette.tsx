@@ -10,6 +10,7 @@ import {
   type PaletteWords,
 } from '@ggary/core/command-palette'
 import { attachDialog, reactNormalizer, type Dict } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface CommandPaletteProps {
   commands: PaletteCommand[]
@@ -32,6 +33,7 @@ export interface CommandPaletteProps {
 
 /** Ctrl+K from anywhere: a field that finds what to do, and Enter does it. */
 export function CommandPalette(props: CommandPaletteProps) {
+  props = useConfigured(props, { words: 'commandPalette' })
   const { commands, open, defaultOpen, onOpenChange, onRun, load, loadOptions, hotkey = 'k', trigger, words } = props
   const id = `gg-palette-${useId().replace(/:/g, '')}`
   const callbacks = useRef({ onOpenChange, onRun, load })

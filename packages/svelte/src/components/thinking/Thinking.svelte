@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type ThinkingProps, type ThinkingWords } from '@ggary/core/thinking'
   import { svelteNormalizer, uid } from '@ggary/core'
   import { untrack, type Snippet } from 'svelte'
@@ -14,7 +16,10 @@
     words?: ThinkingWords
   }
 
-  let { children, open = $bindable(), defaultOpen = false, onOpenChange, streaming, duration, locale, disabled, words }: Props = $props()
+  let { children, open = $bindable(), defaultOpen = false, onOpenChange, streaming, duration, locale: ownLocale, disabled, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'thinking', ownWords))
 
   untrack(() => {
     if (open === undefined) open = defaultOpen

@@ -13,6 +13,7 @@ import {
   type FilterBarWords,
   type FilterDraft,
   type GridView,
+  type FilterEditorWords,
 } from '@ggary/core/data-grid'
 import { mergeProps, reactNormalizer } from '@ggary/core'
 import { Button } from '../button'
@@ -24,19 +25,11 @@ import { Menu } from '../menu'
 import { NumberField } from '../number-field'
 import { Popover } from '../popover'
 import { Select } from '../select'
+import { useConfigured } from '../config-provider'
 
 const useGrid = <Row,>(grid: DataGridController<Row>) => useSyncExternalStore(grid.subscribe, grid.getSnapshot, grid.getSnapshot)
 
-export interface FilterEditorWords {
-  /** The locale the date filter reads and writes days in. */
-  locale?: string
-  apply?: string
-  clear?: string
-  column?: string
-  from?: string
-  to?: string
-  contains?: string
-}
+export type { FilterEditorWords }
 
 interface FilterEditorProps {
   columns: ColumnDef[]
@@ -142,7 +135,8 @@ export interface GridFiltersProps<Row> {
 }
 
 /** The filters in force as chips — press one to change it, × to remove it — and a way to add one. */
-export function GridFilters<Row>({ grid, views, words = {} }: GridFiltersProps<Row>) {
+export function GridFilters<Row>(own: GridFiltersProps<Row>) {
+  const { grid, views, words = {} } = useConfigured(own, { words: 'gridFilters' })
   const snapshot = useGrid(grid)
   const api = connectFilters(snapshot, grid, reactNormalizer, { words })
   const [editing, setEditing] = useState<string | null>(null)
@@ -229,7 +223,8 @@ export interface GridColumnsProps<Row> {
 }
 
 /** Which columns are shown: a checkbox per column, and a way back to the start. */
-export function GridColumns<Row>({ grid, words = {} }: GridColumnsProps<Row>) {
+export function GridColumns<Row>(own: GridColumnsProps<Row>) {
+  const { grid, words = {} } = useConfigured(own, { words: 'gridColumns' })
   const snapshot = useGrid(grid)
   const api = connectColumns(snapshot, grid, reactNormalizer)
   return (
@@ -260,7 +255,8 @@ export interface GridBulkBarProps<Row> {
 }
 
 /** Shown while something is selected: how much, the offer of everything matching, and the actions. */
-export function GridBulkBar<Row>({ grid, children, words = {} }: GridBulkBarProps<Row>) {
+export function GridBulkBar<Row>(own: GridBulkBarProps<Row>) {
+  const { grid, children, words = {} } = useConfigured(own, { words: 'gridBulkBar' })
   const snapshot = useGrid(grid)
   const api = connectBulk(snapshot, grid, reactNormalizer, { words })
   if (!api.visible) return null

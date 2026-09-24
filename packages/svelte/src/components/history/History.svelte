@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type HistoryProps, type HistoryWords } from '@ggary/core/history'
   import { svelteNormalizer } from '@ggary/core'
 
@@ -9,7 +11,10 @@
   }
 
   /** What happened the last N times: one attempt, one mark, the latest at the end. */
-  let { ticks, groups, label, size, locale, words, ...rest }: Props = $props()
+  let { ticks, groups, label, size, locale: ownLocale, words: ownWords, ...rest }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'history', ownWords))
   const api = $derived(connect({ ticks, groups, label, size, locale }, svelteNormalizer, { words }))
 </script>
 

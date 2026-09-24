@@ -3,6 +3,7 @@ import { connect, createCascaderMachine, focusCascaderItem, type CascaderNode } 
 import { attachPopover, reactNormalizer } from '@ggary/core'
 import type { ControlSize } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useConfigured } from '../config-provider'
 
 export interface CascaderProps {
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
@@ -25,6 +26,7 @@ export interface CascaderProps {
 
 /** A choice from a tree, one level to a column. */
 export function Cascader(props: CascaderProps) {
+  props = useConfigured(props, { size: true })
   const { size, items, label, placeholder, rootLabel, value, defaultValue, onValueChange, selectParents, disabled, name } = props
   const id = `gg-cascader-${useId().replace(/:/g, '')}`
   const callbacks = useRef({ onValueChange })

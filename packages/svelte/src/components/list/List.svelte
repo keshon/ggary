@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import type { Snippet } from 'svelte'
   import { tick } from 'svelte'
   import { connectList, focusListItem, type ListMoreState, type ListProps, type ListWords } from '@ggary/core/list'
@@ -21,7 +23,9 @@
   }
 
   /** A list of things, each a row with what it is, what is known about it, and what can be done with it. */
-  let { variant, label, count, ariaLabel, children, footer, onLoadMore, hasMore, words }: Props = $props()
+  let { variant, label, count, ariaLabel, children, footer, onLoadMore, hasMore, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'list', ownWords))
 
   const id = uid('gg-list')
   let more = $state<ListMoreState>('idle')

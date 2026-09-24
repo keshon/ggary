@@ -1,6 +1,7 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
 import { connect, type ChipProps as CoreChipProps } from '@ggary/core/chip'
 import { reactNormalizer } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface ChipProps extends CoreChipProps, Omit<HTMLAttributes<HTMLElement>, 'onSelect'> {
   children?: ReactNode
@@ -12,6 +13,7 @@ export interface ChipProps extends CoreChipProps, Omit<HTMLAttributes<HTMLElemen
  * a decorative tag should not be a tab stop.
  */
 export const Chip = forwardRef<HTMLElement, ChipProps>(function Chip(props, ref) {
+  props = useConfigured(props, { size: true })
   const { emphasis, size, selected, disabled, removable, interactive, children, onRemove, ...rest } = props
   const isInteractive = interactive ?? false
   const api = connect(

@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from 'react'
 import { connect, type LegendProps as CoreLegendProps, type LegendWords } from '@ggary/core/legend'
 import { reactNormalizer } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface LegendProps extends CoreLegendProps, Omit<HTMLAttributes<HTMLUListElement>, 'children'> {
   /** The default name of the list in another language. */
@@ -8,7 +9,8 @@ export interface LegendProps extends CoreLegendProps, Omit<HTMLAttributes<HTMLUL
 }
 
 /** The key to a chart's colours: a swatch, the series in words, and its quantity. */
-export function Legend({ items, direction, label, words, ...rest }: LegendProps) {
+export function Legend(own: LegendProps) {
+  const { items, direction, label, words, ...rest } = useConfigured(own, { words: 'legend' })
   const api = connect({ items, direction, label }, reactNormalizer, { words })
   return (
     <ul {...api.rootProps} {...rest}>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import type { ControlSize } from '@ggary/core'
   import { connect, createCascaderMachine, focusCascaderItem, type CascaderNode } from '@ggary/core/cascader'
   import { attachPopover, onFormReset, svelteNormalizer, uid } from '@ggary/core'
@@ -24,7 +25,9 @@
   }
 
   /** A choice from a tree, one level to a column. */
-  let { size, items, label, placeholder, rootLabel, value = $bindable(), defaultValue, onValueChange, selectParents, disabled, name }: Props = $props()
+  let { size: ownSize, items, label, placeholder, rootLabel, value = $bindable(), defaultValue, onValueChange, selectParents, disabled, name }: Props = $props()
+  const kit = getConfig()
+  const size = $derived(ownSize ?? kit().size)
 
   const initial = untrack(() => (value !== undefined ? value : (defaultValue ?? null)))
   const machine = untrack(() =>

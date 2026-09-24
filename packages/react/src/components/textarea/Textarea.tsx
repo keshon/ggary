@@ -4,6 +4,7 @@ import { attachAutosize, mergeProps, reactNormalizer, type Autosize } from '@gga
 import { useFieldControl } from '../field/Field'
 import { useMergedRef } from '../../utils/use-merged-ref'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useConfigured } from '../config-provider'
 
 export interface TextareaProps
   extends CoreTextareaProps,
@@ -15,6 +16,7 @@ export interface TextareaProps
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(props, forwardedRef) {
+  props = useConfigured(props, { size: true })
   const {
     size, name, placeholder, rows, minLength, maxLength, autoComplete, disabled, readOnly, required, invalid,
     resize, autoResize, maxRows, value, defaultValue, onValueChange, ...rest

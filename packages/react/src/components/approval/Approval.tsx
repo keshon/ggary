@@ -2,6 +2,7 @@ import { useId, type ReactNode } from 'react'
 import { connect, type ApprovalDecision, type ApprovalProps as CoreApprovalProps, type ApprovalWords } from '@ggary/core/approval'
 import { reactNormalizer } from '@ggary/core'
 import { Button } from '../button'
+import { useConfigured } from '../config-provider'
 
 export interface ApprovalProps extends Omit<CoreApprovalProps, 'id'> {
   /** The answer. Sending it, and moving the block into a decided state, are the owner's. */
@@ -13,6 +14,7 @@ export interface ApprovalProps extends Omit<CoreApprovalProps, 'id'> {
 
 /** A decision a human must make, standing in the flow of the conversation. */
 export function Approval(props: ApprovalProps) {
+  props = useConfigured(props, { words: 'approval' })
   const { what, state, title, effects, decidedBy, decidedAt, live, onDecide, actions, words } = props
   const id = `gg-approval-${useId().replace(/:/g, '')}`
   const api = connect({ id, what, state, title, effects, decidedBy, decidedAt, live }, reactNormalizer, { onDecide, words })

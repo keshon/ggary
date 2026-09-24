@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import type { ControlSize } from '@ggary/core'
   import type { DatePickerWords } from '@ggary/core/date-picker'
   import type { TimePickerWords } from '@ggary/core/time-picker'
@@ -37,9 +39,13 @@
    * reports its half; this joins them, and submits the pair as one value.
    */
   let {
-    size, label, value = $bindable(), defaultValue, onValueChange, min, max, weekStart, isDateDisabled, months, locale, name, placeholder, words,
+    size: ownSize, label, value = $bindable(), defaultValue, onValueChange, min, max, weekStart, isDateDisabled, months, locale: ownLocale, name, placeholder, words: ownWords,
     step, timeLabel = 'Time', timeWords,
   }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const size = $derived(ownSize ?? kit().size)
+  const words = $derived(configWords(kit(), 'datePicker', ownWords))
 
   const initial = untrack(() => splitDateTime(value !== undefined ? value : defaultValue))
   let own = $state(initial)

@@ -4,6 +4,7 @@ import { mergeProps, reactNormalizer } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
 import { useMergedRef } from '../../utils/use-merged-ref'
 import { useFormReset } from '../../utils/use-form-reset'
+import { useConfigured } from '../config-provider'
 
 export interface SliderProps
   extends Omit<CoreSliderProps, 'id' | 'inputId' | 'value'>,
@@ -17,6 +18,7 @@ export interface SliderProps
 }
 
 export const Slider = forwardRef<HTMLInputElement, SliderProps>(function Slider(props, forwardedRef) {
+  props = useConfigured(props, { size: true })
   const {
     min, max, step, name, label, valueText, showValue, size, disabled, required, invalid, marks,
     value, defaultValue, onValueChange, formatValue, ...rest

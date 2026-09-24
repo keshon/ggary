@@ -1,4 +1,6 @@
 <script lang="ts" generics="Row">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connectFilters, type ColumnDef, type DataGridController, type FilterBarWords, type FilterDraft, type GridView } from '@ggary/core/data-grid'
   import { mergeProps, svelteNormalizer } from '@ggary/core'
   import { untrack } from 'svelte'
@@ -14,7 +16,9 @@
     words?: FilterBarWords & { apply?: string; clear?: string; column?: string; from?: string; to?: string; contains?: string; add?: string; views?: string; clearAll?: string }
   }
 
-  let { grid, views, words = {} }: Props = $props()
+  let { grid, views, words: ownWords = {} }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'gridFilters', ownWords))
 
   let snapshot = $state.raw(untrack(() => grid.getSnapshot()))
   $effect(() => {

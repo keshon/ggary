@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { connect, type TurnProps as CoreTurnProps, type TurnWords } from '@ggary/core/turn'
 import { reactNormalizer } from '@ggary/core'
 import { Caret } from '../states'
+import { useConfigured } from '../config-provider'
 
 export interface TurnProps extends CoreTurnProps {
   /** What was said. A turn still arriving gets the caret at the end of it. */
@@ -18,6 +19,7 @@ export interface TurnProps extends CoreTurnProps {
 
 /** One step of an exchange: who spoke, what they said, and what it cost. */
 export function Turn(props: TurnProps) {
+  props = useConfigured(props, { locale: true, words: 'turn' })
   const { who, from, time, tokens, duration, locale, streaming, children, before, after, actions, words } = props
   const api = connect({ who, from, time, tokens, duration, locale, streaming }, reactNormalizer, { words })
 

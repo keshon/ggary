@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import { connect, type InputProps } from '@ggary/core/input'
   import { mergeProps, onFormReset, svelteNormalizer } from '@ggary/core'
   import { getContext, untrack } from 'svelte'
@@ -14,7 +15,7 @@
 
   let {
     type,
-    size,
+    size: ownSize,
     name,
     placeholder,
     autoComplete,
@@ -28,6 +29,8 @@
     onValueChange,
     ...rest
   }: Props = $props()
+  const kit = getConfig()
+  const size = $derived(ownSize ?? kit().size)
 
   // An uncontrolled start: defaultValue seeds the value once, at mount.
   untrack(() => {

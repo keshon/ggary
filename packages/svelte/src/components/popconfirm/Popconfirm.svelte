@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, createPopconfirmMachine, type PopconfirmChangeDetails, type PopconfirmWords } from '@ggary/core/popconfirm'
   import { attachPopover, svelteNormalizer, uid, type AttachedPopover, type Dict, type Placement } from '@ggary/core'
   import { untrack, type Snippet } from 'svelte'
@@ -25,7 +27,9 @@
     words?: Pick<PopconfirmWords, 'failed'>
   }
 
-  let { title, description, destructive = false, confirmLabel, cancelLabel, onConfirm, onCancel, onOpenChange, trigger, placement, words }: Props = $props()
+  let { title, description, destructive = false, confirmLabel, cancelLabel, onConfirm, onCancel, onOpenChange, trigger, placement, words: ownWords }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'popconfirm', ownWords))
 
   const machine = untrack(() =>
     createPopconfirmMachine({

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import { connect, readNumber, type NumberFieldProps } from '@ggary/core/number-field'
   import { attachScrub, mergeProps, onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { getContext, untrack } from 'svelte'
@@ -13,9 +14,11 @@
   }
 
   let {
-    min, max, step, name, label, axis, placeholder, size, disabled, readOnly, required, invalid,
+    min, max, step, name, label, axis, placeholder, size: ownSize, disabled, readOnly, required, invalid,
     value = $bindable(), defaultValue, onValueChange, ...rest
   }: Props = $props()
+  const kit = getConfig()
+  const size = $derived(ownSize ?? kit().size)
 
   const id = uid('gg-number')
 

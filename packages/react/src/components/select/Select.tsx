@@ -8,6 +8,7 @@ import { attachPopover, mergeProps, reactNormalizer, scrollIntoViewIfNeeded } fr
 import type { ControlSize } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 import { useFormField } from '../form/Form'
+import { useConfigured } from '../config-provider'
 
 export interface SelectProps {
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
@@ -24,6 +25,7 @@ export interface SelectProps {
 }
 
 export function Select(props: SelectProps) {
+  props = useConfigured(props, { size: true })
   const { size, items, label, placeholder, value, defaultValue, disabled = false, name, onValueChange } = props
 
   const reactId = useId()

@@ -15,6 +15,7 @@ import {
   type Selection,
 } from '@ggary/core/data-grid'
 import { reactNormalizer, type Dict } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface DataGridProps<Row> {
   columns: ColumnDef<Row>[]
@@ -53,6 +54,7 @@ export interface DataGridProps<Row> {
 }
 
 export function DataGrid<Row>(props: DataGridProps<Row>) {
+  props = useConfigured(props, { locale: true, words: 'dataGrid' })
   const {
     columns, rows, rowKey, label, selectable, initialQuery, onQueryChange, onSelectionChange, onRowActivate,
     renderCell, empty, words, locale, rowHeight, blockSize, controllerRef, style,

@@ -1,6 +1,7 @@
 import type { SVGAttributes } from 'react'
 import { connect, type SparklineProps as CoreSparklineProps, type SparklineWords } from '@ggary/core/sparkline'
 import { reactNormalizer } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface SparklineProps extends CoreSparklineProps, Omit<SVGAttributes<SVGSVGElement>, 'values'> {
   /** The default reading in another language. */
@@ -12,7 +13,8 @@ export interface SparklineProps extends CoreSparklineProps, Omit<SVGAttributes<S
  * it in the order it must be drawn — the fill, the line over it, the dot of
  * the last value last — and nothing else.
  */
-export function Sparkline({ values, area, last, series, label, describe, locale, words, ...rest }: SparklineProps) {
+export function Sparkline(own: SparklineProps) {
+  const { values, area, last, series, label, describe, locale, words, ...rest } = useConfigured(own, { locale: true, words: 'sparkline' })
   const api = connect({ values, area, last, series, label, describe, locale }, reactNormalizer, { words })
   return (
     <svg {...api.rootProps} {...rest}>

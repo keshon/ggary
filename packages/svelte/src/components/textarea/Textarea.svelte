@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
   import { connect, type TextareaProps } from '@ggary/core/textarea'
   import { attachAutosize, mergeProps, onFormReset, svelteNormalizer, type Autosize } from '@ggary/core'
   import { getContext, untrack } from 'svelte'
@@ -13,7 +14,7 @@
   }
 
   let {
-    size,
+    size: ownSize,
     name,
     placeholder,
     rows,
@@ -32,6 +33,8 @@
     onValueChange,
     ...rest
   }: Props = $props()
+  const kit = getConfig()
+  const size = $derived(ownSize ?? kit().size)
 
   untrack(() => {
     if (value === undefined && defaultValue !== undefined) value = defaultValue

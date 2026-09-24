@@ -48,6 +48,18 @@ export function isFilterEmpty(filter: Filter): boolean {
   }
 }
 
+/** The words of the editor a filter is written in, from a chip or the add button. */
+export interface FilterEditorWords {
+  /** The locale the date filter reads and writes days in. */
+  locale?: string
+  apply?: string
+  clear?: string
+  column?: string
+  from?: string
+  to?: string
+  contains?: string
+}
+
 export interface FilterWords {
   locale?: string
   contains?: (text: string) => string

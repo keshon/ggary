@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import {
     connect,
     createChipGroupMachine,
@@ -43,8 +45,10 @@
     defaultValue,
     onValueChange,
     onRemove,
-    words = {},
+    words: ownWords = {},
   }: Props = $props()
+  const kit = getConfig()
+  const words = $derived(configWords(kit(), 'chipGroup', ownWords))
 
   const id = uid('gg-chips')
 

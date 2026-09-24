@@ -1,6 +1,7 @@
 import { useId, useState, type HTMLAttributes } from 'react'
 import { connect, type NavItem, type NavProps as CoreNavProps } from '@ggary/core/nav'
 import { reactNormalizer } from '@ggary/core'
+import { useConfigured } from '../config-provider'
 
 export interface NavProps extends Omit<CoreNavProps, 'id'>, Omit<HTMLAttributes<HTMLElement>, 'children'> {}
 
@@ -9,7 +10,8 @@ export interface NavProps extends Omit<CoreNavProps, 'id'>, Omit<HTMLAttributes<
  * by the button beside it; which are open is kept here unless `open` is
  * given, and follows the reading until the reader sets it.
  */
-export function Nav({ label, groups, open, onOpenChange, words, ...rest }: NavProps) {
+export function Nav(own: NavProps) {
+  const { label, groups, open, onOpenChange, words, ...rest } = useConfigured(own, { words: 'nav' })
   const id = `gg-nav-${useId().replace(/:/g, '')}`
   const [chosen, setChosen] = useState<Record<string, boolean>>({})
   const api = connect(

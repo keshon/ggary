@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { getConfig } from '../config-provider/context'
+  import { configWords } from '@ggary/core/config-provider'
   import { connect, type HeatmapProps, type HeatmapWords } from '@ggary/core/heatmap'
   import { svelteNormalizer } from '@ggary/core'
 
@@ -8,7 +10,10 @@
     [key: string]: unknown
   }
 
-  let { days, weekStart, label, unit, locale, words, ...rest }: Props = $props()
+  let { days, weekStart, label, unit, locale: ownLocale, words: ownWords, ...rest }: Props = $props()
+  const kit = getConfig()
+  const locale = $derived(ownLocale ?? kit().locale)
+  const words = $derived(configWords(kit(), 'heatmap', ownWords))
   const api = $derived(connect({ days, weekStart, label, unit, locale }, svelteNormalizer, { words }))
 </script>
 
