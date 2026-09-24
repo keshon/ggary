@@ -421,6 +421,15 @@ export const SITEMAP: SiteCategory[] = [
             "label": null
           }
         ]
+      },
+      {
+        "label": "Flex and Columns",
+        "anchors": [
+          {
+            "id": "flex",
+            "label": null
+          }
+        ]
       }
     ]
   },

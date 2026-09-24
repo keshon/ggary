@@ -7,6 +7,8 @@ import GridWithTools from './GridWithTools.svelte'
 import GridWithRows from './GridWithRows.svelte'
 import ShellWith from './ShellWith.svelte'
 import FlowWith from './FlowWith.svelte'
+import FlexWith from './FlexWith.svelte'
+import ColumnsWith from './ColumnsWith.svelte'
 import PageHeaderWith from './PageHeaderWith.svelte'
 import SectionWith from './SectionWith.svelte'
 import SplitWith from './SplitWith.svelte'
@@ -139,6 +141,8 @@ export const svelte: Adapter = {
   datePicker: (props, target) => mountSvelte(DatePicker as Component<any>, props, target),
   combobox: (props, target) => mountSvelte(Combobox as Component<any>, props, target),
   flow: (props, target) => mountSvelte(FlowWith as Component<any>, props, target),
+  flex: (props, target) => mountSvelte(FlexWith as Component<any>, props, target),
+  columns: (props, target) => mountSvelte(ColumnsWith as Component<any>, props, target),
   pageHeader: (props, target) => mountSvelte(PageHeaderWith as Component<any>, props, target),
   section: (props, target) => mountSvelte(SectionWith as Component<any>, props, target),
   shell: (props, target) => mountSvelte(ShellWith as Component<any>, props, target),

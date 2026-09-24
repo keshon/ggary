@@ -358,6 +358,25 @@ export interface StatusBarProps {
   end?: { text: string }[]
 }
 
+/** A Flex around paragraphs; an item with grow, shrink or align is wrapped in a FlexItem. */
+export interface FlexProps {
+  direction?: 'row' | 'column'
+  gap?: 'none' | 'tight' | 'default' | 'loose'
+  align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline'
+  justify?: 'start' | 'center' | 'end' | 'between'
+  wrap?: boolean
+  items: { text: string; grow?: boolean | number; shrink?: boolean; align?: 'start' | 'center' | 'end' | 'stretch' | 'baseline' }[]
+}
+
+type ColumnsValue = number | Partial<Record<'base' | 'narrow' | 'medium' | 'wide', number>>
+
+/** A Columns of Columns, each around a paragraph. */
+export interface ColumnsProps {
+  gap?: 'none' | 'tight' | 'default' | 'loose'
+  align?: 'start' | 'center' | 'end' | 'stretch'
+  columns: { text: string; span?: ColumnsValue; start?: ColumnsValue }[]
+}
+
 /** One flow primitive around paragraphs of `items`; a spacer after `spacerAfter` items (cluster only). */
 export interface FlowProps {
   kind: 'stack' | 'cluster' | 'grid' | 'container'
@@ -1108,6 +1127,8 @@ export interface Adapter {
   rail(props: RailProps, target: HTMLElement): Promise<Mounted<RailProps>>
   statusBar(props: StatusBarProps, target: HTMLElement): Promise<Mounted<StatusBarProps>>
   flow(props: FlowProps, target: HTMLElement): Promise<Mounted<FlowProps>>
+  flex(props: FlexProps, target: HTMLElement): Promise<Mounted<FlexProps>>
+  columns(props: ColumnsProps, target: HTMLElement): Promise<Mounted<ColumnsProps>>
   pageHeader(props: PageHeaderProps, target: HTMLElement): Promise<Mounted<PageHeaderProps>>
   section(props: SectionProps, target: HTMLElement): Promise<Mounted<SectionProps>>
   combobox(props: ComboboxProps, target: HTMLElement): Promise<Mounted<ComboboxProps>>

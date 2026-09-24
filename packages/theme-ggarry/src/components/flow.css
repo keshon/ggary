@@ -7,13 +7,22 @@
    panels or fields of one.
    ========================================================================== */
 
-[data-scope='stack'][data-part='root'] { gap: var(--ggarry-space-4); }
-[data-scope='stack'][data-part='root'][data-gap='tight'] { gap: var(--ggarry-space-2); }
-[data-scope='stack'][data-part='root'][data-gap='loose'] { gap: var(--ggarry-space-8); }
+/* A flexbox's gap follows its direction: a column is the rhythm of a screen's
+   blocks, a row the shorter one of controls beside each other. Stack and
+   Cluster are the two directions, so they keep the steps they always had. */
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-direction='column'] { gap: var(--ggarry-space-4); }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-direction='column'][data-gap='tight'] { gap: var(--ggarry-space-2); }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-direction='column'][data-gap='loose'] { gap: var(--ggarry-space-8); }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-direction='row'] { gap: var(--ggarry-space-3); }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-direction='row'][data-gap='tight'] { gap: var(--ggarry-space-2); }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-direction='row'][data-gap='loose'] { gap: var(--ggarry-space-5); }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-gap='none'] { gap: 0; }
 
-[data-scope='cluster'][data-part='root'] { gap: var(--ggarry-space-3); }
-[data-scope='cluster'][data-part='root'][data-gap='tight'] { gap: var(--ggarry-space-2); }
-[data-scope='cluster'][data-part='root'][data-gap='loose'] { gap: var(--ggarry-space-5); }
+/* The columns' gutter, down and across alike: a grid of panels. */
+[data-scope='columns'][data-part='root'] { gap: var(--ggarry-space-4); }
+[data-scope='columns'][data-part='root'][data-gap='tight'] { gap: var(--ggarry-space-2); }
+[data-scope='columns'][data-part='root'][data-gap='loose'] { gap: var(--ggarry-space-6); }
+[data-scope='columns'][data-part='root'][data-gap='none'] { gap: 0; }
 
 /* The column never gets narrower than it can be read at, nor wider than the
    frame: min() keeps a single column inside a narrow screen. */
@@ -26,6 +35,7 @@
 [data-scope='grid'][data-part='root'][data-columns='wide'] { --grid-min: 380px; }
 [data-scope='grid'][data-part='root'][data-gap='tight'] { gap: var(--ggarry-space-2); }
 [data-scope='grid'][data-part='root'][data-gap='loose'] { gap: var(--ggarry-space-6); }
+[data-scope='grid'][data-part='root'][data-gap='none'] { gap: 0; }
 
 /* The auto margins that centre a container live here, not in the structure
    layer: a theme's reset stands above it and would zero them. */

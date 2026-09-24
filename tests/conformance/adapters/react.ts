@@ -56,6 +56,10 @@ import {
   Combobox,
   Cluster,
   ClusterSpacer,
+  Column,
+  Columns,
+  Flex,
+  FlexItem,
   Container,
   Grid,
   PageHeader,
@@ -116,6 +120,8 @@ import {
   type ButtonGroupProps,
   type GridRowsProps,
   type FlowProps,
+  type FlexProps,
+  type ColumnsProps,
   type PageHeaderProps,
   type SectionProps,
   type ShellProps,
@@ -263,6 +269,21 @@ function ReactStatusBar(props: StatusBarProps) {
   )
 }
 
+function ReactFlex(props: FlexProps) {
+  const { items, ...options } = props
+  const children = items.map(({ text, grow, shrink, align }) =>
+    grow !== undefined || shrink !== undefined || align !== undefined
+      ? createElement(FlexItem, { key: text, grow, shrink, align }, createElement('p', null, text))
+      : createElement('p', { key: text }, text)
+  )
+  return createElement(Flex, options, ...children)
+}
+
+function ReactColumns(props: ColumnsProps) {
+  const { columns, ...options } = props
+  return createElement(Columns, options, ...columns.map(({ text, span, start }) => createElement(Column, { key: text, span, start }, createElement('p', null, text))))
+}
+
 function ReactFlow(props: FlowProps) {
   const { kind, items, spacerAfter, ...options } = props
   const Component = ({ stack: Stack, cluster: Cluster, grid: Grid, container: Container } as const)[kind] as ComponentType<any>
@@ -378,6 +399,8 @@ export const react: Adapter = {
   datePicker: (props, target) => mount(DatePicker as ComponentType<any>, props, target),
   combobox: (props, target) => mount(Combobox as ComponentType<any>, props, target),
   flow: (props, target) => mount(ReactFlow as ComponentType<any>, props, target),
+  flex: (props, target) => mount(ReactFlex as ComponentType<any>, props, target),
+  columns: (props, target) => mount(ReactColumns as ComponentType<any>, props, target),
   pageHeader: (props, target) => mount(ReactPageHeader as ComponentType<any>, props, target),
   section: (props, target) => mount(ReactSection as ComponentType<any>, props, target),
   shell: (props, target) => mount(ReactShell as ComponentType<any>, props, target),

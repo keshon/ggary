@@ -255,12 +255,30 @@
   inherits: false;
 }
 
-[data-scope='stack'][data-part='root'] {
+/* One flexbox under three names: Flex, and its presets Stack (a column) and
+   Cluster (a row that wraps, centred). Each says its shape in attributes, and
+   these rules read them for all three. */
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'] {
   display: flex;
-  flex-direction: column;
   min-inline-size: 0;
 }
-:is([data-scope='stack'][data-part='root'], [data-scope='section'][data-part='body']) > * {
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-direction='column'] { flex-direction: column; }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-wrap] { flex-wrap: wrap; }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-align='start'] { align-items: flex-start; }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-align='center'] { align-items: center; }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-align='end'] { align-items: flex-end; }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-align='stretch'] { align-items: stretch; }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-align='baseline'] { align-items: baseline; }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-justify='center'] { justify-content: center; }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-justify='end'] { justify-content: flex-end; }
+:is([data-scope='flex'], [data-scope='stack'], [data-scope='cluster'])[data-part='root'][data-justify='between'] { justify-content: space-between; }
+
+/* A column that was given no alignment speaks on the channel, as a Stack does. */
+:is(
+    [data-scope='stack'][data-part='root'],
+    [data-scope='flex'][data-part='root'][data-direction='column']:not([data-align]),
+    [data-scope='section'][data-part='body']
+  ) > * {
   --gg-flow-self: start;
 }
 /* Sized by their content: they keep their width in a column that stretches the
@@ -274,25 +292,66 @@
     [data-scope='avatar-group'],
     [data-scope='spinner'],
     [data-scope='segmented-control']
-  )[data-part='root'],
-:is(gg-button, gg-badge, gg-chip, gg-button-group, gg-avatar, gg-avatar-group, gg-spinner, gg-segmented-control) {
+  )[data-part='root'] {
   align-self: var(--gg-flow-self, auto);
 }
 
-[data-scope='cluster'][data-part='root'] {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+/* A share of what is left, against the other growing items — from nothing, so
+   two items that grow by 1 are equal whatever they hold — and allowed below
+   its content's width, so a field in it can narrow. */
+[data-scope='flex-item'][data-part='root'] {
   min-inline-size: 0;
 }
-[data-scope='cluster'][data-part='root'][data-justify='end'] {
-  justify-content: flex-end;
+[data-scope='flex-item'][data-part='root'][data-grow] {
+  flex: var(--gg-flex-grow, 1) 1 0%;
 }
-[data-scope='cluster'][data-part='root'][data-justify='between'] {
-  justify-content: space-between;
+[data-scope='flex-item'][data-part='root'][data-shrink='false'] {
+  flex-shrink: 0;
 }
+[data-scope='flex-item'][data-part='root'][data-align='start'] { align-self: flex-start; }
+[data-scope='flex-item'][data-part='root'][data-align='center'] { align-self: center; }
+[data-scope='flex-item'][data-part='root'][data-align='end'] { align-self: flex-end; }
+[data-scope='flex-item'][data-part='root'][data-align='stretch'] { align-self: stretch; }
+[data-scope='flex-item'][data-part='root'][data-align='baseline'] { align-self: baseline; }
+
 [data-scope='cluster'][data-part='spacer'] {
   flex: 1 1 0;
+}
+
+/* Twelve columns, and the region its columns measure: a Columns answers to its
+   own width, so one inside a column answers to that column. Being a size
+   container, it takes its width from where it stands, never from what it
+   holds: in a row, give it a FlexItem that grows. */
+[data-scope='columns'][data-part='root'] {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  min-inline-size: 0;
+  container: columns / inline-size;
+}
+[data-scope='columns'][data-part='root'][data-align='start'] { align-items: start; }
+[data-scope='columns'][data-part='root'][data-align='center'] { align-items: center; }
+[data-scope='columns'][data-part='root'][data-align='end'] { align-items: end; }
+
+/* A column's span and start at each width are custom properties core writes;
+   the queries below pick the one for the Columns' width, and a width the
+   column did not name keeps the one before it. */
+[data-scope='column'][data-part='root'] {
+  --column-span: var(--gg-column-span, 12);
+  --column-start: var(--gg-column-start, auto);
+  grid-column: var(--column-start) / span var(--column-span);
+  min-inline-size: 0;
+}
+@container columns (inline-size >= 30rem) {
+  [data-scope='column'][data-part='root'][data-span-narrow] { --column-span: var(--gg-column-span-narrow); }
+  [data-scope='column'][data-part='root'][data-start-narrow] { --column-start: var(--gg-column-start-narrow); }
+}
+@container columns (inline-size >= 48rem) {
+  [data-scope='column'][data-part='root'][data-span-medium] { --column-span: var(--gg-column-span-medium); }
+  [data-scope='column'][data-part='root'][data-start-medium] { --column-start: var(--gg-column-start-medium); }
+}
+@container columns (inline-size >= 64rem) {
+  [data-scope='column'][data-part='root'][data-span-wide] { --column-span: var(--gg-column-span-wide); }
+  [data-scope='column'][data-part='root'][data-start-wide] { --column-start: var(--gg-column-start-wide); }
 }
 
 /* The columns are the theme's: how narrow a card may get is a matter of look. */

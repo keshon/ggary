@@ -259,6 +259,82 @@ export function flowConformance(adapter: Adapter) {
     })
   })
 
+  describe('flex', () => {
+    it('says its shape as attributes, with the defaults named: a row, the default gap, from the start', async () => {
+      const m = await adapter.flex({ items: [{ text: 'One' }, { text: 'Two' }] }, freshTarget())
+      const root = part(m.root, 'flex', 'root')!
+      expect(root.dataset.direction).toBe('row')
+      expect(root.dataset.gap).toBe('default')
+      expect(root.dataset.justify).toBe('start')
+      expect(root.hasAttribute('data-align')).toBe(false)
+      expect(root.hasAttribute('data-wrap')).toBe(false)
+      await m.update({ direction: 'column', gap: 'none', align: 'center', justify: 'between', wrap: true })
+      expect(root.dataset.direction).toBe('column')
+      expect(root.dataset.gap).toBe('none')
+      expect(root.dataset.align).toBe('center')
+      expect(root.dataset.justify).toBe('between')
+      expect(root.hasAttribute('data-wrap')).toBe(true)
+      expect(m.root.querySelector('[class]')).toBeNull()
+    })
+
+    it('an item grows by one, by a share it hands the stylesheet, keeps its size, or aligns itself', async () => {
+      const m = await adapter.flex(
+        { items: [{ text: 'All', grow: true }, { text: 'Two', grow: 2 }, { text: 'Fixed', shrink: false }, { text: 'Low', align: 'end' }] },
+        freshTarget()
+      )
+      const [all, two, fixed, low] = parts(m.root, 'flex-item', 'root')
+      expect(all.hasAttribute('data-grow')).toBe(true)
+      expect(all.style.getPropertyValue('--gg-flex-grow')).toBe('')
+      expect(two.style.getPropertyValue('--gg-flex-grow')).toBe('2')
+      expect(fixed.dataset.shrink).toBe('false')
+      expect(fixed.hasAttribute('data-grow')).toBe(false)
+      expect(low.dataset.align).toBe('end')
+    })
+
+    it('Stack and Cluster are its presets: a column, and a row that wraps, centred', async () => {
+      const stack = await adapter.flow({ kind: 'stack', items: ['One'] }, freshTarget())
+      const column = part(stack.root, 'stack', 'root')!
+      expect([column.dataset.direction, column.hasAttribute('data-align')]).toEqual(['column', false])
+      const cluster = await adapter.flow({ kind: 'cluster', items: ['One'] }, freshTarget())
+      const row = part(cluster.root, 'cluster', 'root')!
+      expect([row.dataset.direction, row.dataset.align, row.hasAttribute('data-wrap')]).toEqual(['row', 'center', true])
+    })
+  })
+
+  describe('columns', () => {
+    it('writes each span and start as a custom property, and names the widths it changes at', async () => {
+      const m = await adapter.columns(
+        {
+          columns: [
+            { text: 'Main', span: { base: 12, medium: 8 } },
+            { text: 'Side', span: { base: 12, medium: 4 } },
+            { text: 'Offset', span: 4, start: 5 },
+            { text: 'Whole' },
+          ],
+        },
+        freshTarget()
+      )
+      expect(part(m.root, 'columns', 'root')!.dataset.gap).toBe('default')
+      const [main, side, offset, whole] = parts(m.root, 'column', 'root')
+      expect(main.style.getPropertyValue('--gg-column-span')).toBe('12')
+      expect(main.style.getPropertyValue('--gg-column-span-medium')).toBe('8')
+      expect(main.hasAttribute('data-span-medium')).toBe(true)
+      expect(main.hasAttribute('data-span-narrow')).toBe(false)
+      expect(side.style.getPropertyValue('--gg-column-span-medium')).toBe('4')
+      expect(offset.style.getPropertyValue('--gg-column-span')).toBe('4')
+      expect(offset.style.getPropertyValue('--gg-column-start')).toBe('5')
+      expect(whole.getAttribute('style') ?? '').toBe('')
+      expect(main.textContent).toBe('Main')
+    })
+
+    it('keeps a span between one and twelve', async () => {
+      const m = await adapter.columns({ columns: [{ text: 'Big', span: 20 }, { text: 'None', span: 0 }] }, freshTarget())
+      const [big, none] = parts(m.root, 'column', 'root')
+      expect(big.style.getPropertyValue('--gg-column-span')).toBe('12')
+      expect(none.style.getPropertyValue('--gg-column-span')).toBe('1')
+    })
+  })
+
   describe('page header', () => {
     it('is the screen’s one title, described by its line, with context above and actions beside', async () => {
       const m = await adapter.pageHeader(

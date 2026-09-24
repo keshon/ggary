@@ -105,6 +105,10 @@
     Approval,
     Failure,
     Divider,
+    Flex,
+    FlexItem,
+    Columns,
+    Column,
     Link,
     Prose,
     Text,
@@ -1143,6 +1147,42 @@
         <span>Delete</span>
       </div>
     </Stack>
+  </section>
+
+  <section id="flex">
+    <h3>Flex and Columns</h3>
+    <Columns gap="loose">
+      <Column span={{ base: 12, medium: 8 }}>
+        <Panel title="Leads">
+          <Stack gap="tight">
+            <Flex gap="tight" align="center">
+              <FlexItem grow>
+                <Search aria-label="Search leads" placeholder="Search leads" />
+              </FlexItem>
+              <Button>Filter</Button>
+              <Button emphasis="high">New lead</Button>
+            </Flex>
+            <Flex justify="between" align="baseline">
+              <Text emphasis="low">12 400 leads</Text>
+              <Link href="#flex">Export</Link>
+            </Flex>
+          </Stack>
+        </Panel>
+      </Column>
+      <Column span={{ base: 12, medium: 4 }}>
+        <Columns gap="tight">
+          <Column span={{ base: 12, narrow: 6 }}>
+            <Metric label="Won" value="42" />
+          </Column>
+          <Column span={{ base: 12, narrow: 6 }}>
+            <Metric label="Lost" value="7" />
+          </Column>
+        </Columns>
+      </Column>
+      <Column span={{ base: 12, medium: 6 }} start={{ medium: 4 }}>
+        <Note>A column that starts at the fourth line from the medium width: an offset.</Note>
+      </Column>
+    </Columns>
   </section>
 </div>
 

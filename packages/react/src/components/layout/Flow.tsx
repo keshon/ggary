@@ -1,11 +1,19 @@
 import { useId, type HTMLAttributes, type ReactNode } from 'react'
 import {
   connectCluster,
+  connectColumn,
+  connectColumns,
   connectContainer,
+  connectFlex,
+  connectFlexItem,
   connectGrid,
   connectStack,
   type ClusterProps,
+  type ColumnProps,
+  type ColumnsProps,
   type ContainerProps,
+  type FlexItemProps,
+  type FlexProps,
   type GridProps,
   type StackProps,
 } from '@ggary/core/flow'
@@ -44,6 +52,46 @@ export function ClusterSpacer() {
 /** Cards in columns that fall to fewer as the width narrows. */
 export function Grid({ gap, columns, children, ...rest }: GridProps & Div & { children?: ReactNode }) {
   const api = connectGrid({ gap, columns }, reactNormalizer)
+  return (
+    <div {...rest} {...api.rootProps}>
+      {children}
+    </div>
+  )
+}
+
+/** Any flexbox: Stack and Cluster are its two presets. */
+export function Flex({ direction, gap, align, justify, wrap, children, ...rest }: FlexProps & Div & { children?: ReactNode }) {
+  const api = connectFlex({ direction, gap, align, justify, wrap }, reactNormalizer)
+  return (
+    <div {...rest} {...api.rootProps}>
+      {children}
+    </div>
+  )
+}
+
+/** A child of a Flex with its share of the room. */
+export function FlexItem({ grow, shrink, align, children, ...rest }: FlexItemProps & Div & { children?: ReactNode }) {
+  const api = connectFlexItem({ grow, shrink, align }, reactNormalizer)
+  return (
+    <div {...rest} {...api.rootProps}>
+      {children}
+    </div>
+  )
+}
+
+/** Twelve columns that answer to their own width. */
+export function Columns({ gap, align, children, ...rest }: ColumnsProps & Div & { children?: ReactNode }) {
+  const api = connectColumns({ gap, align }, reactNormalizer)
+  return (
+    <div {...rest} {...api.rootProps}>
+      {children}
+    </div>
+  )
+}
+
+/** A span of the twelve, per width if it changes. */
+export function Column({ span, start, children, ...rest }: ColumnProps & Div & { children?: ReactNode }) {
+  const api = connectColumn({ span, start }, reactNormalizer)
   return (
     <div {...rest} {...api.rootProps}>
       {children}

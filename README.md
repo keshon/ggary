@@ -2,12 +2,12 @@
 
 A UI kit scaffold: one framework-agnostic core, two sibling renderers (React 19
 and Svelte 5), and one design language, GGarry, on top of it.
-Ninety-nine components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+A hundred and three components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
 Menu, Menubar, Badge, Avatar, AvatarGroup, Spinner, Skeleton, Card, Panel, Banner,
-Note, EmptyState, Divider, Prose, Text and Link — built end to end to prove the architecture holds.
+Note, EmptyState, Divider, Prose, Text, Link, Flex, FlexItem, Columns and Column — built end to end to prove the architecture holds.
 
 **Retired on 2026-09-18: the vanilla custom-elements adapter (`@ggary/elements`,
 the `gg-*` tags) and the Instrument theme**, a second language ported from
@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3605 tests, 1339 of them in headless Chrome
+npm test         # 3637 tests, 1357 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck   # tsc, then svelte-check over every .svelte file
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -2517,7 +2517,7 @@ not read. It is a landmark only when asked (`region`): a screen of ten sections
 is not ten regions.
 
 **Stack**, **Cluster**, **Grid** and **Container** hold no state. Each has three
-steps of gap named by intent — tight, default, loose — and nothing between:
+steps of gap named by intent — tight, default, loose — and `none`, and nothing between:
 Instrument's refusal of spacing utilities, kept. A stack is a column; a cluster a
 row that wraps, with a `ClusterSpacer` to send the rest to the far end; a grid
 fills the width with columns no narrower than `tight`, `default` or `wide` allows,
@@ -2542,6 +2542,65 @@ Found on the way:
   made it narrow enough to fit next to the title after all. A section is only as
   wide as its column; the cap is gone, and a browser test checks the line is
   under the heading.
+
+## Flex and Columns
+
+Two primitives, nested to any depth, for what the four above cannot say: this
+pane is two thirds and that one a third; this child takes what is left and
+that one keeps its width.
+
+```tsx
+<Columns gap="loose">
+  <Column span={{ base: 12, medium: 8 }}>
+    <Flex gap="tight" align="center">
+      <FlexItem grow><Search aria-label="Search leads" /></FlexItem>
+      <Button>Filter</Button>
+    </Flex>
+  </Column>
+  <Column span={{ base: 12, medium: 4 }}>
+    <Columns gap="tight">
+      <Column span={{ base: 12, narrow: 6 }}>…</Column>
+      <Column span={{ base: 12, narrow: 6 }}>…</Column>
+    </Columns>
+  </Column>
+  <Column span={6} start={4}>…</Column>
+</Columns>
+```
+
+**Flex** is the kit's one flexbox — `direction`, `gap`, `align`, `justify`,
+`wrap` — and **Stack and Cluster are its presets**: a Stack is a Flex column, a
+Cluster a Flex row that wraps, centred. The three speak one set of attributes
+and one set of rules, so there is one engine under three names rather than
+three ways to build a row. The gap follows the direction: a column keeps the
+rhythm of a screen's blocks (8/16/32), a row the shorter one of controls beside
+each other (8/12/20), which are the steps Stack and Cluster always had. A
+column given no `align` keeps what is sized by its content at its own width,
+as a Stack does. **FlexItem** is a child with a share of the room: `grow` takes
+what is left (a number is its share against the others, from nothing, so two
+items growing by 1 are equal whatever they hold), `shrink={false}` keeps its
+size, `align` places it alone; it may narrow below its content, so a field in
+it can.
+
+**Columns** is twelve columns in a CSS grid, with one gutter across and down,
+and **Column** takes a `span` (1–12, default the whole row) and a `start` —
+the column line it begins at, which is what an offset is. Either is one number
+or one per width: `{ base, narrow, medium, wide }`, each holding until the
+next one given.
+
+**The widths are the Columns' own, not the window's** — Bootstrap's and Ant
+Design's grids ask the window (`col-md-6`), which is wrong the moment a layout
+stands in a Sheet, a Split pane or a sidebar: the window is wide and the pane
+is not. A Columns is a size container; its columns pick their span by
+container query — `narrow` from 30rem, `medium` from 48rem, `wide` from 64rem —
+so the same layout holds wherever it is put, and a Columns inside a column
+answers to that column. Core writes each span and start as custom properties
+(`--gg-column-span-medium` …) and names the widths a column changes at
+(`data-span-medium`); the structure layer's queries choose among them.
+Ant Design's `offset`, `order`, `push` and `pull` across six breakpoints are
+left out: a start line covers the offset, and order belongs to the markup.
+
+One cost of a size container: it takes its width from where it stands, never
+from what it holds. In a row, give a Columns a FlexItem that grows.
 
 ## One size scale
 
@@ -2845,9 +2904,9 @@ sandbox build prints none.
 | contract | node | `sizes.contract.test.ts` | 3 tests. Every control's size is `ControlSize`, and its stylesheet draws `sm` and `lg`. |
 | contract | node | `core-shape.contract.test.ts` | 2 tests. Every component laid out as `<dir>.<role>.ts` with a re-export-only index; every connect ending at the normalizer or one `options`. |
 | contract | node | `checks.contract.test.ts` | 30 tests. The gates themselves: each rule fires on a planted defect — the literal families and their ledger among them; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1096 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1106 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 1096 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1106 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
 | browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
 | browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |
@@ -2859,6 +2918,7 @@ sandbox build prints none.
 | browser | Chrome | `agent.browser.test.ts` | 6 tests. A history clipped at its leading edge, batches dividing the width they were given, a queue's dots on one vertical whatever the titles, one Tab into the queue and the arrows moving real focus, a run's room drawn before it begins. |
 | browser | Chrome | `agent-stream.browser.test.ts` | 11 tests. A log holding the bottom as lines arrive and letting go the moment the reader scrolls up; a diff copying clean code with no numbers or signs in the text, its sign drawn in the gutter, a long line scrolling rather than wrapping; a step opened by find-in-page; lanes measured against one axis. |
 | browser | Chrome | `chat.browser.test.ts` | 8 tests. The composer's field growing and its frame holding one line at rest, Enter sending and Shift+Enter breaking the line, nothing sent while busy; a turn's actions appearing under the pointer; an approval and a failure keeping their record once answered. |
+| browser | Chrome | `flex.browser.test.ts` | 8 tests. Shares of a row by grow, a field narrowing beside a button, a column keeping a button's width unless told to stretch, both ends; spans at a Columns' width, a nested Columns answering to its column, a start line, one gutter across and down. |
 | browser | Chrome | `sizes.browser.test.ts` | 6 tests. Input, Button, NumberField, Select, Combobox, Cascader and DatePicker at 28, 34 and 40 pixels, in both adapters. |
 | browser | Chrome | `typography.browser.test.ts` | 6 tests. Prose's ladder and its step down, the reading measure, a heading nearer what follows it; a text cut to two lines and to one; a divider's line on either side of its label, and a vertical one a line tall. |
 | browser | Chrome | `forced-colors.browser.test.ts` | 12 tests. Forced colours emulated through Playwright (`page.emulateMedia({ forcedColors })`): a checked box and a switch that is on keep their state as `Highlight` with a border, a checked radio's dot shows against its box, and a busy button's ring keeps a turning arc. Each fails with the `gg.forced` layer removed. |
