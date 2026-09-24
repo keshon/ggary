@@ -102,11 +102,11 @@ describe('lanes', () => {
   })
 
   it('the fixed words are the page’s to change', () => {
-    const russian = connect({ lanes: workers, label: 'x', locale: 'ru-RU' }, same, {
+    const russian = connect({ lanes: workers, label: 'x', locale: 'ru-RU' }, same, { words: {
       time: (value) => `${value} с`,
       ok: 'готово',
       span: (label, from, to, outcome) => `${label}: ${from} — ${to}, ${outcome}`,
-    })
+    } })
     expect(russian.lanes[0].text).toBe(': reading files: 0,0 с — 4,0 с, готово')
   })
 

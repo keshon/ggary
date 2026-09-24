@@ -9,7 +9,7 @@
   }
 
   let { days, weekStart, label, unit, locale, words, ...rest }: Props = $props()
-  const api = $derived(connect({ days, weekStart, label, unit, locale }, svelteNormalizer, words))
+  const api = $derived(connect({ days, weekStart, label, unit, locale }, svelteNormalizer, { words }))
 </script>
 
 <div {...rest} {...api.rootProps}>

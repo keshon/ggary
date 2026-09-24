@@ -33,7 +33,8 @@ export const RUN_WORDS: RunWords = {
  * neither is allowed to be the only carrier. No machine: the outcomes come
  * from outside.
  */
-export function connect<T = Dict>(props: RunProps, normalize: Normalizer<T>, words: Partial<RunWords> = {}) {
+export function connect<T = Dict>(props: RunProps, normalize: Normalizer<T>, options: { words?: Partial<RunWords> } = {}) {
+  const { words = {} } = options
   const { units, label, locale } = props
   const w = { ...RUN_WORDS, ...words }
   const write = (n: number) => new Intl.NumberFormat(locale).format(n)

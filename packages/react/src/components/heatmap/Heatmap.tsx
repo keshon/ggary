@@ -8,7 +8,7 @@ export interface HeatmapProps extends CoreHeatmapProps, Omit<HTMLAttributes<HTML
 }
 
 export function Heatmap({ days, weekStart, label, unit, locale, words, ...rest }: HeatmapProps) {
-  const api = connect({ days, weekStart, label, unit, locale }, reactNormalizer, words)
+  const api = connect({ days, weekStart, label, unit, locale }, reactNormalizer, { words })
   return (
     <div {...rest} {...api.rootProps}>
       {api.weeks.map((week) => (

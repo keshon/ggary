@@ -13,7 +13,7 @@
   }
 
   let { tone, title, live, dismissible, dismissLabel, children, actions, onDismiss }: Props = $props()
-  const api = $derived(connect({ tone, title, live, dismissible: dismissible ?? !!onDismiss, dismissLabel }, svelteNormalizer, onDismiss))
+  const api = $derived(connect({ tone, title, live, dismissible: dismissible ?? !!onDismiss, dismissLabel }, svelteNormalizer, { onDismiss }))
 </script>
 
 <div {...api.rootProps}>

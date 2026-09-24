@@ -44,10 +44,10 @@ describe('thinking', () => {
 
   it('toggles through the owner, and a disabled one does not', () => {
     const onToggle = vi.fn()
-    ;(connect({ id: 't1' }, same, onToggle).triggerProps.onClick as () => void)()
+    ;(connect({ id: 't1' }, same, { onToggle }).triggerProps.onClick as () => void)()
     expect(onToggle).toHaveBeenCalledOnce()
 
-    const off = connect({ id: 't1', disabled: true }, same, onToggle)
+    const off = connect({ id: 't1', disabled: true }, same, { onToggle })
     ;(off.triggerProps.onClick as () => void)()
     expect(onToggle).toHaveBeenCalledOnce()
     expect(off.triggerProps.disabled).toBe(true)
@@ -55,8 +55,8 @@ describe('thinking', () => {
 
   it('takes the words of another language', () => {
     const words = { thinking: 'Думает…', thoughtFor: (d: string) => `Думал ${d}`, seconds: 'с' }
-    expect(connect({ id: 't1', duration: 3, locale: 'ru-RU' }, same, undefined, words).label).toBe('Думал 3 с')
-    expect(connect({ id: 't1', streaming: true }, same, undefined, words).label).toBe('Думает…')
+    expect(connect({ id: 't1', duration: 3, locale: 'ru-RU' }, same, { words }).label).toBe('Думал 3 с')
+    expect(connect({ id: 't1', streaming: true }, same, { words }).label).toBe('Думает…')
   })
 
   it('builds both ids from the one it was given', () => {

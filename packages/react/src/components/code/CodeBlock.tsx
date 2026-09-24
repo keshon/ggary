@@ -7,9 +7,8 @@ export interface CodeBlockProps extends CoreCodeBlockProps, Omit<HTMLAttributes<
 
 export function CodeBlock({ code, numbered, start, label, copyValue, onCopy, words, ...rest }: CodeBlockProps) {
   const [copy, runCopy] = useCopier()
-  const api = connect({ code, numbered, start, label, copyValue, words, copy }, reactNormalizer, (): void =>
-    runCopy(api.copyText, { onCopy, words })
-  )
+  const api = connect({ code, numbered, start, label, copyValue, words, copy }, reactNormalizer, { onCopyPress: (): void =>
+    runCopy(api.copyText, { onCopy, words }) })
   return (
     <div {...api.rootProps} {...rest}>
       <div {...api.contentProps}>

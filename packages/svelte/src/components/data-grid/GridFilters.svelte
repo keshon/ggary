@@ -22,7 +22,7 @@
     return grid.subscribe(() => (snapshot = grid.getSnapshot()))
   })
 
-  const api = $derived(connectFilters(snapshot, grid, svelteNormalizer, words))
+  const api = $derived(connectFilters(snapshot, grid, svelteNormalizer, { words }))
   let editing = $state<string | null>(null)
   let adding = $state(false)
 

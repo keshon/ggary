@@ -94,7 +94,7 @@ describe('composer', () => {
   })
 
   it('takes the words of another language', () => {
-    const api = connect({ label: 'Спросить', busy: true }, same, {}, { send: 'Отправить', stop: 'Остановить' })
+    const api = connect({ label: 'Спросить', busy: true }, same, { words: { send: 'Отправить', stop: 'Остановить' } })
     expect(api.sendProps['aria-label']).toBe('Остановить')
   })
 })

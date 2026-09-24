@@ -64,10 +64,10 @@ describe('failure', () => {
       retry: 'Ещё раз',
       verdict: () => 'Сдались',
     }
-    const api = connect({ ...base, tried: ['раз'], state: 'given-up' as const }, same, {}, words)
+    const api = connect({ ...base, tried: ['раз'], state: 'given-up' as const }, same, { words })
     expect(api.reason).toBe('The file is locked by another process [EBUSY]')
     expect(api.triedProps['aria-label']).toBe('Уже пробовали: 1')
     expect(api.verdict).toBe('Сдались')
-    expect(connect(base, same, {}, words).retry.label).toBe('Ещё раз')
+    expect(connect(base, same, { words }).retry.label).toBe('Ещё раз')
   })
 })

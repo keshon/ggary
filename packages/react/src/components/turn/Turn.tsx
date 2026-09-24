@@ -19,7 +19,7 @@ export interface TurnProps extends CoreTurnProps {
 /** One step of an exchange: who spoke, what they said, and what it cost. */
 export function Turn(props: TurnProps) {
   const { who, from, time, tokens, duration, locale, streaming, children, before, after, actions, words } = props
-  const api = connect({ who, from, time, tokens, duration, locale, streaming }, reactNormalizer, words)
+  const api = connect({ who, from, time, tokens, duration, locale, streaming }, reactNormalizer, { words })
 
   return (
     <div {...api.rootProps}>

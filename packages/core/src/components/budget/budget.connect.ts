@@ -48,7 +48,8 @@ export function exhaustion(seconds: number): { value: number; unit: Intl.Relativ
  * thirty seconds — is a property of the data being pushed in, not of the
  * markup. No machine: the spending comes from outside.
  */
-export function connect<T = Dict>(props: BudgetProps, normalize: Normalizer<T>, words: Partial<BudgetWords> = {}) {
+export function connect<T = Dict>(props: BudgetProps, normalize: Normalizer<T>, options: { words?: Partial<BudgetWords> } = {}) {
+  const { words = {} } = options
   const { value, max, label, rate, tone, size, locale } = props
   const w = { ...BUDGET_WORDS, ...words }
 

@@ -81,7 +81,8 @@ export function sharePercents(values: number[]): number[] {
  * A part with a value and no visible width is the failure this guards against;
  * see `sharePercents` for the rounding and the minimum.
  */
-export function connect<T = Dict>(props: ShareProps, normalize: Normalizer<T>, words: ShareWords = {}) {
+export function connect<T = Dict>(props: ShareProps, normalize: Normalizer<T>, options: { words?: ShareWords } = {}) {
+  const { words = {} } = options
   const { items, label, unit, locale, size = 'md' } = props
   const w = { ...SHARE_WORDS, ...words }
   const format = new Intl.NumberFormat(locale)

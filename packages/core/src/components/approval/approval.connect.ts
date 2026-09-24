@@ -40,7 +40,8 @@ export interface ApprovalConnectOptions {
  * renders them with the kit's own Button — "Allow" at high emphasis and first,
  * which is the one signal of which is the principal action.
  */
-export function connect<T = Dict>(props: ApprovalProps, normalize: Normalizer<T>, options: ApprovalConnectOptions = {}, words: ApprovalWords = {}) {
+export function connect<T = Dict>(props: ApprovalProps, normalize: Normalizer<T>, options: ApprovalConnectOptions & { words?: ApprovalWords } = {}) {
+  const { words = {} } = options
   const { id, what, state = 'pending', title, effects = [], decidedBy, decidedAt, live = 'polite' } = props
   const say = { ...WORDS, ...words }
   const ids = approvalIds(id)

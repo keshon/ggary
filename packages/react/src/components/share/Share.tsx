@@ -8,7 +8,7 @@ export interface ShareProps extends CoreShareProps, Omit<HTMLAttributes<HTMLDivE
 }
 
 export function Share({ items, label, unit, locale, size, words, ...rest }: ShareProps) {
-  const api = connect({ items, label, unit, locale, size }, reactNormalizer, words)
+  const api = connect({ items, label, unit, locale, size }, reactNormalizer, { words })
   return (
     <div {...rest} {...api.rootProps}>
       {api.segments.map((segment) => (

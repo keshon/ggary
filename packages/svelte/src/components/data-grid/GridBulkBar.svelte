@@ -10,7 +10,7 @@
     snapshot = grid.getSnapshot()
     return grid.subscribe(() => (snapshot = grid.getSnapshot()))
   })
-  const api = $derived(connectBulk(snapshot, grid, svelteNormalizer, words))
+  const api = $derived(connectBulk(snapshot, grid, svelteNormalizer, { words }))
 </script>
 
 {#if api.visible}

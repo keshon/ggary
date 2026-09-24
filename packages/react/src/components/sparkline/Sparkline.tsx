@@ -13,7 +13,7 @@ export interface SparklineProps extends CoreSparklineProps, Omit<SVGAttributes<S
  * the last value last — and nothing else.
  */
 export function Sparkline({ values, area, last, series, label, describe, locale, words, ...rest }: SparklineProps) {
-  const api = connect({ values, area, last, series, label, describe, locale }, reactNormalizer, words)
+  const api = connect({ values, area, last, series, label, describe, locale }, reactNormalizer, { words })
   return (
     <svg {...api.rootProps} {...rest}>
       {api.showArea && <path {...api.areaProps} />}

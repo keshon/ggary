@@ -9,7 +9,7 @@ export interface HistoryProps extends CoreHistoryProps, Omit<HTMLAttributes<HTML
 
 /** What happened the last N times: one attempt, one mark, the latest at the end. */
 export function History({ ticks, groups, label, size, locale, words, ...rest }: HistoryProps) {
-  const api = connect({ ticks, groups, label, size, locale }, reactNormalizer, words)
+  const api = connect({ ticks, groups, label, size, locale }, reactNormalizer, { words })
   return (
     <div {...rest} {...api.rootProps}>
       <div {...api.stripProps}>

@@ -22,7 +22,8 @@ const seconds = (value: number, locale: string | undefined) =>
  * Only the person's turn is marked. A turn still arriving is `aria-busy` and
  * asks for the kit's Caret at the end of its body, rather than drawing one.
  */
-export function connect<T = Dict>(props: TurnProps, normalize: Normalizer<T>, words: TurnWords = {}) {
+export function connect<T = Dict>(props: TurnProps, normalize: Normalizer<T>, options: { words?: TurnWords } = {}) {
+  const { words = {} } = options
   const { who, from = 'agent', time, tokens, duration, locale, streaming = false } = props
   const say = { ...WORDS, ...words }
 

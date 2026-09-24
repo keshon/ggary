@@ -12,7 +12,7 @@
   $effect(() => () => copier.destroy())
 
   const api = $derived(
-    connect({ value, copyValue, words, copy }, svelteNormalizer, (): void => void copier.copy(api.copyText, { onCopy, words }))
+    connect({ value, copyValue, words, copy }, svelteNormalizer, { onCopyPress: (): void => void copier.copy(api.copyText, { onCopy, words }) })
   )
 </script>
 

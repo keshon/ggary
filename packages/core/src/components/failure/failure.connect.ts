@@ -40,7 +40,8 @@ export interface FailureConnectOptions {
  * pending; where going on is impossible in principle, the action is "cancel the
  * run" and the words say so.
  */
-export function connect<T = Dict>(props: FailureProps, normalize: Normalizer<T>, options: FailureConnectOptions = {}, words: FailureWords = {}) {
+export function connect<T = Dict>(props: FailureProps, normalize: Normalizer<T>, options: FailureConnectOptions & { words?: FailureWords } = {}) {
+  const { words = {} } = options
   const { title, code, reason, state = 'pending', tried = [], resolvedAt, live = 'alert' } = props
   const say = { ...WORDS, ...words }
   const pending = state === 'pending'

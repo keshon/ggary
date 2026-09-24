@@ -60,8 +60,7 @@ describe('share', () => {
     const api = connect(
       { items: day, unit: 'ч', locale: 'ru-RU', label: 'Сутки' },
       same,
-      { part: (value, label, unit) => `${label} — ${value} ${unit}`, separator: '; ', labelSeparator: ' — ' }
-    )
+      { words: { part: (value, label, unit) => `${label} — ${value} ${unit}`, separator: '; ', labelSeparator: ' — ' } })
     expect(api.rootProps['aria-label']).toBe('Сутки — up — 22 ч; down — 1,5 ч; unknown — 0,5 ч')
   })
 
@@ -98,7 +97,7 @@ describe('share', () => {
     const api = connect({ items: [] }, same)
     expect(api.segments).toEqual([])
     expect(api.rootProps['aria-label']).toBe('Nothing yet')
-    expect(connect({ items: [] }, same, { empty: 'No checks yet' }).rootProps['aria-label']).toBe('No checks yet')
+    expect(connect({ items: [] }, same, { words: { empty: 'No checks yet' } }).rootProps['aria-label']).toBe('No checks yet')
   })
 
   it('is the meter’s height unless it is the subject of the screen', () => {

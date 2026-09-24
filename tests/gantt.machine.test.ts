@@ -59,7 +59,7 @@ describe('gantt', () => {
 
   it('is a grid: a row per task, its title the row’s header, one tab stop on a schedule cell', () => {
     const machine = createGanttMachine({ id: 'g', tasks: plan, range: planRange })
-    const api = connect(machine.getState(), machine.send, same, { label: 'Launch plan' })
+    const api = connect(machine.getState(), machine.send, same, { words: { label: 'Launch plan' } })
     expect(api.rootProps).toMatchObject({ role: 'grid', 'aria-label': 'Launch plan', 'aria-rowcount': 5 })
     expect(api.getRowProps(plan[0])).toMatchObject({ role: 'row', 'aria-rowindex': 2 })
     expect(api.getTitleProps(plan[0])).toMatchObject({ role: 'rowheader' })

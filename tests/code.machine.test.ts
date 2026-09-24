@@ -87,7 +87,7 @@ describe('code block — props', () => {
 
   it('the press goes to the handler the adapter gave', () => {
     const press = vi.fn()
-    ;(connect({ code: 'x' }, same, press).copyProps.onClick as () => void)()
+    ;(connect({ code: 'x' }, same, { onCopyPress: press }).copyProps.onClick as () => void)()
     expect(press).toHaveBeenCalledOnce()
   })
 })

@@ -88,11 +88,10 @@ describe('heatmap', () => {
     const api = connect(
       { days: run('2026-01-01', [3]), weekStart: 1, locale: 'ru-RU', unit: 'запусков' },
       same,
-      {
+      { words: {
         day: (value, date, unit) => `${date}: ${value} ${unit}`,
         summary: (total, weeks, busiest, unit) => `${total} ${unit} за ${weeks} нед., больше всего ${busiest?.value} — ${busiest?.date}`,
-      }
-    )
+      } })
     expect(cells(api).find((day) => !day.empty)!.dayProps.title).toBe('1 января: 3 запусков')
     expect(api.rootProps['aria-label']).toBe('3 запусков за 1 нед., больше всего 3 — 1 января')
   })
@@ -127,7 +126,7 @@ describe('heatmap', () => {
     const api = connect({ days: [] }, same)
     expect(api.weeks).toEqual([])
     expect(api.rootProps['aria-label']).toBe('Nothing yet')
-    const nonsense = connect({ days: [{ date: '2026-02-31', value: 4 }, { date: 'yesterday', value: 1 }] }, same, { empty: 'No runs yet' })
+    const nonsense = connect({ days: [{ date: '2026-02-31', value: 4 }, { date: 'yesterday', value: 1 }] }, same, { words: { empty: 'No runs yet' } })
     expect(nonsense.weeks).toEqual([])
     expect(nonsense.rootProps['aria-label']).toBe('No runs yet')
   })

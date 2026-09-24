@@ -7,7 +7,7 @@ export interface CopyableProps extends CoreCopyableProps, Omit<HTMLAttributes<HT
 
 export function Copyable({ value, copyValue, onCopy, words, ...rest }: CopyableProps) {
   const [copy, runCopy] = useCopier()
-  const api = connect({ value, copyValue, words, copy }, reactNormalizer, (): void => runCopy(api.copyText, { onCopy, words }))
+  const api = connect({ value, copyValue, words, copy }, reactNormalizer, { onCopyPress: (): void => runCopy(api.copyText, { onCopy, words }) })
   return (
     <span {...api.rootProps} {...rest}>
       <code {...api.valueProps}>{value}</code>

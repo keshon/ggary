@@ -18,7 +18,7 @@
   }
 
   let { who, from, time, tokens, duration, locale, streaming, children, before, after, actions, words }: Props = $props()
-  const api = $derived(connect({ who, from, time, tokens, duration, locale, streaming }, svelteNormalizer, words))
+  const api = $derived(connect({ who, from, time, tokens, duration, locale, streaming }, svelteNormalizer, { words }))
 </script>
 
 <div {...api.rootProps}>

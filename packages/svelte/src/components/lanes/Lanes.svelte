@@ -9,7 +9,7 @@
   }
 
   let { lanes, label, start, end, locale, words, ...rest }: Props = $props()
-  const api = $derived(connect({ lanes, label, start, end, locale }, svelteNormalizer, words))
+  const api = $derived(connect({ lanes, label, start, end, locale }, svelteNormalizer, { words }))
 </script>
 
 <ul {...rest} {...api.rootProps}>

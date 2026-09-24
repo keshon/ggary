@@ -40,7 +40,7 @@ describe('log', () => {
 
   it('writes the level as a word, never as a colour alone', () => {
     expect(api(stream).lines.map((line) => line.level)).toEqual(['info', 'debug', 'warn', 'error'])
-    expect(connect({ lines: stream, label: 'x' }, same, { warn: 'внимание' }).lines[2].level).toBe('внимание')
+    expect(connect({ lines: stream, label: 'x' }, same, { words: { warn: 'внимание' } }).lines[2].level).toBe('внимание')
   })
 
   describe('the time', () => {

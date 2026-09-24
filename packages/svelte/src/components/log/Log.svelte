@@ -14,7 +14,7 @@
   }
 
   let { lines, label, locale, timeZone, announce, words, tail = true, ...rest }: Props = $props()
-  const api = $derived(connect({ lines, label, locale, timeZone, announce }, svelteNormalizer, words))
+  const api = $derived(connect({ lines, label, locale, timeZone, announce }, svelteNormalizer, { words }))
 
   let root = $state<HTMLDivElement | null>(null)
   $effect(() => {

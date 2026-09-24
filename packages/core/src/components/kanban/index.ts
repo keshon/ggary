@@ -617,7 +617,8 @@ function withFlip(event: KeyboardEvent, change: () => void, prevent?: KeyboardEv
 /** A press on these inside a card is theirs, not the card's. */
 const INTERACTIVE = 'a[href], button, input, select, textarea, summary, [role="button"], [role="checkbox"], [role="link"], [role="menuitem"]'
 
-export function connect<T extends KanbanCard, P = Dict>(state: KanbanState<T>, send: (event: KanbanEvent) => void, normalize: Normalizer<P>, words: Partial<KanbanWords> = {}, options: KanbanConnectOptions = {}) {
+export function connect<T extends KanbanCard, P = Dict>(state: KanbanState<T>, send: (event: KanbanEvent) => void, normalize: Normalizer<P>, options: KanbanConnectOptions & { words?: Partial<KanbanWords> } = {}) {
+  const { words = {} } = options
   const w = { ...KANBAN_WORDS, ...words }
   const ids = kanbanIds(state.id)
   const stop = tabStop(state)

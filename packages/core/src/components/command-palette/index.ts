@@ -390,7 +390,8 @@ export const paletteIds = (id: string) => ({
   item: (command: string) => `${id}-item-${idPart(command)}`,
 })
 
-export function connect<T = Dict>(state: PaletteState, send: (event: PaletteEvent) => void, normalize: Normalizer<T>, words: Partial<PaletteWords> = {}) {
+export function connect<T = Dict>(state: PaletteState, send: (event: PaletteEvent) => void, normalize: Normalizer<T>, options: { words?: Partial<PaletteWords> } = {}) {
+  const { words = {} } = options
   const w = { ...PALETTE_WORDS, ...words }
   const ids = paletteIds(state.id)
   const groups = visibleGroups(state, w.results)

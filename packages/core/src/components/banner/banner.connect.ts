@@ -10,7 +10,8 @@ import type { BannerProps } from './banner.types'
  * "maintenance under way". It has a ground, a border, a tone icon and room for
  * an action. Not a note: a note is an aside next to what it explains.
  */
-export function connect<T = Dict>(props: BannerProps, normalize: Normalizer<T>, onDismiss?: () => void) {
+export function connect<T = Dict>(props: BannerProps, normalize: Normalizer<T>, options: { onDismiss?: () => void } = {}) {
+  const { onDismiss } = options
   const { tone, live, dismissible = false, dismissLabel = 'Dismiss' } = props
   return {
     showIcon: tone !== undefined,

@@ -100,7 +100,7 @@ export function GridDetail<Row>(props: GridDetailProps<Row>) {
 
   useEffect(() => grid.provide('detail'), [grid])
   const snapshot = useSyncExternalStore(grid.subscribe, grid.getSnapshot, grid.getSnapshot)
-  const api = connectDetail(snapshot, grid, reactNormalizer, words)
+  const api = connectDetail(snapshot, grid, reactNormalizer, { words })
   const row = api.row
 
   return (

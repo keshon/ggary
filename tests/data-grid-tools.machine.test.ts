@@ -101,12 +101,12 @@ describe('filter chips', () => {
 
   it('the bar lists the filters in force, and applying and removing go through the grid', () => {
     const controller = grid()
-    let api = connectFilters(controller.getSnapshot(), controller, same, { locale: 'en-US' })
+    let api = connectFilters(controller.getSnapshot(), controller, same, { words: { locale: 'en-US' } })
     expect(api.chips).toEqual([])
     expect(api.columns.map((column) => column.id)).toEqual(['company', 'status', 'sum', 'registered', 'active'])
 
     api.apply(columns[1], { ...draftFor(columns[1]), values: ['won'] })
-    api = connectFilters(controller.getSnapshot(), controller, same, { locale: 'en-US' })
+    api = connectFilters(controller.getSnapshot(), controller, same, { words: { locale: 'en-US' } })
     expect(api.chips.map((chip) => `${chip.name}: ${chip.value}`)).toEqual(['Status: Won'])
     expect(api.hasFilters).toBe(true)
 
@@ -145,14 +145,14 @@ describe('the bulk bar', () => {
 
     controller.send({ type: 'TOGGLE', key: 1, index: 0 })
     controller.send({ type: 'TOGGLE', key: 2, index: 1 })
-    let api = connectBulk(controller.getSnapshot(), controller, same, { locale: 'en-US' })
+    let api = connectBulk(controller.getSnapshot(), controller, same, { words: { locale: 'en-US' } })
     expect(api.visible).toBe(true)
     expect(api.countText).toBe('2 selected')
     expect(api.selectAllText).toBe('Select all 1,000')
     expect(api.payload()).toEqual({ mode: 'keys', keys: [1, 2] })
 
     ;(api.selectAllProps.onClick as () => void)()
-    api = connectBulk(controller.getSnapshot(), controller, same, { locale: 'en-US' })
+    api = connectBulk(controller.getSnapshot(), controller, same, { words: { locale: 'en-US' } })
     expect(api.countText).toBe('All 1,000 selected')
     expect(api.offer).toBe(false)
     expect(api.payload()).toMatchObject({ mode: 'matching', except: [] })

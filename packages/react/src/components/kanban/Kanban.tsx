@@ -64,7 +64,7 @@ export function Kanban<T extends KanbanCard>(props: KanbanProps<T>) {
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, words, { headingLevel })
+  const api = connect(state, machine.send, reactNormalizer, { words, headingLevel })
 
   useEffect(() => machine.send({ type: 'SYNC_COLUMNS', columns }), [machine, columns])
   useEffect(() => machine.send({ type: 'SYNC_CARDS', cards }), [machine, cards])

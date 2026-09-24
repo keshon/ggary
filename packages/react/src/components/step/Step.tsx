@@ -32,8 +32,7 @@ export function Step({
   const api = connect(
     { name, argument, state, detail, duration, locale, defaultOpen, outputLines, onShowAll, streaming, onOpenChange },
     reactNormalizer,
-    words
-  )
+    { words })
   const hasOutput = output !== undefined || api.truncated
   return (
     <details {...rest} {...api.rootProps}>

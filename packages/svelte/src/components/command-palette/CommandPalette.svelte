@@ -51,7 +51,7 @@
   // Effects that attach on open read this, not the snapshot: a new snapshot on every
   // change would detach and attach them again on each key.
   const isOpen = $derived(snapshot.open)
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, words))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { words }))
 
   $effect(() => machine.send({ type: 'SYNC_COMMANDS', commands }))
   $effect(() => {

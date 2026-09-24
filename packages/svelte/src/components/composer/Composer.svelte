@@ -43,7 +43,7 @@
     if (text !== '') onSend?.(text)
   }
 
-  const api = $derived(connect({ label, placeholder, bar, busy, disabled, submitOnEnter, rows, maxRows }, svelteNormalizer, { onSend: send, onStop }, words))
+  const api = $derived(connect({ label, placeholder, bar, busy, disabled, submitOnEnter, rows, maxRows }, svelteNormalizer, { onSend: send, onStop, words }))
 </script>
 
 <div {...api.rootProps}>

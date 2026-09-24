@@ -24,12 +24,10 @@ export function Thinking(props: ThinkingProps) {
   const api = connect(
     { id, open: isOpen, streaming, duration, locale, disabled },
     reactNormalizer,
-    () => {
+    { onToggle: () => {
       if (open === undefined) setUncontrolled(!isOpen)
       onOpenChange?.(!isOpen)
-    },
-    words
-  )
+    }, words })
 
   return (
     <div {...api.rootProps}>

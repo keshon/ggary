@@ -9,7 +9,7 @@
   }
 
   let { items, direction, label, words, ...rest }: Props = $props()
-  const api = $derived(connect({ items, direction, label }, svelteNormalizer, words))
+  const api = $derived(connect({ items, direction, label }, svelteNormalizer, { words }))
 </script>
 
 <ul {...api.rootProps} {...rest}>

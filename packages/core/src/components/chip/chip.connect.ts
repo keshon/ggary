@@ -66,7 +66,8 @@ export function chipRemoveIconAttrs(): Dict {
   }
 }
 
-export function connect<T = Dict>(props: ChipProps, normalize: Normalizer<T>, onRemove?: () => void) {
+export function connect<T = Dict>(props: ChipProps, normalize: Normalizer<T>, options: { onRemove?: () => void } = {}) {
+  const { onRemove } = options
   const { disabled = false, removable = false, interactive = false } = props
 
   return {

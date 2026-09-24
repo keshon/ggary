@@ -159,7 +159,7 @@ describe('diff', () => {
   })
 
   it('the fixed words are the page’s to change', () => {
-    const russian = connect({ path: 'a.ts', rows }, same, { fold: (count) => `пропущено строк: ${count}`, region: (path) => `Изменения в ${path}` })
+    const russian = connect({ path: 'a.ts', rows }, same, { words: { fold: (count) => `пропущено строк: ${count}`, region: (path) => `Изменения в ${path}` } })
     expect(russian.rows[3].fold).toBe('пропущено строк: 18')
     expect(russian.bodyProps['aria-label']).toBe('Изменения в a.ts')
   })

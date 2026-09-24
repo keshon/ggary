@@ -37,7 +37,7 @@
     snapshot = grid.getSnapshot()
     return grid.subscribe(() => (snapshot = grid.getSnapshot()))
   })
-  const api = $derived(connectDetail(snapshot, grid, svelteNormalizer, words))
+  const api = $derived(connectDetail(snapshot, grid, svelteNormalizer, { words }))
 </script>
 
 <Sheet

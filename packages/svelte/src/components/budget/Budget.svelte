@@ -15,7 +15,7 @@
    * with no `rate` has none, which is to say it is a Meter.
    */
   let { value, max, label, rate, tone, size, locale, words, ...rest }: Props = $props()
-  const api = $derived(connect({ value, max, label, rate, tone, size, locale }, svelteNormalizer, words))
+  const api = $derived(connect({ value, max, label, rate, tone, size, locale }, svelteNormalizer, { words }))
 </script>
 
 <div {...rest} {...api.rootProps}>

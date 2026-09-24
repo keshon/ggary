@@ -255,7 +255,7 @@ describe('kanban', () => {
 
   it('says its parts: one tab stop, cards named by their title, a count against a limit', () => {
     const { machine } = board()
-    const api = connect(machine.getState(), machine.send, same, { label: 'Deals' })
+    const api = connect(machine.getState(), machine.send, same, { words: { label: 'Deals' } })
     expect(api.rootProps).toMatchObject({ role: 'group', 'aria-label': 'Deals' })
     const cards = api.columns.flatMap(({ cards }) => cards.map((card) => api.getCardProps(card) as Record<string, unknown>))
     expect(cards.filter((props) => props.tabIndex === 0)).toHaveLength(1)

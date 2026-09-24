@@ -36,7 +36,7 @@ describe('copyable', () => {
 
   it('the press goes to the handler the adapter gave', () => {
     const press = vi.fn()
-    ;(connect({ value: 'v' }, same, press).copyProps.onClick as () => void)()
+    ;(connect({ value: 'v' }, same, { onCopyPress: press }).copyProps.onClick as () => void)()
     expect(press).toHaveBeenCalledOnce()
   })
 })

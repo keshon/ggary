@@ -19,12 +19,8 @@ export interface DetailWords {
   next?: string
 }
 
-export function connectDetail<Row, T = Dict>(
-  snapshot: DataGridSnapshot,
-  controller: DataGridController<Row>,
-  normalize: Normalizer<T>,
-  words: DetailWords = {}
-) {
+export function connectDetail<Row, T = Dict>(snapshot: DataGridSnapshot, controller: DataGridController<Row>, normalize: Normalizer<T>, options: { words?: DetailWords } = {}) {
+  const { words = {} } = options
   const index = snapshot.grid.detail
   const total = snapshot.data.total ?? 0
   const open = index !== null

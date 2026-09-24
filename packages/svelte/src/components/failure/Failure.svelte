@@ -13,7 +13,7 @@
   }
 
   let { title, code, reason, state, tried, resolvedAt, live, onRetry, actions, words }: Props = $props()
-  const api = $derived(connect({ title, code, reason, state, tried, resolvedAt, live }, svelteNormalizer, { onRetry }, words))
+  const api = $derived(connect({ title, code, reason, state, tried, resolvedAt, live }, svelteNormalizer, { onRetry, words }))
 </script>
 
 <div {...api.rootProps}>

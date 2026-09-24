@@ -69,7 +69,8 @@ export interface ComposerConnectOptions {
  * the message — the mode, the model, what is left of the context — is a
  * Toolbar standing UNDER the frame, because a session is not a message.
  */
-export function connect<T = Dict>(props: ComposerProps, normalize: Normalizer<T>, options: ComposerConnectOptions = {}, words: ComposerWords = {}) {
+export function connect<T = Dict>(props: ComposerProps, normalize: Normalizer<T>, options: ComposerConnectOptions & { words?: ComposerWords } = {}) {
+  const { words = {} } = options
   const { label, placeholder, bar = 'edge', busy = false, disabled = false, submitOnEnter = true, rows = 1, maxRows = 8 } = props
   const say = { ...WORDS, ...words }
   const rules: SendRules = { submitOnEnter, busy, disabled }

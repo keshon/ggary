@@ -10,7 +10,7 @@
 
   /** What happened the last N times: one attempt, one mark, the latest at the end. */
   let { ticks, groups, label, size, locale, words, ...rest }: Props = $props()
-  const api = $derived(connect({ ticks, groups, label, size, locale }, svelteNormalizer, words))
+  const api = $derived(connect({ ticks, groups, label, size, locale }, svelteNormalizer, { words }))
 </script>
 
 <div {...rest} {...api.rootProps}>

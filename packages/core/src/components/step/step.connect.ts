@@ -61,7 +61,8 @@ export function stepDuration(ms: number, locale: string | undefined, words: Requ
  * The tone of a name is not spoken, so the phase is also a word in the head,
  * shown to no one and read by everything.
  */
-export function connect<T = Dict>(props: StepProps, normalize: Normalizer<T>, words: StepWords = {}) {
+export function connect<T = Dict>(props: StepProps, normalize: Normalizer<T>, options: { words?: StepWords } = {}) {
+  const { words = {} } = options
   const { name, argument, state, detail, duration, locale, defaultOpen, outputLines, streaming } = props
   const w = { ...STEP_WORDS, ...words }
   const tone: StatusTone = state ? STEP_TONES[state] : 'neutral'

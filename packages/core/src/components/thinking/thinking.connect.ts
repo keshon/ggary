@@ -35,7 +35,8 @@ export const thinkingIds = (id: string) => ({ root: id, trigger: `${id}-trigger`
  * NOT a Step either, for Instrument's reason: a step is a call with a result
  * that can fail, and nothing here can. It carries no tone and no dot.
  */
-export function connect<T = Dict>(props: ThinkingProps, normalize: Normalizer<T>, onToggle?: () => void, words: ThinkingWords = {}) {
+export function connect<T = Dict>(props: ThinkingProps, normalize: Normalizer<T>, options: { onToggle?: () => void; words?: ThinkingWords } = {}) {
+  const { onToggle, words = {} } = options
   const { id, open = false, streaming = false, duration, locale, disabled = false } = props
   const say = { ...WORDS, ...words }
   const ids = thinkingIds(id)

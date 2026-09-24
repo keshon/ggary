@@ -9,7 +9,7 @@ export interface LegendProps extends CoreLegendProps, Omit<HTMLAttributes<HTMLUL
 
 /** The key to a chart's colours: a swatch, the series in words, and its quantity. */
 export function Legend({ items, direction, label, words, ...rest }: LegendProps) {
-  const api = connect({ items, direction, label }, reactNormalizer, words)
+  const api = connect({ items, direction, label }, reactNormalizer, { words })
   return (
     <ul {...api.rootProps} {...rest}>
       {api.items.map((item, index) => {

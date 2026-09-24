@@ -49,9 +49,9 @@ describe('legend', () => {
   it('the list has a name: the author’s, the words’, or "Chart key"', () => {
     expect(connect({ items }, same).rootProps['aria-label']).toBe('Chart key')
     expect(connect({ items, label: 'Time by module' }, same).rootProps['aria-label']).toBe('Time by module')
-    expect(connect({ items }, same, { key: 'Условные обозначения' }).rootProps['aria-label']).toBe('Условные обозначения')
+    expect(connect({ items }, same, { words: { key: 'Условные обозначения' } }).rootProps['aria-label']).toBe('Условные обозначения')
     // The author's name wins over the default in any language.
-    expect(connect({ items, label: 'Time by module' }, same, { key: 'x' }).rootProps['aria-label']).toBe('Time by module')
+    expect(connect({ items, label: 'Time by module' }, same, { words: { key: 'x' } }).rootProps['aria-label']).toBe('Time by module')
   })
 
   it('runs along the foot of a chart by default, down its side when asked', () => {

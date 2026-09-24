@@ -8,7 +8,7 @@ export interface LanesProps extends CoreLanesProps, Omit<HTMLAttributes<HTMLULis
 }
 
 export function Lanes({ lanes, label, start, end, locale, words, ...rest }: LanesProps) {
-  const api = connect({ lanes, label, start, end, locale }, reactNormalizer, words)
+  const api = connect({ lanes, label, start, end, locale }, reactNormalizer, { words })
   return (
     <ul {...rest} {...api.rootProps}>
       {api.lanes.map((lane) => (

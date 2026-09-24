@@ -385,7 +385,8 @@ export interface FormSummaryWords {
 }
 
 /** A form's errors in one place, at its top: a heading, the server's message, and a link to each field. */
-export function connectSummary<T = Dict>(state: FormState, normalize: Normalizer<T>, words: FormSummaryWords = {}, options: { headingLevel?: 1 | 2 | 3 | 4 | 5 | 6 } = {}) {
+export function connectSummary<T = Dict>(state: FormState, normalize: Normalizer<T>, options: { headingLevel?: 1 | 2 | 3 | 4 | 5 | 6 } & { words?: FormSummaryWords } = {}) {
+  const { words = {} } = options
   const shown = (state.status === 'invalid' || state.status === 'failed') && (state.summary.length > 0 || !!state.message)
   const titleId = `${state.id}-summary-title`
   return {

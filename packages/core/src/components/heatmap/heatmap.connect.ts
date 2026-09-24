@@ -63,7 +63,8 @@ export function heatmapLevel(value: number, thresholds: [number, number, number]
  * with nothing inside; the title on a cell is for the pointer, and everything
  * a reader is owed has to be in the name. No machine.
  */
-export function connect<T = Dict>(props: HeatmapProps, normalize: Normalizer<T>, words: HeatmapWords = {}) {
+export function connect<T = Dict>(props: HeatmapProps, normalize: Normalizer<T>, options: { words?: HeatmapWords } = {}) {
+  const { words = {} } = options
   const { days, label, unit, locale } = props
   const w = { ...HEATMAP_WORDS, ...words }
   const weekStart = props.weekStart ?? weekStartOf(locale)

@@ -41,7 +41,7 @@ describe('history', () => {
   it('a strip with nothing in it keeps its name', () => {
     expect(connect({ ticks: [] }, same).label).toBe('Nothing has run yet')
     expect(connect({ ticks: [{ empty: true }, { empty: true }] }, same).label).toBe('Nothing has run yet')
-    expect(connect({ ticks: [] }, same, { empty: 'No builds yet' }).label).toBe('No builds yet')
+    expect(connect({ ticks: [] }, same, { words: { empty: 'No builds yet' } }).label).toBe('No builds yet')
   })
 
   it('one attempt is one attempt, and the figures are the locale’s', () => {

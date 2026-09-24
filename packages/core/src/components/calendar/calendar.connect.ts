@@ -33,7 +33,8 @@ export interface CalendarWords {
  * A range is chosen by two presses, in either order; between them the days up
  * to the pointer or the focused day show the range a second press would make.
  */
-export function connect<T = Dict>(state: CalendarState, send: (event: CalendarEvent) => void, normalize: Normalizer<T>, words: CalendarWords = {}) {
+export function connect<T = Dict>(state: CalendarState, send: (event: CalendarEvent) => void, normalize: Normalizer<T>, options: CalendarWords = {}) {
+  const words = options
   const ids = calendarIds(state.id)
   const locale = words.locale
   const month = startOfMonth(state.focused)

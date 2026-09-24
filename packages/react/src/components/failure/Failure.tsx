@@ -14,7 +14,7 @@ export interface FailureProps extends CoreFailureProps {
 /** A breakdown: what failed, why in words that can be acted on, and the way back. */
 export function Failure(props: FailureProps) {
   const { title, code, reason, state, tried, resolvedAt, live, onRetry, actions, words } = props
-  const api = connect({ title, code, reason, state, tried, resolvedAt, live }, reactNormalizer, { onRetry }, words)
+  const api = connect({ title, code, reason, state, tried, resolvedAt, live }, reactNormalizer, { onRetry, words })
 
   return (
     <div {...api.rootProps}>

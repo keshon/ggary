@@ -51,7 +51,8 @@ const countOf = (ticks: HistoryTick[]): HistoryCounts => {
  * the reading is owed to a reader through the name rather than through two
  * hundred tab stops. No machine: a history is a state, not a process.
  */
-export function connect<T = Dict>(props: HistoryProps, normalize: Normalizer<T>, words: Partial<HistoryWords> = {}) {
+export function connect<T = Dict>(props: HistoryProps, normalize: Normalizer<T>, options: { words?: Partial<HistoryWords> } = {}) {
+  const { words = {} } = options
   const { label, locale, size = 'md' } = props
   const w = { ...HISTORY_WORDS, ...words }
   const grouped = props.groups !== undefined

@@ -17,8 +17,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(function Chip(props, ref)
   const api = connect(
     { emphasis, size, selected, disabled, removable: removable ?? !!onRemove, interactive: isInteractive },
     reactNormalizer,
-    onRemove
-  )
+    { onRemove })
 
   const content = (
     <>

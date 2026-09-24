@@ -30,7 +30,8 @@ export function codeLines(code: string, start = 1): CodeLine[] {
  * `copy` is the adapter's copying state; `onCopyPress` starts a copy of
  * `copyText`.
  */
-export function connect<T = Dict>(props: CodeBlockProps & { copy?: CopyState }, normalize: Normalizer<T>, onCopyPress?: () => void) {
+export function connect<T = Dict>(props: CodeBlockProps & { copy?: CopyState }, normalize: Normalizer<T>, options: { onCopyPress?: () => void } = {}) {
+  const { onCopyPress } = options
   const { code, numbered = false, start = 1, copy = COPY_IDLE } = props
   const words = { ...CODE_WORDS, ...props.words }
   const label = props.label ?? words.label

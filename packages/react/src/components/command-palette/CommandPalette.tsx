@@ -47,7 +47,7 @@ export function CommandPalette(props: CommandPaletteProps) {
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, words)
+  const api = connect(state, machine.send, reactNormalizer, { words })
 
   useEffect(() => machine.send({ type: 'SYNC_COMMANDS', commands }), [machine, commands])
   useEffect(() => {

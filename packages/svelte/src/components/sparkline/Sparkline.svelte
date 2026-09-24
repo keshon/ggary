@@ -9,7 +9,7 @@
   }
 
   let { values, area, last, series, label, describe, locale, words, ...rest }: Props = $props()
-  const api = $derived(connect({ values, area, last, series, label, describe, locale }, svelteNormalizer, words))
+  const api = $derived(connect({ values, area, last, series, label, describe, locale }, svelteNormalizer, { words }))
 </script>
 
 <!-- The fill first, the line over it, the dot of the last value last: the order of the nodes is the order of drawing. -->

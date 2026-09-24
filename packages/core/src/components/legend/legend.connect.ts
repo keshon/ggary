@@ -25,7 +25,8 @@ export const LEGEND_WORDS: LegendWords = {
  * is; the value says how much. Both are words, so the legend survives colour
  * blindness, a black-and-white print and a forced-colours mode alike.
  */
-export function connect<T = Dict>(props: LegendProps, normalize: Normalizer<T>, words: Partial<LegendWords> = {}) {
+export function connect<T = Dict>(props: LegendProps, normalize: Normalizer<T>, options: { words?: Partial<LegendWords> } = {}) {
+  const { words = {} } = options
   const { items, direction = 'row' } = props
   const say = { ...LEGEND_WORDS, ...words }
 

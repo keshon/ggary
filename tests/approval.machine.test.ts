@@ -63,7 +63,7 @@ describe('approval', () => {
       deny: 'Запретить',
       effects: (n: number) => `Затронет: ${n}`,
     }
-    const api = connect({ ...base, effects: [{ text: 'build/' }] }, same, {}, words)
+    const api = connect({ ...base, effects: [{ text: 'build/' }] }, same, { words })
     expect(api.title).toBe('Нужно подтверждение')
     expect([api.allow.label, api.deny.label]).toEqual(['Разрешить', 'Запретить'])
     expect(api.effectsProps['aria-label']).toBe('Затронет: 1')

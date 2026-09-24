@@ -97,8 +97,8 @@ describe('sparkline', () => {
   it('takes the author’s label, and other words for the default', () => {
     expect(connect({ values: rising, label: '42 runs, up from 31' }, same).rootProps['aria-label']).toBe('42 runs, up from 31')
     const words = { reading: (first: string, last: string) => `с ${first} до ${last}`, empty: 'Нет данных' }
-    expect(connect({ values: [1, 2] }, same, words).label).toBe('с 1 до 2')
-    expect(connect({ values: [] }, same, words).label).toBe('Нет данных')
+    expect(connect({ values: [1, 2] }, same, { words }).label).toBe('с 1 до 2')
+    expect(connect({ values: [] }, same, { words }).label).toBe('Нет данных')
   })
 
   it('with nothing to draw it still says so, and a label still wins', () => {

@@ -13,7 +13,7 @@ export interface LogProps extends CoreLogProps, Omit<HTMLAttributes<HTMLDivEleme
 }
 
 export function Log({ lines, label, locale, timeZone, announce, words, tail = true, ...rest }: LogProps) {
-  const api = connect({ lines, label, locale, timeZone, announce }, reactNormalizer, words)
+  const api = connect({ lines, label, locale, timeZone, announce }, reactNormalizer, { words })
   const root = useRef<HTMLDivElement>(null)
 
   useEffect(() => {

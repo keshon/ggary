@@ -15,7 +15,7 @@
   let { what, state, title, effects, decidedBy, decidedAt, live, onDecide, actions, words }: Props = $props()
 
   const id = uid('gg-approval')
-  const api = $derived(connect({ id, what, state, title, effects, decidedBy, decidedAt, live }, svelteNormalizer, { onDecide }, words))
+  const api = $derived(connect({ id, what, state, title, effects, decidedBy, decidedAt, live }, svelteNormalizer, { onDecide, words }))
 </script>
 
 <div {...api.rootProps}>

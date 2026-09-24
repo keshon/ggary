@@ -14,7 +14,7 @@ export interface BudgetProps extends CoreBudgetProps, Omit<HTMLAttributes<HTMLDi
  * with no `rate` has none, which is to say it is a Meter.
  */
 export function Budget({ value, max, label, rate, tone, size, locale, words, ...rest }: BudgetProps) {
-  const api = connect({ value, max, label, rate, tone, size, locale }, reactNormalizer, words)
+  const api = connect({ value, max, label, rate, tone, size, locale }, reactNormalizer, { words })
   return (
     <div {...rest} {...api.rootProps}>
       <Meter {...api.meterProps} />

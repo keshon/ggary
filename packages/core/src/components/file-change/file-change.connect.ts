@@ -32,7 +32,8 @@ const WORDS: Record<FileChangeKind, string> = {
  *
  * A value outside the vocabulary draws no sign and takes no colour.
  */
-export function connect<T = Dict>(props: FileChangeProps, normalize: Normalizer<T>, words: FileChangeWords = {}) {
+export function connect<T = Dict>(props: FileChangeProps, normalize: Normalizer<T>, options: { words?: FileChangeWords } = {}) {
+  const { words = {} } = options
   const { change } = props
   const known = Object.hasOwn(FILE_CHANGE_SIGNS, change)
   return {

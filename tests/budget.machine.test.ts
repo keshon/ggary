@@ -28,7 +28,7 @@ describe('budget', () => {
   })
 
   it('the reading is the meter’s, and the budget’s words reach it', () => {
-    const api = connect({ ...tokens, rate: 1 }, same, { reading: (value, max) => `${value} из ${max}` })
+    const api = connect({ ...tokens, rate: 1 }, same, { words: { reading: (value, max) => `${value} из ${max}` } })
     expect(api.meterProps.words?.reading?.('184 200', '250 000')).toBe('184 200 из 250 000')
   })
 
@@ -68,7 +68,7 @@ describe('budget', () => {
   })
 
   it('takes words of its own, and the figures are the locale’s', () => {
-    const api = connect({ ...tokens, rate: 90, locale: 'de-DE' }, same, { forecast: (when) => `Limit erreicht ${when}` })
+    const api = connect({ ...tokens, rate: 90, locale: 'de-DE' }, same, { words: { forecast: (when) => `Limit erreicht ${when}` } })
     expect(api.note).toBe('Limit erreicht in 12 Minuten')
   })
 

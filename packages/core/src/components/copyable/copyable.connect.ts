@@ -15,7 +15,8 @@ import type { CopyableProps } from './copyable.types'
  * as shown, so what is heard matches what is seen, even when `copyValue`
  * copies more.
  */
-export function connect<T = Dict>(props: CopyableProps & { copy?: CopyState }, normalize: Normalizer<T>, onCopyPress?: () => void) {
+export function connect<T = Dict>(props: CopyableProps & { copy?: CopyState }, normalize: Normalizer<T>, options: { onCopyPress?: () => void } = {}) {
+  const { onCopyPress } = options
   const { value, copy = COPY_IDLE } = props
   const words = { ...COPY_WORDS, ...props.words }
 

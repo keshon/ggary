@@ -10,7 +10,7 @@
   }
 
   let { path, change, rows, before, after, context, locale, words, ...rest }: Props = $props()
-  const api = $derived(connect({ path, change, rows, before, after, context, locale }, svelteNormalizer, words))
+  const api = $derived(connect({ path, change, rows, before, after, context, locale }, svelteNormalizer, { words }))
 </script>
 
 <div {...rest} {...api.rootProps}>

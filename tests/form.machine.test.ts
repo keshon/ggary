@@ -57,7 +57,7 @@ describe('form', () => {
     expect(connectSummary(machine.getState(), same).shown).toBe(false)
     machine.send({ type: 'INVALID', errors: {} })
     machine.send({ type: 'SUMMARY', items: [{ id: 'email', name: 'email', label: 'Email', message: 'Enter an email address' }] })
-    const api = connectSummary(machine.getState(), same, {}, { headingLevel: 3 })
+    const api = connectSummary(machine.getState(), same, { headingLevel: 3 })
     expect(api.shown).toBe(true)
     expect(api.rootProps).toMatchObject({ role: 'region', tabIndex: -1, 'aria-labelledby': 'f-summary-title', hidden: undefined })
     expect(api.titleProps).toMatchObject({ role: 'heading', 'aria-level': 3 })

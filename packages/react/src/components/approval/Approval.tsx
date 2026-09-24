@@ -15,7 +15,7 @@ export interface ApprovalProps extends Omit<CoreApprovalProps, 'id'> {
 export function Approval(props: ApprovalProps) {
   const { what, state, title, effects, decidedBy, decidedAt, live, onDecide, actions, words } = props
   const id = `gg-approval-${useId().replace(/:/g, '')}`
-  const api = connect({ id, what, state, title, effects, decidedBy, decidedAt, live }, reactNormalizer, { onDecide }, words)
+  const api = connect({ id, what, state, title, effects, decidedBy, decidedAt, live }, reactNormalizer, { onDecide, words })
 
   return (
     <div {...api.rootProps}>

@@ -92,7 +92,8 @@ export function sparklineGeometry(values: number[]): SparklineGeometry {
  * in text (`describe: false`). There is no third way — an unnamed picture is
  * an announcement of nothing.
  */
-export function connect<T = Dict>(props: SparklineProps, normalize: Normalizer<T>, words: Partial<SparklineWords> = {}) {
+export function connect<T = Dict>(props: SparklineProps, normalize: Normalizer<T>, options: { words?: Partial<SparklineWords> } = {}) {
+  const { words = {} } = options
   const { values, area = false, last = true, series, describe = true, locale } = props
   const geometry = sparklineGeometry(values)
   const say = { ...SPARKLINE_WORDS, ...words }

@@ -9,7 +9,7 @@ export interface RunProps extends CoreRunProps, Omit<HTMLAttributes<HTMLSpanElem
 
 /** The countable units of one run: phases, attempts or shards, each carrying its own outcome. */
 export function Run({ units, label, showValue, locale, words, ...rest }: RunProps) {
-  const api = connect({ units, label, showValue, locale }, reactNormalizer, words)
+  const api = connect({ units, label, showValue, locale }, reactNormalizer, { words })
   return (
     <span {...rest} {...api.rootProps}>
       <span {...api.unitsProps}>

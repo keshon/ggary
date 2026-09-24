@@ -34,9 +34,9 @@ describe('file change', () => {
 
   it('takes the words of another language, one change at a time', () => {
     const words = { added: 'Добавлен', deleted: 'Удалён' }
-    expect(connect({ change: 'added' }, same, words).word).toBe('Добавлен')
-    expect(connect({ change: 'deleted' }, same, words).word).toBe('Удалён')
-    expect(connect({ change: 'renamed' }, same, words).word).toBe('Renamed')
+    expect(connect({ change: 'added' }, same, { words }).word).toBe('Добавлен')
+    expect(connect({ change: 'deleted' }, same, { words }).word).toBe('Удалён')
+    expect(connect({ change: 'renamed' }, same, { words }).word).toBe('Renamed')
   })
 
   it('a value outside the vocabulary draws no sign and takes no colour', () => {

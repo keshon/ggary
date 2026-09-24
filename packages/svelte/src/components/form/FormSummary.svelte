@@ -19,7 +19,7 @@
     machine.send({ type: 'SUMMARY_MOUNT' })
     return () => machine.send({ type: 'SUMMARY_UNMOUNT' })
   })
-  const api = $derived(form.current ? connectSummary(form.current, svelteNormalizer, words, { headingLevel }) : null)
+  const api = $derived(form.current ? connectSummary(form.current, svelteNormalizer, { words, headingLevel }) : null)
 </script>
 
 {#if api}

@@ -37,8 +37,7 @@
     connect(
       { name, argument, state, detail, duration, locale, defaultOpen, outputLines, onShowAll, streaming, onOpenChange },
       svelteNormalizer,
-      words
-    )
+      { words })
   )
 </script>
 

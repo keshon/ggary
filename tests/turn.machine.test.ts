@@ -49,6 +49,6 @@ describe('turn', () => {
 
   it('takes the units of another language', () => {
     const words = { tokens: 'токенов', seconds: 'с', separator: ', ' }
-    expect(connect({ who: 'Агент', tokens: 1000, duration: 3, locale: 'en-GB' }, same, words).cost).toBe('1,000 токенов, 3 с')
+    expect(connect({ who: 'Агент', tokens: 1000, duration: 3, locale: 'en-GB' }, same, { words }).cost).toBe('1,000 токенов, 3 с')
   })
 })

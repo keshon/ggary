@@ -58,7 +58,8 @@ const round = (value: number) => Math.round(value * 10_000) / 10_000
  * On a narrow screen lanes are unreadable; the fallback view is a table of the
  * start, the end and the duration, and that is the application's to choose.
  */
-export function connect<T = Dict>(props: LanesProps, normalize: Normalizer<T>, words: LanesWords = {}) {
+export function connect<T = Dict>(props: LanesProps, normalize: Normalizer<T>, options: { words?: LanesWords } = {}) {
+  const { words = {} } = options
   const { lanes, label, locale } = props
   const w = { ...LANES_WORDS, ...words }
   const window = lanesWindow(lanes, props.start, props.end)

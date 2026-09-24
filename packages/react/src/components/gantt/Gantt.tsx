@@ -57,7 +57,7 @@ export function Gantt<T extends GanttTask>(props: GanttProps<T>) {
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, words)
+  const api = connect(state, machine.send, reactNormalizer, { words })
 
   useEffect(() => machine.send({ type: 'SYNC_TASKS', tasks }), [machine, tasks])
   useEffect(() => machine.send({ type: 'SYNC_GROUPS', groups: groups ?? NO_GROUPS }), [machine, groups])

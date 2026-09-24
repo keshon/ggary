@@ -32,7 +32,7 @@ export function Composer(props: ComposerProps) {
     if (text !== '') onSend?.(text)
   }
 
-  const api = connect({ label, placeholder, bar, busy, disabled, submitOnEnter, rows, maxRows }, reactNormalizer, { onSend: send, onStop }, words)
+  const api = connect({ label, placeholder, bar, busy, disabled, submitOnEnter, rows, maxRows }, reactNormalizer, { onSend: send, onStop, words })
   const valueProps = value !== undefined ? { value } : { defaultValue }
 
   return (

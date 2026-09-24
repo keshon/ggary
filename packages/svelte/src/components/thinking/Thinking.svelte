@@ -22,10 +22,10 @@
 
   const id = uid('gg-thinking')
   const api = $derived(
-    connect({ id, open, streaming, duration, locale, disabled }, svelteNormalizer, () => {
+    connect({ id, open, streaming, duration, locale, disabled }, svelteNormalizer, { onToggle: () => {
       open = !open
       onOpenChange?.(open)
-    }, words)
+    }, words })
   )
 </script>
 

@@ -42,12 +42,8 @@ export interface FilterBarWords extends FilterWords {
 }
 
 /** The filters in force as chips, each one editable and removable. */
-export function connectFilters<Row, T = Dict>(
-  snapshot: DataGridSnapshot,
-  controller: DataGridController<Row>,
-  normalize: Normalizer<T>,
-  words: FilterBarWords = {}
-) {
+export function connectFilters<Row, T = Dict>(snapshot: DataGridSnapshot, controller: DataGridController<Row>, normalize: Normalizer<T>, options: { words?: FilterBarWords } = {}) {
+  const { words = {} } = options
   const columns = controller.options.columns as ColumnDef[]
   const byId = new Map(columns.map((column) => [column.id, column]))
   const { query } = snapshot.grid
@@ -113,12 +109,8 @@ export interface BulkWords {
  * the offer is the point: the registry's "all in the filter" meant the 100
  * rows on screen.
  */
-export function connectBulk<Row, T = Dict>(
-  snapshot: DataGridSnapshot,
-  controller: DataGridController<Row>,
-  normalize: Normalizer<T>,
-  words: BulkWords = {}
-) {
+export function connectBulk<Row, T = Dict>(snapshot: DataGridSnapshot, controller: DataGridController<Row>, normalize: Normalizer<T>, options: { words?: BulkWords } = {}) {
+  const { words = {} } = options
   const { selection, query } = snapshot.grid
   const total = snapshot.data.total
   const count = selectedCount(selection, total) ?? 0

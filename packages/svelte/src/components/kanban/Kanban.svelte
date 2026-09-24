@@ -64,7 +64,7 @@
   )
   let snapshot = $state.raw(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, words, { headingLevel }))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { words, headingLevel }))
 
   $effect(() => machine.send({ type: 'SYNC_COLUMNS', columns }))
   $effect(() => machine.send({ type: 'SYNC_CARDS', cards }))

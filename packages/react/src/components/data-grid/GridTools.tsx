@@ -144,7 +144,7 @@ export interface GridFiltersProps<Row> {
 /** The filters in force as chips — press one to change it, × to remove it — and a way to add one. */
 export function GridFilters<Row>({ grid, views, words = {} }: GridFiltersProps<Row>) {
   const snapshot = useGrid(grid)
-  const api = connectFilters(snapshot, grid, reactNormalizer, words)
+  const api = connectFilters(snapshot, grid, reactNormalizer, { words })
   const [editing, setEditing] = useState<string | null>(null)
   const [adding, setAdding] = useState(false)
 
@@ -262,7 +262,7 @@ export interface GridBulkBarProps<Row> {
 /** Shown while something is selected: how much, the offer of everything matching, and the actions. */
 export function GridBulkBar<Row>({ grid, children, words = {} }: GridBulkBarProps<Row>) {
   const snapshot = useGrid(grid)
-  const api = connectBulk(snapshot, grid, reactNormalizer, words)
+  const api = connectBulk(snapshot, grid, reactNormalizer, { words })
   if (!api.visible) return null
   return (
     <div {...api.rootProps}>

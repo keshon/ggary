@@ -750,7 +750,8 @@ function formatRange(start: ISODate, end: ISODate, locale?: string): string {
   return `${formatDate(start, locale, sameYear ? { day: 'numeric', month: 'short' } : undefined)} – ${formatDate(end, locale)}`
 }
 
-export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, send: (event: GanttEvent) => void, normalize: Normalizer<P>, words: Partial<GanttWords> = {}) {
+export function connect<T extends GanttTask, P = Dict>(state: GanttState<T>, send: (event: GanttEvent) => void, normalize: Normalizer<P>, options: { words?: Partial<GanttWords> } = {}) {
+  const { words = {} } = options
   const w = { ...GANTT_WORDS, ...words }
   const ids = ganttIds(state.id)
   const range = state.range ?? rangeOf(state.tasks, state.scale, state.locale)

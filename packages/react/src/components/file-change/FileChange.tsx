@@ -7,7 +7,7 @@ export interface FileChangeProps extends CoreFileChangeProps {
 }
 
 export function FileChange({ change, words }: FileChangeProps) {
-  const api = connect({ change }, reactNormalizer, words)
+  const api = connect({ change }, reactNormalizer, { words })
   return (
     <span {...api.rootProps}>
       <span {...api.signProps}>{api.sign}</span>

@@ -36,7 +36,8 @@ export function logTime(time: LogLine['time'], locale: string | undefined, timeZ
  * is not — see `attachLogTail`, which is the one piece that has to know when
  * the reader has scrolled away.
  */
-export function connect<T = Dict>(props: LogProps, normalize: Normalizer<T>, words: LogWords = {}) {
+export function connect<T = Dict>(props: LogProps, normalize: Normalizer<T>, options: { words?: LogWords } = {}) {
+  const { words = {} } = options
   const { lines, label, locale, timeZone, announce = false } = props
   const w = { ...LOG_WORDS, ...words }
 

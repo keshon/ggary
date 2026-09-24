@@ -101,7 +101,7 @@ export function FormSummary({ words, headingLevel }: FormSummaryProps) {
     return () => machine.send({ type: 'SUMMARY_UNMOUNT' })
   }, [machine])
   if (!state) return null
-  const api = connectSummary(state, reactNormalizer, words, { headingLevel })
+  const api = connectSummary(state, reactNormalizer, { words, headingLevel })
   return (
     <div {...api.rootProps}>
       <div {...api.titleProps}>{api.title}</div>

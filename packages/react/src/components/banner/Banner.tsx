@@ -12,7 +12,7 @@ export interface BannerProps extends CoreBannerProps {
 }
 
 export function Banner({ tone, title, live, dismissible, dismissLabel, children, actions, onDismiss }: BannerProps) {
-  const api = connect({ tone, title, live, dismissible: dismissible ?? !!onDismiss, dismissLabel }, reactNormalizer, onDismiss)
+  const api = connect({ tone, title, live, dismissible: dismissible ?? !!onDismiss, dismissLabel }, reactNormalizer, { onDismiss })
   return (
     <div {...api.rootProps}>
       {api.showIcon && <span {...api.iconProps} />}

@@ -23,7 +23,7 @@ describe('step', () => {
 
   it('says the phase in words as well as in colour', () => {
     expect(all.map((state) => connect({ ...call, state }, same).status)).toEqual(['Running', 'Succeeded', 'Failed'])
-    expect(connect({ ...call, state: 'failed' }, same, { failed: 'Не удалось' }).status).toBe('Не удалось')
+    expect(connect({ ...call, state: 'failed' }, same, { words: { failed: 'Не удалось' } }).status).toBe('Не удалось')
   })
 
   it('draws no dot of its own: the kit’s dot reads the tone from the root', () => {

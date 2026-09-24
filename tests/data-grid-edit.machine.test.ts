@@ -217,7 +217,7 @@ describe('the detail sheet', () => {
     controller.press(4, 3, { shiftKey: false, ctrlKey: false, metaKey: false, detail: 2 })
     expect(controller.getSnapshot().grid.detail).toBe(4)
 
-    let detail = connectDetail(controller.getSnapshot(), controller, same, { locale: 'en-US' })
+    let detail = connectDetail(controller.getSnapshot(), controller, same, { words: { locale: 'en-US' } })
     expect(detail.row?.company).toBe('Acme 5')
     expect(detail.positionText).toBe('5 of 300')
 

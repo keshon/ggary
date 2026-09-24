@@ -56,7 +56,7 @@
   )
   let snapshot = $state.raw(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, words))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { words }))
   const shownScale = $derived(snapshot.scale)
 
   $effect(() => machine.send({ type: 'SYNC_TASKS', tasks }))

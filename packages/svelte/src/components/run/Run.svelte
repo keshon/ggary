@@ -10,7 +10,7 @@
 
   /** The countable units of one run: phases, attempts or shards, each carrying its own outcome. */
   let { units, label, showValue, locale, words, ...rest }: Props = $props()
-  const api = $derived(connect({ units, label, showValue, locale }, svelteNormalizer, words))
+  const api = $derived(connect({ units, label, showValue, locale }, svelteNormalizer, { words }))
 </script>
 
 <span {...rest} {...api.rootProps}>

@@ -9,7 +9,7 @@ export interface DiffProps extends CoreDiffProps, Omit<HTMLAttributes<HTMLDivEle
 }
 
 export function Diff({ path, change, rows, before, after, context, locale, words, ...rest }: DiffProps) {
-  const api = connect({ path, change, rows, before, after, context, locale }, reactNormalizer, words)
+  const api = connect({ path, change, rows, before, after, context, locale }, reactNormalizer, { words })
   return (
     <div {...rest} {...api.rootProps}>
       <div {...api.headProps}>

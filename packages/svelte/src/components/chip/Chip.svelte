@@ -23,7 +23,7 @@
 
   const showRemove = $derived(removable ?? !!onRemove)
   const api = $derived(
-    connect({ emphasis, size, selected, disabled, removable: showRemove, interactive }, svelteNormalizer, onRemove)
+    connect({ emphasis, size, selected, disabled, removable: showRemove, interactive }, svelteNormalizer, { onRemove })
   )
 </script>
 

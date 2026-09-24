@@ -58,11 +58,11 @@ describe('run', () => {
   })
 
   it('takes words of its own', () => {
-    const api = connect({ units: phase }, same, {
+    const api = connect({ units: phase }, same, { words: {
       reading: (done, total) => `${done} из ${total}`,
       warned: (count) => `${count} с замечанием`,
       separator: ' · ',
-    })
+    } })
     expect(api.valueText).toBe('4 из 7 · 1 с замечанием')
   })
 

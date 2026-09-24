@@ -34,7 +34,8 @@ const isFold = (row: DiffRow): row is DiffFold => row.kind === 'fold'
  * print and colour blindness, and still do not reach the clipboard; the line
  * numbers are not selectable, for the same reason.
  */
-export function connect<T = Dict>(props: DiffProps, normalize: Normalizer<T>, words: DiffWords = {}) {
+export function connect<T = Dict>(props: DiffProps, normalize: Normalizer<T>, options: { words?: DiffWords } = {}) {
+  const { words = {} } = options
   const { path, rows, before, after, context = 3, locale } = props
   const w = { ...DIFF_WORDS, ...words }
   const format = new Intl.NumberFormat(locale)
