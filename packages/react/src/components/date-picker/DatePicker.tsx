@@ -11,6 +11,7 @@ import {
 } from '@ggary/core/calendar'
 import { connect, createDatePickerMachine, type DatePickerWords, type DatePreset } from '@ggary/core/date-picker'
 import { attachPopover, mergeProps, reactNormalizer, type Dict, type ISODate } from '@ggary/core'
+import type { ControlSize } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 import { useFormField } from '../form/Form'
 
@@ -99,6 +100,8 @@ export function Calendar(props: CalendarProps) {
 }
 
 export interface DatePickerProps extends CalendarOptionsProps {
+  /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   label?: string
   value?: ISODate | DateRange | null
   defaultValue?: ISODate | DateRange | null
@@ -113,7 +116,7 @@ export interface DatePickerProps extends CalendarOptionsProps {
 
 /** A field for a day or a range of days, typed or chosen from a calendar. */
 export function DatePicker(props: DatePickerProps) {
-  const { label, value, defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, locale, name, placeholder, presets, words } = props
+  const { size, label, value, defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, locale, name, placeholder, presets, words } = props
   const id = `gg-date-${useId().replace(/:/g, '')}`
   const callbacks = useRef<{ onValueChange?: typeof onValueChange; edited?: () => void }>({ onValueChange })
   callbacks.current.onValueChange = onValueChange
@@ -127,7 +130,7 @@ export function DatePicker(props: DatePickerProps) {
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, presets })
+  const api = connect(state, machine.send, reactNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, presets, size })
   // Inside a Form, by name: the error its rules hold for this day.
   const form = useFormField(name, api.ids.input, label)
   callbacks.current.edited = () => form.edited(document.getElementById(api.ids.input))

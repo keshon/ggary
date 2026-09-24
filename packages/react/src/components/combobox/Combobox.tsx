@@ -8,10 +8,13 @@ import {
   type ComboboxWords,
 } from '@ggary/core/combobox'
 import { attachPopover, mergeProps, reactNormalizer, scrollIntoViewIfNeeded } from '@ggary/core'
+import type { ControlSize } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 import { useFormField } from '../form/Form'
 
 export interface ComboboxProps {
+  /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   label?: string
   /** The options, filtered in the page as the person types. */
   items?: ComboboxItem[]
@@ -46,6 +49,7 @@ export interface ComboboxProps {
 /** A text field with a list of options: type to narrow it, arrows and Enter to choose. */
 export function Combobox(props: ComboboxProps) {
   const {
+    size,
     label, items, load, debounce, minLength, multiple = false, value, defaultValue, selectedItems, onValueChange, onCreate,
     placeholder, disabled = false, limit, name, words,
   } = props
@@ -72,7 +76,7 @@ export function Combobox(props: ComboboxProps) {
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { ...words, placeholder: placeholder ?? words?.placeholder, name })
+  const api = connect(state, machine.send, reactNormalizer, { ...words, placeholder: placeholder ?? words?.placeholder, name, size })
   // Inside a Form, by name: the error its rules hold for this choice.
   const form = useFormField(name, api.ids.input, label)
   callbacks.current.edited = () => form.edited(document.getElementById(api.ids.input))

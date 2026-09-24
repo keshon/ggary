@@ -34,6 +34,7 @@ export { attachScrub, scrubValue, setInputValue, SCRUB_PIXELS_PER_STEP } from '.
 export type { ScrubInput } from './utils/scrub'
 export { attachToolbarKeys, toolbarItems } from './utils/toolbar'
 export { attachShellDrawer } from './utils/shell'
+export type { ControlSize } from './utils/size'
 export * from './utils/calendar'
 export type { ShellDrawerOptions } from './utils/shell'
 export { attachAutosize } from './utils/autosize'

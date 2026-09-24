@@ -1,4 +1,5 @@
-export type SegmentedControlSize = 'sm' | 'md'
+import type { ControlSize } from '../../utils/size'
+export type SegmentedControlSize = ControlSize
 
 export interface SegmentedItem {
   value: string

@@ -10,6 +10,24 @@ import type { RunUnit } from '@ggary/core/run'
 import type { TaskItem } from '@ggary/core/task'
 import type { HistoryGroup, HistoryTick } from '@ggary/core/history'
 
+/** The kit's one size scale, for the row that shows a control at each. */
+export const controlSizes = ['sm', 'md', 'lg'] as const
+export const sizePlaces = [
+  { value: 'eu', label: 'Europe', children: [{ value: 'de', label: 'Germany' }, { value: 'fr', label: 'France' }] },
+  { value: 'as', label: 'Asia', children: [{ value: 'jp', label: 'Japan' }] },
+]
+/** What a markdown renderer hands Prose. */
+export const proseSample = `<h2>Deploying a preview</h2>
+<p>A preview is built from any branch you push. It gets its own address, and its checks run before anyone is asked to look at it — see <a href="#typography">how checks are chosen</a>.</p>
+<h3>Before you push</h3>
+<ol><li>Run <code>npm test</code> and <code>npm run typecheck</code>.</li><li>Keep the branch rebased on <code>main</code>.</li><li>Press <kbd>Ctrl</kbd> <kbd>K</kbd> and choose <em>Deploy preview</em>.</li></ol>
+<blockquote><p>A preview that fails its checks is kept for a day, so the failure can be read.</p></blockquote>
+<pre><code>npm run deploy -- --preview feature/billing</code></pre>
+<h3>Limits</h3>
+<table><thead><tr><th>Plan</th><th>Previews</th><th>Kept for</th></tr></thead><tbody><tr><td>Free</td><td>3</td><td>7 days</td></tr><tr><td>Team</td><td>25</td><td>30 days</td></tr></tbody></table>
+<hr>
+<p>Previews older than their plan allows are removed at night, <mark>without notice</mark>.</p>`
+
 export const frameworks: SelectItem[] = [
   { value: 'vanilla', label: 'Vanilla JS' },
   { value: 'react', label: 'React' },

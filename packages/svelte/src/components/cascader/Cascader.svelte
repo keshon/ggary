@@ -1,9 +1,12 @@
 <script lang="ts">
+  import type { ControlSize } from '@ggary/core'
   import { connect, createCascaderMachine, focusCascaderItem, type CascaderNode } from '@ggary/core/cascader'
   import { attachPopover, onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { untrack } from 'svelte'
 
   type Props = {
+    /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
+    size?: ControlSize
     items: CascaderNode[]
     label?: string
     placeholder?: string
@@ -21,7 +24,7 @@
   }
 
   /** A choice from a tree, one level to a column. */
-  let { items, label, placeholder, rootLabel, value = $bindable(), defaultValue, onValueChange, selectParents, disabled, name }: Props = $props()
+  let { size, items, label, placeholder, rootLabel, value = $bindable(), defaultValue, onValueChange, selectParents, disabled, name }: Props = $props()
 
   const initial = untrack(() => (value !== undefined ? value : (defaultValue ?? null)))
   const machine = untrack(() =>
@@ -42,7 +45,7 @@
   // Effects that attach on open read this, not the snapshot: a new snapshot on every
   // change would detach and attach them again on each key.
   const isOpen = $derived(snapshot.open)
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label, placeholder, rootLabel, name }))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label, placeholder, rootLabel, name, size }))
 
   $effect(() => machine.send({ type: 'SYNC_ITEMS', items }))
   $effect(() => machine.send({ type: 'SYNC_OPTIONS', selectParents, disabled }))

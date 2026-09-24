@@ -2,12 +2,12 @@
 
 A UI kit scaffold: one framework-agnostic core, two sibling renderers (React 19
 and Svelte 5), and one design language, GGarry, on top of it.
-Ninety-five components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+Ninety-nine components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
 Menu, Menubar, Badge, Avatar, AvatarGroup, Spinner, Skeleton, Card, Panel, Banner,
-Note and EmptyState — built end to end to prove the architecture holds.
+Note, EmptyState, Divider, Prose, Text and Link — built end to end to prove the architecture holds.
 
 **Retired on 2026-09-18: the vanilla custom-elements adapter (`@ggary/elements`,
 the `gg-*` tags) and the Instrument theme**, a second language ported from
@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3537 tests, 1309 of them in headless Chrome
+npm test         # 3605 tests, 1339 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck   # tsc, then svelte-check over every .svelte file
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -309,13 +309,13 @@ component CSS to it:
 |---|---|
 | space | `space-1` … `space-8`, on a 4px grid |
 | radius | `mark` 2 (a glyph under 8px), `sm` 4, `md` 6, `lg` 10, `full`; `control-sm/md/lg` by a control's size |
-| type | `font-size-2xs` 11 (the floor: a rail's labels, a count on a dot) … `xl`, three weights; `line-height-tight` 1.3 (titles), `snug` 1.4 (labels), `normal` 1.5 (body), `relaxed` 1.6 (long reading), `row` 20px (a one-line list row, whose height is this and its padding), `caption` 16px (a readout's small line) |
+| type | `font-size-2xs` 11 (the floor: a rail's labels, a count on a dot) … `xl`, and `heading-1…4` 28/22/18/16 for Prose's ladder alone; three weights; `line-height-tight` 1.3 (titles), `snug` 1.4 (labels), `normal` 1.5 (body), `relaxed` 1.6 (long reading), `row` 20px (a one-line list row, whose height is this and its padding), `caption` 16px (a readout's small line) |
 | size | `control-sm/md/lg` 28/34/40, `row` 32 (a list row), `icon-button-sm` 24 (closes a message, sits in a field), `icon-button-md` 28 (a surface's own tool), `tap` 24, `edge` 3 (an accent edge), `indicator` 2 (a chosen tab's line, a thumb's border) |
 | opacity | `disabled` 0.55, `stale` 0.6 (content being replaced, or waiting on its owner), `quiet` 0.6 (a secondary glyph at rest), `area` 0.12 (a series' fill under its line) |
 | motion | `duration-fast` 120ms (a control), `normal` 200ms (a surface moving); loops: `spin` 600ms, `blink` 1s, `pulse` 1.6s, `calm` 3s (a loop slowed under reduced motion); `easing-standard` (ease), `settle` (ease-out, a value arriving), `breathe` (ease-in-out, a loop) |
 | z | `sheet` 10, `drawer` 30, `skip-link` 40, `popover` 50 — public as `--gg-z-*`, and the only levels structure stacks at |
 
-Colours are semantic: `bg.*`, `text.*`, `border.*`, and `mark.*` for the
+Colours are semantic: `bg.*` (with `bg.highlight`, a marked word's amber), `text.*`, `border.*`, and `mark.*` for the
 five state tones (neutral, running, ok, warn, error), which a dot, a meter, a
 ring and a share bar read through `--ggarry-tone-mark`. Marks equal their
 text colours today; they are separate so a mark can move to 3:1 without
@@ -2543,6 +2543,84 @@ Found on the way:
   wide as its column; the cap is gone, and a browser test checks the line is
   under the heading.
 
+## One size scale
+
+A control that has a size has all three, `sm`, `md` and `lg`, and they are
+one scale: `ControlSize` in core, which Button's, Input's and every other
+control's size type is an alias of. Select, Combobox, Cascader, DatePicker,
+Pagination and Tabs took it in batch D; NumberField, Chip, SegmentedControl and
+Slider gained the third size they lacked.
+
+The field controls — Input, Select, Combobox, Cascader, DatePicker, NumberField
+— and Button stand at 28, 34 and 40 pixels, with the type and the corner of the
+size (13/14/16 and 4/6/10): a small Select beside a small Input and a small
+Button is one row with one edge. Each root sets `--control-height`,
+`--control-font-size` and `--control-radius`, and its trigger or box reads
+them; a combobox's inner inset shrinks at `sm` so its 24-pixel buttons fit.
+Pagination stands a step under the fields (24/28/34), as it always did, and
+Tabs scale their type and air, and their document chips' height.
+
+`tests/sizes.contract.test.ts` holds the rule — every control's size is the
+one type, and its stylesheet draws `sm` and `lg` — and
+`tests/sizes.browser.test.ts` measures the promise: seven controls at each
+size, in both adapters, one height.
+
+## Divider
+
+A separator between two things that belong apart. Horizontal by default, a
+hairline in the default border, or the strong one at `emphasis="medium"`. A
+`label` names what follows — "Advanced", "or" — at the `start` of the line or
+in its `center`; the line is drawn by the root's own pseudo-elements on either
+side of the label, so the label needs no background to hide a line behind it.
+A vertical divider stands in a row at the height of its text, and takes no
+label.
+
+It is a `div` with `role="separator"`, not an `<hr>`: an `<hr>` cannot hold a
+label. A separator's children are not read, so the label is also its
+`aria-label`, and the words on the line are `aria-hidden`. The theme sets the
+line's colour on `--gg-divider-line`, which structure reads.
+
+## Prose, Text and Link
+
+Typography follows Instrument's one rule: **the heading ladder lives inside
+Prose and nowhere else.** Outside prose a title takes its size from the
+component it names — PageHeader, Section, Card — so an application cannot grow
+a second ladder beside the kit's.
+
+**Prose** styles text written to be read — an article, a help page, an agent's
+answer, what a markdown renderer gives — as its elements come: headings, lists,
+quotes, code and pre, tables, rules, images, marks. It adds nothing to them;
+React passes HTML through `dangerouslySetInnerHTML`, Svelte through `html`,
+and either takes children. At `md` it is 16 pixels on 1.6 leading with the
+ladder 28/22/18/16 (chosen from screenshots against 32/24/20/16); `sm`, for
+prose in a panel or a message, is 14 pixels with the ladder a step down. A line
+is bounded at 68 characters. Space between blocks is in em, so both sizes keep
+one proportion, and a heading stands farther from what comes before it than
+from what follows. Figures are proportional in running text and tabular in a
+table.
+
+**Text** is a run inside a line, said a particular way: `emphasis="low"`
+(secondary, the muted ink), `tone` (a state's ink — the kit's word for a
+state), `strong`, `code`, `kbd`, `mark`, `deleted`, and `truncate` — `true`
+for one line with an ellipsis, a number for that many lines. It is one element,
+the most meaningful of what was asked: `<Text strong code>` is a `<code>` that
+is also strong, and every asked-for way is an attribute, so a theme draws
+`strong` alike on either. Code, keys, marks and deletions are drawn once, for a
+Text and for the same elements inside Prose.
+
+**Link** is an anchor in the accent ink, underlined always: in running text a
+link told from its words by colour alone is lost to whoever cannot see colour.
+The underline thickens under the pointer. `external` opens a new tab with
+`rel="noopener noreferrer"`, shows the new `external` glyph, and says "(opens
+in a new tab)" to a screen reader, in `words.external`'s words.
+
+Found on the way:
+
+- **A mark was invisible in light mode.** The warning ground (`#fffbeb`) is a
+  tint for a banner, not a highlighter; on white it drew nothing. Marks read the
+  new `bg.highlight` — amber-100 in light, amber-950 in dark — held a step off
+  the surface.
+
 ## Layering inside core
 
 ```
@@ -2764,11 +2842,12 @@ sandbox build prints none.
 | contract | node | `themes.contract.test.ts` | 5 tests. Every discovered theme — GGarry, now the only one: structure, literals, contrast, coverage. |
 | contract | node | `packages.contract.test.ts` | 9 tests. Each package's exports are its root and `./*`; every component directory has an index; both adapters have the same directories, the same components in each, and all of them at their root. |
 | contract | node | `anatomy.contract.test.ts` | 2 tests. Every element an adapter draws takes a prop bag from core — no bare `<span>` a theme could only name by its tag — and no adapter writes a class. |
+| contract | node | `sizes.contract.test.ts` | 3 tests. Every control's size is `ControlSize`, and its stylesheet draws `sm` and `lg`. |
 | contract | node | `core-shape.contract.test.ts` | 2 tests. Every component laid out as `<dir>.<role>.ts` with a re-export-only index; every connect ending at the normalizer or one `options`. |
 | contract | node | `checks.contract.test.ts` | 30 tests. The gates themselves: each rule fires on a planted defect — the literal families and their ledger among them; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1078 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1096 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 1078 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1096 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
 | browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
 | browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |
@@ -2780,6 +2859,8 @@ sandbox build prints none.
 | browser | Chrome | `agent.browser.test.ts` | 6 tests. A history clipped at its leading edge, batches dividing the width they were given, a queue's dots on one vertical whatever the titles, one Tab into the queue and the arrows moving real focus, a run's room drawn before it begins. |
 | browser | Chrome | `agent-stream.browser.test.ts` | 11 tests. A log holding the bottom as lines arrive and letting go the moment the reader scrolls up; a diff copying clean code with no numbers or signs in the text, its sign drawn in the gutter, a long line scrolling rather than wrapping; a step opened by find-in-page; lanes measured against one axis. |
 | browser | Chrome | `chat.browser.test.ts` | 8 tests. The composer's field growing and its frame holding one line at rest, Enter sending and Shift+Enter breaking the line, nothing sent while busy; a turn's actions appearing under the pointer; an approval and a failure keeping their record once answered. |
+| browser | Chrome | `sizes.browser.test.ts` | 6 tests. Input, Button, NumberField, Select, Combobox, Cascader and DatePicker at 28, 34 and 40 pixels, in both adapters. |
+| browser | Chrome | `typography.browser.test.ts` | 6 tests. Prose's ladder and its step down, the reading measure, a heading nearer what follows it; a text cut to two lines and to one; a divider's line on either side of its label, and a vertical one a line tall. |
 | browser | Chrome | `forced-colors.browser.test.ts` | 12 tests. Forced colours emulated through Playwright (`page.emulateMedia({ forcedColors })`): a checked box and a switch that is on keep their state as `Highlight` with a border, a checked radio's dot shows against its box, and a busy button's ring keeps a turning arc. Each fails with the `gg.forced` layer removed. |
 | browser | Chrome | `dialog.browser.test.ts` | 8 tests. What only a browser has: `:modal`, inert page, scroll lock, real keys and clicks, the dismiss stack, form closes. |
 | browser | Chrome | `rhythm.ggarry.browser.test.ts` | 2 tests. The form rhythm — Field's label and hint included — option rows with the field's 6px corner and 32px tall, the menu's corners, a closed menu not drawn, a menu row's shortcut at its edge, and a sheet flush with each edge, measured in pixels, in light and dark. |

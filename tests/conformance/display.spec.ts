@@ -210,6 +210,41 @@ export function displayConformance(adapter: Adapter) {
     })
   })
 
+  describe('divider', () => {
+    it('is a horizontal separator by default, a hairline at low emphasis, with no label', async () => {
+      const m = await adapter.divider({}, freshTarget())
+      const root = part(m.root, 'divider', 'root')!
+      expect(root.getAttribute('role')).toBe('separator')
+      expect(root.getAttribute('aria-orientation')).toBe('horizontal')
+      expect(root.dataset.emphasis).toBe('low')
+      expect(root.hasAttribute('data-labelled')).toBe(false)
+      expect(part(root, 'divider', 'label')).toBeNull()
+      expect(m.root.querySelector('[class]')).toBeNull()
+    })
+
+    it('is named by its label, which it draws for the eye alone, at the start unless centred', async () => {
+      const m = await adapter.divider({ label: 'Advanced' }, freshTarget())
+      const root = part(m.root, 'divider', 'root')!
+      expect(root.getAttribute('aria-label')).toBe('Advanced')
+      expect(root.dataset.align).toBe('start')
+      const label = part(root, 'divider', 'label')!
+      expect(label.textContent).toBe('Advanced')
+      expect(label.getAttribute('aria-hidden')).toBe('true')
+      await m.update({ label: 'or', align: 'center', emphasis: 'medium' })
+      expect(root.dataset.align).toBe('center')
+      expect(root.dataset.emphasis).toBe('medium')
+      expect(root.getAttribute('aria-label')).toBe('or')
+    })
+
+    it('stands vertical in a row, and a vertical one takes no label', async () => {
+      const m = await adapter.divider({ orientation: 'vertical', label: 'ignored' }, freshTarget())
+      const root = part(m.root, 'divider', 'root')!
+      expect(root.getAttribute('aria-orientation')).toBe('vertical')
+      expect(root.hasAttribute('aria-label')).toBe(false)
+      expect(part(root, 'divider', 'label')).toBeNull()
+    })
+  })
+
   describe('note', () => {
     it('is an aside with a tone icon, or a bare one without', async () => {
       const m = await adapter.note({ text: 'The model is being retired.', tone: 'warn', live: 'polite' }, freshTarget())

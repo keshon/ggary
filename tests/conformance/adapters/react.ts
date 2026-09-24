@@ -87,6 +87,10 @@ import {
   Card,
   EmptyState,
   Note,
+  Divider,
+  Text,
+  Link,
+  Prose,
   Panel,
   AvatarGroup,
   Badge,
@@ -476,6 +480,10 @@ export const react: Adapter = {
       { ...rest, actions: actions ? createElement('button', { type: 'button' }, 'Renew') : undefined },
       ...(text === undefined ? [] : [text]),
     ]),
+  divider: (props, target) => mount(Divider, props, target),
+  text: (props, target) => mount(Text, props, target, ({ text, ...rest }: { text: string }) => [rest, text]),
+  link: (props, target) => mount(Link, props, target, ({ text, ...rest }: { text: string }) => [rest, text]),
+  prose: (props, target) => mount(Prose, props, target, ({ html, ...rest }: { html: string }) => [{ ...rest, dangerouslySetInnerHTML: { __html: html } }]),
   note: (props, target) => mount(Note, props, target, ({ text, ...rest }: { text: string }) => [rest, text]),
   emptyState: (props, target) =>
     mount(EmptyState, props, target, ({ action, ...rest }: { action?: string }) => [

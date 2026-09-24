@@ -1,3 +1,4 @@
+import type { ControlSize } from '../../utils/size'
 import type { TypeaheadState } from '../../utils/typeahead'
 
 export interface CascaderNode {
@@ -41,6 +42,8 @@ export type CascaderEvent =
   | { type: 'SYNC_OPTIONS'; selectParents?: boolean; disabled?: boolean }
 
 export interface CascaderConnectOptions {
+  /** The control's size, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   label?: string
   placeholder?: string
   /** The name of the first column; the others are named by their parent. */

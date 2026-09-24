@@ -1,3 +1,4 @@
+import type { ControlSize } from '../../utils/size'
 /**
  * How loudly the button asks to be pressed. Named by INTENT, never by look.
  *
@@ -15,7 +16,7 @@
  */
 export type ButtonEmphasis = 'high' | 'medium' | 'low' | 'minimal'
 
-export type ButtonSize = 'sm' | 'md' | 'lg'
+export type ButtonSize = ControlSize
 
 export interface ButtonProps {
   emphasis?: ButtonEmphasis

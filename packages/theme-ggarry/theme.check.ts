@@ -155,6 +155,12 @@ const pairs: Pair[] = [
   { label: 'steps: the bar of a step to come', fg: '--ggarry-border-control', bg: ['--ggarry-bg-canvas'], min: LARGE },
   { label: 'steps: the bar of a step reached', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-canvas'], min: LARGE },
   { label: 'toolbar: its line under the strip', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
+  // A divider is a line and no more; its label is muted text, measured with every muted label.
+  // A mark in text: the default ink on the warning ground.
+  { label: 'text: a mark on the highlight', fg: '--ggarry-text-default', bg: ['--ggarry-bg-highlight'], min: TEXT },
+  { label: 'text: the highlight off the surface', fg: '--ggarry-bg-highlight', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'divider: the line off the surface', fg: '--ggarry-border-default', bg: ['--ggarry-bg-surface'], min: STEP },
+  { label: 'divider: the medium line off the surface', fg: '--ggarry-border-strong', bg: ['--ggarry-bg-surface'], min: STEP },
   { label: 'choice card: description on its ground', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
   { label: 'choice card: description on the chosen ground', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
   { label: 'choice card: the bar of the chosen one', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-subtle'], min: LARGE },

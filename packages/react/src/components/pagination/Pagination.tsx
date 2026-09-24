@@ -1,14 +1,17 @@
 import { createElement, type HTMLAttributes } from 'react'
 import { connect, type PaginationProps as CorePaginationProps } from '@ggary/core/pagination'
 import { reactNormalizer } from '@ggary/core'
+import type { ControlSize } from '@ggary/core'
 
 export interface PaginationProps extends CorePaginationProps, Omit<HTMLAttributes<HTMLElement>, 'children'> {
+  /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   /** The page behind the link that was pressed. Call preventDefault to keep the page. */
   onPageChange?: (page: number, event: Event) => void
 }
 
-export function Pagination({ items, label, onPageChange, ...rest }: PaginationProps) {
-  const api = connect({ items, label }, reactNormalizer, { onPageChange })
+export function Pagination({ items, label, onPageChange, size, ...rest }: PaginationProps) {
+  const api = connect({ items, label }, reactNormalizer, { onPageChange, size })
   return (
     <nav {...rest} {...api.rootProps}>
       <ol {...api.listProps}>

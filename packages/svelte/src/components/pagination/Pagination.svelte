@@ -1,12 +1,13 @@
 <script lang="ts">
+  import type { ControlSize } from '@ggary/core'
   import { connect, type PaginationProps } from '@ggary/core/pagination'
   import { svelteNormalizer } from '@ggary/core'
 
   let {
-    items, label, onPageChange, ...rest
-  }: PaginationProps & { onPageChange?: (page: number, event: Event) => void; [key: string]: unknown } = $props()
+    items, label, onPageChange, size, ...rest
+  }: PaginationProps & { onPageChange?: (page: number, event: Event) => void; size?: ControlSize; [key: string]: unknown } = $props()
 
-  const api = $derived(connect({ items, label }, svelteNormalizer, { onPageChange }))
+  const api = $derived(connect({ items, label }, svelteNormalizer, { onPageChange, size }))
 </script>
 
 <nav {...rest} {...api.rootProps}>

@@ -21,14 +21,14 @@
 
 [data-scope='cascader'][data-part='trigger'] {
   gap: var(--ggarry-space-2);
-  block-size: var(--ggarry-size-control-md);
+  block-size: var(--control-height);
   padding-inline: var(--ggarry-space-3);
   border: 1px solid var(--ggarry-border-control);
-  border-radius: var(--ggarry-radius-control-md);
+  border-radius: var(--control-radius);
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-default);
   font: inherit;
-  font-size: var(--ggarry-font-size-md);
+  font-size: var(--control-font-size);
   text-align: start;
   transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
@@ -156,4 +156,22 @@
 }
 @media (prefers-reduced-motion: reduce) {
   [data-scope='cascader']:is([data-part='trigger'], [data-part='indicator']) { transition: none; }
+}
+
+/* --- sizes: Input's three, set on the root and read by the trigger ---------- */
+
+[data-scope='cascader'][data-part='root'] {
+  --control-height: var(--ggarry-size-control-md);
+  --control-font-size: var(--ggarry-font-size-md);
+  --control-radius: var(--ggarry-radius-control-md);
+}
+[data-scope='cascader'][data-part='root'][data-size='sm'] {
+  --control-height: var(--ggarry-size-control-sm);
+  --control-font-size: var(--ggarry-font-size-sm);
+  --control-radius: var(--ggarry-radius-control-sm);
+}
+[data-scope='cascader'][data-part='root'][data-size='lg'] {
+  --control-height: var(--ggarry-size-control-lg);
+  --control-font-size: var(--ggarry-font-size-lg);
+  --control-radius: var(--ggarry-radius-control-lg);
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { ControlSize } from '@ggary/core'
   import {
     attachComboboxSource,
     connect,
@@ -12,6 +13,8 @@
   import { untrack } from 'svelte'
 
   type Props = {
+    /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
+    size?: ControlSize
     label?: string
     /** The options, filtered in the page as the person types. */
     items?: ComboboxItem[]
@@ -35,6 +38,7 @@
   }
 
   let {
+    size,
     label, items, load, debounce, minLength, multiple = false, value = $bindable(), defaultValue, selectedItems, onValueChange, onCreate,
     placeholder, disabled = false, limit, name, words,
   }: Props = $props()
@@ -65,7 +69,7 @@
   // Effects that attach on open read this, not the snapshot: a new snapshot on every
   // change would detach and attach them again on each key.
   const isOpen = $derived(snapshot.open)
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, placeholder: placeholder ?? words?.placeholder, name }))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, placeholder: placeholder ?? words?.placeholder, name, size }))
   // Inside a Form, by name: the error its rules hold for this choice.
   const form = useFormField(() => name, () => api.ids.input, () => label)
 

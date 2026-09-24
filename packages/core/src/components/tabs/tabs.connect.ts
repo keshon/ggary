@@ -1,3 +1,4 @@
+import type { ControlSize } from '../../utils/size'
 import type { IconName } from '@ggary/icons'
 import type { Dict, Normalizer } from '../../types'
 import { tabsAnatomy } from './tabs.anatomy'
@@ -14,6 +15,8 @@ export const tabsIds = (id: string) => ({
 })
 
 export interface TabsConnectOptions {
+  /** The control's size, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   /** The tab list's accessible name. */
   label?: string
   variant?: TabsVariant
@@ -92,6 +95,7 @@ export function connect<T = Dict>(
     rootProps: normalize({
       ...tabsAnatomy.attrs('root'),
       id: ids.root,
+      'data-size': options.size ?? 'md',
       'data-orientation': state.orientation,
       'data-variant': variant,
     }),

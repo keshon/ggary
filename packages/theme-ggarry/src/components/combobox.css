@@ -25,13 +25,13 @@
 
 [data-scope='combobox'][data-part='control'] {
   gap: var(--ggarry-space-1);
-  min-block-size: var(--ggarry-size-control-md);
-  padding: 3px var(--ggarry-space-1) 3px var(--ggarry-space-3);
+  min-block-size: var(--control-height);
+  padding: var(--control-inset) var(--ggarry-space-1) var(--control-inset) var(--ggarry-space-3);
   border: 1px solid var(--ggarry-border-control);
-  border-radius: var(--ggarry-radius-control-md);
+  border-radius: var(--control-radius);
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-default);
-  font-size: var(--ggarry-font-size-md);
+  font-size: var(--control-font-size);
   transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='combobox'][data-part='root'][data-multiple] [data-part='control'] {
@@ -54,7 +54,7 @@
 }
 
 [data-scope='combobox'][data-part='input'] {
-  min-block-size: calc(var(--ggarry-size-control-md) - 8px);
+  min-block-size: calc(var(--control-height) - 2 * var(--control-inset) - 2px);
 }
 /* One ring, the box's: the input inside it draws none of its own. */
 [data-scope='combobox'][data-part='input']:focus-visible {
@@ -193,3 +193,23 @@
 @media (prefers-reduced-motion: reduce) {
   [data-scope='combobox']:is([data-part='control'], [data-part='content'], [data-part='trigger-icon']) { transition: none; }
 }
+
+/* --- sizes: Input's three, set on the root and read by the control ---------- */
+
+[data-scope='combobox'][data-part='root'] {
+  --control-height: var(--ggarry-size-control-md);
+  --control-font-size: var(--ggarry-font-size-md);
+  --control-radius: var(--ggarry-radius-control-md);
+}
+[data-scope='combobox'][data-part='root'][data-size='sm'] {
+  --control-height: var(--ggarry-size-control-sm);
+  --control-font-size: var(--ggarry-font-size-sm);
+  --control-radius: var(--ggarry-radius-control-sm);
+}
+[data-scope='combobox'][data-part='root'][data-size='lg'] {
+  --control-height: var(--ggarry-size-control-lg);
+  --control-font-size: var(--ggarry-font-size-lg);
+  --control-radius: var(--ggarry-radius-control-lg);
+}
+[data-scope='combobox'][data-part='root'] { --control-inset: 3px; }
+[data-scope='combobox'][data-part='root'][data-size='sm'] { --control-inset: 1px; }

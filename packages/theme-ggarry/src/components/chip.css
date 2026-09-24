@@ -43,6 +43,11 @@ button[data-scope='chip'][data-part='root']:hover:not([data-disabled]) {
   --chip-padding-x: var(--ggarry-space-2);
   --chip-font-size: var(--ggarry-font-size-xs);
 }
+[data-scope='chip'][data-part='root'][data-size='lg'] {
+  --chip-height: 30px;
+  --chip-padding-x: var(--ggarry-space-4);
+  --chip-font-size: var(--ggarry-font-size-md);
+}
 
 [data-scope='chip'][data-part='root'][data-emphasis='medium'] {
   --chip-bg: transparent;

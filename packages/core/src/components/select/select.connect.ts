@@ -1,3 +1,4 @@
+import type { ControlSize } from '../../utils/size'
 import type { IconName } from '@ggary/icons'
 import type { Dict, Normalizer } from '../../types'
 import { selectAnatomy } from './select.anatomy'
@@ -17,6 +18,8 @@ const isPrintable = (key: string) => key.length === 1 && key !== ' '
 const PAGE_STEP = 10
 
 export interface ConnectOptions {
+  /** The control's size, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   placeholder?: string
   /** Renders a hidden input so the value participates in native form submission. */
   name?: string
@@ -121,6 +124,7 @@ export function connect<T = Dict>(
     rootProps: normalize({
       ...selectAnatomy.attrs('root'),
       id: ids.root,
+      'data-size': options.size ?? 'md',
       'data-state': state.open ? 'open' : 'closed',
       'data-disabled': state.disabled ? '' : undefined,
     }),

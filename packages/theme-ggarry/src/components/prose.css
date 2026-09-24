@@ -1,0 +1,120 @@
+/* ==========================================================================
+   GGarry — prose
+
+   Text written to be read, at a reading size and leading, on a line bounded
+   at 68 characters: a longer one loses the start of the next. The heading
+   ladder lives here and nowhere else — outside prose a title takes its size
+   from the component it names — and every step of it is semibold, tight and
+   balanced. Space between blocks is set in em, so it follows the size: `sm`
+   prose in a panel keeps the proportions of an article.
+   ========================================================================== */
+
+[data-scope='prose'][data-part='root'] {
+  --prose-h1: var(--ggarry-font-size-heading-1);
+  --prose-h2: var(--ggarry-font-size-heading-2);
+  --prose-h3: var(--ggarry-font-size-heading-3);
+  --prose-h4: var(--ggarry-font-size-heading-4);
+  max-inline-size: 68ch;
+  color: var(--ggarry-text-default);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-lg);
+  line-height: var(--ggarry-line-height-relaxed);
+  /* Figures in running text are proportional; a table sets them back. */
+  font-variant-numeric: proportional-nums;
+}
+[data-scope='prose'][data-part='root'][data-size='sm'] {
+  --prose-h1: var(--ggarry-font-size-heading-2);
+  --prose-h2: var(--ggarry-font-size-heading-3);
+  --prose-h3: var(--ggarry-font-size-heading-4);
+  --prose-h4: var(--ggarry-font-size-md);
+  font-size: var(--ggarry-font-size-md);
+}
+
+/* The flow: blocks a line apart, the first and last flush with the box. */
+[data-scope='prose'][data-part='root'] > * {
+  margin-block: 0;
+}
+[data-scope='prose'][data-part='root'] > * + * {
+  margin-block-start: 1em;
+}
+
+/* Headings: size from the ladder, and more air above than below, so a
+   heading belongs to what follows it. */
+[data-scope='prose'][data-part='root'] :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--ggarry-text-default);
+  font-weight: var(--ggarry-font-weight-semibold);
+  line-height: var(--ggarry-line-height-tight);
+  text-wrap: balance;
+}
+[data-scope='prose'][data-part='root'] h1 { font-size: var(--prose-h1); }
+[data-scope='prose'][data-part='root'] h2 { font-size: var(--prose-h2); }
+[data-scope='prose'][data-part='root'] h3 { font-size: var(--prose-h3); }
+[data-scope='prose'][data-part='root'] :is(h4, h5, h6) { font-size: var(--prose-h4); }
+[data-scope='prose'][data-part='root'] > * + :is(h1, h2, h3, h4, h5, h6) {
+  margin-block-start: 1.75em;
+}
+[data-scope='prose'][data-part='root'] > :is(h1, h2, h3, h4, h5, h6) + * {
+  margin-block-start: 0.5em;
+}
+
+[data-scope='prose'][data-part='root'] :is(ul, ol) {
+  padding-inline-start: 1.5em;
+}
+[data-scope='prose'][data-part='root'] li + li {
+  margin-block-start: 0.25em;
+}
+[data-scope='prose'][data-part='root'] li::marker {
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='prose'][data-part='root'] blockquote {
+  margin-inline: 0;
+  padding-inline-start: var(--ggarry-space-4);
+  border-inline-start: var(--ggarry-size-edge) solid var(--ggarry-border-strong);
+  color: var(--ggarry-text-muted);
+}
+
+[data-scope='prose'][data-part='root'] pre {
+  padding: var(--ggarry-space-3) var(--ggarry-space-4);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-subtle);
+  font-family: var(--ggarry-font-family-mono);
+  font-size: var(--ggarry-font-size-sm);
+  line-height: var(--ggarry-line-height-normal);
+}
+
+[data-scope='prose'][data-part='root'] hr {
+  margin-block: 2em;
+  border: 0;
+  border-block-start: 1px solid var(--ggarry-border-default);
+}
+
+[data-scope='prose'][data-part='root'] table {
+  border-collapse: collapse;
+  font-size: var(--ggarry-font-size-sm);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--ggarry-line-height-normal);
+}
+[data-scope='prose'][data-part='root'] :is(th, td) {
+  padding: var(--ggarry-space-2) var(--ggarry-space-3);
+  border-block-end: 1px solid var(--ggarry-border-default);
+  text-align: start;
+}
+[data-scope='prose'][data-part='root'] th {
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+
+[data-scope='prose'][data-part='root'] img {
+  border-radius: var(--ggarry-radius-md);
+}
+[data-scope='prose'][data-part='root'] figcaption {
+  margin-block-start: var(--ggarry-space-2);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-sm);
+}
+[data-scope='prose'][data-part='root'] dt {
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+[data-scope='prose'][data-part='root'] dd {
+  margin-inline-start: var(--ggarry-space-4);
+}

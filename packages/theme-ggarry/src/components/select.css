@@ -1,5 +1,4 @@
 [data-scope='select'][data-part='root'] {
-  --select-height: var(--ggarry-size-control-md);
   display: inline-flex;
   flex-direction: column;
   gap: var(--ggarry-space-1);
@@ -22,10 +21,10 @@
   justify-content: space-between;
   gap: var(--ggarry-space-2);
   width: 100%;
-  height: var(--select-height);
+  height: var(--control-height);
   padding-inline: var(--ggarry-space-3);
   font-family: var(--ggarry-font-family-sans);
-  font-size: var(--ggarry-font-size-md);
+  font-size: var(--control-font-size);
   text-align: start;
   color: var(--ggarry-text-default);
   background: var(--ggarry-bg-surface);
@@ -33,7 +32,7 @@
      boundary, so it owes 3:1 (WCAG 1.4.11). A button's outline is decoration —
      its label identifies it — and keeps the quieter border-strong. */
   border: 1px solid var(--ggarry-border-control);
-  border-radius: var(--ggarry-radius-control-md);
+  border-radius: var(--control-radius);
   cursor: pointer;
   transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
@@ -132,4 +131,22 @@
 
 @media (prefers-reduced-motion: reduce) {
   [data-scope='select']:is([data-part='trigger'], [data-part='indicator']) { transition: none; }
+}
+
+/* --- sizes: Input's three, set on the root and read by the trigger ---------- */
+
+[data-scope='select'][data-part='root'] {
+  --control-height: var(--ggarry-size-control-md);
+  --control-font-size: var(--ggarry-font-size-md);
+  --control-radius: var(--ggarry-radius-control-md);
+}
+[data-scope='select'][data-part='root'][data-size='sm'] {
+  --control-height: var(--ggarry-size-control-sm);
+  --control-font-size: var(--ggarry-font-size-sm);
+  --control-radius: var(--ggarry-radius-control-sm);
+}
+[data-scope='select'][data-part='root'][data-size='lg'] {
+  --control-height: var(--ggarry-size-control-lg);
+  --control-font-size: var(--ggarry-font-size-lg);
+  --control-radius: var(--ggarry-radius-control-lg);
 }

@@ -1,10 +1,13 @@
 <script lang="ts">
+  import type { ControlSize } from '@ggary/core'
   import { connect, createSelectMachine, type SelectItem } from '@ggary/core/select'
   import { attachPopover, mergeProps, onFormReset, scrollIntoViewIfNeeded, svelteNormalizer, uid } from '@ggary/core'
   import { useFormField } from '../form/context.svelte'
   import { untrack } from 'svelte'
 
   type Props = {
+    /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
+    size?: ControlSize
     items: SelectItem[]
     label?: string
     placeholder?: string
@@ -17,6 +20,7 @@
   }
 
   let {
+    size,
     items,
     label,
     placeholder,
@@ -56,7 +60,7 @@
   const isOpen = $derived(snapshot.open)
 
   // Identical to the React adapter's `connect()` call — different normalizer.
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { placeholder, name }))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { placeholder, name, size }))
   // Inside a Form, by name: the error its rules hold for this choice.
   const form = useFormField(() => name, () => api.ids.trigger, () => label)
 

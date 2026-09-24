@@ -69,6 +69,7 @@ export function connect<T = Dict>(state: DatePickerState, send: (event: DatePick
     rootProps: normalize({
       ...anatomy.attrs('root'),
       id: ids.root,
+      'data-size': options.size ?? 'md',
       'data-state': state.open ? 'open' : 'closed',
       'data-mode': state.calendar.mode,
       'data-invalid': state.invalid ? '' : undefined,

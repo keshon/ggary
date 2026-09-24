@@ -52,6 +52,10 @@
 @import './components/menu.css' layer(gg.components);
 @import './components/menubar.css' layer(gg.components);
 @import './components/nav.css' layer(gg.components);
+@import './components/divider.css' layer(gg.components);
+@import './components/text.css' layer(gg.components);
+@import './components/link.css' layer(gg.components);
+@import './components/prose.css' layer(gg.components);
 @import './components/note.css' layer(gg.components);
 @import './components/number-field.css' layer(gg.components);
 @import './components/panel.css' layer(gg.components);

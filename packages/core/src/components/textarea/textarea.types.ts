@@ -1,4 +1,5 @@
-export type TextareaSize = 'sm' | 'md' | 'lg'
+import type { ControlSize } from '../../utils/size'
+export type TextareaSize = ControlSize
 
 /** Horizontal resizing is left out on purpose: it breaks every form layout. */
 export type TextareaResize = 'vertical' | 'none'

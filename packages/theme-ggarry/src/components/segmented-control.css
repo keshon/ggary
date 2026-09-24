@@ -36,6 +36,11 @@
   padding-inline: var(--ggarry-space-2);
   font-size: var(--ggarry-font-size-xs);
 }
+[data-scope='segmented-control'][data-part='root'][data-size='lg'] > [data-part='item'] {
+  min-block-size: calc(var(--ggarry-size-control-lg) - var(--ggarry-space-2));
+  padding-inline: var(--ggarry-space-4);
+  font-size: var(--ggarry-font-size-md);
+}
 
 [data-scope='segmented-control'][data-part='item']:hover:not([data-disabled]):not([data-state='checked']) {
   background: var(--ggarry-bg-muted);

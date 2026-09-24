@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { ControlSize } from '@ggary/core'
   import {
     connect,
     createTabsMachine,
@@ -11,6 +12,8 @@
   import { untrack, type Snippet } from 'svelte'
 
   type Props = {
+    /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
+    size?: ControlSize
     items: TabItem[]
     /** Bindable: `bind:value`. A one-way `value` works too. */
     value?: string | null
@@ -32,6 +35,7 @@
   }
 
   let {
+    size,
     items,
     value = $bindable(),
     defaultValue,
@@ -68,7 +72,7 @@
   let snapshot = $state(machine.getState())
   $effect(() => machine.subscribe((next) => (snapshot = next)))
 
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label, variant, panels: panel !== undefined, closeLabel }))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label, variant, panels: panel !== undefined, closeLabel, size }))
 
   $effect(() => machine.send({ type: 'SYNC_ITEMS', items }))
   $effect(() => {

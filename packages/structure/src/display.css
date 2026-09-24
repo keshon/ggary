@@ -442,3 +442,77 @@
   align-items: center;
   white-space: nowrap;
 }
+
+/* Divider: the line is drawn by the root's own pseudo-elements, one on each
+   side of a label, so a label never needs a background to hide the line
+   behind it. A vertical one stands in a row at the height of its text. */
+[data-scope='divider'][data-part='root'][data-orientation='horizontal'] {
+  display: flex;
+  align-items: center;
+  inline-size: 100%;
+}
+[data-scope='divider'][data-part='root'][data-orientation='horizontal']::before,
+[data-scope='divider'][data-part='root'][data-orientation='horizontal']::after {
+  content: '';
+  flex: 1 1 0;
+  border-block-start: 1px solid var(--gg-divider-line, currentColor);
+}
+[data-scope='divider'][data-part='root'][data-orientation='horizontal']:not([data-labelled])::after,
+[data-scope='divider'][data-part='root'][data-align='start']::before {
+  display: none;
+}
+[data-scope='divider'][data-part='root'][data-orientation='vertical'] {
+  display: inline-block;
+  align-self: center;
+  inline-size: 0;
+  block-size: 1lh;
+  border-inline-start: 1px solid var(--gg-divider-line, currentColor);
+}
+[data-scope='divider'][data-part='label'] {
+  flex: none;
+}
+
+/* Text cut to its room. One line is an inline box that can hold an ellipsis;
+   several are a clamped box. Both keep the whole text for a screen reader. */
+[data-scope='text'][data-part='root'][data-truncate='line'] {
+  display: inline-block;
+  max-inline-size: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+[data-scope='text'][data-part='root'][data-truncate='lines'] {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--gg-text-lines);
+  line-clamp: var(--gg-text-lines);
+  overflow: hidden;
+}
+
+/* An external link's glyph sits on the line with its last word; its words
+   ("opens in a new tab") are for a screen reader alone. */
+[data-scope='link'][data-part='icon'] {
+  display: inline-block;
+  vertical-align: -0.1em;
+}
+[data-scope='link'][data-part='hint'] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Prose holds a reading measure; its own flow is the theme's. */
+[data-scope='prose'][data-part='root'] {
+  overflow-wrap: break-word;
+}
+[data-scope='prose'][data-part='root'] :is(img, video) {
+  max-inline-size: 100%;
+  block-size: auto;
+}
+[data-scope='prose'][data-part='root'] pre {
+  overflow-x: auto;
+}

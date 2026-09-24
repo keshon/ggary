@@ -24,6 +24,10 @@
 [data-scope='slider'][data-part='root'][data-size='sm'] {
   --slider-thumb: 12px;
 }
+[data-scope='slider'][data-part='root'][data-size='lg'] {
+  --slider-track: 6px;
+  --slider-thumb: 20px;
+}
 
 [data-scope='slider'][data-part='input'] {
   block-size: 24px;

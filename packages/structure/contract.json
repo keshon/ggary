@@ -65,7 +65,9 @@
     "--gg-history-n": "set by core on a history's batch and on the axis cell under it: how many attempts stand behind it, which is its share of the strip",
     "--gg-task-gutter": "the width of a queue row's gutter, where the state dot stands; a theme sets it, and a page may widen it for what else it puts there",
     "--gg-lane-start": "set by core on a lane's segment: where its work began, as a percentage of the window every lane shares",
-    "--gg-lane-span": "set by core on a lane's segment: how long its work took, as a percentage of that window"
+    "--gg-lane-span": "set by core on a lane's segment: how long its work took, as a percentage of that window",
+    "--gg-divider-line": "set by a theme on a divider: the colour its line is drawn in, read by structure for both the horizontal rule and the vertical one",
+    "--gg-text-lines": "written by core onto a text cut to lines: how many it keeps"
   },
   "$pairs": "What every theme promises through the public names, whatever its language. Deliberately small: only what the token descriptions above promise, and nothing about how a theme builds depth — GGarry divides same-white surfaces with borders, a theme may as well separate them by lightness, and both are legitimate. min: text 4.5:1, large 3:1, step ΔL 0.022.",
   "pairs": [

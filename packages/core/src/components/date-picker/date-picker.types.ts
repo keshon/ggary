@@ -1,3 +1,4 @@
+import type { ControlSize } from '../../utils/size'
 import type { ISODate } from '../../utils/calendar'
 import type { CalendarWords } from '../calendar/calendar.connect'
 import type { CalendarEvent, CalendarOptions, CalendarState, DateRange } from '../calendar/calendar.types'
@@ -48,6 +49,8 @@ export interface DatePickerWords extends CalendarWords {
 }
 
 export interface DatePickerConnectOptions extends DatePickerWords {
+  /** The control's size, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   /** Choices made in one press beside the calendar. `rangePresets()` gives the usual ones. */
   presets?: DatePreset[]
   /** The presets' name. Default "Presets". */

@@ -1,9 +1,12 @@
 import { Fragment, useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { connect, createCascaderMachine, focusCascaderItem, type CascaderNode } from '@ggary/core/cascader'
 import { attachPopover, reactNormalizer } from '@ggary/core'
+import type { ControlSize } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 
 export interface CascaderProps {
+  /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   items: CascaderNode[]
   label?: string
   placeholder?: string
@@ -22,7 +25,7 @@ export interface CascaderProps {
 
 /** A choice from a tree, one level to a column. */
 export function Cascader(props: CascaderProps) {
-  const { items, label, placeholder, rootLabel, value, defaultValue, onValueChange, selectParents, disabled, name } = props
+  const { size, items, label, placeholder, rootLabel, value, defaultValue, onValueChange, selectParents, disabled, name } = props
   const id = `gg-cascader-${useId().replace(/:/g, '')}`
   const callbacks = useRef({ onValueChange })
   callbacks.current = { onValueChange }
@@ -30,7 +33,7 @@ export function Cascader(props: CascaderProps) {
     createCascaderMachine({ id, items, value, defaultValue, selectParents, disabled, onValueChange: (next, nodes) => callbacks.current.onValueChange?.(next, nodes) })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { label, placeholder, rootLabel, name })
+  const api = connect(state, machine.send, reactNormalizer, { label, placeholder, rootLabel, name, size })
 
   useEffect(() => machine.send({ type: 'SYNC_ITEMS', items }), [machine, items])
   useEffect(() => machine.send({ type: 'SYNC_OPTIONS', selectParents, disabled }), [machine, selectParents, disabled])

@@ -1,4 +1,5 @@
-export type InputSize = 'sm' | 'md' | 'lg'
+import type { ControlSize } from '../../utils/size'
+export type InputSize = ControlSize
 
 /** The text-like native input types. Checkboxes and radios are their own components. */
 export type InputType = 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number' | 'date' | 'time'

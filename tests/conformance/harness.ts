@@ -874,6 +874,38 @@ export interface BannerProps {
   dismissLabel?: string
 }
 
+export interface TextProps {
+  text: string
+  tone?: StatusTone
+  emphasis?: 'medium' | 'low'
+  strong?: boolean
+  code?: boolean
+  kbd?: boolean
+  mark?: boolean
+  deleted?: boolean
+  truncate?: boolean | number
+}
+
+export interface LinkProps {
+  text: string
+  href: string
+  external?: boolean
+  words?: { external?: string }
+}
+
+/** Authored HTML, as a markdown renderer gives it. */
+export interface ProseProps {
+  html: string
+  size?: 'sm' | 'md'
+}
+
+export interface DividerProps {
+  orientation?: 'horizontal' | 'vertical'
+  label?: string
+  align?: 'start' | 'center'
+  emphasis?: 'low' | 'medium'
+}
+
 export interface NoteProps {
   text: string
   tone?: StatusTone
@@ -1133,6 +1165,10 @@ export interface Adapter {
   panel(props: PanelProps, target: HTMLElement): Promise<Mounted<PanelProps>>
   banner(props: BannerProps, target: HTMLElement): Promise<Mounted<BannerProps>>
   note(props: NoteProps, target: HTMLElement): Promise<Mounted<NoteProps>>
+  divider(props: DividerProps, target: HTMLElement): Promise<Mounted<DividerProps>>
+  text(props: TextProps, target: HTMLElement): Promise<Mounted<TextProps>>
+  link(props: LinkProps, target: HTMLElement): Promise<Mounted<LinkProps>>
+  prose(props: ProseProps, target: HTMLElement): Promise<Mounted<ProseProps>>
   emptyState(props: EmptyStateProps, target: HTMLElement): Promise<Mounted<EmptyStateProps>>
   /** Updates apply to the Field's own props; the control's props are read at mount only. */
   field(props: FieldProps, target: HTMLElement): Promise<Mounted<FieldProps>>

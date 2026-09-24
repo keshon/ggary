@@ -1,3 +1,4 @@
+import type { ControlSize } from '../../utils/size'
 import type { IconName } from '@ggary/icons'
 import type { Dict, Normalizer } from '../../types'
 import { comboboxAnatomy as anatomy } from './combobox.anatomy'
@@ -38,6 +39,8 @@ export interface ComboboxWords {
 }
 
 export interface ComboboxConnectOptions extends ComboboxWords {
+  /** The control's size, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   /** Renders hidden inputs, one per value, so the choice submits with its form. */
   name?: string
   form?: string
@@ -154,6 +157,7 @@ export function connect<T = Dict>(state: ComboboxState, send: (event: ComboboxEv
     rootProps: normalize({
       ...anatomy.attrs('root'),
       id: ids.root,
+      'data-size': options.size ?? 'md',
       'data-state': state.open ? 'open' : 'closed',
       'data-multiple': state.multiple ? '' : undefined,
       'data-disabled': state.disabled ? '' : undefined,

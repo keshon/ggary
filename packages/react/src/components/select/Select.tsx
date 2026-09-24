@@ -5,10 +5,13 @@ import {
   type SelectItem,
 } from '@ggary/core/select'
 import { attachPopover, mergeProps, reactNormalizer, scrollIntoViewIfNeeded } from '@ggary/core'
+import type { ControlSize } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 import { useFormField } from '../form/Form'
 
 export interface SelectProps {
+  /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   items: SelectItem[]
   label?: string
   placeholder?: string
@@ -21,7 +24,7 @@ export interface SelectProps {
 }
 
 export function Select(props: SelectProps) {
-  const { items, label, placeholder, value, defaultValue, disabled = false, name, onValueChange } = props
+  const { size, items, label, placeholder, value, defaultValue, disabled = false, name, onValueChange } = props
 
   const reactId = useId()
   const id = `gg-select-${reactId.replace(/:/g, '')}`
@@ -46,7 +49,7 @@ export function Select(props: SelectProps) {
   )
 
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { placeholder, name })
+  const api = connect(state, machine.send, reactNormalizer, { placeholder, name, size })
   // Inside a Form, by name: the error its rules hold for this choice.
   const form = useFormField(name, api.ids.trigger, label)
   callbacks.current.edited = () => form.edited(document.getElementById(api.ids.trigger))

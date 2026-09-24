@@ -134,8 +134,12 @@ import {
   Thinking,
   Approval,
   Failure,
+  Divider,
+  Link,
+  Prose,
+  Text,
 } from '@ggary/react'
-import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes } from './demo-data'
+import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample } from './demo-data'
 
 function App() {
   const [value, setValue] = useState<string | null>('react')
@@ -823,6 +827,32 @@ function App() {
           </form>
           <pre className="state">{formOutput}</pre>
         </section>
+
+        <section id="sizes">
+          <h3>Sizes: one row, one height</h3>
+          {controlSizes.map((size) => (
+            <div key={size} className="row" style={{ marginBottom: 16 }}>
+              <Input size={size} aria-label={`Name, ${size}`} placeholder={`Input ${size}`} style={{ width: 150 }} />
+              <Select size={size} label={`Select ${size}`} items={frameworks} placeholder="Framework" />
+              <Combobox size={size} label={`Combobox ${size}`} items={frameworks} />
+              <Cascader size={size} label={`Cascader ${size}`} items={sizePlaces} />
+              <DatePicker size={size} label={`Date ${size}`} />
+              <NumberField size={size} aria-label={`Count, ${size}`} defaultValue={3} />
+              <Button size={size} emphasis="high">
+                Save
+              </Button>
+            </div>
+          ))}
+          <Stack>
+            {controlSizes.map((size) => (
+              <div key={size} className="row" style={{ alignItems: 'center' }}>
+                <SegmentedControl size={size} label={`View, ${size}`} items={densities} defaultValue={densities[0].value} />
+                <Chip size={size}>{size}</Chip>
+                <Pagination size={size} label={`Pages, ${size}`} items={paginationRange({ page: 3, pages: 9, href: (page: number) => `#sizes-${page}` })} />
+              </div>
+            ))}
+          </Stack>
+        </section>
       </div>
 
       <div className="category" aria-labelledby="overlays">
@@ -1248,6 +1278,23 @@ function App() {
           </div>
           <pre className="state">{refreshes ? `refreshed the queue ${refreshes}×` : '—'}</pre>
         </section>
+
+        <section id="divider">
+          <h3>Divider</h3>
+          <Stack>
+            <Divider />
+            <Divider label="Advanced" />
+            <Divider label="or" align="center" />
+            <Divider label="Danger zone" emphasis="medium" />
+            <div className="row" style={{ alignItems: 'center' }}>
+              <span>Edit</span>
+              <Divider orientation="vertical" />
+              <span>Duplicate</span>
+              <Divider orientation="vertical" />
+              <span>Delete</span>
+            </div>
+          </Stack>
+        </section>
       </div>
 
       <div className="category" aria-labelledby="data">
@@ -1584,6 +1631,25 @@ function App() {
               <Textarea rows={3} defaultValue={'{{name}} has failed at {{time}}' + String.fromCharCode(10)} />
               <Inserts items={templateInserts} label="Template variables" />
             </Field>
+          </div>
+        </section>
+
+        <section id="typography">
+          <h3>Prose, Text and Link</h3>
+          <Prose dangerouslySetInnerHTML={{ __html: proseSample }} />
+          <p style={{ marginTop: 24 }}>
+            <Text emphasis="low">Updated 3 min ago</Text> · <Text strong>12 400</Text> rows · <Text code>npm test</Text> · press{' '}
+            <Text kbd>Ctrl</Text> <Text kbd>K</Text> · a <Text mark>match</Text> · <Text deleted>$40</Text> <Text tone="ok">$32</Text> ·{' '}
+            <Text tone="error">3 failed</Text> · <Link href="#typography">a link</Link> ·{' '}
+            <Link href="https://github.com/keshon" external>
+              GitHub
+            </Link>
+          </p>
+          <div style={{ maxWidth: 280, marginTop: 12 }}>
+            <Text truncate={2}>
+              A description long enough to need cutting: it runs on past the second line of its narrow column and is closed with an
+              ellipsis there.
+            </Text>
           </div>
         </section>
       </div>

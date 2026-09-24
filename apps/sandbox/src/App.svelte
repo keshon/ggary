@@ -104,6 +104,10 @@
     Thinking,
     Approval,
     Failure,
+    Divider,
+    Link,
+    Prose,
+    Text,
   } from '@ggary/svelte'
   import type { DataGridController } from '@ggary/core/data-grid'
   import { todayISO } from '@ggary/core'
@@ -130,7 +134,7 @@
   import { applyMove, type KanbanMove } from '@ggary/core/kanban'
   import { rangePresets } from '@ggary/core/date-picker'
   import type { PaletteCommand } from '@ggary/core/command-palette'
-  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes } from './demo-data'
+  import { agentsText, badgeTones, crumbs, densities, importSteps, isWeekend, layoutLeads, navGroups, railItems, weekTiles, rolloutPlan, rolloutGroups, runMetrics, headlineMetrics, runFacts, changedFiles, runEvents, runTimeTrend, suiteSeries, suiteLegend, generatorSource, templateInserts, ganttScales, saveTaskDates, stageItems, dealFormRules, saveDealForm, sandboxCommands, dealStages, initialDeals, saveDealMove, saveNewDeal, dealMenu, dueOf, formatAmount, type Deal, leadSections, leadSectionText, projectTree, regions, teams, people, runExtras, runModes, viewModes, toastDemos, newFile, openFiles, propertyPanels, propertyTabs, appMenus, applyView, describeView, documentMenu, frameworks, initialView, roles, tags, terms, viewMenu, runBudgets, runWindow, runShards, dayOutcomes, runYear, chatThread, chatFailure, chatApproval, runPhases, runCounters, runTasks, runSpending, runHistory, runHistoryHours, filtersExcerpt, filtersBefore, filtersAfter, shardOutput, runLines, runNextLine, runLanes, controlSizes, sizePlaces, proseSample } from './demo-data'
 
   let value = $state<string | null>('svelte')
   let lastEvent = $state('—')
@@ -770,6 +774,30 @@
     </form>
     <pre class="state">{formOutput}</pre>
   </section>
+
+  <section id="sizes">
+    <h3>Sizes: one row, one height</h3>
+    {#each controlSizes as size (size)}
+      <div class="row" style="margin-bottom: 16px">
+        <Input {size} aria-label={`Name, ${size}`} placeholder={`Input ${size}`} style="width: 150px" />
+        <Select {size} label={`Select ${size}`} items={frameworks} placeholder="Framework" />
+        <Combobox {size} label={`Combobox ${size}`} items={frameworks} />
+        <Cascader {size} label={`Cascader ${size}`} items={sizePlaces} />
+        <DatePicker {size} label={`Date ${size}`} />
+        <NumberField {size} aria-label={`Count, ${size}`} defaultValue={3} />
+        <Button {size} emphasis="high">Save</Button>
+      </div>
+    {/each}
+    <Stack>
+      {#each controlSizes as size (size)}
+        <div class="row" style="align-items: center">
+          <SegmentedControl {size} label={`View, ${size}`} items={densities} value={densities[0].value} />
+          <Chip {size}>{size}</Chip>
+          <Pagination {size} label={`Pages, ${size}`} items={paginationRange({ page: 3, pages: 9, href: (page: number) => `#sizes-${page}` })} />
+        </div>
+      {/each}
+    </Stack>
+  </section>
 </div>
 
 <div class="category" aria-labelledby="overlays">
@@ -1099,6 +1127,23 @@
     </div>
     <pre class="state">{refreshes ? `refreshed the queue ${refreshes}×` : '—'}</pre>
   </section>
+
+  <section id="divider">
+    <h3>Divider</h3>
+    <Stack>
+      <Divider />
+      <Divider label="Advanced" />
+      <Divider label="or" align="center" />
+      <Divider label="Danger zone" emphasis="medium" />
+      <div class="row" style="align-items: center">
+        <span>Edit</span>
+        <Divider orientation="vertical" />
+        <span>Duplicate</span>
+        <Divider orientation="vertical" />
+        <span>Delete</span>
+      </div>
+    </Stack>
+  </section>
 </div>
 
 <div class="category" aria-labelledby="data">
@@ -1379,6 +1424,20 @@
         <Textarea rows={3} defaultValue={'{{name}} has failed at {{time}}' + String.fromCharCode(10)} />
         <Inserts items={templateInserts} label="Template variables" />
       </Field>
+    </div>
+  </section>
+
+  <section id="typography">
+    <h3>Prose, Text and Link</h3>
+    <Prose html={proseSample} />
+    <p style="margin-top: 24px">
+      <Text emphasis="low">Updated 3 min ago</Text> · <Text strong>12 400</Text> rows · <Text code>npm test</Text> · press
+      <Text kbd>Ctrl</Text> <Text kbd>K</Text> · a <Text mark>match</Text> · <Text deleted>$40</Text> <Text tone="ok">$32</Text> ·
+      <Text tone="error">3 failed</Text> · <Link href="#typography">a link</Link> ·
+      <Link href="https://github.com/keshon" external>GitHub</Link>
+    </p>
+    <div style="max-width: 280px; margin-top: 12px">
+      <Text truncate={2}>A description long enough to need cutting: it runs on past the second line of its narrow column and is closed with an ellipsis there.</Text>
     </div>
   </section>
 </div>

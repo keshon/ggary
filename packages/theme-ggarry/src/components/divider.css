@@ -1,0 +1,20 @@
+/* ==========================================================================
+   GGarry — divider
+
+   A hairline in the default border, or the strong one at medium emphasis. A
+   label is small and muted, set off from its line by a step of air, and
+   takes no background: the line stops where the label begins.
+   ========================================================================== */
+
+[data-scope='divider'][data-part='root'] {
+  --gg-divider-line: var(--ggarry-border-default);
+  gap: var(--ggarry-space-3);
+  color: var(--ggarry-text-muted);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-medium);
+  line-height: var(--ggarry-line-height-tight);
+}
+[data-scope='divider'][data-part='root'][data-emphasis='medium'] {
+  --gg-divider-line: var(--ggarry-border-strong);
+}

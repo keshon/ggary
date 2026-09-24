@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, StatusDot, Timeline, Button, CodeBlock, Copyable, Inserts, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster, Metric, FileChange, Sparkline, Legend, Meter, Ring, Share, Heatmap, Run, Queue, History, Budget, Log, Diff, Lanes } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, StatusDot, Timeline, Button, CodeBlock, Copyable, Inserts, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster, Divider, Prose, Metric, FileChange, Sparkline, Legend, Meter, Ring, Share, Heatmap, Run, Queue, History, Budget, Log, Diff, Lanes } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
@@ -184,6 +184,10 @@ export const svelte: Adapter = {
   card: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'card' })),
   panel: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'panel' })),
   banner: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'banner' })),
+  divider: (props, target) => mountSvelte(Divider as Component<any>, props, target),
+  text: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'text' })),
+  link: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'link' })),
+  prose: (props, target) => mountSvelte(Prose as Component<any>, props, target),
   note: (props, target) => mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'note' })),
   emptyState: (props, target) =>
     mountSvelte(DisplayWithContent as Component<any>, props, target, (p) => ({ ...p, component: 'empty-state' })),

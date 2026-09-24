@@ -26,6 +26,11 @@
   border-radius: var(--ggarry-radius-control-sm);
   font-size: var(--ggarry-font-size-sm);
 }
+[data-scope='number-field'][data-part='root'][data-size='lg'] {
+  --number-height: var(--ggarry-size-control-lg);
+  border-radius: var(--ggarry-radius-control-lg);
+  font-size: var(--ggarry-font-size-lg);
+}
 
 [data-scope='number-field'][data-part='root']:hover:not([data-disabled]):not([data-readonly]):not([data-invalid]) {
   border-color: var(--ggarry-border-accent);

@@ -1,3 +1,4 @@
+import type { ControlSize } from '../../utils/size'
 import type { Dict, Normalizer } from '../../types'
 import { paginationAnatomy as anatomy } from './pagination.anatomy'
 import type { PageItem, PaginationProps, PaginationRangeOptions } from './pagination.types'
@@ -42,6 +43,8 @@ export function paginationRange(options: PaginationRangeOptions): PageItem[] {
 }
 
 export interface PaginationConnectOptions {
+  /** The control's size, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   /** The page behind the link that was pressed; the page decides what to do with it. */
   onPageChange?: (page: number, event: Event) => void
 }
@@ -86,7 +89,7 @@ export function connect<T = Dict>(props: PaginationProps, normalize: Normalizer<
   return {
     items,
     getItemProps,
-    rootProps: normalize({ ...anatomy.attrs('root'), 'aria-label': label }),
+    rootProps: normalize({ ...anatomy.attrs('root'), 'aria-label': label, 'data-size': options.size ?? 'md' }),
     listProps: normalize({ ...anatomy.attrs('list') }),
   }
 }

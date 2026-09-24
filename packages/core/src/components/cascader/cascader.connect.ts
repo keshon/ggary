@@ -65,7 +65,7 @@ export function connect<T = Dict>(state: CascaderState, send: (event: CascaderEv
     /** The id of the option the focus should be on, while the dialog is open. */
     focusedId: state.open && focused !== undefined ? ids.item(state.focusLevel, focused) : null,
     placeholder: options.placeholder ?? 'Choose…',
-    rootProps: normalize({ ...anatomy.attrs('root'), id: ids.root, 'data-state': state.open ? 'open' : 'closed', 'data-disabled': state.disabled ? '' : undefined }),
+    rootProps: normalize({ ...anatomy.attrs('root'), id: ids.root, 'data-size': options.size ?? 'md', 'data-state': state.open ? 'open' : 'closed', 'data-disabled': state.disabled ? '' : undefined }),
     labelProps: normalize({ ...anatomy.attrs('label'), id: ids.label, htmlFor: ids.trigger }),
     triggerProps: normalize({
       ...anatomy.attrs('trigger'),

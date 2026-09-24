@@ -277,6 +277,15 @@ export const SITEMAP: SiteCategory[] = [
             "label": "Native form participation"
           }
         ]
+      },
+      {
+        "label": "Sizes",
+        "anchors": [
+          {
+            "id": "sizes",
+            "label": null
+          }
+        ]
       }
     ]
   },
@@ -403,6 +412,15 @@ export const SITEMAP: SiteCategory[] = [
             "label": null
           }
         ]
+      },
+      {
+        "label": "Divider",
+        "anchors": [
+          {
+            "id": "divider",
+            "label": null
+          }
+        ]
       }
     ]
   },
@@ -484,6 +502,15 @@ export const SITEMAP: SiteCategory[] = [
         "anchors": [
           {
             "id": "code",
+            "label": null
+          }
+        ]
+      },
+      {
+        "label": "Prose, Text and Link",
+        "anchors": [
+          {
+            "id": "typography",
             "label": null
           }
         ]

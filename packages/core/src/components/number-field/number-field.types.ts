@@ -1,4 +1,5 @@
-export type NumberFieldSize = 'sm' | 'md'
+import type { ControlSize } from '../../utils/size'
+export type NumberFieldSize = ControlSize
 
 export interface NumberFieldProps {
   id: string

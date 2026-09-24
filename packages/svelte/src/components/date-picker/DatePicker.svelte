@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { ControlSize } from '@ggary/core'
   import { focusCalendarDay, toRange, type CalendarMode, type DateRange } from '@ggary/core/calendar'
   import { connect, createDatePickerMachine, type DatePickerWords, type DatePreset } from '@ggary/core/date-picker'
   import { attachPopover, mergeProps, onFormReset, svelteNormalizer, uid, type ISODate } from '@ggary/core'
@@ -7,6 +8,8 @@
   import CalendarView from './CalendarView.svelte'
 
   type Props = {
+    /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
+    size?: ControlSize
     label?: string
     /** Bindable: a day, or `{ start, end }` for a range. */
     value?: ISODate | DateRange | null
@@ -28,6 +31,7 @@
 
   /** A field for a day or a range of days, typed or chosen from a calendar. */
   let {
+    size,
     label, value = $bindable(), defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, locale, name, placeholder, presets, words,
   }: Props = $props()
 
@@ -49,7 +53,7 @@
   // Effects that attach on open read this, not the snapshot: a new snapshot on every
   // change would detach and attach them again on each key.
   const isOpen = $derived(snapshot.open)
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, presets }))
+  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, presets, size }))
   // Inside a Form, by name: the error its rules hold for this day.
   const form = useFormField(() => name, () => api.ids.input, () => label)
 

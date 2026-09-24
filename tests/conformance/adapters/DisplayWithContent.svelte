@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Banner, Card, EmptyState, Note, Panel } from '../../../packages/svelte/src/index'
+  import { Banner, Card, EmptyState, Link, Note, Panel, Text } from '../../../packages/svelte/src/index'
 
   let { component, ...props }: any = $props()
 </script>
@@ -19,6 +19,12 @@
   {:else}
     <Banner {...rest} actions={actions ? renew : undefined}>{text}</Banner>
   {/if}
+{:else if component === 'text'}
+  {@const { text, ...rest } = props}
+  <Text {...rest}>{text}</Text>
+{:else if component === 'link'}
+  {@const { text, ...rest } = props}
+  <Link {...rest}>{text}</Link>
 {:else if component === 'note'}
   {@const { text, ...rest } = props}
   <Note {...rest}>{text}</Note>

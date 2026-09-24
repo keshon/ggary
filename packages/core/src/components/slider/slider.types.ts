@@ -1,4 +1,5 @@
-export type SliderSize = 'sm' | 'md'
+import type { ControlSize } from '../../utils/size'
+export type SliderSize = ControlSize
 
 export interface SliderProps {
   id: string

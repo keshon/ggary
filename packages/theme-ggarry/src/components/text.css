@@ -1,0 +1,51 @@
+/* ==========================================================================
+   GGarry — text, and the inline pieces prose shares with it
+
+   A Text keeps the ink around it unless it is asked otherwise: quieter
+   (emphasis low), or in a state's ink (tone, from the tone map in card.css).
+   Code, a key, a mark and a deletion are drawn here once, for a <Text> and
+   for the same elements written inside Prose.
+   ========================================================================== */
+
+[data-scope='text'][data-part='root'][data-emphasis='low'] {
+  color: var(--ggarry-text-muted);
+}
+[data-scope='text'][data-part='root'][data-tone] {
+  color: var(--tone-ink);
+}
+[data-scope='text'][data-part='root'][data-strong] {
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+
+/* Code in a line: the mono face a little smaller, on the subtle plate. */
+:is([data-scope='text'][data-part='root'][data-code], [data-scope='prose'][data-part='root'] :not(pre) > code) {
+  padding-inline: var(--ggarry-space-1);
+  border-radius: var(--ggarry-radius-sm);
+  background: var(--ggarry-bg-subtle);
+  font-family: var(--ggarry-font-family-mono);
+  font-size: 0.9em;
+}
+
+/* A key: a cap with thickness, which is what the heavier lower edge draws. */
+:is([data-scope='text'][data-part='root'][data-kbd], [data-scope='prose'][data-part='root'] kbd) {
+  padding-inline: var(--ggarry-space-1);
+  border: 1px solid var(--ggarry-border-strong);
+  border-block-end-width: var(--ggarry-size-indicator);
+  border-radius: var(--ggarry-radius-sm);
+  background: var(--ggarry-bg-surface);
+  font-family: var(--ggarry-font-family-mono);
+  font-size: 0.85em;
+}
+
+/* Picked out in the highlighter's amber, in the default ink: a match, not an alarm. */
+:is([data-scope='text'][data-part='root'][data-mark], [data-scope='prose'][data-part='root'] mark) {
+  padding-inline: 0.1em;
+  border-radius: var(--ggarry-radius-mark);
+  background: var(--ggarry-bg-highlight);
+  color: var(--ggarry-text-default);
+}
+
+:is([data-scope='text'][data-part='root'][data-deleted], [data-scope='prose'][data-part='root'] del) {
+  color: var(--ggarry-text-muted);
+  text-decoration-thickness: 1px;
+}

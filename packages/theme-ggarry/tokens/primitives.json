@@ -12,7 +12,7 @@
     },
     "danger": { "50": "#fef2f2", "400": "#f87171", "500": "#ef4444", "600": "#dc2626", "700": "#b91c1c", "950": "#450a0a" },
     "success": { "50": "#f0fdf4", "400": "#4ade80", "600": "#16a34a", "700": "#15803d", "950": "#052e16" },
-    "warning": { "50": "#fffbeb", "400": "#fbbf24", "600": "#d97706", "700": "#b45309", "950": "#451a03" },
+    "warning": { "50": "#fffbeb", "100": "#fef3c7", "400": "#fbbf24", "600": "#d97706", "700": "#b45309", "950": "#451a03" },
     "chart": {
       "light": { "1": "#7e53bc", "2": "#009589", "3": "#bc467c", "4": "#998700", "5": "#007491", "6": "#c170bb" },
       "dark": { "1": "#bf9cfa", "2": "#71d2c5", "3": "#e981ac", "4": "#d8c971", "5": "#3cb6d0", "6": "#feb4f6" }
@@ -30,7 +30,8 @@
       "sans": "ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif",
       "mono": "ui-monospace, SFMono-Regular, 'JetBrains Mono', Consolas, monospace"
     },
-    "size": { "2xs": "11px", "xs": "12px", "sm": "13px", "md": "14px", "lg": "16px", "xl": "20px", "metric": "22px", "metric-headline": "28px" },
+    "size": { "2xs": "11px", "xs": "12px", "sm": "13px", "md": "14px", "lg": "16px", "xl": "20px", "metric": "22px", "metric-headline": "28px",
+      "heading-1": "28px", "heading-2": "22px", "heading-3": "18px", "heading-4": "16px" },
     "weight": { "normal": "400", "medium": "500", "semibold": "600" }
   },
   "line-height": { "tight": "1.3", "snug": "1.4", "normal": "1.5", "relaxed": "1.6", "row": "20px", "caption": "16px" },

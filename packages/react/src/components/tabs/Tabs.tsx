@@ -8,8 +8,11 @@ import {
   type TabsVariant,
 } from '@ggary/core/tabs'
 import { focusTab, reactNormalizer } from '@ggary/core'
+import type { ControlSize } from '@ggary/core'
 
 export interface TabsProps {
+  /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
+  size?: ControlSize
   items: TabItem[]
   /** Controlled. Omit and use `defaultValue` for uncontrolled. */
   value?: string | null
@@ -32,6 +35,7 @@ export interface TabsProps {
 
 export function Tabs(props: TabsProps) {
   const {
+    size,
     items, value, defaultValue, onValueChange, onClose, label, orientation, activation, variant,
     children, keepMounted = false, closeLabel,
   } = props
@@ -48,7 +52,7 @@ export function Tabs(props: TabsProps) {
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { label, variant, panels: children !== undefined, closeLabel })
+  const api = connect(state, machine.send, reactNormalizer, { label, variant, panels: children !== undefined, closeLabel, size })
 
   useEffect(() => machine.send({ type: 'SYNC_ITEMS', items }), [machine, items])
   useEffect(() => {

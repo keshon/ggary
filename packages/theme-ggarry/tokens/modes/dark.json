@@ -13,6 +13,7 @@
     "danger-subtle": "{color.danger.950}",
     "success-subtle": "{color.success.950}",
     "warning-subtle": "{color.warning.950}",
+    "highlight": "{color.warning.950}",
     "scrim": "rgba(2, 6, 23, 0.72)"
   },
   "text": {

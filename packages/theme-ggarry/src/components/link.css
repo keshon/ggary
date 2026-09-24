@@ -1,0 +1,33 @@
+/* ==========================================================================
+   GGarry — link
+
+   Accent ink and an underline that is always there: a link in running text
+   told from its words by colour alone is lost to whoever cannot see the
+   colour. The underline thickens under the pointer rather than appearing.
+   ========================================================================== */
+
+:is([data-scope='link'][data-part='root'], [data-scope='prose'][data-part='root'] a) {
+  color: var(--ggarry-text-accent);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  border-radius: var(--ggarry-radius-mark);
+  transition: text-decoration-thickness var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+:is([data-scope='link'][data-part='root'], [data-scope='prose'][data-part='root'] a):hover {
+  text-decoration-thickness: var(--ggarry-size-indicator);
+}
+:is([data-scope='link'][data-part='root'], [data-scope='prose'][data-part='root'] a):focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+
+[data-scope='link'][data-part='icon'] {
+  inline-size: 0.85em;
+  block-size: 0.85em;
+  margin-inline-start: 0.15em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is([data-scope='link'][data-part='root'], [data-scope='prose'][data-part='root'] a) { transition: none; }
+}
