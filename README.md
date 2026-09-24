@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3505 tests, 1309 of them in headless Chrome
+npm test         # 3507 tests, 1309 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -2546,10 +2546,22 @@ Found on the way:
 ## Layering inside core
 
 ```
-components/<name>/machine.ts   pure reducer. No DOM. Node-testable.
-components/<name>/connect.ts   state -> prop bags. Framework-neutral.
-utils/*.ts                     DOM-aware, framework-free.
+components/<name>/<name>.anatomy.ts   the parts, and the component's overview comment
+components/<name>/<name>.types.ts     props, state, events, words, options
+components/<name>/<name>.machine.ts   pure reducer. No DOM. Node-testable. (Stateless components have none.)
+components/<name>/<name>.connect.ts   state -> prop bags. Framework-neutral.
+components/<name>/<name>.<role>.ts    anything else, named for its job: .drag, .collection, .links, .source
+components/<name>/index.ts            re-exports only
+utils/*.ts                            DOM-aware, framework-free.
 ```
+
+A connect takes what it reads — props, a machine's `state` and `send`, or a
+controller's snapshot — then the normalizer, then at most one `options`
+object that carries its `words` and callbacks. A twelfth word or a new
+callback is a new field, never a new positional argument.
+`tests/core-shape.contract.test.ts` holds both the layout and the signature;
+twelve components that had grown into one `index.ts` (Gantt's was 1,065 lines)
+were split to it, their exports unchanged.
 
 "SSR-safe" is not "no DOM" — it is *no DOM access at module scope*. `utils/` may
 touch `document` freely inside functions. The machine tests run in vitest's
@@ -2746,6 +2758,7 @@ sandbox build prints none.
 | machine | node | `*.machine.test.ts` | 661 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
 | contract | node | `icons.contract.test.ts` | 399 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 5 tests. Every discovered theme — GGarry, now the only one: structure, literals, contrast, coverage. |
+| contract | node | `core-shape.contract.test.ts` | 2 tests. Every component laid out as `<dir>.<role>.ts` with a re-export-only index; every connect ending at the normalizer or one `options`. |
 | contract | node | `checks.contract.test.ts` | 30 tests. The gates themselves: each rule fires on a planted defect — the literal families and their ledger among them; the colour engine. |
 | dom | jsdom | `conformance.dom.test.ts` | 1078 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |

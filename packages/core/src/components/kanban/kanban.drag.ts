@@ -1,4 +1,4 @@
-import type { KanbanEvent } from './index'
+import type { KanbanEvent } from './kanban.types'
 
 /**
  * The board's pointer: a card dragged from one place to another, and the

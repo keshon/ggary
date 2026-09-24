@@ -1,11 +1,7 @@
 import type { Dict, Normalizer } from '../../types'
 import type { StatusTone } from '../../utils/tone'
 import { statusBarAnatomy as anatomy } from './status-bar.anatomy'
-
-export interface StatusBarProps {
-  /** Names the strip as a group: "Editor status". Without it the strip is plain readings. */
-  label?: string
-}
+import type { StatusBarProps } from './status-bar.types'
 
 /**
  * A strip ONE LINE tall of readings rather than controls — the branch and the

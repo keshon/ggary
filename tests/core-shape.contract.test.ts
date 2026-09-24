@@ -20,6 +20,27 @@ const files = (dir: string): string[] =>
 
 const CONNECT = /export function (connect\w*)(?:<[^>]*>)?\(([\s\S]*?)\)\s*(?::[^{]*)?\{/g
 
+it('every component is laid out the same way: index re-exports, the rest named <dir>.<role>.ts', () => {
+  const wrong: string[] = []
+  for (const dir of readdirSync(components)) {
+    const names = readdirSync(join(components, dir))
+    if (!names.includes(`${dir}.anatomy.ts`)) wrong.push(`${dir}: no ${dir}.anatomy.ts`)
+    for (const name of names) {
+      if (name !== 'index.ts' && !name.startsWith(`${dir}.`)) wrong.push(`${dir}/${name}: not named ${dir}.<role>.ts`)
+    }
+    // Statements only: a declaration in an index is code nobody finds by its file name.
+    const statements = readFileSync(join(components, dir, 'index.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, '')
+      .split(/(?<=['"])\s*;?\s*\n/)
+      .map((s) => s.trim())
+      .filter(Boolean)
+    for (const statement of statements) {
+      if (!/^export (type )?(\{[\s\S]*\}|\*) from '\.\.?\/[\w./-]+'$/.test(statement)) wrong.push(`${dir}/index.ts: ${statement.slice(0, 60)}`)
+    }
+  }
+  expect(wrong).toEqual([])
+})
+
 it('every connect ends at the normalizer or at one `options` after it', () => {
   const found: string[] = []
   const wrong: string[] = []

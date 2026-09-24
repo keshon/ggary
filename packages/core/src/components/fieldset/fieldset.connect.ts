@@ -2,6 +2,7 @@ import type { Dict, Normalizer } from '../../types'
 import { groupValidity, type GroupContext } from '../../utils/group'
 import type { FieldEvent, FieldState } from '../field/field.types'
 import { fieldsetAnatomy } from './fieldset.anatomy'
+import type { FieldsetConnectOptions } from './fieldset.types'
 
 export const fieldsetIds = (id: string) => ({
   root: id,
@@ -9,13 +10,6 @@ export const fieldsetIds = (id: string) => ({
   hint: `${id}-hint`,
   error: `${id}-error`,
 })
-
-export interface FieldsetConnectOptions {
-  legend?: boolean
-  hint?: boolean
-  /** Shown when the group is invalid. Absent, the first failing control's own message is used. */
-  error?: string
-}
 
 /**
  * A native <fieldset> and <legend>: a group of controls with one name, one

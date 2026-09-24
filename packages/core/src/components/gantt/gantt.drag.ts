@@ -1,4 +1,4 @@
-import type { GanttEdge, GanttEvent } from './index'
+import type { GanttEdge, GanttEvent } from './gantt.types'
 
 /**
  * A Gantt bar under a pointer: its body moves it, its ends resize it, in whole
