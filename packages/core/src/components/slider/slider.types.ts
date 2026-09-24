@@ -1,6 +1,9 @@
 import type { ControlSize } from '../../utils/size'
 export type SliderSize = ControlSize
 
+/** A labelled tick under the track: a value, or a value with its own words. Labels only — the step still decides where a thumb stops. */
+export type SliderMark = number | { value: number; label?: string }
+
 export interface SliderProps {
   id: string
   /** The id the input already has — server markup a custom element enhances. */
@@ -22,6 +25,8 @@ export interface SliderProps {
   valueText?: string
   /** Show the value beside the track. */
   showValue?: boolean
+  /** Labelled ticks under the track. A bare number is labelled with the formatted value. */
+  marks?: SliderMark[]
   size?: SliderSize
   disabled?: boolean
   required?: boolean

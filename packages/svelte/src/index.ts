@@ -70,6 +70,7 @@ export { default as Popconfirm } from './components/popconfirm/Popconfirm.svelte
 export { default as Upload } from './components/upload/Upload.svelte'
 export { default as List } from './components/list/List.svelte'
 export { default as ListItem } from './components/list/ListItem.svelte'
+export { default as RangeSlider } from './components/range-slider/RangeSlider.svelte'
 export { default as ContextMenu } from './components/context-menu/ContextMenu.svelte'
 export { default as Result } from './components/result/Result.svelte'
 export { default as Divider } from './components/divider/Divider.svelte'

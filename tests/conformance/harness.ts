@@ -160,6 +160,28 @@ export interface SliderProps {
   disabled?: boolean
   required?: boolean
   invalid?: boolean
+  marks?: (number | { value: number; label?: string })[]
+  formatValue?: (value: number) => string
+}
+
+/** RangeSlider: two thumbs on one track. */
+export interface RangeSliderProps {
+  label: string
+  value?: [number, number]
+  defaultValue?: [number, number]
+  onValueChange?: (value: [number, number]) => void
+  min?: number
+  max?: number
+  step?: number
+  minGap?: number
+  name?: string | [string, string]
+  valueDisplay?: 'header' | 'bubbles' | 'inputs'
+  prefix?: string
+  suffix?: string
+  marks?: (number | { value: number; label?: string })[]
+  formatValue?: (value: number) => string
+  disabled?: boolean
+  invalid?: boolean
 }
 
 export interface NumberFieldProps {
@@ -1271,6 +1293,7 @@ export interface Adapter {
   timePicker(props: TimePickerProps, target: HTMLElement): Promise<Mounted<TimePickerProps>>
   upload(props: UploadProps, target: HTMLElement): Promise<Mounted<UploadProps>>
   list(props: ListProps, target: HTMLElement): Promise<Mounted<ListProps>>
+  rangeSlider(props: RangeSliderProps, target: HTMLElement): Promise<Mounted<RangeSliderProps>>
   result(props: ResultProps, target: HTMLElement): Promise<Mounted<ResultProps>>
   popconfirm(props: PopconfirmProps, target: HTMLElement): Promise<Mounted<PopconfirmProps>>
   contextMenu(props: ContextMenuProps, target: HTMLElement): Promise<Mounted<ContextMenuProps>>

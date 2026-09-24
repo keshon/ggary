@@ -50,8 +50,13 @@
 
 /* --- slider -------------------------------------------------------------------- */
 
+/* A grid: the input and its number on one row, the marks under the input.
+   The number's column exists only when there is a number, so a slider
+   without one keeps its whole width. */
 [data-scope='slider'][data-part='root'] {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-columns: auto;
   align-items: center;
   min-inline-size: 0;
 }
@@ -60,7 +65,8 @@
    behaviour — keys, step, value, role — stays the browser's. */
 [data-scope='slider'][data-part='input'] {
   appearance: none;
-  flex: 1 1 auto;
+  grid-row: 1;
+  grid-column: 1;
   min-inline-size: 0;
   margin: 0;
   background: transparent;
@@ -74,8 +80,34 @@
 }
 
 [data-scope='slider'][data-part='output'] {
-  flex: none;
+  grid-row: 1;
+  grid-column: 2;
   font-variant-numeric: tabular-nums;
+}
+[data-scope='slider'][data-part='marks'] {
+  position: relative;
+  grid-column: 1;
+}
+[data-scope='slider'][data-part='mark'] {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: calc(var(--gg-mark, 0) * 100%);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  translate: -50% 0;
+}
+[data-scope='slider'][data-part='mark']:dir(rtl) {
+  translate: 50% 0;
+}
+/* The marks at the ends stand inside the track from their end, rather than centred half past it. */
+[data-scope='slider'][data-part='mark'][data-edge='start'] {
+  translate: 0 0;
+}
+[data-scope='slider'][data-part='mark'][data-edge='end'] {
+  translate: -100% 0;
+}
+[data-scope='slider'][data-part='mark'][data-edge='end']:dir(rtl) {
+  translate: 100% 0;
 }
 
 /* --- number field ---------------------------------------------------------------- */

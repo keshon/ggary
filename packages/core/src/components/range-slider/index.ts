@@ -1,0 +1,5 @@
+export { rangeSliderAnatomy } from './range-slider.anatomy'
+export type { RangeSliderPart } from './range-slider.anatomy'
+export { connect, placeEnd, rangeSliderIds } from './range-slider.connect'
+export type { RangeSliderApi, RangeSliderConnectOptions } from './range-slider.connect'
+export type { RangeSliderProps, RangeSliderWords, RangeValue, RangeValueDisplay } from './range-slider.types'

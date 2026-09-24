@@ -1,0 +1,111 @@
+/* Range slider: two native range inputs over one drawn track. Geometry only.
+
+   The inputs lie on top of each other across the whole control and take no
+   pointer; only their thumbs do, so each thumb is dragged as itself and a
+   press anywhere else falls through to the control, which moves the nearer
+   thumb there. Their own tracks are blank: the track and the fill between the
+   thumbs are drawn once, underneath, from --gg-range-start and --gg-range-end
+   (0 to 1, set on the root). Where they sit along the track depends on the
+   thumb's size, which is the theme's to say. */
+
+[data-scope='range-slider'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+[data-scope='range-slider'][data-part='header'] {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  min-inline-size: 0;
+}
+[data-scope='range-slider'][data-part='value'] {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+[data-scope='range-slider'][data-part='bubbles'] {
+  position: relative;
+}
+[data-scope='range-slider'][data-part='bubble'] {
+  position: absolute;
+  inset-block-end: 0;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  translate: -50% 0;
+}
+[data-scope='range-slider'][data-part='bubble']:dir(rtl) {
+  translate: 50% 0;
+}
+[data-scope='range-slider'][data-part='control'] {
+  position: relative;
+  touch-action: none;
+  cursor: pointer;
+}
+[data-scope='range-slider'][data-part='control'][data-disabled] {
+  cursor: not-allowed;
+}
+:is([data-scope='range-slider'][data-part='track'], [data-scope='range-slider'][data-part='range']) {
+  position: absolute;
+  pointer-events: none;
+}
+[data-scope='range-slider'][data-part='thumb'] {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+}
+[data-scope='range-slider'][data-part='thumb'][data-front] {
+  z-index: 2;
+}
+[data-scope='range-slider'][data-part='thumb']::-webkit-slider-runnable-track {
+  background: none;
+}
+[data-scope='range-slider'][data-part='thumb']::-moz-range-track {
+  background: none;
+}
+[data-scope='range-slider'][data-part='thumb']::-webkit-slider-thumb {
+  appearance: none;
+  pointer-events: auto;
+  cursor: grab;
+}
+[data-scope='range-slider'][data-part='thumb']::-moz-range-thumb {
+  pointer-events: auto;
+  cursor: grab;
+}
+[data-scope='range-slider'][data-part='thumb']:disabled::-webkit-slider-thumb {
+  cursor: not-allowed;
+}
+[data-scope='range-slider'][data-part='marks'] {
+  position: relative;
+}
+[data-scope='range-slider'][data-part='mark'] {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: calc(var(--gg-mark, 0) * 100%);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  translate: -50% 0;
+}
+[data-scope='range-slider'][data-part='mark']:dir(rtl) {
+  translate: 50% 0;
+}
+/* The marks at the ends stand inside the track from their end, rather than centred half past it. */
+[data-scope='range-slider'][data-part='mark'][data-edge='start'] {
+  translate: 0 0;
+}
+[data-scope='range-slider'][data-part='mark'][data-edge='end'] {
+  translate: -100% 0;
+}
+[data-scope='range-slider'][data-part='mark'][data-edge='end']:dir(rtl) {
+  translate: 100% 0;
+}
+[data-scope='range-slider'][data-part='fields'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+}

@@ -2,9 +2,9 @@
 
 A UI kit scaffold: one framework-agnostic core, two sibling renderers (React 19
 and Svelte 5), and one design language, GGarry, on top of it.
-A hundred and ten components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, TimePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+A hundred and eleven components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, TimePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
-RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, NumberField, FileDrop, Tabs,
+RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, RangeSlider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
 Menu, Menubar, Badge, Avatar, AvatarGroup, Spinner, Skeleton, Card, Panel, Banner,
 Note, EmptyState, Divider, Prose, Text, Link, Flex, FlexItem, Columns, Column, Popconfirm, ContextMenu, Result, Upload, List and ListItem — built end to end to prove the architecture holds.
@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3878 tests, 1451 of them in headless Chrome
+npm test         # 3936 tests, 1476 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck   # tsc, then svelte-check over every .svelte file
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -1326,6 +1326,64 @@ Found on the way:
   differs from the number the input already holds.
 - **`PageUp` does not step a number input** — that is a range input's behaviour. A
   browser test claimed it and failed, which is what a browser test is for.
+
+## RangeSlider, and marks
+
+Two ends on one track: a price from and to, a run time from and to.
+
+```tsx
+<RangeSlider label="Price" min={0} max={200} step={5} value={price} onValueChange={setPrice}
+             formatValue={(n) => `€${n}`} marks={[0, 50, 100, 150, 200]} />
+<RangeSlider label="Price" valueDisplay="inputs" prefix="€" name={['price_min', 'price_max']} … />
+<Slider label="Parallel agents" min={0} max={16} marks={[0, 4, 8, 12, 16]} … />
+```
+
+**Two native range inputs over one track.** Each thumb is a real slider,
+"Minimum" and "Maximum", inside a group named by the label: the keys, the step,
+the `slider` role, the announcement and the form value stay the browser's, as
+Slider's do. The inputs take no pointer themselves; only their thumbs do, and a
+press anywhere else on the track reaches the kit, which moves the nearer thumb
+there, gives it the focus, and lets a drag carry it on. The kit also keeps the
+ends apart: they meet but never cross (`minGap` keeps them further apart), and a
+thumb pushed past the other is written back to where it stops — a state that did
+not change would otherwise draw nothing, and leave the thumb where the pointer
+left it. Once the lower thumb is in the upper half it comes to the front, so two
+thumbs met at the top can be pulled apart; met at the bottom, the upper one is on
+top for the same reason. The fill is drawn once under the thumbs from
+`--gg-range-start` and `--gg-range-end` (0 to 1), placed where the thumbs'
+centres really are: half a thumb in from each end, not at the bare percentage.
+
+**The values are shown one of three ways**, chosen from mockups:
+
+- `header` (the default): the range in words beside the label, "€20 – €80".
+- `bubbles`: each value over its thumb. Thumbs closer than a seventh of the
+  track share one bubble, "€60 – €75", rather than piling their words up.
+- `inputs`: two number fields under the track — the kit's own Input in an
+  InputGroup, with `prefix` or `suffix` — for when the exact number matters.
+  What is typed is a draft until Enter or leaving the field commits it, so "3"
+  on the way to "35" does not throw the thumb about; the commit is kept on the
+  step and on its side of the other end, and Escape puts the draft back.
+
+The header and the bubbles are hidden from a screen reader: each thumb already
+says its value, in `formatValue`'s words as `aria-valuetext`. `name` submits
+both ends under one name, or each under its own.
+
+**Marks**, on Slider and RangeSlider alike: `marks={[0, 15, 30]}` or
+`{ value, label }`, a tick and its words under the value, the ones inside the
+range (or passed) drawn stronger. They are labels only — the step still decides
+where a thumb stops — and seen, not read. The marks at the ends stand inside the
+track from their end rather than centred half past it, where a narrow container
+would cut them.
+
+Found on the way:
+
+- **The ring went round the whole track.** Both inputs span the track, so the
+  kit's one focus ring, drawn on the focused element, circled all of it and said
+  nothing about which end had the keys. The range slider is the one place the
+  ring moves off its element: onto the thumb.
+- **`setPointerCapture` throws for a pointer the browser does not hold.** A
+  synthetic press in a test is one; the drag now follows without capture when it
+  cannot have it.
 
 ## ChoiceCards, Search, InputGroup, FileDrop and ButtonGroup
 
@@ -3156,16 +3214,16 @@ sandbox build prints none.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 667 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
-| contract | node | `icons.contract.test.ts` | 468 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `icons.contract.test.ts` | 472 tests. Core names only real glyphs, adapters draw none. |
 | contract | node | `themes.contract.test.ts` | 5 tests. Every discovered theme — GGarry, now the only one: structure, literals, contrast, coverage. |
 | contract | node | `packages.contract.test.ts` | 9 tests. Each package's exports are its root and `./*`; every component directory has an index; both adapters have the same directories, the same components in each, and all of them at their root. |
 | contract | node | `anatomy.contract.test.ts` | 2 tests. Every element an adapter draws takes a prop bag from core — no bare `<span>` a theme could only name by its tag — and no adapter writes a class. |
 | contract | node | `sizes.contract.test.ts` | 3 tests. Every control's size is `ControlSize`, and its stylesheet draws `sm` and `lg`. |
 | contract | node | `core-shape.contract.test.ts` | 2 tests. Every component laid out as `<dir>.<role>.ts` with a re-export-only index; every connect ending at the normalizer or one `options`. |
 | contract | node | `checks.contract.test.ts` | 30 tests. The gates themselves: each rule fires on a planted defect — the literal families and their ledger among them; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1184 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1202 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 1184 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1202 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
 | browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
 | browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |
@@ -3189,9 +3247,11 @@ sandbox build prints none.
 | browser | Chrome | `toast.browser.test.ts` | 4 tests. The region in its corner over a clipping ancestor, presses passing through its empty stretch, a real pointer holding a toast, the keyboard reaching its action. |
 | browser | Chrome | `data-grid.browser.test.ts` | 13 tests. A row's checkbox pressed by a real pointer, React and Svelte; its Open button shown under the pointer and opening the row without selecting or editing it, and Shift+Enter opening it from a cell that edits. The grid at 700,000 rows: a screenful drawn, the true count announced, the scaled scrollbar reaching the last row flush with the bottom, Ctrl+End with the focus surviving recycled rows, a pinned column staying put, resizing by drag, a scroll step inside a frame, requests aborted for rows scrolled past, and React under StrictMode and Svelte reaching the end too. |
 | machine | node | `time-picker.machine.test.ts` | 13 tests. Times typed in the locale's words, with the day-period word at either end; the times at a step within min and max; the nearest time; opening on the value, walking, typing, committing and clearing; a day and a time joined only when both are there, and split back. |
+| machine | node | `range-slider.machine.test.ts` | 11 tests. An end kept on the step and the track, meeting the other but never crossing it, the gap asked for kept; the group and its two named sliders; a value given backwards put right; a thumb pushed past the other written back; which thumb is in front; bubbles apart and shared; a field's draft committed on Enter or when left, Escape putting it back; marks in range and at the ends; a slider's marks passed. |
 | machine | node | `upload.machine.test.ts` | 13 tests. Sizes in the locale's decimal units and an `accept` list read as the file input reads one; files refused before sending and why; so many sent at once, in order; progress, and none when the upload does not know; what a file there submits and what is said; a failure's own words and a retry as a new try; a cancel aborting its try and its late answer ignored; a synchronous throw; one file at most replacing the last; the owner told of changes, not percents; going away aborting what is under way. |
 | machine | node | `popconfirm.machine.test.ts` | 8 tests. One attempt while one is under way; closing on success, staying and saying why on a failure (a rejection, a throw, or the words); a late answer to an abandoned attempt ignored; a new opening forgetting the failure; cancels heard for every close but the action's; the focus mark by `destructive`; the alert dialog's name and description. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
+| browser | Chrome | `range-slider.browser.test.ts` | 7 tests. A press on the track moving the nearer thumb and giving it the focus, a drag carrying it; the real keys by the step and End stopping against the other end; two thumbs met at the top, the lower under the pointer; the fill and the bubbles at the thumbs' real centres; a mark's tick under its thumb and the end marks inside the track; the ring on the thumb, not the track; a slider's marks under its thumb. |
 | browser | Chrome | `list.browser.test.ts` | 4 tests. A press anywhere on a row landing on its stretched button, found by what is under the pointer at its line and its icon, and its own action pressed as itself; Tab walking a row then its actions, the ring on the whole row; the columns lined up whatever a row has and a long line cut before the meta; a bordered list one surface, cards apart. |
 | browser | Chrome | `upload.browser.test.ts` | 4 tests. A row's fill as wide as its progress and one of unknown progress kept inside its row; the buttons in one column down the list whatever a row has; a real drop listing a refused file with its reason; tiles square in a wrapping row, the zone a tile's size and the limits under them. |
 | browser | Chrome | `date-picker.browser.test.ts` | 8 tests. The calendar under the field over an ancestor that clips, on the chosen day; the keyboard turning pages with the focus riding along and Enter choosing; a typed day committed on Tab; a range drawn under a real pointer before the second press. Two months level and apart, each title centred over its grid, the real keyboard carrying the focus from one grid into the other. A time list under its field at its width, real typing walking it to the nearest time in view and Enter keeping the typed one; the list opening with its time in the middle, some rows tall, and the arrows not scrolling it needlessly; a date-time's time on the day's line inside one field-tall box. |
@@ -3310,6 +3370,8 @@ Real, and deliberately left open:
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that was Instrument's position, and it stays available.
+- **Sliders are horizontal.** No vertical Slider or RangeSlider, and no more
+  than two thumbs.
 - **List is not windowed.** A few hundred rows are fine; thousands belong in
   DataGrid, which draws only what is on screen. Nor are rows chosen, dragged
   or grouped under headings: those are DataGrid's, Kanban's and Tree's.

@@ -248,6 +248,15 @@ export const SITEMAP: SiteCategory[] = [
         ]
       },
       {
+        "label": "Range slider",
+        "anchors": [
+          {
+            "id": "range-slider",
+            "label": null
+          }
+        ]
+      },
+      {
         "label": "Number field",
         "anchors": [
           {

@@ -13,7 +13,7 @@
   --slider-thumb: 16px;
   --slider-direction: to right;
 
-  gap: var(--ggarry-space-3);
+  gap: 2px var(--ggarry-space-3);
   font-family: var(--ggarry-font-family-sans);
   font-size: var(--ggarry-font-size-sm);
   color: var(--ggarry-text-default);
@@ -83,6 +83,39 @@
 [data-scope='slider'][data-part='output'] {
   min-inline-size: 3ch;
   text-align: end;
+}
+
+/* Marks: a tick and its words under the value they name. A thumb's centre
+   travels from half a thumb in to half a thumb short of the end, so a mark
+   stands where the thumb would, not where the percentage alone would put it. */
+[data-scope='slider'][data-part='marks'] {
+  block-size: 20px;
+  margin-inline: 0;
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+}
+[data-scope='slider'][data-part='mark'] {
+  inset-inline-start: calc(var(--slider-thumb) / 2 + var(--gg-mark, 0) * (100% - var(--slider-thumb)));
+  padding-block-start: 6px;
+}
+[data-scope='slider'][data-part='mark']::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  inline-size: 1px;
+  block-size: 4px;
+  background: var(--ggarry-border-strong);
+}
+[data-scope='slider'][data-part='mark'][data-edge='start']::before {
+  inset-inline-start: 0;
+}
+[data-scope='slider'][data-part='mark'][data-edge='end']::before {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}
+[data-scope='slider'][data-part='mark'][data-passed] {
+  color: var(--ggarry-text-default);
 }
 
 @media (forced-colors: active) {

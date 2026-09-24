@@ -25,6 +25,7 @@
     Fieldset,
     FileDrop,
     Upload,
+    RangeSlider,
     List,
     ListItem,
     Input,
@@ -178,6 +179,11 @@
   let dateLog = $state('—')
   let listRows = $state<Reviewer[]>(reviewers)
   let listLog = $state('—')
+  let priceRange = $state<[number, number]>([20, 80])
+  let rangeLog = $state('—')
+  const euro = (n: number) => `€${n}`
+  const logPrice = (value: [number, number]) => (rangeLog = `price: ${value.join(' – ')}`)
+  const minutes = (n: number) => `${n} min`
   let timeLog = $state('—')
   let placeLog = $state('—')
   let boardLog = $state('—')
@@ -739,11 +745,23 @@
   
     <h3 id="slider" style="margin-top: 32px">Slider</h3>
     <div class="controls">
-      <Slider label="Parallel agents" min={0} max={16} bind:value={agents} showValue formatValue={agentsText} />
+      <Slider label="Parallel agents" min={0} max={16} bind:value={agents} showValue formatValue={agentsText} marks={[0, 4, 8, 12, 16]} />
       <Field label="Confidence threshold" hint="Below it the agent asks before acting">
         <Slider min={0} max={100} step={5} defaultValue={80} showValue />
       </Field>
     </div>
+
+    <h3 id="range-slider" style="margin-top: 32px">Range slider</h3>
+    <p class="note">The range in the header, with marks; in bubbles over the thumbs, sharing one when they come close; in two fields that move the thumbs when typed in (Enter or leaving commits); and disabled.</p>
+    <div class="fields" style="gap: 28px 32px">
+      <RangeSlider label="Price" min={0} max={200} step={5} bind:value={priceRange} formatValue={euro} onValueChange={logPrice} />
+      <RangeSlider label="Run time" min={0} max={60} defaultValue={[2, 45]} formatValue={minutes} marks={[0, 15, 30, 45, 60]} />
+      <RangeSlider label="Price" valueDisplay="bubbles" min={0} max={200} step={5} bind:value={priceRange} formatValue={euro} onValueChange={logPrice} />
+      <RangeSlider label="Budget, close together" valueDisplay="bubbles" min={0} max={200} step={5} defaultValue={[60, 75]} formatValue={euro} />
+      <RangeSlider label="Price" valueDisplay="inputs" prefix="€" min={0} max={200} step={5} bind:value={priceRange} formatValue={euro} onValueChange={logPrice} name={['price_min', 'price_max']} />
+      <RangeSlider label="Retries" min={0} max={10} defaultValue={[1, 3]} disabled marks={[0, 5, 10]} />
+    </div>
+    <pre class="state">{rangeLog}</pre>
   
     <h3 id="number-field" style="margin-top: 32px">Number field</h3>
     <div class="vector">

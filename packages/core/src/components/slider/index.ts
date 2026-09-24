@@ -1,5 +1,5 @@
 export { sliderAnatomy } from './slider.anatomy'
 export type { SliderPart } from './slider.anatomy'
-export { connect, sliderFill } from './slider.connect'
-export type { SliderConnectOptions } from './slider.connect'
-export type { SliderProps, SliderSize } from './slider.types'
+export { connect, sliderFill, sliderMarks } from './slider.connect'
+export type { SliderConnectOptions, SliderMarkView } from './slider.connect'
+export type { SliderMark, SliderProps, SliderSize } from './slider.types'

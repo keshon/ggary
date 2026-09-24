@@ -18,7 +18,7 @@ export interface SliderProps
 
 export const Slider = forwardRef<HTMLInputElement, SliderProps>(function Slider(props, forwardedRef) {
   const {
-    min, max, step, name, label, valueText, showValue, size, disabled, required, invalid,
+    min, max, step, name, label, valueText, showValue, size, disabled, required, invalid, marks,
     value, defaultValue, onValueChange, formatValue, ...rest
   } = props
   const id = `gg-slider-${useId().replace(/:/g, '')}`
@@ -26,7 +26,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(function Slider(
   const controlled = value !== undefined
 
   const api = connect(
-    { id, value: controlled ? value : uncontrolled, min, max, step, name, label, valueText, showValue, size, disabled, required, invalid },
+    { id, value: controlled ? value : uncontrolled, min, max, step, name, label, valueText, showValue, size, disabled, required, invalid, marks },
     reactNormalizer,
     {
       onValueChange: (next) => {
@@ -48,6 +48,15 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(function Slider(
     <div {...api.rootProps}>
       <input ref={ref} {...mergeProps(rest, api.inputProps)} value={api.value} />
       {api.showValue && <output {...api.outputProps}>{api.valueLabel}</output>}
+      {api.marks.length > 0 && (
+        <div {...api.marksProps}>
+          {api.marks.map((mark) => (
+            <span key={mark.value} {...api.getMarkProps(mark)}>
+              {mark.label}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   )
 })

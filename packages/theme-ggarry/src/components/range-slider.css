@@ -1,0 +1,205 @@
+/* ==========================================================================
+   GGarry — range slider
+
+   Slider's track and thumbs, twice: the fill runs between the two thumbs,
+   not from the start. The values are said in one of three places — in words
+   beside the label, in a bubble over each thumb (one bubble for both when
+   they come close), or in two fields under the track that are the kit's own
+   Inputs. Marks are Slider's.
+   ========================================================================== */
+
+[data-scope='range-slider'][data-part='root'] {
+  --range-track: 4px;
+  --range-thumb: 16px;
+  /* Where a value stands along the control: a thumb's centre travels from half a thumb in to half a thumb short of the end. */
+  --range-at-start: calc(var(--range-thumb) / 2 + var(--gg-range-start, 0) * (100% - var(--range-thumb)));
+  --range-at-end: calc(var(--range-thumb) / 2 + var(--gg-range-end, 1) * (100% - var(--range-thumb)));
+  gap: var(--ggarry-space-2);
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-default);
+}
+[data-scope='range-slider'][data-part='root'][data-size='sm'] {
+  --range-thumb: 12px;
+}
+[data-scope='range-slider'][data-part='root'][data-size='lg'] {
+  --range-track: 6px;
+  --range-thumb: 20px;
+}
+[data-scope='range-slider'][data-part='root'][data-disabled] {
+  opacity: var(--ggarry-opacity-disabled);
+}
+
+[data-scope='range-slider'][data-part='header'] {
+  gap: var(--ggarry-space-3);
+}
+[data-scope='range-slider'][data-part='label'] {
+  font-weight: var(--ggarry-font-weight-medium);
+}
+[data-scope='range-slider'][data-part='value'] {
+  font-weight: var(--ggarry-font-weight-semibold);
+}
+
+/* --- the track ----------------------------------------------------------------- */
+
+[data-scope='range-slider'][data-part='control'] {
+  block-size: 24px;
+}
+:is([data-scope='range-slider'][data-part='track'], [data-scope='range-slider'][data-part='range']) {
+  inset-block-start: calc(50% - var(--range-track) / 2);
+  block-size: var(--range-track);
+  border-radius: var(--ggarry-radius-full);
+}
+[data-scope='range-slider'][data-part='track'] {
+  inset-inline: 0;
+  background: var(--ggarry-border-control);
+}
+[data-scope='range-slider'][data-part='range'] {
+  inset-inline-start: var(--range-at-start);
+  inline-size: calc(var(--range-at-end) - var(--range-at-start));
+  border-radius: 0;
+  background: var(--ggarry-bg-accent);
+}
+[data-scope='range-slider'][data-part='root'][data-invalid] [data-part='range'] {
+  background: var(--ggarry-border-danger);
+}
+
+[data-scope='range-slider'][data-part='thumb']::-webkit-slider-runnable-track {
+  block-size: var(--range-track);
+}
+[data-scope='range-slider'][data-part='thumb']::-webkit-slider-thumb {
+  inline-size: var(--range-thumb);
+  block-size: var(--range-thumb);
+  margin-block-start: calc((var(--range-track) - var(--range-thumb)) / 2);
+  border: var(--ggarry-size-indicator) solid var(--ggarry-bg-accent);
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-bg-thumb);
+  box-shadow: var(--ggarry-shadow-thumb);
+  transition: scale var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+[data-scope='range-slider'][data-part='thumb']::-moz-range-thumb {
+  inline-size: var(--range-thumb);
+  block-size: var(--range-thumb);
+  box-sizing: border-box;
+  border: var(--ggarry-size-indicator) solid var(--ggarry-bg-accent);
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-bg-thumb);
+  box-shadow: var(--ggarry-shadow-thumb);
+}
+[data-scope='range-slider'][data-part='thumb']:active:not(:disabled)::-webkit-slider-thumb {
+  scale: 1.15;
+}
+[data-scope='range-slider'][data-part='thumb'][data-invalid]::-webkit-slider-thumb {
+  border-color: var(--ggarry-border-danger);
+}
+[data-scope='range-slider'][data-part='thumb'][data-invalid]::-moz-range-thumb {
+  border-color: var(--ggarry-border-danger);
+}
+/* The one place the kit's ring moves off its element: both inputs span the
+   whole track, so a ring round the focused input would circle the track, not
+   say which end has the keys. It goes round the thumb instead. */
+[data-scope='range-slider'][data-part='thumb']:focus-visible {
+  outline: none;
+}
+[data-scope='range-slider'][data-part='thumb']:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 0 0 var(--ggarry-focus-ring-offset) var(--ggarry-bg-surface),
+    0 0 0 calc(var(--ggarry-focus-ring-offset) + var(--ggarry-focus-ring-width)) var(--ggarry-focus-ring);
+}
+[data-scope='range-slider'][data-part='thumb']:focus-visible::-moz-range-thumb {
+  box-shadow:
+    0 0 0 var(--ggarry-focus-ring-offset) var(--ggarry-bg-surface),
+    0 0 0 calc(var(--ggarry-focus-ring-offset) + var(--ggarry-focus-ring-width)) var(--ggarry-focus-ring);
+}
+
+/* --- bubbles ------------------------------------------------------------------- */
+
+[data-scope='range-slider'][data-part='bubbles'] {
+  block-size: 26px;
+  margin-block-end: calc(-1 * var(--ggarry-space-1));
+}
+[data-scope='range-slider'][data-part='bubble'] {
+  inset-block-end: 6px;
+  padding: 2px var(--ggarry-space-2);
+  border-radius: var(--ggarry-radius-md);
+  background: var(--ggarry-bg-inverted);
+  color: var(--ggarry-text-on-inverted);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-semibold);
+  line-height: var(--ggarry-line-height-row);
+}
+[data-scope='range-slider'][data-part='bubble']::after {
+  content: '';
+  position: absolute;
+  inset-block-end: -3px;
+  inset-inline-start: calc(50% - 4px);
+  z-index: -1;
+  inline-size: 8px;
+  block-size: 8px;
+  background: inherit;
+  rotate: 45deg;
+}
+[data-scope='range-slider'][data-part='bubble'][data-thumb='start'] {
+  inset-inline-start: var(--range-at-start);
+}
+[data-scope='range-slider'][data-part='bubble'][data-thumb='end'] {
+  inset-inline-start: var(--range-at-end);
+}
+[data-scope='range-slider'][data-part='bubble'][data-thumb='both'] {
+  inset-inline-start: calc((var(--range-at-start) + var(--range-at-end)) / 2);
+}
+
+/* --- marks --------------------------------------------------------------------- */
+
+[data-scope='range-slider'][data-part='marks'] {
+  block-size: 20px;
+  margin-block-start: calc(-1 * var(--ggarry-space-2) + 2px);
+  color: var(--ggarry-text-muted);
+  font-size: var(--ggarry-font-size-xs);
+}
+[data-scope='range-slider'][data-part='mark'] {
+  inset-inline-start: calc(var(--range-thumb) / 2 + var(--gg-mark, 0) * (100% - var(--range-thumb)));
+  padding-block-start: 6px;
+}
+[data-scope='range-slider'][data-part='mark']::before {
+  content: '';
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  inline-size: 1px;
+  block-size: 4px;
+  background: var(--ggarry-border-strong);
+}
+[data-scope='range-slider'][data-part='mark'][data-edge='start']::before {
+  inset-inline-start: 0;
+}
+[data-scope='range-slider'][data-part='mark'][data-edge='end']::before {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}
+[data-scope='range-slider'][data-part='mark'][data-in-range] {
+  color: var(--ggarry-text-default);
+}
+
+/* --- fields -------------------------------------------------------------------- */
+
+[data-scope='range-slider'][data-part='fields'] {
+  gap: var(--ggarry-space-2);
+  margin-block-start: var(--ggarry-space-1);
+}
+[data-scope='range-slider'][data-part='separator'] {
+  color: var(--ggarry-text-muted);
+}
+
+@media (forced-colors: active) {
+  [data-scope='range-slider'][data-part='track'] { forced-color-adjust: none; background: CanvasText; }
+  [data-scope='range-slider'][data-part='range'] { forced-color-adjust: none; background: Highlight; }
+  [data-scope='range-slider'][data-part='thumb']::-webkit-slider-thumb {
+    border-color: CanvasText;
+    background: Canvas;
+  }
+  [data-scope='range-slider'][data-part='bubble'] { forced-color-adjust: none; border: 1px solid CanvasText; background: Canvas; color: CanvasText; }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='range-slider'][data-part='thumb']::-webkit-slider-thumb { transition: none; }
+}

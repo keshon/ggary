@@ -15,7 +15,7 @@
   }
 
   let {
-    min, max, step, name, label, valueText, showValue, size, disabled, required, invalid,
+    min, max, step, name, label, valueText, showValue, size, disabled, required, invalid, marks,
     value = $bindable(), defaultValue, onValueChange, formatValue, ...rest
   }: Props = $props()
 
@@ -29,7 +29,7 @@
   const field = getContext<FieldContext | undefined>(FIELD_CONTEXT)
 
   const api = $derived(
-    connect({ id, value, min, max, step, name, label, valueText, showValue, size, disabled, required, invalid }, svelteNormalizer, {
+    connect({ id, value, min, max, step, name, label, valueText, showValue, size, disabled, required, invalid, marks }, svelteNormalizer, {
       onValueChange: (next) => {
         value = next
         onValueChange?.(next)
@@ -54,5 +54,10 @@
   <input bind:this={element} {...attrs} value={api.value} />
   {#if api.showValue}
     <output {...api.outputProps}>{api.valueLabel}</output>
+  {/if}
+  {#if api.marks.length > 0}
+    <div {...api.marksProps}>
+      {#each api.marks as mark (mark.value)}<span {...api.getMarkProps(mark)}>{mark.label}</span>{/each}
+    </div>
   {/if}
 </div>

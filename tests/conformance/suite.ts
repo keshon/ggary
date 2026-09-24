@@ -36,6 +36,7 @@ import { feedbackConformance } from './feedback.spec'
 import { timeConformance } from './time.spec'
 import { uploadConformance } from './upload.spec'
 import { listConformance } from './list.spec'
+import { rangeSliderConformance } from './range-slider.spec'
 import { meterConformance } from './meter.spec'
 import { ringConformance } from './ring.spec'
 import { codeConformance } from './code.spec'
@@ -115,6 +116,7 @@ export function runConformance() {
       timeConformance(adapter)
       uploadConformance(adapter)
       listConformance(adapter)
+      rangeSliderConformance(adapter)
       meterConformance(adapter)
       ringConformance(adapter)
       timelineConformance(adapter)
