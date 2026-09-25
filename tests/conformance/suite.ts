@@ -22,6 +22,7 @@ import { commandPaletteConformance } from './command-palette.spec'
 import { formConformance } from './form.spec'
 import { ganttConformance } from './gantt.spec'
 import { calendarConformance, datePickerConformance } from './date-picker.spec'
+import { anchorConformance } from './anchor.spec'
 import { breadcrumbsConformance, navConformance, paginationConformance, stepsConformance, toolbarConformance } from './navigation.spec'
 import { menubarConformance } from './menubar.spec'
 import { popoverConformance, tooltipConformance } from './popover.spec'
@@ -84,6 +85,7 @@ export function runConformance() {
       buttonGroupConformance(adapter)
       breadcrumbsConformance(adapter)
       navConformance(adapter)
+      anchorConformance(adapter)
       paginationConformance(adapter)
       stepsConformance(adapter)
       toolbarConformance(adapter)

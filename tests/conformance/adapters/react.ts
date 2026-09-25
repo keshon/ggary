@@ -75,6 +75,7 @@ import {
   FileDrop,
   InputGroup,
   Nav,
+  Anchor,
   NumberField,
   Pagination,
   RadioGroup,
@@ -478,6 +479,7 @@ export const react: Adapter = {
   gridTools: (props, target) => mount(ReactGridWithTools as ComponentType<any>, props, target),
   dataGrid: (props, target) => mount(DataGrid as ComponentType<any>, { rowKey: (row: { id: unknown }) => row.id, ...props }, target),
   nav: (props, target) => mount(Nav, props, target),
+  anchor: (props, target) => mount(Anchor, props, target),
   pagination: (props, target) => mount(Pagination, props, target),
   steps: (props, target) => mount(Steps, props, target),
   toolbar: (props, target) =>

@@ -144,3 +144,50 @@
     display: none;
   }
 }
+
+/* --- anchor ----------------------------------------------------------------------- */
+
+/* A list of links down a rail. Folded, the anchor stands at the window's end
+   corner and its list opens above its button; the corner's distance and the
+   list's surface are the theme's. */
+[data-scope='anchor'][data-part='list'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+[data-scope='anchor'][data-part='link'] {
+  display: block;
+  overflow-wrap: anywhere;
+  text-decoration: none;
+}
+[data-scope='anchor'][data-part='panel'][hidden] {
+  display: none;
+}
+[data-scope='anchor'][data-part='root'][data-floating] {
+  position: fixed;
+  z-index: var(--gg-z-popover);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+[data-scope='anchor'][data-floating] [data-part='panel'] {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+[data-scope='anchor'][data-part='trigger'] {
+  display: inline-flex;
+  align-items: center;
+  max-inline-size: 100%;
+}
+[data-scope='anchor'][data-part='trigger-icon'] {
+  flex: none;
+}
+[data-scope='anchor'][data-part='trigger-label'] {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

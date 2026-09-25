@@ -295,6 +295,18 @@ export interface NavProps {
   onOpenChange?: (href: string, open: boolean) => void
 }
 
+/** Anchor: links to the page's sections, folded at the corner with `float`. */
+export interface AnchorProps {
+  label: string
+  items: { label: string; href: string; items?: { label: string; href: string }[] }[]
+  current?: string
+  onCurrentChange?: (href: string) => void
+  float?: boolean | number
+  open?: boolean
+  defaultOpen?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
 export interface PaginationProps {
   items: { label: string; href?: string; page?: number; current?: boolean; disabled?: boolean; gap?: boolean }[]
   label?: string
@@ -1226,6 +1238,7 @@ export interface Adapter {
   buttonGroup(props: ButtonGroupProps, target: HTMLElement): Promise<Mounted<ButtonGroupProps>>
   breadcrumbs(props: BreadcrumbsProps, target: HTMLElement): Promise<Mounted<BreadcrumbsProps>>
   nav(props: NavProps, target: HTMLElement): Promise<Mounted<NavProps>>
+  anchor(props: AnchorProps, target: HTMLElement): Promise<Mounted<AnchorProps>>
   pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
   steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
   toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>

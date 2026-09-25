@@ -1,5 +1,5 @@
 import { createRawSnippet, flushSync, mount, unmount, type Component } from 'svelte'
-import { Avatar, AvatarGroup, Badge, StatusDot, Timeline, Button, CodeBlock, Copyable, Inserts, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster, Divider, TimePicker, Upload, RangeSlider, Icon, Prose, Metric, FileChange, Sparkline, Legend, Meter, Ring, Share, Heatmap, Run, Queue, History, Budget, Log, Diff, Lanes } from '../../../packages/svelte/src/index'
+import { Avatar, AvatarGroup, Badge, StatusDot, Timeline, Button, CodeBlock, Copyable, Inserts, Calendar, Cascader, Tree, Progress, Kanban, CommandPalette, Gantt, Checkbox, CheckboxGroup, ChipGroup, Combobox, DatePicker, Breadcrumbs, ChoiceCardGroup, DataGrid, FileDrop, Input, Menubar, Nav, Anchor, NumberField, Pagination, RadioGroup, Rail, Search, SegmentedControl, Select, Skeleton, Slider, Spinner, Steps, Switch, Textarea, Toaster, Divider, TimePicker, Upload, RangeSlider, Icon, Prose, Metric, FileChange, Sparkline, Legend, Meter, Ring, Share, Heatmap, Run, Queue, History, Budget, Log, Diff, Lanes } from '../../../packages/svelte/src/index'
 import FieldWithControl from './FieldWithControl.svelte'
 import GroupWithControl from './GroupWithControl.svelte'
 import ToolbarWithTools from './ToolbarWithTools.svelte'
@@ -156,6 +156,7 @@ export const svelte: Adapter = {
   dataGrid: (props, target) =>
     mountSvelte(DataGrid as Component<any>, props, target, (p) => ({ rowKey: (row: { id: unknown }) => row.id, ...p })),
   nav: (props, target) => mountSvelte(Nav as Component<any>, props, target),
+  anchor: (props, target) => mountSvelte(Anchor as Component<any>, props, target),
   pagination: (props, target) => mountSvelte(Pagination as Component<any>, props, target),
   steps: (props, target) => mountSvelte(Steps as Component<any>, props, target),
   toolbar: (props, target) => mountSvelte(ToolbarWithTools as Component<any>, props, target),

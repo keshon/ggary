@@ -20,6 +20,7 @@ export { default as ChoiceCardGroup } from './components/choice-card/ChoiceCardG
 export { default as FileDrop } from './components/file-drop/FileDrop.svelte'
 export { default as InputGroup } from './components/input-group/InputGroup.svelte'
 export { default as Nav } from './components/nav/Nav.svelte'
+export { default as Anchor } from './components/anchor/Anchor.svelte'
 export { default as NumberField } from './components/number-field/NumberField.svelte'
 export { default as Pagination } from './components/pagination/Pagination.svelte'
 export { paginationRange } from '@ggary/core/pagination'

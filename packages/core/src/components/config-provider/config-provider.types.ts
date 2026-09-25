@@ -22,6 +22,7 @@ import type { LegendWords } from '../legend'
 import type { LinkWords } from '../link'
 import type { ListWords } from '../list'
 import type { LogWords } from '../log'
+import type { AnchorWords } from '../anchor'
 import type { NavWords } from '../nav'
 import type { PopconfirmWords } from '../popconfirm'
 import type { RangeSliderWords } from '../range-slider'
@@ -71,6 +72,7 @@ export interface KitWords {
   list?: ListWords
   log?: LogWords
   nav?: Partial<NavWords>
+  anchor?: Partial<AnchorWords>
   popconfirm?: Pick<PopconfirmWords, 'failed'>
   queue?: QueueWordsInput
   rangeSlider?: RangeSliderWords
