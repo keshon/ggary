@@ -24,6 +24,9 @@ export function goToFramework(value: string): void {
   if (framework && !location.pathname.endsWith(framework.href)) location.href = framework.href + location.hash
 }
 
+/** A route starts #/; any other hash is a place on the page being read. */
+const isRoute = (hash: string) => hash === '' || hash.startsWith('#/')
+
 /** The page the route names: #/button. An unknown or empty route is the first page. */
 export function currentPage(): DocPage {
   const id = location.hash.replace(/^#\/?/, '')
@@ -32,6 +35,7 @@ export function currentPage(): DocPage {
 
 export function onRouteChange(listener: (page: DocPage) => void): () => void {
   const handle = () => {
+    if (!isRoute(location.hash)) return
     listener(currentPage())
     window.scrollTo(0, 0)
   }
@@ -45,6 +49,21 @@ export function navGroups(current: DocPage): NavGroup[] {
     label: group.title,
     items: group.pages.map((page) => ({ label: page.title, href: `#/${page.id}`, current: page.id === current.id })),
   }))
+}
+
+/**
+ * A page opens at its top with nothing focused. What a page shows open on
+ * load — a dialog, a popover — takes the focus as it opens, as it should in an
+ * app, and the browser scrolls to it; here it is only on show.
+ */
+export function settlePage(): void {
+  requestAnimationFrame(() =>
+    requestAnimationFrame(() => {
+      const active = document.activeElement
+      if (active instanceof HTMLElement && active.closest('.page')) active.blur()
+      window.scrollTo(0, 0)
+    })
+  )
 }
 
 /** The fixed sections every page has, in this order, when it has them. */

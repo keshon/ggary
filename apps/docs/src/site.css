@@ -97,6 +97,7 @@ body {
 }
 .section {
   margin-block-start: 32px;
+  scroll-margin-block-start: 72px;
 }
 .section-title {
   margin: 0 0 12px;
@@ -174,4 +175,28 @@ body {
     grid-column: 1;
     padding: 24px 16px 64px;
   }
+}
+
+/* A small window, for what stands at the window's corner or edge: what is
+   fixed inside it is fixed to it. */
+.frame {
+  contain: layout;
+  position: relative;
+  inline-size: 100%;
+  block-size: 320px;
+}
+/* A dialog shown rather than opened stands in the page, and its frame grows
+   around it. */
+.frame:has(> dialog:not([data-placement='start'], [data-placement='end'])) {
+  block-size: auto;
+}
+.frame > dialog:not([data-placement='start'], [data-placement='end'])[open] {
+  position: relative;
+  inset: auto;
+  margin: 0 auto;
+}
+.frame-end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
 }
