@@ -1,0 +1,177 @@
+/* The docs site's own layout, written as an app using the kit would write it:
+   with the theme's public --gg-* names only. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--gg-page);
+  color: var(--gg-text);
+  font-family: var(--gg-font-sans);
+}
+
+.site {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  grid-template-rows: 56px 1fr;
+  min-block-size: 100vh;
+}
+
+/* --- the bar ------------------------------------------------------------------- */
+
+.bar {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-inline: 20px;
+  border-block-end: 1px solid var(--gg-border);
+  background: var(--gg-page);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-inline-end: 8px;
+  color: var(--gg-text);
+  font-size: 17px;
+  font-weight: 700;
+  text-decoration: none;
+}
+.brand-mark {
+  display: flex;
+  inline-size: 26px;
+  block-size: 26px;
+  color: var(--gg-accent-text);
+}
+.bar-end {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-inline-start: auto;
+}
+.nav-button {
+  display: none;
+}
+
+/* --- the side ------------------------------------------------------------------ */
+
+/* A popover, so it can open from the bar on a narrow screen; on a wide one it
+   stands in the page, and the browser's popover look is taken back. */
+.side {
+  display: block;
+  position: sticky;
+  inset: 56px auto auto;
+  inline-size: auto;
+  block-size: calc(100vh - 56px);
+  margin: 0;
+  overflow-y: auto;
+  padding: 16px 12px 40px;
+  border: 0;
+  border-inline-end: 1px solid var(--gg-border);
+  background: none;
+  color: inherit;
+}
+
+/* --- a page --------------------------------------------------------------------- */
+
+.main {
+  grid-column: 2;
+  min-inline-size: 0;
+  padding: 32px 40px 80px;
+}
+.page {
+  max-inline-size: 1080px;
+}
+.page-title {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.section {
+  margin-block-start: 32px;
+}
+.section-title {
+  margin: 0 0 12px;
+  color: var(--gg-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Specimens: equal cards, each a stage and the prop that made it. */
+.specimens {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+.specimen {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  min-inline-size: 0;
+  margin: 0;
+  border: 1px solid var(--gg-border);
+  border-radius: var(--gg-radius);
+  background: var(--gg-surface);
+}
+.specimen[data-wide] {
+  grid-column: 1 / -1;
+}
+.specimen-stage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-block-size: 96px;
+  min-inline-size: 0;
+  padding: 24px 20px;
+}
+.specimen[data-wide] .specimen-stage {
+  display: block;
+  padding: 20px;
+}
+.specimen-label {
+  padding: 8px 12px;
+  border-block-start: 1px solid var(--gg-border);
+  color: var(--gg-text-muted);
+  font-family: var(--gg-font-mono);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* --- narrow: the navigation folds into a popover from the bar ---------------- */
+
+@media (max-width: 860px) {
+  .site {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .side {
+    display: none;
+  }
+  .side:popover-open {
+    display: block;
+    position: fixed;
+    inset: 56px auto 0 0;
+    inline-size: min(300px, 86vw);
+    margin: 0;
+    border: 0;
+    border-inline-end: 1px solid var(--gg-border);
+    background: var(--gg-page);
+  }
+  .nav-button {
+    display: inline-flex;
+  }
+  .main {
+    grid-column: 1;
+    padding: 24px 16px 64px;
+  }
+}
