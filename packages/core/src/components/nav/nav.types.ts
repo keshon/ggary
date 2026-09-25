@@ -31,6 +31,8 @@ export interface NavProps {
   /** The landmark's name, required: a screen has more than one navigation. */
   label: string
   groups: NavGroup[]
+  /** Each labelled group carries its number before its name, 01, 02…, in the accent: for a long column read by its sections. Drawn, not said. */
+  numbered?: boolean
   /**
    * Which items with sections are open, by href, as the reader set them. An
    * item not listed is open while it or one of its sections is current, and

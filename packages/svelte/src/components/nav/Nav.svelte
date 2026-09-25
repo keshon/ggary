@@ -9,7 +9,7 @@
    * by the button beside it; which are open is kept here unless `open` is
    * given, and follows the reading until the reader sets it.
    */
-  let { label, groups, open, onOpenChange, words: ownWords, ...rest }: Omit<NavProps, 'id'> & { [key: string]: unknown } = $props()
+  let { label, groups, open, onOpenChange, numbered, words: ownWords, ...rest }: Omit<NavProps, 'id'> & { [key: string]: unknown } = $props()
   const kit = getConfig()
   const words = $derived(configWords(kit(), 'nav', ownWords))
 
@@ -21,6 +21,7 @@
         id,
         label,
         groups,
+        numbered,
         words,
         open: open ?? chosen,
         onOpenChange: (href, next) => {

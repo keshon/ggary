@@ -37,6 +37,27 @@
   line-height: var(--ggarry-line-height-relaxed);
 }
 
+/* Numbered: each group's number before its name, in the accent and in figures
+   of one width, so a long column reads as its chapters. A counter draws it, so
+   it is not in the group's name and a screen reader does not read "01". */
+[data-scope='nav'][data-part='root'][data-numbered] {
+  counter-reset: nav-group;
+}
+[data-scope='nav'][data-part='root'][data-numbered] [data-part='group'] {
+  counter-increment: nav-group;
+}
+[data-scope='nav'][data-part='root'][data-numbered] [data-part='group-label'] {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ggarry-space-2);
+  color: var(--ggarry-text-default);
+}
+[data-scope='nav'][data-part='root'][data-numbered] [data-part='group-label']::before {
+  content: counter(nav-group, decimal-leading-zero);
+  color: var(--ggarry-text-accent);
+  font-variant-numeric: tabular-nums;
+}
+
 /* A row of one line is the control's height; a label that wraps grows the
    row by its lines, with the same air above and below, and the icon and the
    count stay on the first line rather than centring on two. */

@@ -114,6 +114,6 @@ export function connect<T = Dict>(props: NavProps, normalize: Normalizer<T>) {
     getGroupProps,
     getItemProps,
     getBranchProps,
-    rootProps: normalize({ ...anatomy.attrs('root'), id: ids.root, 'aria-label': label }),
+    rootProps: normalize({ ...anatomy.attrs('root'), id: ids.root, 'aria-label': label, 'data-numbered': props.numbered ? '' : undefined }),
   }
 }

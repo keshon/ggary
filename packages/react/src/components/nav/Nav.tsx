@@ -11,13 +11,14 @@ export interface NavProps extends Omit<CoreNavProps, 'id'>, Omit<HTMLAttributes<
  * given, and follows the reading until the reader sets it.
  */
 export function Nav(own: NavProps) {
-  const { label, groups, open, onOpenChange, words, ...rest } = useConfigured(own, { words: 'nav' })
+  const { label, groups, open, onOpenChange, numbered, words, ...rest } = useConfigured(own, { words: 'nav' })
   const id = `gg-nav-${useId().replace(/:/g, '')}`
   const [chosen, setChosen] = useState<Record<string, boolean>>({})
   const api = connect(
     {
       id,
       label,
+      numbered,
       groups,
       words,
       open: open ?? chosen,

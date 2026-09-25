@@ -4,7 +4,7 @@ import '../packages/theme-ggarry/src/index.css'
 import { createElement as h, Fragment, type ReactNode } from 'react'
 import { flushSync } from 'react-dom'
 import { createRoot, type Root } from 'react-dom/client'
-import { Breadcrumbs, Pagination, Search, Steps, Toolbar, ToolbarSeparator, ToolbarSpacer } from '../packages/react/src/index'
+import { Breadcrumbs, Nav, Pagination, Search, Steps, Toolbar, ToolbarSeparator, ToolbarSpacer } from '../packages/react/src/index'
 
 /**
  * What only a browser answers about the navigation components: the real Tab and
@@ -183,5 +183,28 @@ describe('breadcrumbs and steps in a real browser', () => {
     const back = part(part(host, 'pagination', 'root'), 'pagination', 'link')
     expect(back.textContent).toBe('Back')
     expect(getComputedStyle(back).pointerEvents).toBe('none')
+  })
+})
+
+describe('nav in a real browser', () => {
+  const groups = [
+    { label: 'Actions', items: [{ label: 'Button', href: '#button' }] },
+    { label: 'Inputs', items: [{ label: 'Field', href: '#field' }] },
+  ]
+  const numberOf = (label: HTMLElement) => getComputedStyle(label, '::before').content
+
+  it('numbered draws 01, 02 before the group names, in the accent, out of the text', () => {
+    const host = mount(h(Nav, { label: 'Components', numbered: true, groups }))
+    const labels = [...host.querySelectorAll<HTMLElement>('[data-part="group-label"]')]
+    expect(labels.map((label) => label.textContent)).toEqual(['Actions', 'Inputs'])
+    const before = getComputedStyle(labels[0], '::before')
+    expect(before.content).toMatch(/counter\(nav-group, decimal-leading-zero\)/)
+    expect(before.color).not.toBe(getComputedStyle(labels[0]).color)
+    expect(before.fontVariantNumeric).toBe('tabular-nums')
+  })
+
+  it('unnumbered draws nothing before the names', () => {
+    const host = mount(h(Nav, { label: 'Components', groups }))
+    expect(numberOf(host.querySelector<HTMLElement>('[data-part="group-label"]')!)).toBe('none')
   })
 })

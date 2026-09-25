@@ -32,3 +32,13 @@ describe('nav sections', () => {
     expect(asked).toEqual([['#button', true]])
   })
 })
+
+describe('nav numbered', () => {
+  it('marks the root only when asked; the number is drawn, never in the names', () => {
+    const groups = [{ label: 'Actions', items: [{ label: 'Button', href: '#button' }] }]
+    expect(connect({ id: 'n', label: 'Components', groups }, same).rootProps).toMatchObject({ 'data-numbered': undefined })
+    const api = connect({ id: 'n', label: 'Components', groups, numbered: true }, same)
+    expect(api.rootProps).toMatchObject({ 'data-numbered': '' })
+    expect(JSON.stringify(api.getGroupProps(groups[0], 0))).not.toContain('01')
+  })
+})

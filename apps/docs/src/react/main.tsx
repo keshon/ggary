@@ -47,7 +47,7 @@ function App() {
           if ((event.target as Element).closest('a') && side.matches(':popover-open')) side.hidePopover()
         }}
       >
-        <Nav label="Components" groups={navGroups(page)} />
+        <Nav label="Components" numbered groups={navGroups(page)} />
       </aside>
       <main className="main">
         <article className="page" key={page.id}>
