@@ -1,0 +1,7 @@
+/* Icon: the glyph an app places. It sits on the text's line, a little below
+   its middle as a letter's body does, and never shrinks in a row. */
+
+[data-scope='icon'][data-part='root'] {
+  vertical-align: -0.125em;
+  flex: none;
+}

@@ -1301,6 +1301,7 @@ export interface Adapter {
   list(props: ListProps, target: HTMLElement): Promise<Mounted<ListProps>>
   rangeSlider(props: RangeSliderProps, target: HTMLElement): Promise<Mounted<RangeSliderProps>>
   configProvider(props: ConfigHarnessProps, target: HTMLElement): Promise<Mounted<ConfigHarnessProps>>
+  icon(props: import('../../packages/core/src/components/icon').IconProps, target: HTMLElement): Promise<Mounted<import('../../packages/core/src/components/icon').IconProps>>
   result(props: ResultProps, target: HTMLElement): Promise<Mounted<ResultProps>>
   popconfirm(props: PopconfirmProps, target: HTMLElement): Promise<Mounted<PopconfirmProps>>
   contextMenu(props: ContextMenuProps, target: HTMLElement): Promise<Mounted<ContextMenuProps>>

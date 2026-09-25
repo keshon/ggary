@@ -58,6 +58,7 @@
 @import './components/list.css' layer(gg.components);
 @import './components/range-slider.css' layer(gg.components);
 @import './components/config-provider.css' layer(gg.components);
+@import './components/icon.css' layer(gg.components);
 @import './components/context-menu.css' layer(gg.components);
 @import './components/result.css' layer(gg.components);
 @import './components/divider.css' layer(gg.components);

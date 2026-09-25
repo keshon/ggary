@@ -2,12 +2,12 @@
 
 A UI kit scaffold: one framework-agnostic core, two sibling renderers (React 19
 and Svelte 5), and one design language, GGarry, on top of it.
-A hundred and twelve components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, TimePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
+A hundred and thirteen components — DataGrid, Kanban, Gantt, CommandPalette, Run, Queue, History, Budget, Step, Log, Diff, Lanes, Turn, Composer, Thinking, Approval, Failure, Sparkline, Legend, Meter, Ring, Share, Heatmap, Metric, MetricRow, KeyValueList, FileChange, Timeline, StatusDot, Caret, CodeBlock, Copyable, Inserts, Form, FormSummary, Combobox, DatePicker, TimePicker, Calendar, Cascader, Accordion, Tree, Progress, Shell, Split, Rail, StatusBar, PageHeader, Section, Container, Stack, Cluster, Grid, Button, ButtonGroup, Chip, ChipGroup, Select, Field,
 Fieldset, Input, InputGroup, Search, Textarea, Checkbox, CheckboxGroup, Switch,
 RadioGroup, ChoiceCardGroup, SegmentedControl, Slider, RangeSlider, NumberField, FileDrop, Tabs,
 Breadcrumbs, Nav, Pagination, Steps, Toolbar, Dialog, Sheet, Popover, Tooltip, Toast,
 Menu, Menubar, Badge, Avatar, AvatarGroup, Spinner, Skeleton, Card, Panel, Banner,
-Note, EmptyState, Divider, Prose, Text, Link, Flex, FlexItem, Columns, Column, Popconfirm, ContextMenu, Result, Upload, List, ListItem and ConfigProvider — built end to end to prove the architecture holds.
+Note, EmptyState, Divider, Prose, Text, Link, Flex, FlexItem, Columns, Column, Popconfirm, ContextMenu, Result, Upload, List, ListItem, ConfigProvider and Icon — built end to end to prove the architecture holds.
 
 **Retired on 2026-09-18: the vanilla custom-elements adapter (`@ggary/elements`,
 the `gg-*` tags) and the Instrument theme**, a second language ported from
@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3966 tests, 1486 of them in headless Chrome
+npm test         # 3992 tests, 1496 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck   # tsc, then svelte-check over every .svelte file
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -207,6 +207,58 @@ the text around it, and a theme recolours it the way it recolours text. A theme
 may draw its own glyphs on its own grid and stroke; GGarry uses the defaults.
 Adding a glyph is one SVG file — no adapter changes.
 
+**89 glyphs, one hand.** Every glyph is drawn on the same 16px grid, with a
+1.75 stroke (1.5 on the busier ones) and round ends and corners, so the kit's
+own chevrons and an app's trash can read as one set. Beyond what the components
+need, the set covers what an app reaches for:
+
+| | |
+|---|---|
+| Actions and editing | edit, trash, save, undo, redo, cut, paste, grip, filter, sort, share, send, archive, pin |
+| Files, media and data | folder, folder-open, image, video, audio, attachment, download, upload, database, code, terminal, cloud |
+| People, messages and objects | user, users, mail, bell, chat, phone, lock, unlock, key, eye, eye-off, star, heart, flag, bookmark, tag, home, clock, globe, link |
+| Navigation, view and media | menu, sidebar, the chevrons and arrows each way, expand, collapse, zoom-in, zoom-out, grid, list, columns, play, pause, skip, stop, volume, mute |
+
+The glyphs are drawn for 16–20px, the sizes they sit at in controls and rows.
+A mask scales its stroke with it, so a glyph at 24px or more is bolder than at
+16: fine for an empty state's picture, but not a set drawn for that size.
+
+**`Icon` puts one where an app wants it.**
+
+```tsx
+<Icon name="download" />                     // decoration: aria-hidden
+<Icon name="status-warn" label="Warning" />  // the only carrier of its meaning: role="img", named
+<Icon name="star" size="lg" />               // sm, md, lg: 14, 16 and 20px, beside controls of that size
+```
+
+It is the same empty element carrying `data-icon`, so it is drawn exactly as the
+components' glyphs are. Without a size it is the size and colour of the words
+beside it — the base layer gives every component root the kit's own text size
+and ink, and the icon takes both back from its surroundings.
+
+**An app brings its own glyphs** two ways, held to the same rules (a `viewBox`,
+kebab-case names, no styles, scripts or images), in `glyph.mjs`:
+
+```js
+// at build time: the app's SVGs, typed
+import { compileIcons } from '@ggary/icons/compile'
+compileIcons({ srcDir: 'icons', outCss: 'src/icons.css', outTs: 'src/icons.d.ts', app: true })
+
+// at runtime, for an app with no build step
+import { defineIcons } from '@ggary/react' // or '@ggary/svelte', '@ggary/icons'
+defineIcons({ rocket: '<svg viewBox="0 0 16 16">…</svg>' })
+```
+
+`compileIcons` in app mode maps each name and writes a declaration that adds
+the names to `IconRegistry`, so `<Icon name="rocket" />` type-checks; with
+`defineIcons`, declare them by hand:
+`declare module '@ggary/icons' { interface IconRegistry { rocket: true } }`. A
+glyph named as one of the kit's replaces it everywhere — how an app moves the
+whole kit to another icon set — and wins whatever loads first, because the
+kit's glyphs sit in a cascade layer and the app's do not. `defineIcons` keeps
+one stylesheet for everything it has been given, and a call with one bad glyph
+adds none of its others.
+
 **A mask clips everything on its element, pseudo-elements included** — learned
 from Instrument the hard way. A part that carries an enlarged tap area in
 `::before` cannot also be the glyph. That is why chip has `remove` (the target)
@@ -214,6 +266,13 @@ and `remove-icon` (the drawing), and the tab's close button likewise.
 
 `npm run assets` compiles the glyph sets and GGarry's tokens; `dev`, `test` and
 `typecheck` run it first.
+
+Found on the way:
+
+- **An icon beside a word came out the kit's size and ink.** The base layer sets
+  the kit's text size and colour on every component root, the icon's included,
+  so `1em` was 14px beside 20px words and a warning's icon stayed grey on a red
+  line. The icon inherits both now.
 
 ### What Instrument left behind
 
@@ -3264,7 +3323,7 @@ sandbox build prints none.
 | Project | Env | Files | What it covers |
 |---|---|---|---|
 | machine | node | `*.machine.test.ts` | 667 tests. Every transition of every machine, pure, milliseconds; `mergeProps`; the choice and group connects; tooltip timing with fake timers; the menu's highlight, selection, item roles, submenu levels and pointer corridor; the menubar's bar, menu switching and access keys; tabs' selection and closing; the toast queue and its clock, with fake timers; the grid's query, loader and selection; filter chips and drafts, views, the bulk bar, the column picker, export and CSV, the URL and column storage; drafts and their parsing, saves shown at once and rolled back per cell, the detail following the grid, the row menu's target; the cascader's columns, its walk down and across, and choosing a leaf or a branch; the accordion's one-or-several rules; the tree's rows, keys and three ways of choosing; progress numbers in the locale's words; the board's walk, carry, drop and put-back by keyboard and by pointer, its card menu and cards added and answered, moves shown at once and taken back per card, what the live region says; the palette's ranking, levels, a command run after closing and a server's late answer dropped; a form's errors by name, what an edit keeps and where the focus goes; the Gantt's range, its header's cells, its bars in days and its walk; nudges adding up and kept when the keys rest, a drag's ends never crossing, a refused change going back; each dependency's arrow, its corners with room and without, out of and into a milestone, the room growing with the scale, an arrow up the chart; conflicts; the schedule saying what a task waits for, and a change moving its arrows; groups: rows in the tasks' order, a treegrid with levels, the summary's days and weighed progress following a change, closing and opening by the owner or not, the keyboard taken to the heading, keys on a heading, arrows from a group and from a closed group's row.; the readouts: a metric's formatting, direction and tone apart, key–value pairs, file changes' closed set and words, a timeline's times in the locale, the dot's and caret's parts; code lines and the copier's states and fallback, inserts at the caret and cancelled |
-| contract | node | `icons.contract.test.ts` | 477 tests. Core names only real glyphs, adapters draw none. |
+| contract | node | `icons.contract.test.ts` | 483 tests. Core names only real glyphs, adapters draw none; the compiler's rules, and its app mode mapping an app's glyphs and typing them through IconRegistry. |
 | contract | node | `themes.contract.test.ts` | 5 tests. Every discovered theme — GGarry, now the only one: structure, literals, contrast, coverage. |
 | contract | node | `packages.contract.test.ts` | 9 tests. Each package's exports are its root and `./*`; every component directory has an index; both adapters have the same directories, the same components in each, and all of them at their root. |
 | contract | node | `anatomy.contract.test.ts` | 2 tests. Every element an adapter draws takes a prop bag from core — no bare `<span>` a theme could only name by its tag — and no adapter writes a class. |
@@ -3272,9 +3331,10 @@ sandbox build prints none.
 | contract | node | `core-shape.contract.test.ts` | 2 tests. Every component laid out as `<dir>.<role>.ts` with a re-export-only index; every connect ending at the normalizer or one `options`. |
 | contract | node | `config.contract.test.ts` | 2 tests. Every component in either adapter that takes a `locale` or `words`, or a control that takes a `size` — declared in the adapter or in its core types — reads the settings in force. |
 | contract | node | `checks.contract.test.ts` | 30 tests. The gates themselves: each rule fires on a planted defect — the literal families and their ledger among them; the colour engine. |
-| dom | jsdom | `conformance.dom.test.ts` | 1210 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `conformance.dom.test.ts` | 1216 tests, 8 of them skipped where an adapter or the environment cannot express the case. One contract × two adapters. |
+| dom | jsdom | `icons.dom.test.ts` | 4 tests. defineIcons: one stylesheet, a glyph defined again replaced, a kit glyph replaced by name, a bad glyph refused and a call with one adding none. |
 | dom | jsdom | `layers.dom.test.ts` | 8 tests. The dismiss stack: which layer hears Escape and an outside press. |
-| browser | Chrome | `conformance.browser.test.ts` | 1210 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
+| browser | Chrome | `conformance.browser.test.ts` | 1216 tests, 2 skipped. The conformance suite again, in a real browser through Playwright: real layout, focus, events and top layer. |
 | browser | Chrome | `data-display.browser.test.ts` | 10 tests. A metric's unit at a little over half its value, the headline band's 28px, a joined row's hairlines not hanging when it wraps; two key–value lists lining up on the shared column, a tight one sizing to its longest name; a file change's 16px box with its sign centred. |
 | browser | Chrome | `states.browser.test.ts` | 10 tests. The caret in em at two sizes, its stepped blink, stopped but shown under reduced motion, left out of print; a dot's colour following its own or an ancestor's tone, and a badge's, a timeline's and a lone dot agreeing; the running pulse slowing under reduced motion; Highlight under forced colours; the timeline's line from centre to centre and none after the last. |
 | browser | Chrome | `code.browser.test.ts` | 7 tests. A long line not wrapping, the copy button staying in its corner while the code scrolls, a 5ch number column, a 24px target; copying through a stubbed clipboard, the fallback when it refuses, a failure, the live region's words and the tick resetting. |
@@ -3303,6 +3363,7 @@ sandbox build prints none.
 | machine | node | `upload.machine.test.ts` | 13 tests. Sizes in the locale's decimal units and an `accept` list read as the file input reads one; files refused before sending and why; so many sent at once, in order; progress, and none when the upload does not know; what a file there submits and what is said; a failure's own words and a retry as a new try; a cancel aborting its try and its late answer ignored; a synchronous throw; one file at most replacing the last; the owner told of changes, not percents; going away aborting what is under way. |
 | machine | node | `popconfirm.machine.test.ts` | 8 tests. One attempt while one is under way; closing on success, staying and saying why on a failure (a rejection, a throw, or the words); a late answer to an abandoned attempt ignored; a new opening forgetting the failure; cancels heard for every close but the action's; the focus mark by `destructive`; the alert dialog's name and description. |
 | machine | node | `layout.machine.test.ts` | 10 tests. The drawer's state and what its toggle says, the split's size inside its bounds and what the frame leaves, the fold, the rail's ends, and the breakpoint agreeing with the structure layer's. |
+| browser | Chrome | `icons.browser.test.ts` | 4 tests. Every name the kit ships drawn by a glyph; an icon the size and colour of the words beside it; the three sizes; a runtime glyph drawn, and one named as a kit glyph winning over the kit's layered one. |
 | browser | Chrome | `config-provider.browser.test.ts` | 2 tests. No box: a flex row lays out what it wraps; its direction reaching a component under it; a dark island recolouring the page's own text. |
 | browser | Chrome | `range-slider.browser.test.ts` | 7 tests. A press on the track moving the nearer thumb and giving it the focus, a drag carrying it; the real keys by the step and End stopping against the other end; two thumbs met at the top, the lower under the pointer; the fill and the bubbles at the thumbs' real centres; a mark's tick under its thumb and the end marks inside the track; the ring on the thumb, not the track; a slider's marks under its thumb. |
 | browser | Chrome | `list.browser.test.ts` | 4 tests. A press anywhere on a row landing on its stretched button, found by what is under the pointer at its line and its icon, and its own action pressed as itself; Tab walking a row then its actions, the ring on the whole row; the columns lined up whatever a row has and a long line cut before the meta; a bordered list one surface, cards apart. |
@@ -3423,6 +3484,8 @@ Real, and deliberately left open:
 - **The grid's rows have one height.** By design (see DataGrid), not by accident.
 - **A toolbar's role is opt-in.** An unnamed strip is a row of ordinary buttons
   with a tab stop each; that was Instrument's position, and it stays available.
+- **Icons are drawn for 16–20px.** Larger, the stroke grows with the glyph; there is
+  no second set drawn for 24px.
 - **Sliders are horizontal.** No vertical Slider or RangeSlider, and no more
   than two thumbs.
 - **List is not windowed.** A few hundred rows are fine; thousands belong in

@@ -551,6 +551,15 @@ export const SITEMAP: SiteCategory[] = [
     "title": "Display and feedback",
     "components": [
       {
+        "label": "Icons",
+        "anchors": [
+          {
+            "id": "icons",
+            "label": null
+          }
+        ]
+      },
+      {
         "label": "Badge, Avatar, Spinner and Skeleton",
         "anchors": [
           {

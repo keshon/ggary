@@ -1,0 +1,28 @@
+/* ==========================================================================
+   GGarry — icon
+
+   Without a size, an icon is the size of the text around it (1em, from the
+   structure layer) and its colour: it belongs to the words beside it. With
+   one, it matches the controls: 14, 16 and 20px, the glyphs' own range.
+   The glyphs are drawn for 16–20px; larger, the stroke grows with them.
+   ========================================================================== */
+
+/* The size and colour of the text around it: the base layer gives every
+   component root the kit's own text size and colour, which would make 1em the
+   kit's size and the glyph the kit's ink, not the words' beside it. */
+[data-scope='icon'][data-part='root'] {
+  font-size: inherit;
+  color: inherit;
+}
+[data-scope='icon'][data-part='root'][data-size='sm'] {
+  inline-size: 14px;
+  block-size: 14px;
+}
+[data-scope='icon'][data-part='root'][data-size='md'] {
+  inline-size: 16px;
+  block-size: 16px;
+}
+[data-scope='icon'][data-part='root'][data-size='lg'] {
+  inline-size: 20px;
+  block-size: 20px;
+}

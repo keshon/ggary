@@ -154,6 +154,11 @@ form.stack { display: grid; gap: var(--gg-space-group); max-width: 420px; paddin
 
 .form-column { display: grid; gap: 20px; max-inline-size: 520px; margin-top: 16px; }
 .note { margin: 4px 0 0; max-inline-size: 64ch; color: var(--gg-text-muted); font-size: 13px; }
+.icon-sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; margin-top: 16px; }
+.icon-cell { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 4px 8px; border: 1px solid var(--gg-border); border-radius: var(--gg-radius); color: var(--gg-text); font-size: 11px; }
+.icon-cell span { color: var(--gg-text-muted); }
+.icon-uses { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 32px; margin-top: 20px; font-size: 13px; }
+.icon-uses > span { display: inline-flex; align-items: center; gap: 6px; }
 
 /* A vector of number fields: equal shares, so a six-digit number does not skew it. */
 .vector { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; max-inline-size: 340px; }

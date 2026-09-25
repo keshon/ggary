@@ -78,6 +78,8 @@ import {
   Fieldset,
   FileDrop,
   Upload,
+  Icon,
+  iconNames,
   ConfigProvider,
   RangeSlider,
   List,
@@ -1742,6 +1744,36 @@ function App() {
 
       <div className="category" aria-labelledby="display-group">
         <h2 className="category-title" id="display-group"><span className="category-number" aria-hidden="true">07</span>Display and feedback</h2>
+        <section id="icons">
+          <h3>Icons</h3>
+          <p className="note">Every glyph the kit ships, on one 16px grid and drawn for 16–20px. Without a size an icon takes the size and colour of the words beside it; with a label it is read. The last two are an app’s own, added at runtime with defineIcons.</p>
+          <div className="icon-sheet">
+            {iconNames.map((name) => (
+              <div key={name} className="icon-cell">
+                <Icon name={name} size="lg" />
+                <span>{name}</span>
+              </div>
+            ))}
+          </div>
+          <div className="icon-uses">
+            <span>
+              <Icon name="star" size="sm" />
+              <Icon name="star" size="md" />
+              <Icon name="star" size="lg" /> sm · md · lg
+            </span>
+            <span style={{ fontSize: 22, color: 'var(--gg-danger-text)' }}>
+              <Icon name="status-warn" /> the words' size and colour
+            </span>
+            <span>
+              <Icon name="status-error" label="Failed" /> labelled: read as “Failed”
+            </span>
+            <span>
+              <Icon name="rocket" size="lg" />
+              <Icon name="planet" size="lg" /> the app's own, from defineIcons
+            </span>
+          </div>
+        </section>
+
         <section id="display">
           <h3>Badge, Avatar, Spinner and Skeleton</h3>
           <div className="row" style={{ alignItems: 'center' }}>

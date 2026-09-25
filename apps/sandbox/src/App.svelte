@@ -25,6 +25,8 @@
     Fieldset,
     FileDrop,
     Upload,
+    Icon,
+    iconNames,
     ConfigProvider,
     RangeSlider,
     List,
@@ -1514,6 +1516,20 @@
 
 <div class="category" aria-labelledby="display-group">
   <h2 class="category-title" id="display-group"><span class="category-number" aria-hidden="true">07</span>Display and feedback</h2>
+  <section id="icons">
+    <h3>Icons</h3>
+    <p class="note">Every glyph the kit ships, on one 16px grid and drawn for 16–20px. Without a size an icon takes the size and colour of the words beside it; with a label it is read. The last two are an app’s own, added at runtime with defineIcons.</p>
+    <div class="icon-sheet">
+      {#each iconNames as name (name)}<div class="icon-cell"><Icon {name} size="lg" /><span>{name}</span></div>{/each}
+    </div>
+    <div class="icon-uses">
+      <span><Icon name="star" size="sm" /><Icon name="star" size="md" /><Icon name="star" size="lg" /> sm · md · lg</span>
+      <span style="font-size: 22px; color: var(--gg-danger-text)"><Icon name="status-warn" /> the words' size and colour</span>
+      <span><Icon name="status-error" label="Failed" /> labelled: read as “Failed”</span>
+      <span><Icon name="rocket" size="lg" /><Icon name="planet" size="lg" /> the app's own, from defineIcons</span>
+    </div>
+  </section>
+
   <section id="display">
     <h3>Badge, Avatar, Spinner and Skeleton</h3>
     <div class="row" style="align-items: center">

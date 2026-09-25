@@ -136,6 +136,32 @@ describe('the glyph compiler', () => {
     expect(() => compileIcons({ srcDir: dir, outCss: join(dir, 'o.css') })).toThrow(/not allowed/)
   })
 
+  it('compiles an app’s own glyphs: mapped, and typed through the kit’s IconRegistry', () => {
+    const dir = scratch({ 'rocket.svg': svg(), 'check.svg': svg('<path d="M1 1h2"/>') })
+    const out = join(dir, 'app.css')
+    const types = join(dir, 'icons.d.ts')
+    const names = compileIcons({ srcDir: dir, outCss: out, outTs: types, app: true })
+    expect(names).toEqual(['check', 'rocket'])
+    const css = readFileSync(out, 'utf8')
+    expect(css).toContain('--gg-icon-rocket: url("data:image/svg+xml,')
+    expect(css).toContain("[data-icon='rocket'] { --gg-icon: var(--gg-icon-rocket); }")
+    // Named as a kit glyph, it replaces it: the same token, declared again.
+    expect(css).toContain('--gg-icon-check: url("data:image/svg+xml,')
+    const declared = readFileSync(types, 'utf8')
+    expect(declared).toContain("declare module '@ggary/icons'")
+    expect(declared).toContain("interface IconRegistry")
+    expect(declared).toContain("'rocket': true")
+  })
+
+  it('holds a glyph added at runtime to the same rules', async () => {
+    const { checkGlyph } = await import('../packages/icons/glyph.mjs')
+    expect(checkGlyph('rocket', svg())).toContain('viewBox')
+    expect(() => checkGlyph('rocket', '<svg><path d="M0 0"/></svg>')).toThrow(/viewBox/)
+    expect(() => checkGlyph('rocket', svg('<script>alert(1)</script>'))).toThrow(/not allowed/)
+    expect(() => checkGlyph('Rocket', svg())).toThrow(/kebab-case/)
+    expect(() => checkGlyph('rocket', '<div></div>')).toThrow(/one <svg>/)
+  })
+
   it('rejects a name that is not kebab-case', () => {
     const dir = scratch({ 'Arrow_Up.svg': svg() })
     expect(() => compileIcons({ srcDir: dir, outCss: join(dir, 'o.css') })).toThrow(/kebab-case/)
