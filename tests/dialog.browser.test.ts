@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { userEvent } from '@vitest/browser/context'
-import { act, createElement, type ReactNode } from 'react'
+import { act, createElement, StrictMode, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import '../packages/structure/src/index.css'
 import { Dialog, Select, type DialogProps } from '../packages/react/src/index'
@@ -171,5 +171,20 @@ describe('dialog in a real browser', () => {
       [false, { reason: 'escape' }],
       [false, { reason: 'escape' }],
     ])
+  })
+})
+
+describe('dialog under StrictMode', () => {
+  it.each([true, false])('opened with the page (modal %s) stays open: the close queued by the first effect is stale', async (modal) => {
+    const host = document.createElement('div')
+    document.body.append(host)
+    const onOpenChange = vi.fn()
+    const root = createRoot(host)
+    await act(async () => root.render(createElement(StrictMode, null, createElement(Dialog, { defaultOpen: true, modal, title: 'Edit profile', onOpenChange }))))
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(host.querySelector('dialog')?.open).toBe(true)
+    expect(onOpenChange).not.toHaveBeenCalled()
+    await act(async () => root.unmount())
+    host.remove()
   })
 })

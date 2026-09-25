@@ -19,6 +19,8 @@ export interface PopconfirmProps {
   /** It closed any way but by the action. */
   onCancel?: () => void
   onOpenChange?: (open: boolean, details: PopconfirmChangeDetails) => void
+  /** Opens with the page: the question already asked. */
+  defaultOpen?: boolean
   /** The opener: spread the props onto a Button. */
   trigger: (props: Dict) => ReactNode
   placement?: Placement
@@ -27,7 +29,7 @@ export interface PopconfirmProps {
 
 export function Popconfirm(props: PopconfirmProps) {
   props = useConfigured(props, { words: 'popconfirm' })
-  const { title, description, destructive = false, confirmLabel, cancelLabel, onConfirm, onCancel, onOpenChange, trigger, placement, words } = props
+  const { title, description, destructive = false, confirmLabel, cancelLabel, onConfirm, onCancel, onOpenChange, defaultOpen, trigger, placement, words } = props
   const id = `gg-popconfirm-${useId().replace(/:/g, '')}`
   const callbacks = useRef({ onConfirm, onCancel, onOpenChange })
   callbacks.current = { onConfirm, onCancel, onOpenChange }
@@ -36,6 +38,7 @@ export function Popconfirm(props: PopconfirmProps) {
     createPopconfirmMachine({
       id,
       placement,
+      defaultOpen,
       onConfirm: () => callbacks.current.onConfirm?.(),
       onCancel: () => callbacks.current.onCancel?.(),
       onOpenChange: (open, details) => callbacks.current.onOpenChange?.(open, details),

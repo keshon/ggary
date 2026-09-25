@@ -28,8 +28,8 @@
 
   let {
     brand, aside, header, footer, children, collapse, open = $bindable(), defaultOpen, onOpenChange,
-    skipLabel, toggleLabel, asideLabel, style,
-  }: Props = $props()
+    skipLabel, toggleLabel, asideLabel, style, ...rest
+  }: Props & { [key: string]: unknown } = $props()
 
   const machine = untrack(() =>
     createShellMachine({
@@ -64,7 +64,7 @@
   const hasColumn = $derived(Boolean(brand || aside))
 </script>
 
-<div bind:this={root} {...api.rootProps} {style}>
+<div bind:this={root} {...rest} {...api.rootProps} {style}>
   <a {...api.skipLinkProps}>{api.skipLabel}</a>
   {#if hasColumn}
     <div bind:this={column} {...api.asideProps}>

@@ -27,8 +27,8 @@
 
   let {
     label, first, second, orientation, primary, min, max, step, collapsible, defaultSize, size, collapsed, restMin,
-    onSizeChange, style,
-  }: Props = $props()
+    onSizeChange, style, ...rest
+  }: Props & { [key: string]: unknown } = $props()
 
   const machine = untrack(() =>
     createSplitMachine({
@@ -42,7 +42,7 @@
   const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label, restMin }))
 </script>
 
-<div {...api.rootProps} style={[api.rootProps.style, style].filter(Boolean).join('; ')}>
+<div {...rest} {...api.rootProps} style={[api.rootProps.style, style].filter(Boolean).join('; ')}>
   <div {...api.startPaneProps}>{@render first()}</div>
   <div {...api.separatorProps}><span {...api.handleProps}></span></div>
   <div {...api.endPaneProps}>{@render second()}</div>

@@ -18,6 +18,12 @@ export interface CommandPaletteProps {
   open?: boolean
   defaultOpen?: boolean
   onOpenChange?: (open: boolean) => void
+  /**
+   * Over the page, the rest of it inert (default). False shows it in the page
+   * instead — beside what is around it, as a palette set into a panel — and a
+   * press elsewhere leaves it open.
+   */
+  modal?: boolean
   /** A command was chosen. It runs after the palette has closed and given the focus back. */
   onRun?: (command: PaletteCommand) => void
   /** Records from a server, under their own heading on the top level: leads, deals, people. */
@@ -34,7 +40,7 @@ export interface CommandPaletteProps {
 /** Ctrl+K from anywhere: a field that finds what to do, and Enter does it. */
 export function CommandPalette(props: CommandPaletteProps) {
   props = useConfigured(props, { words: 'commandPalette' })
-  const { commands, open, defaultOpen, onOpenChange, onRun, load, loadOptions, hotkey = 'k', trigger, words } = props
+  const { commands, open, defaultOpen, onOpenChange, modal = true, onRun, load, loadOptions, hotkey = 'k', trigger, words } = props
   const id = `gg-palette-${useId().replace(/:/g, '')}`
   const callbacks = useRef({ onOpenChange, onRun, load })
   callbacks.current = { onOpenChange, onRun, load }
@@ -66,16 +72,16 @@ export function CommandPalette(props: CommandPaletteProps) {
     const element = contentRef.current
     if (!state.open || !element) return
     const instance = attachDialog(element, {
-      modal: true,
+      modal,
       closeOnEscape: true,
-      closeOnOutside: true,
+      closeOnOutside: modal,
       // Escape goes up a level first, and closes only at the top.
       onDismiss: (reason) => machine.send({ type: reason === 'escape' ? 'ESCAPE' : 'CLOSE' }),
       onNativeClose: () => machine.send({ type: 'CLOSE' }),
     })
     document.getElementById(api.ids.input)?.focus()
     return () => instance.destroy()
-  }, [machine, state.open, api.ids.input])
+  }, [machine, state.open, api.ids.input, modal])
 
   const listRef = useRef<HTMLDivElement>(null)
   useLayoutEffect(() => revealPaletteItem(listRef.current, state.highlighted ? api.ids.item(state.highlighted) : null))

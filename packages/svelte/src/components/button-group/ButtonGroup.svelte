@@ -4,11 +4,11 @@
   import { svelteNormalizer } from '@ggary/core'
   import type { Snippet } from 'svelte'
 
-  let { size: ownSize, label, children }: ButtonGroupProps & { children: Snippet } = $props()
+  let { size: ownSize, label, children, ...rest }: ButtonGroupProps & { children: Snippet; [key: string]: unknown } = $props()
   const kit = getConfig()
   const size = $derived(ownSize ?? kit().size)
 
   const api = $derived(connect({ size, label }, svelteNormalizer))
 </script>
 
-<div {...api.rootProps}>{@render children()}</div>
+<div {...rest} {...api.rootProps}>{@render children()}</div>

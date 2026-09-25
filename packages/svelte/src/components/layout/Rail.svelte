@@ -8,7 +8,7 @@
     items: RailItem[]
   }
 
-  let { label, items }: Props = $props()
+  let { label, items, ...rest }: Props & { [key: string]: unknown } = $props()
   const id = uid('gg-rail')
   const api = $derived(connect({ id, label, items }, svelteNormalizer))
 </script>
@@ -22,7 +22,7 @@
   </a>
 {/snippet}
 
-<nav {...api.rootProps}>
+<nav {...rest} {...api.rootProps}>
   {#each api.start as item (item.href)}{@render link(item)}{/each}
   {#if api.end.length > 0}<span {...api.spacerProps}></span>{/if}
   {#each api.end as item (item.href)}{@render link(item)}{/each}

@@ -16,12 +16,12 @@
   }
 
   /** A stretch of the page under its heading, with no box around it. */
-  let { title, description, headingLevel, rank, region, actions, children }: Props = $props()
+  let { title, description, headingLevel, rank, region, actions, children, ...rest }: Props & { [key: string]: unknown } = $props()
   const id = uid('gg-section')
   const api = $derived(connect({ id, title, description, headingLevel, rank, region }, svelteNormalizer))
 </script>
 
-<section {...api.rootProps}>
+<section {...rest} {...api.rootProps}>
   {#if title || actions || description}
     <div {...api.headerProps}>
       {#if title}<svelte:element this={api.titleElement} {...api.titleProps}>{title}</svelte:element>{/if}

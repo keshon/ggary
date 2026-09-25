@@ -95,6 +95,9 @@ export function attachDialog(el: HTMLDialogElement, initial: AttachDialogOptions
   // itself is counted rather than unsubscribed from.
   let ownCloses = 0
   const onClose = () => {
+    // Stale: queued by an earlier close, and the dialog has been shown again
+    // since — as React's StrictMode does, closing and reattaching at once.
+    if (el.open) return
     if (ownCloses > 0) ownCloses--
     else options.onNativeClose?.(el.returnValue)
   }

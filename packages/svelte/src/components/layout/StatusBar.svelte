@@ -4,8 +4,8 @@
   import type { Snippet } from 'svelte'
 
   /** One line of readings along the bottom of a tool. */
-  let { label, children }: { label?: string; children: Snippet } = $props()
+  let { label, children, ...rest }: { label?: string; children: Snippet; [key: string]: unknown } = $props()
   const api = $derived(connect({ label }, svelteNormalizer))
 </script>
 
-<div {...api.rootProps}>{@render children()}</div>
+<div {...rest} {...api.rootProps}>{@render children()}</div>

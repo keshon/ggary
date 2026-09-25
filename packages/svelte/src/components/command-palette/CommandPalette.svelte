@@ -20,6 +20,12 @@
     open?: boolean
     defaultOpen?: boolean
     onOpenChange?: (open: boolean) => void
+    /**
+     * Over the page, the rest of it inert (default). False shows it in the page
+     * instead — beside what is around it, as a palette set into a panel — and a
+     * press elsewhere leaves it open.
+     */
+    modal?: boolean
     /** A command was chosen. It runs after the palette has closed and given the focus back. */
     onRun?: (command: PaletteCommand) => void
     /** Records from a server, under their own heading on the top level: leads, deals, people. */
@@ -34,7 +40,7 @@
   }
 
   /** Ctrl+K from anywhere: a field that finds what to do, and Enter does it. */
-  let { commands, open = $bindable(), defaultOpen, onOpenChange, onRun, load, loadOptions, hotkey = 'k', trigger, words: ownWords }: Props = $props()
+  let { commands, open = $bindable(), defaultOpen, onOpenChange, modal = true, onRun, load, loadOptions, hotkey = 'k', trigger, words: ownWords }: Props = $props()
   const kit = getConfig()
   const words = $derived(configWords(kit(), 'commandPalette', ownWords))
 
@@ -76,11 +82,12 @@
   $effect(() => {
     const element = contentEl
     if (!isOpen || !element) return
+    const shownModal = modal
     return untrack(() => {
       const instance = attachDialog(element, {
-        modal: true,
+        modal: shownModal,
         closeOnEscape: true,
-        closeOnOutside: true,
+        closeOnOutside: shownModal,
         // Escape goes up a level first, and closes only at the top.
         onDismiss: (reason) => machine.send({ type: reason === 'escape' ? 'ESCAPE' : 'CLOSE' }),
         onNativeClose: () => machine.send({ type: 'CLOSE' }),

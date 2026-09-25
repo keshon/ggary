@@ -4,8 +4,8 @@
   import type { Snippet } from 'svelte'
 
   /** A reading. One that can be pressed is a small low Button instead. */
-  let { tone, children }: { tone?: StatusTone; children: Snippet } = $props()
+  let { tone, children, ...rest }: { tone?: StatusTone; children: Snippet; [key: string]: unknown } = $props()
   const api = $derived(connect({}, svelteNormalizer))
 </script>
 
-<span {...api.getItemProps(tone)}>{@render children()}</span>
+<span {...rest} {...api.getItemProps(tone)}>{@render children()}</span>

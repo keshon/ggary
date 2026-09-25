@@ -21,13 +21,15 @@
     /** It closed any way but by the action. */
     onCancel?: () => void
     onOpenChange?: (open: boolean, details: PopconfirmChangeDetails) => void
+    /** Opens with the page: the question already asked. */
+    defaultOpen?: boolean
     /** The opener: spread the props onto a Button. */
     trigger: Snippet<[Dict]>
     placement?: Placement
     words?: Pick<PopconfirmWords, 'failed'>
   }
 
-  let { title, description, destructive = false, confirmLabel, cancelLabel, onConfirm, onCancel, onOpenChange, trigger, placement, words: ownWords }: Props = $props()
+  let { title, description, destructive = false, confirmLabel, cancelLabel, onConfirm, onCancel, onOpenChange, defaultOpen, trigger, placement, words: ownWords }: Props = $props()
   const kit = getConfig()
   const words = $derived(configWords(kit(), 'popconfirm', ownWords))
 
@@ -35,6 +37,7 @@
     createPopconfirmMachine({
       id: uid('gg-popconfirm'),
       placement,
+      defaultOpen,
       onConfirm: () => onConfirm?.(),
       onCancel: () => onCancel?.(),
       onOpenChange: (open, details) => onOpenChange?.(open, details),

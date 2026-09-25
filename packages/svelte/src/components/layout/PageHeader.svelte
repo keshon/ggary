@@ -15,12 +15,12 @@
   }
 
   /** The top of a screen: where you are, what this is, what can be done with it. */
-  let { title, description, headingLevel, context, actions }: Props = $props()
+  let { title, description, headingLevel, context, actions, ...rest }: Props & { [key: string]: unknown } = $props()
   const id = uid('gg-page')
   const api = $derived(connect({ id, title, description, headingLevel }, svelteNormalizer))
 </script>
 
-<div {...api.rootProps}>
+<div {...rest} {...api.rootProps}>
   {#if context}<div {...api.contextProps}>{@render context()}</div>{/if}
   <div {...api.mainProps}>
     <svelte:element this={api.titleElement} {...api.titleProps}>{title}</svelte:element>
