@@ -1523,10 +1523,22 @@
       {#each iconNames as name (name)}<div class="icon-cell"><Icon {name} size="lg" /><span>{name}</span></div>{/each}
     </div>
     <div class="icon-uses">
-      <span><Icon name="star" size="sm" /><Icon name="star" size="md" /><Icon name="star" size="lg" /> sm · md · lg</span>
-      <span style="font-size: 22px; color: var(--gg-danger-text)"><Icon name="status-warn" /> the words' size and colour</span>
-      <span><Icon name="status-error" label="Failed" /> labelled: read as “Failed”</span>
-      <span><Icon name="rocket" size="lg" /><Icon name="planet" size="lg" /> the app's own, from defineIcons</span>
+      <div class="icon-use">
+        <div class="icon-use-preview"><Icon name="star" size="sm" /><Icon name="star" size="md" /><Icon name="star" size="lg" /></div>
+        <div class="icon-use-caption"><code>sm</code> · <code>md</code> · <code>lg</code> — 14, 16 and 20px</div>
+      </div>
+      <div class="icon-use">
+        <div class="icon-use-preview" style="font-size: 18px; color: var(--gg-danger-text)"><Icon name="status-warn" /> Build failed</div>
+        <div class="icon-use-caption">No size: the words' size and colour</div>
+      </div>
+      <div class="icon-use">
+        <div class="icon-use-preview"><Icon name="status-error" size="lg" label="Failed" /></div>
+        <div class="icon-use-caption"><code>label="Failed"</code>: read aloud</div>
+      </div>
+      <div class="icon-use">
+        <div class="icon-use-preview"><Icon name="rocket" size="lg" /><Icon name="planet" size="lg" /></div>
+        <div class="icon-use-caption">The app's own, from <code>defineIcons</code></div>
+      </div>
     </div>
   </section>
 
