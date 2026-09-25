@@ -209,7 +209,7 @@ const pairs: Pair[] = [
   { label: 'toast: error icon', fg: '--ggarry-text-danger', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'toast: running icon', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'tabs: resting label on surface', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-surface'], min: TEXT },
-  { label: 'tabs: bar under the selected tab', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'tabs: bar under the selected tab', fg: '--ggarry-border-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'tabs: resting chip label on the track', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-subtle'], min: TEXT },
   { label: 'tabs: chip label on its hover plate', fg: '--ggarry-text-default', bg: ['--ggarry-bg-muted'], min: TEXT },
   { label: 'tabs: unsaved dot on the selected chip', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
@@ -315,7 +315,12 @@ const pairs: Pair[] = [
   { label: 'approval: the head glyph on the surface', fg: '--ggarry-text-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'approval: the action on its plate', fg: '--ggarry-text-default', bg: ['--ggarry-bg-surface', '--ggarry-bg-subtle'], min: TEXT },
   // The one accent GGarry puts on a block's edge: it has to read as a mark.
-  { label: 'approval: the waiting edge on the surface', fg: '--ggarry-bg-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  { label: 'approval: the waiting edge on the surface', fg: '--ggarry-border-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
+  // Every accent edge is border-accent, at size-edge or size-indicator, and owes 3:1 on each ground it marks.
+  { label: 'edge: a current nav item on its tint', fg: '--ggarry-border-accent', bg: ['--ggarry-bg-accent-subtle'], min: LARGE },
+  { label: 'edge: a checked choice card on the subtle ground', fg: '--ggarry-border-accent', bg: ['--ggarry-bg-subtle'], min: LARGE },
+  { label: 'edge: a bordered list’s current row on its tint', fg: '--ggarry-border-accent', bg: ['--ggarry-bg-accent-subtle'], min: LARGE },
+  { label: 'edge: the grid’s open row on the surface', fg: '--ggarry-border-accent', bg: ['--ggarry-bg-surface'], min: LARGE },
   { label: 'composer: the glyph on the send disc', fg: '--ggarry-text-on-accent', bg: ['--ggarry-bg-accent'], min: TEXT },
   { label: 'thinking: the aside on the canvas', fg: '--ggarry-text-muted', bg: ['--ggarry-bg-canvas'], min: TEXT },
   // The agent layer. A run's units and a history's marks take the kit's tone

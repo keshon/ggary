@@ -63,7 +63,7 @@
   background: var(--ggarry-bg-accent-subtle);
   color: var(--ggarry-text-accent);
   font-weight: var(--ggarry-font-weight-medium);
-  box-shadow: inset var(--ggarry-size-edge) 0 0 0 var(--ggarry-text-accent);
+  box-shadow: inset var(--ggarry-size-edge) 0 0 0 var(--ggarry-border-accent);
 }
 
 [data-scope='nav'][data-part='icon'] {
@@ -132,7 +132,7 @@
 }
 [data-scope='nav'][data-part='item'][data-level='2'][data-current] {
   margin-inline-start: -1px;
-  box-shadow: inset var(--ggarry-size-indicator) 0 0 0 var(--ggarry-text-accent);
+  box-shadow: inset var(--ggarry-size-indicator) 0 0 0 var(--ggarry-border-accent);
 }
 
 @media (forced-colors: active) {

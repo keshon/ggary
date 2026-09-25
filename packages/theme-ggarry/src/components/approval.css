@@ -16,7 +16,7 @@
   gap: var(--ggarry-space-3);
   padding: var(--ggarry-space-4);
   border: 1px solid var(--ggarry-border-accent);
-  border-inline-start: var(--ggarry-size-edge) solid var(--ggarry-bg-accent);
+  border-inline-start: var(--ggarry-size-edge) solid var(--ggarry-border-accent);
   border-radius: var(--ggarry-radius-lg);
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-default);

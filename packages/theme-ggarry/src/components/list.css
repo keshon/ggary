@@ -119,10 +119,10 @@
   border-block-start: 1px solid var(--ggarry-border-default);
 }
 [data-scope='list'][data-part='items'][data-variant='bordered'] > [data-part='item'][data-current] {
-  box-shadow: inset 3px 0 0 var(--ggarry-bg-accent);
+  box-shadow: inset var(--ggarry-size-edge) 0 0 var(--ggarry-border-accent);
 }
 [data-scope='list'][data-part='items'][data-variant='bordered'] > [data-part='item'][data-current]:dir(rtl) {
-  box-shadow: inset -3px 0 0 var(--ggarry-bg-accent);
+  box-shadow: inset calc(-1 * var(--ggarry-size-edge)) 0 0 var(--ggarry-border-accent);
 }
 [data-scope='list'][data-part='footer'][data-variant='bordered'] {
   justify-content: center;

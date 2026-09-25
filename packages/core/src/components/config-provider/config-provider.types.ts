@@ -15,6 +15,7 @@ import type { FormSummaryWords } from '../form'
 import type { GanttWords } from '../gantt'
 import type { HeatmapWords } from '../heatmap'
 import type { HistoryWords } from '../history'
+import type { InputWords } from '../input'
 import type { KanbanWords } from '../kanban'
 import type { LanesWords } from '../lanes'
 import type { LegendWords } from '../legend'
@@ -62,6 +63,7 @@ export interface KitWords {
   gridFilters?: FilterBarWords & FilterEditorWords & { add?: string; views?: string; clearAll?: string }
   heatmap?: HeatmapWords
   history?: Partial<HistoryWords>
+  input?: InputWords
   kanban?: Partial<KanbanWords>
   lanes?: LanesWords
   legend?: Partial<LegendWords>

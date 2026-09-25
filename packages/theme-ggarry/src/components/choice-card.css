@@ -56,9 +56,9 @@
 [data-scope='choice-card'][data-part='root']:has(:checked) {
   border-color: var(--ggarry-border-accent);
   background: var(--ggarry-bg-subtle);
-  /* text-accent, not the accent fill: the fill measures 2.80:1 on the subtle
-     ground in dark mode, and this bar is a state, so it owes 3:1. */
-  box-shadow: inset var(--ggarry-size-edge) 0 0 0 var(--ggarry-text-accent);
+  /* The kit's accent edge: border-accent, which holds 3:1 on the subtle ground
+     in dark mode where the accent fill measures 2.80:1. */
+  box-shadow: inset var(--ggarry-size-edge) 0 0 0 var(--ggarry-border-accent);
 }
 
 /* The ring goes round the whole card: on the control it would ring a dot. */

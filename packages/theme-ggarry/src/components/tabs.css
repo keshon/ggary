@@ -43,7 +43,7 @@
 
 [data-scope='tabs'][data-part='list'][data-variant='sections'] > [data-part='tab'][data-state='active'] {
   color: var(--ggarry-text-default);
-  border-block-end-color: var(--ggarry-bg-accent);
+  border-block-end-color: var(--ggarry-border-accent);
 }
 
 /* Vertical: the bar stands at the inline end, beside the panel. */
@@ -63,7 +63,7 @@
   border-inline-end-color: var(--ggarry-border-strong);
 }
 [data-scope='tabs'][data-part='list'][data-variant='sections'][data-orientation='vertical'] > [data-part='tab'][data-state='active'] {
-  border-inline-end-color: var(--ggarry-bg-accent);
+  border-inline-end-color: var(--ggarry-border-accent);
 }
 
 /* --- documents ----------------------------------------------------------- */

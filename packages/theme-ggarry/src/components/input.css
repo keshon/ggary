@@ -76,3 +76,32 @@
 @media (prefers-reduced-motion: reduce) {
   :is([data-scope='input'], [data-scope='textarea'])[data-part='root'] { transition: none; }
 }
+
+/* --- password reveal ------------------------------------------------------------ */
+
+/* The eye stands inside the field's end, a small icon button, and the typing
+   stops short of it. It is the field's colour until pointed at. */
+[data-scope='input'][data-part='root'][data-reveal] {
+  padding-inline-end: calc(var(--ggarry-size-icon-button-sm) + var(--ggarry-space-2));
+}
+[data-scope='input'][data-part='reveal'] {
+  inline-size: var(--ggarry-size-icon-button-sm);
+  block-size: var(--ggarry-size-icon-button-sm);
+  margin-inline-end: var(--ggarry-space-1);
+  border-radius: var(--ggarry-radius-md);
+  color: var(--ggarry-text-muted);
+}
+[data-scope='input'][data-part='reveal']:hover:not(:disabled) {
+  background: var(--ggarry-bg-subtle);
+  color: var(--ggarry-text-default);
+}
+[data-scope='input'][data-part='reveal'][aria-pressed='true'] {
+  color: var(--ggarry-text-default);
+}
+[data-scope='input'][data-part='reveal']:disabled {
+  opacity: var(--ggarry-opacity-disabled);
+}
+[data-scope='input'][data-part='reveal-icon'] {
+  inline-size: 16px;
+  block-size: 16px;
+}

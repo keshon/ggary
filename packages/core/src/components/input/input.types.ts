@@ -20,4 +20,11 @@ export interface InputProps {
   readOnly?: boolean
   required?: boolean
   invalid?: boolean
+  /** A password field's button that shows what was typed. Default: on for `type="password"`. */
+  reveal?: boolean
+}
+
+export interface InputWords {
+  /** The reveal button's name; it says whether it is pressed. Default "Show password". */
+  reveal?: string
 }

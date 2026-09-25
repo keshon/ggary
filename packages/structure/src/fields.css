@@ -44,6 +44,36 @@
   pointer-events: none;
 }
 
+/* --- password reveal --------------------------------------------------------- */
+
+/* The wrapper has no look: the input keeps its box, and the button stands over
+   its end. The browser's own reveal (Edge) would stand beside the kit's. */
+[data-scope='input'][data-part='field'] {
+  position: relative;
+  display: block;
+  min-inline-size: 0;
+}
+[data-scope='input'][data-part='reveal'] {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: auto 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+[data-scope='input'][data-part='reveal']:disabled {
+  cursor: not-allowed;
+}
+[data-scope='input'][data-part='root'][data-reveal]::-ms-reveal {
+  display: none;
+}
+
 /* --- input group -------------------------------------------------------------- */
 
 [data-scope='input-group'][data-part='root'] {
@@ -55,6 +85,7 @@
    the theme, not here: gg.components outranks gg.structure, so a rule written
    here would lose to the theme's own field look. */
 [data-scope='input-group'][data-part='root'] > :is([data-scope='input'], [data-scope='select'])[data-part='root'],
+[data-scope='input-group'][data-part='root'] > [data-scope='input'][data-part='field'],
 [data-scope='input-group'][data-part='root'] > [data-scope='select'][data-part='trigger'] {
   flex: 1 1 auto;
   min-inline-size: 0;

@@ -80,6 +80,8 @@ export interface InputProps {
   value?: string
   defaultValue?: string
   onValueChange?: (value: string) => void
+  reveal?: boolean
+  words?: { reveal?: string }
 }
 
 export interface TextareaProps {

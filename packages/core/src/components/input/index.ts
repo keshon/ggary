@@ -1,5 +1,5 @@
 export { inputAnatomy } from './input.anatomy'
 export type { InputPart } from './input.anatomy'
-export { connect } from './input.connect'
+export { connect, hideOnSubmit } from './input.connect'
 export type { InputConnectOptions } from './input.connect'
-export type { InputProps, InputSize, InputType } from './input.types'
+export type { InputProps, InputSize, InputType, InputWords } from './input.types'

@@ -117,8 +117,14 @@
 [data-scope='data-grid']:is([data-part='cell'], [data-part='header-cell'])[data-pinned='start'][data-pin-edge] {
   box-shadow: inset -1px 0 0 var(--ggarry-border-default);
 }
+[data-scope='data-grid']:is([data-part='cell'], [data-part='header-cell'])[data-pinned='start'][data-pin-edge]:dir(rtl) {
+  box-shadow: inset 1px 0 0 var(--ggarry-border-default);
+}
 [data-scope='data-grid']:is([data-part='cell'], [data-part='header-cell'])[data-pinned='end'][data-pin-edge] {
   box-shadow: inset 1px 0 0 var(--ggarry-border-default);
+}
+[data-scope='data-grid']:is([data-part='cell'], [data-part='header-cell'])[data-pinned='end'][data-pin-edge]:dir(rtl) {
+  box-shadow: inset -1px 0 0 var(--ggarry-border-default);
 }
 
 /* A row's Open button: a small surface chip at the end of its first cell,
@@ -339,9 +345,15 @@
 [data-scope='data-grid'][data-part='row'][data-open] > [data-part='cell']:first-child {
   box-shadow: inset var(--ggarry-size-edge) 0 0 var(--ggarry-border-accent);
 }
+[data-scope='data-grid'][data-part='row'][data-open] > [data-part='cell']:first-child:dir(rtl) {
+  box-shadow: inset calc(-1 * var(--ggarry-size-edge)) 0 0 var(--ggarry-border-accent);
+}
 /* …and the pinned edge, when the first column is also the last pinned one. */
 [data-scope='data-grid'][data-part='row'][data-open] > [data-part='cell']:first-child[data-pinned='start'][data-pin-edge] {
-  box-shadow: inset 3px 0 0 var(--ggarry-border-accent), inset -1px 0 0 var(--ggarry-border-default);
+  box-shadow: inset var(--ggarry-size-edge) 0 0 var(--ggarry-border-accent), inset -1px 0 0 var(--ggarry-border-default);
+}
+[data-scope='data-grid'][data-part='row'][data-open] > [data-part='cell']:first-child[data-pinned='start'][data-pin-edge]:dir(rtl) {
+  box-shadow: inset calc(-1 * var(--ggarry-size-edge)) 0 0 var(--ggarry-border-accent), inset 1px 0 0 var(--ggarry-border-default);
 }
 
 /* --- the detail sheet's row steps ----------------------------------------- */

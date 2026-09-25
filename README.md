@@ -21,7 +21,7 @@ rules are written down under "Theme principles".
 ```bash
 npm install
 npm run dev      # http://localhost:5180 — React and Svelte, same demo
-npm test         # 3992 tests, 1496 of them in headless Chrome
+npm test         # 4011 tests, 1504 of them in headless Chrome
 npm run test:fast  # the same without the browser: node and jsdom only
 npm run typecheck   # tsc, then svelte-check over every .svelte file
 npm run check:themes   # the theme gates as a readable report; -- -v for every row
@@ -477,6 +477,10 @@ For inline errors without the browser's bubble on top, put `novalidate` on the
 form and call `form.checkValidity()` in the submit handler: it still fires each
 control's `invalid` event, which is what the fields listen to. The sandbox's
 validated form does exactly that — and `Form`, below, does it for you.
+
+**A password field can show what was typed.** `type="password"` adds an eye button at the field's end (`reveal={false}` leaves the browser's field alone): a toggle named once, "Show password", pressed or not, in `words.reveal`. The input keeps its own box and ring; the button stands over its end. A shown password is hidden again when its form is sent, so a password manager still sees a password field.
+
+**Every accent edge is one colour.** The line that marks what is current — a nav item, a list row, a checked card, the grid's open row, the selected tab — is `--ggarry-border-accent` at `--ggarry-size-edge` or `--ggarry-size-indicator`, never a bare width; `accent-edges.contract.test.ts` holds it. It is the accent that keeps 3:1 on every ground it marks in both modes, where the accent fill falls to 2.8:1 on a tint in dark mode. The grid's open-row edge and pinned dividers now stand on the start side in RTL too.
 
 ## Textarea
 
