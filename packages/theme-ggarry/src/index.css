@@ -95,6 +95,7 @@
 @import './components/tabs.css' layer(gg.components);
 @import './components/toast.css' layer(gg.components);
 @import './components/toolbar.css' layer(gg.components);
+@import './components/ribbon.css' layer(gg.components);
 @import './components/shell.css' layer(gg.components);
 @import './components/split.css' layer(gg.components);
 @import './components/rail.css' layer(gg.components);

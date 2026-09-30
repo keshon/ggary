@@ -1,0 +1,83 @@
+/* A ribbon is a tab list over panels of groups. Both scrollers move along
+   one axis only: what overflows the other way is a scrollbar's own room or
+   rounding noise, never content, so it is clipped rather than barred. The
+   price is written on the tabs: a keyboard-focused tab keeps the sides of
+   its ring, not the top and bottom. */
+
+[data-scope='ribbon'][data-part='root'] {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+[data-scope='ribbon'][data-part='tab-list'] {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: clip;
+}
+
+[data-scope='ribbon'][data-part='tab'] {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  white-space: nowrap;
+  user-select: none;
+  cursor: pointer;
+}
+[data-scope='ribbon'][data-part='tab'][data-disabled] {
+  cursor: not-allowed;
+}
+
+[data-scope='ribbon'][data-part='panel'] {
+  display: flex;
+  align-items: stretch;
+  overflow-x: auto;
+  overflow-y: clip;
+}
+[data-scope='ribbon'][data-part='panel'][hidden] {
+  display: none;
+}
+
+[data-scope='ribbon'][data-part='group'] {
+  display: flex;
+  flex-direction: column;
+  flex: none;
+  min-inline-size: 0;
+}
+
+[data-scope='ribbon'][data-part='group-body'] {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  min-inline-size: 0;
+}
+
+[data-scope='ribbon'][data-part='group-label'] {
+  flex: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-scope='ribbon'][data-part='separator'] {
+  flex: none;
+  align-self: stretch;
+}
+
+/* A stacked tool: its button's icon over its label. Never focusable itself —
+   the toolbar keys walk the buttons inside it as if it were not there. */
+[data-scope='ribbon'][data-part='tool'] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: none;
+  min-inline-size: 0;
+}
+
+@media print {
+  [data-scope='ribbon'][data-part='root'] {
+    display: none;
+  }
+}

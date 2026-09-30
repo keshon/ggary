@@ -55,8 +55,13 @@
     background: HighlightText;
   }
 
-  /* A highlight that is only a fill: the row the keys or the pointer are on. */
-  :is([data-scope='select'], [data-scope='menu'], [data-scope='combobox'], [data-scope='cascader'], [data-scope='command-palette'])[data-part='item'][data-highlighted],
+  /* The ribbon's row line is an inset shadow, which the reset takes: said
+     again as one, in the text's colour. */
+  [data-scope='ribbon'][data-part='tab-list'] {
+    box-shadow: inset 0 -1px 0 CanvasText;
+  }
+
+  /* A highlight that is only a fill: the row the keys or the pointer are on. */  :is([data-scope='select'], [data-scope='menu'], [data-scope='combobox'], [data-scope='cascader'], [data-scope='command-palette'])[data-part='item'][data-highlighted],
   [data-scope='menubar'][data-part='item'][data-state='open'],
   [data-scope='chip-group'] [data-scope='chip'][data-part='root'][data-selected] {
     forced-color-adjust: none;

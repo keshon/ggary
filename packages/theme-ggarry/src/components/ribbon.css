@@ -1,0 +1,208 @@
+/* ==========================================================================
+   GGarry — ribbon
+
+   A 3ds Max ribbon: a tab row over panels of named groups, each group its
+   own toolbar over the kit's own controls. The tabs read as Tabs sections —
+   a bar under the chosen one, no weight change so the row never shifts —
+   and the panel is a recessed band whose groups are divided by hairlines,
+   each with its caption underneath. Density comes from the group's tight
+   gaps and small type, never from a second set of controls.
+   ========================================================================== */
+
+[data-scope='ribbon'][data-part='root'] {
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  color: var(--ggarry-text-default);
+  background: var(--ggarry-bg-surface);
+  border-block: 1px solid var(--ggarry-border-default);
+}
+
+[data-scope='ribbon'][data-part='tab-list'] {
+  gap: var(--ggarry-space-5);
+  padding-inline: var(--ggarry-space-4);
+  /* The row's line is an inset shadow, not a border: a border stands outside
+     the content the row sizes to, and the tab's bar reaching down over it
+     would protrude a pixel past the row — a vertical scrollbar everywhere.
+     An inset shadow paints inside instead, and a tab's own border still draws
+     over it, so the chosen bar covers the line exactly as before. */
+  box-shadow: inset 0 -1px 0 var(--ggarry-border-default);
+}
+
+[data-scope='ribbon'][data-part='tab'] {
+  gap: var(--ggarry-space-2);
+  padding-block: var(--ggarry-space-2);
+  border-block-end: var(--ggarry-size-indicator) solid transparent;
+  color: var(--ggarry-text-muted);
+  transition: color var(--ggarry-duration-fast) var(--ggarry-easing-standard), border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+
+[data-scope='ribbon'][data-part='tab']:hover:not([data-disabled]) {
+  color: var(--ggarry-text-default);
+  border-block-end-color: var(--ggarry-border-strong);
+}
+
+[data-scope='ribbon'][data-part='tab'][data-state='active'] {
+  color: var(--ggarry-text-default);
+  border-block-end-color: var(--ggarry-border-accent);
+}
+
+[data-scope='ribbon'][data-part='tab'][data-disabled] {
+  color: var(--ggarry-text-subtle);
+}
+
+[data-scope='ribbon'][data-part='panel'] {
+  gap: var(--ggarry-space-3);
+  padding-block-start: var(--ggarry-space-3);
+  padding-inline: var(--ggarry-space-4);
+  background: var(--ggarry-bg-subtle);
+  /* The caption anchors to the edge: the room below it stays one step,
+     whatever the rhythm above it is. */
+  padding-block-end: var(--ggarry-space-1);
+}
+
+[data-scope='ribbon'][data-part='group'] {
+  /* The caption hugs its tools from below and sits on the edge: twice as far
+     from what it names as from what it stands on, so it cannot read as
+     floating between the two. */
+  gap: var(--ggarry-space-2);
+  min-inline-size: var(--ggarry-size-control-sm);
+  max-inline-size: 24rem;
+}
+
+[data-scope='ribbon'][data-part='group-body'] {
+  gap: var(--ggarry-space-1);
+  min-block-size: var(--ggarry-size-control-sm);
+}
+
+[data-scope='ribbon'][data-part='group-label'] {
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-semibold);
+  line-height: var(--ggarry-line-height-relaxed);
+  color: var(--ggarry-text-muted);
+  text-align: center;
+}
+
+[data-scope='ribbon'][data-part='separator'] {
+  inline-size: 1px;
+  margin-block: var(--ggarry-space-1);
+  background: var(--ggarry-border-default);
+}
+
+/* Dense tools: small controls sit at their own size; a labelled control
+   keeps its caption beside it rather than stretching the row. */
+[data-scope='ribbon'][data-part='group-body'] > [data-scope='button'][data-part='root'][data-size='sm'] {
+  border-radius: var(--ggarry-radius-sm);
+}
+
+/* --- stacked tools ----------------------------------------------------------
+   A tool owns the plate: the button inside draws nothing of its own, only its
+   icon over its label in the tool's small type. The button stays the kit's
+   own — these are its documented override points, not a second component. */
+
+[data-scope='ribbon'][data-part='tool'] {
+  padding-block: var(--ggarry-space-1);
+  padding-inline: var(--ggarry-space-2);
+  border-radius: var(--ggarry-radius-md);
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+
+[data-scope='ribbon'][data-part='tool']:hover {
+  background: var(--ggarry-bg-muted);
+}
+
+[data-scope='ribbon'][data-part='tool'] > [data-scope='button'][data-part='root'] {
+  --button-bg-hover: transparent;
+  --button-font-size: var(--ggarry-font-size-xs);
+  flex-direction: column;
+  gap: var(--ggarry-space-1);
+  height: auto;
+  padding-block: var(--ggarry-space-1);
+  padding-inline: var(--ggarry-space-1);
+}
+
+/* --- cards ------------------------------------------------------------------
+   A card per group: pill tabs over a recessed panel, each group its own
+   surface with room for stacked tools. The rules between groups retire —
+   the cards divide themselves. */
+
+[data-scope='ribbon'][data-part='root'][data-variant='cards'] {
+  /* A full border, not the band's block-only one: a radius with no edge along
+     its curve reads as a rendering glitch, not a corner. */
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  overflow: clip;
+}
+
+[data-scope='ribbon'][data-part='root'][data-variant='cards'] > [data-part='tab-list'] {
+  gap: var(--ggarry-space-2);
+  padding: var(--ggarry-space-2) var(--ggarry-space-3);
+}
+
+[data-scope='ribbon'][data-part='root'][data-variant='cards'] [data-part='tab'] {
+  padding-block: var(--ggarry-space-1);
+  padding-inline: var(--ggarry-space-3);
+  margin-block-end: 0;
+  border-block-end: 0;
+  border-radius: var(--ggarry-radius-md);
+}
+
+[data-scope='ribbon'][data-part='root'][data-variant='cards'] [data-part='tab']:hover:not([data-disabled]) {
+  background: var(--ggarry-bg-muted);
+  border-block-end-color: transparent;
+  color: var(--ggarry-text-default);
+}
+
+[data-scope='ribbon'][data-part='root'][data-variant='cards'] [data-part='tab'][data-state='active'] {
+  background: var(--ggarry-bg-accent-subtle);
+  border-block-end-color: transparent;
+  color: var(--ggarry-text-accent);
+}
+
+[data-scope='ribbon'][data-part='root'][data-variant='cards'] [data-part='group'] {
+  padding-block: var(--ggarry-space-3) var(--ggarry-space-2);
+  padding-inline: var(--ggarry-space-3);
+  background: var(--ggarry-bg-surface);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: var(--ggarry-radius-lg);
+  box-shadow: var(--ggarry-shadow-sm);
+}
+
+/* Cards stand on the panel with room on every side: the anchored caption
+   below is the strip's answer, not theirs. The inset matches the gaps, so
+   the canvas reads even all around. */
+[data-scope='ribbon'][data-part='root'][data-variant='cards'] > [data-part='panel'] {
+  padding-inline: var(--ggarry-space-3);
+  padding-block-end: var(--ggarry-space-3);
+}
+
+[data-scope='ribbon'][data-part='root'][data-variant='cards'] [data-part='separator'] {
+  display: none;
+}
+
+/* --- scroll -----------------------------------------------------------------
+   A long ribbon scrolls, and says so three ways: the kit's own thin bar, a
+   fade where content runs under the edge, and a wheel that turns a vertical
+   gesture into a horizontal one. The fades need the scroll position, which CSS
+   cannot read, so the scrollers report it back as data attributes (see
+   attachRibbonScrollers in core) and the theme keys the masks off them. */
+
+[data-scope='ribbon']:is([data-part='tab-list'], [data-part='panel'])[data-fade-start] {
+  -webkit-mask-image: linear-gradient(to right, transparent, black var(--ggarry-space-8));
+  mask-image: linear-gradient(to right, transparent, black var(--ggarry-space-8));
+}
+
+[data-scope='ribbon']:is([data-part='tab-list'], [data-part='panel'])[data-fade-end] {
+  -webkit-mask-image: linear-gradient(to left, transparent, black var(--ggarry-space-8));
+  mask-image: linear-gradient(to left, transparent, black var(--ggarry-space-8));
+}
+
+[data-scope='ribbon']:is([data-part='tab-list'], [data-part='panel'])[data-fade-start][data-fade-end] {
+  -webkit-mask-image:
+    linear-gradient(to right, transparent, black var(--ggarry-space-8)),
+    linear-gradient(to left, transparent, black var(--ggarry-space-8));
+  mask-image:
+    linear-gradient(to right, transparent, black var(--ggarry-space-8)),
+    linear-gradient(to left, transparent, black var(--ggarry-space-8));
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}

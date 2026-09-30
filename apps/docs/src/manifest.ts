@@ -81,6 +81,7 @@ export const MANIFEST: DocGroup[] = [
       { id: 'pagination', title: 'Pagination' },
       { id: 'steps', title: 'Steps' },
       { id: 'toolbar', title: 'Toolbar' },
+      { id: 'ribbon', title: 'Ribbon' },
     ],
   },
   {
