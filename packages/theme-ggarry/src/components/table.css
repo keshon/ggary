@@ -1,0 +1,71 @@
+/* ==========================================================================
+   GGarry — table
+
+   A regular table on a surface sheet: hairlines between rows, a quiet header
+   in the nav's group-label voice, the chosen rows in the grid's selected
+   tint. What answers a query is DataGrid's; this one fits on the screen.
+   ========================================================================== */
+
+[data-scope='table'][data-part='root'] {
+  font-family: var(--ggarry-font-family-sans);
+  font-size: var(--ggarry-font-size-md);
+  color: var(--ggarry-text-default);
+  background: var(--ggarry-bg-surface);
+}
+
+[data-scope='table'][data-part='caption'] {
+  padding-inline: var(--ggarry-space-3);
+  padding-block-end: var(--ggarry-space-2);
+  font-size: var(--ggarry-font-size-sm);
+  color: var(--ggarry-text-muted);
+  text-align: start;
+}
+
+[data-scope='table'][data-part='header-cell'] {
+  padding-block: var(--ggarry-space-2);
+  padding-inline: var(--ggarry-space-3);
+  font-size: var(--ggarry-font-size-xs);
+  font-weight: var(--ggarry-font-weight-semibold);
+  color: var(--ggarry-text-muted);
+  /* Opaque against the rows that scroll under a stuck header. */
+  background: var(--ggarry-bg-surface);
+}
+
+[data-scope='table'][data-part='cell'] {
+  padding-block: var(--ggarry-space-2);
+  padding-inline: var(--ggarry-space-3);
+  font-variant-numeric: tabular-nums;
+  border-block-start: 1px solid var(--ggarry-border-default);
+}
+
+/* A sorted column says so, in the accent, icon and all. */
+[data-scope='table'][data-part='sort'] {
+  gap: var(--ggarry-space-1);
+  color: inherit;
+  transition: color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+[data-scope='table'][data-part='sort']:hover {
+  color: var(--ggarry-text-default);
+}
+[data-scope='table'][data-part='sort'][data-state='asc'],
+[data-scope='table'][data-part='sort'][data-state='desc'] {
+  color: var(--ggarry-text-accent);
+}
+[data-scope='table'][data-part='sort-icon'] {
+  inline-size: 12px;
+  block-size: 12px;
+}
+
+[data-scope='table'][data-part='body'] > [data-part='row']:hover {
+  background: var(--ggarry-bg-subtle);
+}
+[data-scope='table'][data-part='body'] > [data-part='row'][data-selected] {
+  background: var(--ggarry-bg-accent-subtle);
+}
+
+[data-scope='table'][data-part='empty'] {
+  display: block;
+  padding-block: var(--ggarry-space-6);
+  color: var(--ggarry-text-muted);
+  text-align: center;
+}

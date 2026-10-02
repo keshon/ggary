@@ -21,6 +21,7 @@ import TooltipWithTrigger from './TooltipWithTrigger.svelte'
 import MenuWithTrigger from './MenuWithTrigger.svelte'
 import OverlayWithTrigger from './OverlayWithTrigger.svelte'
 import TabsWithPanels from './TabsWithPanels.svelte'
+import TableWithCells from './TableWithCells.svelte'
 import AccordionWithPanels from './AccordionWithPanels.svelte'
 import FormWithFields from './FormWithFields.svelte'
 import DisplayWithContent from './DisplayWithContent.svelte'
@@ -160,6 +161,7 @@ export const svelte: Adapter = {
   pagination: (props, target) => mountSvelte(Pagination as Component<any>, props, target),
   steps: (props, target) => mountSvelte(Steps as Component<any>, props, target),
   toolbar: (props, target) => mountSvelte(ToolbarWithTools as Component<any>, props, target),
+  table: (props, target) => mountSvelte(TableWithCells as Component<any>, props, target),
   checkboxGroup: (props, target) => mountSvelte(CheckboxGroup as Component<any>, props, target),
   fieldset: (props, target) => mountSvelte(FieldsetWithGroup as Component<any>, props, target),
   // Snippets for the trigger, body and footer, as an app writes them.

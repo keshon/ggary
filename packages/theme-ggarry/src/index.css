@@ -93,6 +93,7 @@
 @import './components/steps.css' layer(gg.components);
 @import './components/switch.css' layer(gg.components);
 @import './components/tabs.css' layer(gg.components);
+@import './components/table.css' layer(gg.components);
 @import './components/toast.css' layer(gg.components);
 @import './components/toolbar.css' layer(gg.components);
 @import './components/ribbon.css' layer(gg.components);

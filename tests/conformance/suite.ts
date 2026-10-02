@@ -29,6 +29,7 @@ import { popoverConformance, tooltipConformance } from './popover.spec'
 import { radioGroupConformance } from './radio-group.spec'
 import { resetConformance } from './reset.spec'
 import { selectConformance } from './select.spec'
+import { tableConformance } from './table.spec'
 import { tabsConformance } from './tabs.spec'
 import { toastConformance } from './toast.spec'
 import { displayConformance } from './display.spec'
@@ -89,6 +90,7 @@ export function runConformance() {
       paginationConformance(adapter)
       stepsConformance(adapter)
       toolbarConformance(adapter)
+      tableConformance(adapter)
       dataGridConformance(adapter)
       gridToolsConformance(adapter)
       gridRowsConformance(adapter)

@@ -120,6 +120,7 @@ import {
   Toolbar,
   ToolbarSeparator,
   ToolbarSpacer,
+  Table,
   Turn,
   Composer,
   Thinking,
@@ -498,6 +499,7 @@ export const react: Adapter = {
       rest,
       (buttons ?? ['One', 'Two', 'Three']).map((label) => createElement(Button, { key: label }, label)),
     ]),
+  table: (props, target) => mount(Table as ComponentType<any>, props, target),
   checkboxGroup: (props, target) => mount(CheckboxGroup, props, target),
   fieldset: (props, target) =>
     mount(Fieldset, props, target, ({ group, items, name, defaultValue, ...fieldset }: FieldsetProps) => [

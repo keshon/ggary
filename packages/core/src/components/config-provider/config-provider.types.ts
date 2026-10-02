@@ -30,6 +30,7 @@ import type { RunWords } from '../run'
 import type { ShareWords } from '../share'
 import type { SparklineWords } from '../sparkline'
 import type { StepWords } from '../step'
+import type { TableWords } from '../table'
 import type { QueueWordsInput } from '../task'
 import type { ThinkingWords } from '../thinking'
 import type { TimePickerWords } from '../time-picker'
@@ -80,6 +81,7 @@ export interface KitWords {
   share?: ShareWords
   sparkline?: Partial<SparklineWords>
   step?: StepWords
+  table?: TableWords
   thinking?: ThinkingWords
   timePicker?: TimePickerWords
   turn?: TurnWords

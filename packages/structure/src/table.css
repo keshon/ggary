@@ -1,0 +1,46 @@
+/* A regular table is a native table: columns size themselves, and the header
+   sticks while the page scrolls. The sort control is a button like any other
+   closable tab's: its own browser box is removed here. */
+
+[data-scope='table'][data-part='root'] {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+[data-scope='table'][data-part='header-cell'] {
+  position: sticky;
+  top: 0;
+}
+
+[data-scope='table'][data-part='sort'] {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Cells hold wrapped text beside controls: middle keeps a checkbox on a
+   three-line cell from riding its top edge. */
+[data-scope='table'] :is([data-part='header-cell'], [data-part='cell']) {
+  vertical-align: middle;
+  text-align: start;
+}
+[data-scope='table'] [data-align='center'] {
+  text-align: center;
+}
+[data-scope='table'] [data-align='end'] {
+  text-align: end;
+}
+
+/* The checkbox column is as narrow as its box. */
+[data-scope='table'] [data-select] {
+  width: 1px;
+  white-space: nowrap;
+}

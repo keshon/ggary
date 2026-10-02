@@ -33,6 +33,7 @@ import type { FileChangeKind, FileChangeWords } from '../../packages/core/src/co
 import type { SparklineWords } from '../../packages/core/src/components/sparkline'
 import type { LegendDirection, LegendItem, LegendWords } from '../../packages/core/src/components/legend'
 import type { ChartSeries } from '../../packages/core/src/utils/series'
+import type { TableColumnDef, TableRowKey, TableSort, TableWords } from '../../packages/core/src/components/table'
 
 export interface ButtonProps {
   label: string
@@ -1028,6 +1029,23 @@ export interface ListProps {
   words?: { more?: string; loading?: string; failed?: string; retry?: string }
 }
 
+export interface TableProps {
+  columns: TableColumnDef<Record<string, unknown>>[]
+  rows: Record<string, unknown>[]
+  getRowKey?: (row: Record<string, unknown>, index: number) => TableRowKey
+  caption?: string
+  label?: string
+  selectable?: boolean
+  sort?: TableSort | null
+  defaultSort?: TableSort | null
+  onSortChange?: (sort: TableSort | null) => void
+  selection?: TableRowKey[]
+  defaultSelection?: TableRowKey[]
+  onSelectionChange?: (selection: TableRowKey[]) => void
+  renderCell?: (row: Record<string, unknown>, column: TableColumnDef<Record<string, unknown>>, index: number) => string | undefined
+  words?: TableWords
+}
+
 export interface TimePickerProps {
   label?: string
   value?: string | null
@@ -1242,6 +1260,7 @@ export interface Adapter {
   pagination(props: PaginationProps, target: HTMLElement): Promise<Mounted<PaginationProps>>
   steps(props: StepsProps, target: HTMLElement): Promise<Mounted<StepsProps>>
   toolbar(props: ToolbarProps, target: HTMLElement): Promise<Mounted<ToolbarProps>>
+  table(props: TableProps, target: HTMLElement): Promise<Mounted<TableProps>>
   /** Updates are not supported: a grid's props are read at mount. */
   dataGrid(props: DataGridProps, target: HTMLElement): Promise<Mounted<DataGridProps>>
   gridTools(props: GridToolsProps, target: HTMLElement): Promise<Mounted<GridToolsProps>>

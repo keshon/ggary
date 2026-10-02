@@ -109,6 +109,7 @@ export const MANIFEST: DocGroup[] = [
     title: 'Data',
     pages: [
       { id: 'list', title: 'List' },
+      { id: 'table', title: 'Table' },
       { id: 'data-grid', title: 'DataGrid' },
       { id: 'kanban', title: 'Kanban' },
       { id: 'gantt', title: 'Gantt' },
