@@ -1,4 +1,6 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type HTMLAttributes, type ReactNode } from 'react'
+import { Tabs as Primitive } from '@base-ui/react/tabs'
+import { Toolbar } from '../toolbar/Toolbar'
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type HTMLAttributes, type ReactNode } from 'react'
 import {
   connect,
   connectGroup,
@@ -8,7 +10,7 @@ import {
   type RibbonItem,
   type RibbonVariant,
 } from '@ggary/core/ribbon'
-import { attachRibbonScrollers, attachToolbarKeys, focusTab, reactNormalizer } from '@ggary/core'
+import { attachRibbonScrollers, reactNormalizer } from '@ggary/core'
 import { useConfigured } from '../config-provider'
 
 export interface RibbonProps extends Omit<HTMLAttributes<HTMLDivElement>, 'defaultValue' | 'children'> {
@@ -57,56 +59,47 @@ export function Ribbon(props: RibbonProps) {
     return attachRibbonScrollers(scrollRoot.current)
   }, [])
 
-  // Roving focus moves only when the machine asks (the nonce), never on a re-render.
-  const lastFocusNonce = useRef(0)
-  useLayoutEffect(() => {
-    if (api.focusNonce === 0 || api.focusNonce === lastFocusNonce.current || api.focusValue === null) return
-    lastFocusNonce.current = api.focusNonce
-    focusTab(document, api.ids.tab(api.focusValue))
-  })
-
   return (
-    <div {...rest} {...api.rootProps} ref={scrollRoot}>
-      <div {...api.tabListProps}>
+    <Primitive.Root {...rest} {...api.rootProps} ref={scrollRoot} value={state.value} data-backend="base-ui"
+      onValueChange={next => { if (typeof next === 'string') machine.send({ type: 'SELECT', value: next }) }}>
+      <Primitive.List {...api.tabListProps} activateOnFocus>
         {api.items.map((item) => (
-          <div key={item.value} {...api.getTabProps(item)}>
+          <Primitive.Tab key={item.value} {...(() => {
+            const { onClick, onKeyDown, onFocus, tabIndex, ...presentation } = api.getTabProps(item)
+            return presentation
+          })()} value={item.value} disabled={item.disabled}>
             <span {...api.getTabTextProps()}>{item.label}</span>
-          </div>
+          </Primitive.Tab>
         ))}
-      </div>
+      </Primitive.List>
       {children &&
         api.items.map((item) =>
           keepMounted || item.value === state.value ? (
-            <div key={item.value} {...api.getPanelProps(item)}>
+            <Primitive.Panel key={item.value} {...api.getPanelProps(item)} value={item.value} keepMounted={keepMounted}>
               {children(item)}
-            </div>
+            </Primitive.Panel>
           ) : null
         )}
-    </div>
+    </Primitive.Root>
   )
 }
 
 export interface RibbonGroupProps extends HTMLAttributes<HTMLDivElement> {
+  /** False for mixed/domain controls that manage their own focus; such groups are not toolbars. */
+  managed?: boolean
   label: string
   children: ReactNode
 }
 
 /** One named group of tools: its own toolbar over the kit's own controls. */
-export function RibbonGroup({ label, children, ...rest }: RibbonGroupProps) {
+export function RibbonGroup({ label, managed = true, children, ...rest }: RibbonGroupProps) {
   const group = connectGroup(label, reactNormalizer)
-  const root = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!root.current) return
-    return attachToolbarKeys(root.current, 'horizontal')
-  }, [])
-
-  return (
-    <div {...rest} {...group.groupProps} ref={root}>
-      <div {...group.bodyProps}>{children}</div>
-      <div {...group.labelProps}>{group.label}</div>
+  return <div {...rest} {...group.groupProps} role="group">
+    <div {...group.bodyProps}>
+      {managed ? <Toolbar label={label} style={{ display: 'contents' }}>{children}</Toolbar> : children}
     </div>
-  )
+    <div {...group.labelProps}>{group.label}</div>
+  </div>
 }
 
 /** A line between groups. */

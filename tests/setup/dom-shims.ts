@@ -9,6 +9,23 @@
 
 const focusables = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
+// Base UI dispatches a PointerEvent for keyboard activation of non-native
+// options. jsdom supplies MouseEvent, but not PointerEvent.
+if (typeof window.PointerEvent !== 'function') {
+  class PointerEventShim extends MouseEvent {
+    readonly pointerId: number
+    readonly pointerType: string
+    readonly isPrimary: boolean
+    constructor(type: string, init: PointerEventInit = {}) {
+      super(type, init)
+      this.pointerId = init.pointerId ?? 0
+      this.pointerType = init.pointerType ?? ''
+      this.isPrimary = init.isPrimary ?? false
+    }
+  }
+  window.PointerEvent = globalThis.PointerEvent = PointerEventShim as typeof PointerEvent
+}
+
 // --- <dialog> -------------------------------------------------------------------
 const dialog = HTMLDialogElement.prototype as HTMLDialogElement & Record<string, unknown>
 

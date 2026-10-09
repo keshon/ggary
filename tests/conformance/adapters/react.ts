@@ -118,6 +118,7 @@ import {
   Spinner,
   Textarea,
   Toolbar,
+  ToolbarButton,
   ToolbarSeparator,
   ToolbarSpacer,
   Table,
@@ -199,7 +200,11 @@ async function mount<P extends object>(
       await act(async () => render())
     },
     async unmount() {
+      const hadSelect = !!host.querySelector('[data-backend="base-ui"]')
       await act(async () => root.unmount())
+      // Base UI restores focus on the next frame. Drain that work before the
+      // next framework's fixture starts taking focus in the same document.
+      if (hadSelect) await act(async () => { await new Promise((resolve) => setTimeout(resolve, 25)) })
       host.remove()
     },
   })
@@ -491,7 +496,7 @@ export const react: Adapter = {
           ? createElement(ToolbarSeparator, { key: index })
           : label === '>'
             ? createElement(ToolbarSpacer, { key: index })
-            : createElement(Button, { key: index, size: 'sm' }, label)
+            : createElement(ToolbarButton, { key: index, size: 'sm' }, label)
       ),
     ]),
   buttonGroup: (props, target) =>

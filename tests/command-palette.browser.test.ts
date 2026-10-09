@@ -37,18 +37,20 @@ async function mount(props: Record<string, unknown> = {}) {
   root = createRoot(host)
   root.render(createElement(CommandPalette, { commands, ...props }))
   await frames(2)
-  const content = () => host.querySelector<HTMLDialogElement>('[data-scope="command-palette"][data-part="content"]')!
-  const input = () => host.querySelector<HTMLInputElement>('[data-part="input"]')!
+  const content = () => document.querySelector<HTMLDialogElement>('[data-scope="command-palette"][data-part="content"]')!
+  const input = () => document.querySelector<HTMLInputElement>('[data-part="input"]')!
   return { host, before, content, input }
 }
 
 describe('command palette', () => {
-  it('the real Ctrl+K opens it in the top layer, high in the viewport, over a page that cannot be reached', async () => {
+  it('the real Ctrl+K opens a Base UI modal high in the viewport over an inaccessible page', async () => {
     const { before, content, input } = await mount()
     before.focus()
     await userEvent.keyboard('{Control>}k{/Control}')
     await frames(2)
-    expect(content().matches(':modal')).toBe(true)
+    expect(content().getAttribute('role')).toBe('dialog')
+    expect(content().hasAttribute('data-modal')).toBe(true)
+    expect(content().dataset.state).toBe('open')
     expect(document.activeElement).toBe(input())
     const box = content().getBoundingClientRect()
     expect(box.top).toBeGreaterThan(40)
@@ -57,7 +59,7 @@ describe('command palette', () => {
     expect(document.elementFromPoint(20, 680)).not.toBe(before)
     await userEvent.keyboard('{Control>}k{/Control}')
     await frames(1)
-    expect(content().open).toBe(false)
+    expect(content().dataset.state).toBe('closed')
     expect(document.activeElement).toBe(before)
   })
 
@@ -65,10 +67,10 @@ describe('command palette', () => {
     const many = Array.from({ length: 40 }, (_, i) => ({ id: `c${i}`, label: `Command ${i + 1}`, group: i < 20 ? 'First' : 'Second' }))
     const { host } = await mount({ commands: many, defaultOpen: true })
     await frames(2)
-    const list = host.querySelector<HTMLElement>('[data-part="list"]')!
+    const list = document.querySelector<HTMLElement>('[data-part="list"]')!
     expect(list.scrollHeight).toBeGreaterThan(list.clientHeight)
     await userEvent.keyboard('{ArrowUp}')
-    const last = document.getElementById(host.querySelector('[data-part="input"]')!.getAttribute('aria-activedescendant')!)!
+    const last = document.getElementById(document.querySelector('[data-part="input"]')!.getAttribute('aria-activedescendant')!)!
     expect(last.textContent).toBe('Command 40')
     const lane = list.getBoundingClientRect()
     expect(last.getBoundingClientRect().bottom).toBeLessThanOrEqual(lane.bottom + 1)
@@ -85,9 +87,9 @@ describe('command palette', () => {
     await userEvent.keyboard('kaz')
     await new Promise((resolve) => setTimeout(resolve, 400))
     expect(asked).toEqual(['kaz'])
-    const labels = [...host.querySelectorAll('[data-part="group-label"]')].map((label) => label.textContent)
+    const labels = [...document.querySelectorAll('[data-part="group-label"]')].map((label) => label.textContent)
     expect(labels).toEqual(['Results'])
-    expect(host.querySelector('[data-part="item"][data-highlighted]')!.textContent).toBe('Kazan Metro (kaz)')
+    expect(document.querySelector('[data-part="item"][data-highlighted]')!.textContent).toBe('Kazan Metro (kaz)')
   })
 
   it('a command that opens a dialog of its own gets the focus, not the element before the palette', async () => {

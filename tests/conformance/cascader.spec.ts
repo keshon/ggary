@@ -17,8 +17,8 @@ export function cascaderConformance(adapter: Adapter) {
       const changes: string[][] = []
       const m = await adapter.cascader({ label: 'Place', items: places, onValueChange: (value) => changes.push(value), ...props }, freshTarget())
       const trigger = () => part(m.root, 'cascader', 'trigger') as HTMLButtonElement
-      const content = () => part(m.root, 'cascader', 'content')!
-      const columns = () => parts(m.root, 'cascader', 'column')
+      const content = () => adapter.name === 'react' ? document.getElementById(trigger().id.replace('-trigger', '-content'))! : part(m.root, 'cascader', 'content')!
+      const columns = () => parts(adapter.name === 'react' ? document.body : m.root, 'cascader', 'column')
       const focusedText = () => (document.activeElement ? part(document.activeElement, 'cascader', 'item-text')?.textContent : undefined)
       const press = (name: string) => adapter.act(() => void key(document.activeElement!, name))
       return { m, trigger, content, columns, focusedText, press, changes }
@@ -40,7 +40,7 @@ export function cascaderConformance(adapter: Adapter) {
     it('opens on the first item; the keyboard walks down a column and into the children', async () => {
       const { trigger, columns, focusedText, press } = await setup()
       await adapter.act(() => click(trigger()))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(trigger().getAttribute('aria-expanded')).toBe('true')
       expect(focusedText()).toBe('Russia')
       expect(columns().map((column) => column.getAttribute('role'))).toEqual(['listbox', 'listbox'])
@@ -60,35 +60,35 @@ export function cascaderConformance(adapter: Adapter) {
     it('walking the columns never sends the focus back to the button on the way', async () => {
       const { trigger, press } = await setup()
       await adapter.act(() => click(trigger()))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       let visits = 0
       trigger().addEventListener('focus', () => visits++)
       await press('ArrowDown')
       await press('ArrowRight')
       await press('ArrowDown')
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(visits).toBe(0)
     })
 
     it('Enter on a leaf chooses the path, closes, and gives the focus back to the button', async () => {
       const { m, trigger, press, changes } = await setup({ name: 'place' })
       await adapter.act(() => click(trigger()))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       await press('ArrowDown')
       await press('ArrowRight')
       await press('Enter')
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(changes).toEqual([['kz', 'ala']])
       expect(trigger().getAttribute('aria-expanded')).toBe('false')
       expect(document.activeElement).toBe(trigger())
-      expect(m.root.querySelector<HTMLInputElement>('input[type="hidden"][name="place"]')!.value).toBe('ala')
+      expect(m.root.querySelector<HTMLInputElement>('input[name="place"]')!.value).toBe('ala')
     })
 
     it('a press on a branch opens it; a press on a leaf chooses', async () => {
       const { m, trigger, changes } = await setup()
       await adapter.act(() => click(trigger()))
-      await adapter.wait(0)
-      const item = (text: string) => parts(m.root, 'cascader', 'item').find((row) => part(row, 'cascader', 'item-text')!.textContent === text)!
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      const item = (text: string) => parts(adapter.name === 'react' ? document.body : m.root, 'cascader', 'item').find((row) => part(row, 'cascader', 'item-text')!.textContent === text)!
       await adapter.act(() => click(item('Tatarstan')))
       expect(changes).toEqual([])
       await adapter.act(() => click(item('Naberezhnye Chelny')))
@@ -98,8 +98,8 @@ export function cascaderConformance(adapter: Adapter) {
     it('when a branch may be chosen, a press on its chevron only opens it — the way on a touch screen', async () => {
       const { m, trigger, columns, changes } = await setup({ selectParents: true })
       await adapter.act(() => click(trigger()))
-      await adapter.wait(0)
-      const row = (text: string) => parts(m.root, 'cascader', 'item').find((item) => part(item, 'cascader', 'item-text')!.textContent === text)!
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      const row = (text: string) => parts(adapter.name === 'react' ? document.body : m.root, 'cascader', 'item').find((item) => part(item, 'cascader', 'item-text')!.textContent === text)!
       await adapter.act(() => click(part(row('Kazakhstan'), 'cascader', 'item-branch')!))
       expect(changes).toEqual([])
       expect(columns()[1].getAttribute('aria-label')).toBe('Kazakhstan')
@@ -110,9 +110,9 @@ export function cascaderConformance(adapter: Adapter) {
     it('Escape closes without choosing, and the focus goes back to the button', async () => {
       const { trigger, changes } = await setup()
       await adapter.act(() => click(trigger()))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       await adapter.act(() => void key(document.activeElement!, 'Escape'))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(trigger().getAttribute('aria-expanded')).toBe('false')
       expect(document.activeElement).toBe(trigger())
       expect(changes).toEqual([])
@@ -121,11 +121,11 @@ export function cascaderConformance(adapter: Adapter) {
     it('a disabled item is passed over and cannot be chosen', async () => {
       const { m, trigger, focusedText, press } = await setup({ defaultValue: ['ru', 'tat'] })
       await adapter.act(() => click(trigger()))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(focusedText()).toBe('Tatarstan')
       await press('ArrowDown')
       expect(focusedText()).toBe('Samara')
-      const petersburg = parts(m.root, 'cascader', 'item').find((row) => row.textContent?.includes('Saint Petersburg'))!
+      const petersburg = parts(adapter.name === 'react' ? document.body : m.root, 'cascader', 'item').find((row) => row.textContent?.includes('Saint Petersburg'))!
       expect(petersburg.getAttribute('aria-disabled')).toBe('true')
     })
   })

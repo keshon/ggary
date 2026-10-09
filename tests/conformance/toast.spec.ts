@@ -1,3 +1,4 @@
+import { createToaster as createReactToaster } from '../../packages/react/src/components/toast/toaster-store'
 import { describe, expect, it, vi } from 'vitest'
 import { createToaster, LEAVE_MS } from '../../packages/core/src/components/toast'
 import { type Adapter, type ToasterProps, click, freshTarget, part, parts } from './harness'
@@ -14,9 +15,10 @@ const shownInTopLayer = (el: Element) => {
  * stand still under the pointer and focus, and dismiss by their buttons.
  */
 export function toastConformance(adapter: Adapter) {
+  if (adapter.name === 'react') { baseToastConformance(adapter); return }
   describe('toast', () => {
     const setup = async (props: Partial<ToasterProps> = {}) => {
-      const toaster = props.toaster ?? createToaster()
+      const toaster = (props.toaster ?? createToaster()) as ReturnType<typeof createToaster>
       const m = await adapter.toaster({ toaster, ...props }, freshTarget())
       const region = () => part(m.root, 'toast', 'region')!
       const toasts = () => parts(m.root, 'toast', 'toast')
@@ -142,4 +144,31 @@ export function toastConformance(adapter: Adapter) {
       expect(region().dataset.placement).toBe('top-start')
     })
   })
+}
+
+
+/** React adopts Base UI lifecycle/announcements; legacy core timing contracts remain Svelte/vanilla tests. */
+function baseToastConformance(adapter: Adapter) {
+ describe('Base UI React toast', () => {
+  const setup = async () => {
+   const queue = createReactToaster()
+   await adapter.toaster({ toaster: queue }, freshTarget())
+   return { queue, toasts: () => parts(document.body, 'toast', 'toast'), show: async (options: Parameters<typeof queue.toast>[0]) => { let id = ''; await adapter.act(() => { id = queue.toast(options) }); return id } }
+  }
+  it('renders title, description, tone and accessible close through Base UI', async () => {
+   const f = await setup(); await f.show({ title: 'Saved', text: 'All changes', tone: 'ok', duration: 0 })
+   expect(part(f.toasts()[0], 'toast', 'title')!.textContent).toBe('Saved')
+   expect(part(f.toasts()[0], 'toast', 'text')!.textContent).toBe('All changes')
+   expect(part(f.toasts()[0], 'toast', 'close')!.getAttribute('aria-label')).toBe('Dismiss')
+   await adapter.act(() => click(part(f.toasts()[0], 'toast', 'close')!))
+   expect(f.toasts().length === 0 || f.toasts()[0].dataset.state === 'leaving').toBe(true)
+  })
+  it('updates one toast in place and runs its action', async () => {
+   const f = await setup(); const action = vi.fn(); const id = await f.show({ title: 'Saving', duration: 0 })
+   await adapter.act(() => f.queue.update(id, { title: 'Saved', tone: 'ok', action: { label: 'Undo', onClick: action } }))
+   expect(f.toasts()).toHaveLength(1); expect(part(f.toasts()[0], 'toast', 'title')!.textContent).toBe('Saved')
+   await adapter.act(() => click(part(f.toasts()[0], 'toast', 'action')!))
+   expect(action).toHaveBeenCalledOnce()
+  })
+ })
 }

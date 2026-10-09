@@ -93,3 +93,21 @@ describe('the cascader', () => {
     expect(api().triggerProps).toMatchObject({ 'aria-haspopup': 'dialog', 'aria-expanded': 'true' })
   })
 })
+
+describe('cascader selection eligibility', () => {
+  it('a disabled or missing explicit choice cannot commit the previously highlighted neighbor', () => {
+    const { machine, changes } = cascader({ defaultValue: ['ru', 'msk'] })
+    machine.send({ type: 'OPEN' })
+    machine.send({ type: 'SELECT', level: 1, value: 'spb' })
+    machine.send({ type: 'SELECT', level: 1, value: 'missing' })
+    expect(changes).toEqual([])
+    expect(machine.getState().value).toEqual(['ru', 'msk'])
+    expect(machine.getState().open).toBe(true)
+  })
+  it('a controlled disabled ancestor cannot be selected through its enabled descendant', () => {
+    const { machine, changes } = cascader({ items: [{ value: 'parent', label: 'Parent', disabled: true, children: [{ value: 'leaf', label: 'Leaf' }] }], value: ['parent', 'leaf'] })
+    machine.send({ type: 'OPEN' })
+    machine.send({ type: 'SELECT' })
+    expect(changes).toEqual([])
+  })
+})

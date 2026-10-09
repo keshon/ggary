@@ -200,3 +200,33 @@ body {
   justify-content: flex-end;
   align-items: flex-start;
 }
+
+/* Composition examples need their own layout; Form must retain its real DOM. */
+.select-pilot-layout {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+  inline-size: 100%;
+}
+.select-pilot-layout > [data-scope='select'] {
+  inline-size: min(100%, 320px);
+}
+.select-pilot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.select-pilot-layout output {
+  overflow-wrap: anywhere;
+  color: var(--gg-text-muted);
+}
+
+/* Static sheet specimens are miniature windows, not viewport-height overlays. */
+.frame > dialog:is([data-placement='start'], [data-placement='end'])[open] {
+  block-size: 100%;
+  max-block-size: 100%;
+}
+
+/* Documentation metadata, kept outside component specimens. */
+.component-guidance { margin-block-end: 1.5rem; font-size: .875rem; }
+.implementation-badge { display: inline-block; padding: .2rem .55rem; border: 1px solid var(--ggarry-border-default); border-radius: var(--ggarry-radius-sm); color: var(--ggarry-text-muted); font-size: .75rem; }

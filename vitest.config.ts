@@ -26,12 +26,13 @@ export default defineConfig({
         resolve: { conditions: ['browser'] },
         test: {
           name: 'dom',
+          server: { deps: { inline: [/@base-ui\//, /@floating-ui\//] } },
           environment: 'jsdom',
           include: ['tests/*.dom.test.ts'],
           globals: true,
           // <dialog> methods and the Popover API, which jsdom lacks. Wiring only:
           // what they do is tested in the browser project.
-          setupFiles: ['tests/setup/dom-shims.ts'],
+          setupFiles: ['tests/setup/dom-shims.ts', 'tests/setup/base-select-position.ts'],
         },
       },
       {

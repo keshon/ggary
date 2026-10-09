@@ -1,3 +1,4 @@
+import type { ToasterStore as ReactToasterStore } from '../../packages/react/src/components/toast/toaster-store'
 /**
  * The conformance harness.
  *
@@ -465,6 +466,7 @@ export interface ComboboxProps {
 }
 
 export interface CalendarProps {
+  defaultMonth?: string
   mode?: 'single' | 'range'
   defaultValue?: string | { start: string | null; end: string | null } | null
   min?: string
@@ -484,6 +486,7 @@ export interface DatePickerProps extends CalendarProps {
 }
 
 export interface AccordionProps {
+  value?: string[]
   items: import('../../packages/core/src/components/accordion').AccordionItem[]
   defaultValue?: string[]
   multiple?: boolean
@@ -567,6 +570,10 @@ export interface CommandPaletteProps {
   commands: import('../../packages/core/src/components/command-palette').PaletteCommand[]
   defaultOpen?: boolean
   onRun?: (command: import('../../packages/core/src/components/command-palette').PaletteCommand) => void
+  open?: boolean
+  modal?: boolean
+  hotkey?: string | false
+  onOpenChange?: (open: boolean) => void
 }
 
 export interface KanbanProps {
@@ -691,7 +698,7 @@ export interface TabsProps {
 
 export interface ToasterProps {
   /** A queue of the test's own, so tests do not share the page's toaster. */
-  toaster: Toaster
+  toaster: Toaster | ReactToasterStore
   placement?: ToastPlacement
   label?: string
 }
@@ -1388,7 +1395,14 @@ export async function cleanup(): Promise<void> {
 export const keydown = (target: Element, key: string) =>
   target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
 
-export const click = (target: Element) => (target as HTMLElement).click()
+export const click = (target: Element) => {
+  // Base UI rejects a bare MouseEvent on an unhighlighted option as an
+  // accidental release after opening. An explicit virtual pointer click is
+  // its supported keyboard/assistive-technology activation path.
+  if (target.getAttribute('role') === 'option' && target.getAttribute('data-backend') === 'base-ui') {
+    target.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true, pointerType: '' }))
+  } else (target as HTMLElement).click()
+}
 
 /**
  * Type into a native input the way a user does, for every framework. The value

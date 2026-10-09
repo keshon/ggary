@@ -160,3 +160,7 @@
   inset-block-start: 100%;
   inset-inline-start: 0;
 }
+
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='positioner'][data-backend='base-ui'] {
+  z-index: var(--gg-z-popover, 1100);
+}

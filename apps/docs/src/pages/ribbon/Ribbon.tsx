@@ -1,6 +1,6 @@
 import type { RibbonItem } from '@ggary/core/ribbon'
 import { Fragment } from 'react'
-import { Button, Icon, Ribbon, RibbonGroup, RibbonSeparator, RibbonTool, SegmentedControl, Select } from '@ggary/react'
+import { ToolbarButton, Icon, Ribbon, RibbonGroup, RibbonSeparator, RibbonTool, SegmentedControl, Select } from '@ggary/react'
 import { DemoPage, Specimen } from '../../react/DemoPage'
 import { levels, overflowGroups, sceneTabs, sceneTabsWithLocked, snapModes, toolTabs } from './data'
 
@@ -9,18 +9,18 @@ function ScenePanel({ item }: { item: RibbonItem }) {
     return (
       <>
         <RibbonGroup label="Deform">
-          <Button size="sm" emphasis="minimal" aria-label="Bend">
+          <ToolbarButton size="sm" emphasis="minimal" aria-label="Bend">
             <Icon name="edit" />
-          </Button>
-          <Button size="sm" emphasis="minimal" aria-label="Twist">
+          </ToolbarButton>
+          <ToolbarButton size="sm" emphasis="minimal" aria-label="Twist">
             <Icon name="redo" />
-          </Button>
-          <Button size="sm" emphasis="minimal" aria-label="Taper">
+          </ToolbarButton>
+          <ToolbarButton size="sm" emphasis="minimal" aria-label="Taper">
             <Icon name="filter" />
-          </Button>
+          </ToolbarButton>
         </RibbonGroup>
         <RibbonSeparator />
-        <RibbonGroup label="Snap">
+        <RibbonGroup label="Snap" managed={false}>
           <SegmentedControl size="sm" label="Snap" items={snapModes} defaultValue="grid" />
         </RibbonGroup>
       </>
@@ -30,18 +30,18 @@ function ScenePanel({ item }: { item: RibbonItem }) {
     return (
       <>
         <RibbonGroup label="Playback">
-          <Button size="sm" emphasis="minimal" aria-label="Play">
+          <ToolbarButton size="sm" emphasis="minimal" aria-label="Play">
             <Icon name="play" />
-          </Button>
-          <Button size="sm" emphasis="minimal" aria-label="Stop">
+          </ToolbarButton>
+          <ToolbarButton size="sm" emphasis="minimal" aria-label="Stop">
             <Icon name="stop" />
-          </Button>
-          <Button size="sm" emphasis="minimal" aria-label="Skip">
+          </ToolbarButton>
+          <ToolbarButton size="sm" emphasis="minimal" aria-label="Skip">
             <Icon name="skip" />
-          </Button>
+          </ToolbarButton>
         </RibbonGroup>
         <RibbonSeparator />
-        <RibbonGroup label="Range">
+        <RibbonGroup label="Range" managed={false}>
           <Select size="sm" label="Range" items={levels} defaultValue="mid" />
         </RibbonGroup>
       </>
@@ -50,28 +50,28 @@ function ScenePanel({ item }: { item: RibbonItem }) {
   return (
     <>
       <RibbonGroup label="Create">
-        <Button size="sm" emphasis="minimal" aria-label="Box">
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Box">
           <Icon name="grid" />
-        </Button>
-        <Button size="sm" emphasis="minimal" aria-label="Sphere">
+        </ToolbarButton>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Sphere">
           <Icon name="globe" />
-        </Button>
-        <Button size="sm" emphasis="minimal" aria-label="Cylinder">
+        </ToolbarButton>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Cylinder">
           <Icon name="database" />
-        </Button>
+        </ToolbarButton>
       </RibbonGroup>
       <RibbonSeparator />
-      <RibbonGroup label="Level">
+      <RibbonGroup label="Level" managed={false}>
         <Select size="sm" label="Level" items={levels} defaultValue="base" />
       </RibbonGroup>
       <RibbonSeparator />
       <RibbonGroup label="History">
-        <Button size="sm" emphasis="minimal" aria-label="Undo">
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Undo">
           <Icon name="undo" />
-        </Button>
-        <Button size="sm" emphasis="minimal" aria-label="Redo">
+        </ToolbarButton>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Redo">
           <Icon name="redo" />
-        </Button>
+        </ToolbarButton>
       </RibbonGroup>
     </>
   )
@@ -115,26 +115,26 @@ export default function RibbonPage() {
                   <>
                     <RibbonGroup label="Create">
                       <RibbonTool>
-                        <Button size="sm" emphasis="minimal">
+                        <ToolbarButton size="sm" emphasis="minimal">
                           <Icon name="grid" size="lg" />
                           Box
-                        </Button>
+                        </ToolbarButton>
                       </RibbonTool>
                       <RibbonTool>
-                        <Button size="sm" emphasis="minimal">
+                        <ToolbarButton size="sm" emphasis="minimal">
                           <Icon name="globe" size="lg" />
                           Sphere
-                        </Button>
+                        </ToolbarButton>
                       </RibbonTool>
                       <RibbonTool>
-                        <Button size="sm" emphasis="minimal">
+                        <ToolbarButton size="sm" emphasis="minimal">
                           <Icon name="database" size="lg" />
                           Cylinder
-                        </Button>
+                        </ToolbarButton>
                       </RibbonTool>
                     </RibbonGroup>
                     <RibbonSeparator />
-                    <RibbonGroup label="Level">
+                    <RibbonGroup label="Level" managed={false}>
                       <Select size="sm" label="Level" items={levels} defaultValue="base" />
                     </RibbonGroup>
                   </>
@@ -153,9 +153,9 @@ export default function RibbonPage() {
                       {index > 0 && <RibbonSeparator />}
                       <RibbonGroup label={group.label}>
                         {group.tools.map((tool) => (
-                          <Button key={tool.name} size="sm" emphasis="minimal" aria-label={tool.name}>
+                          <ToolbarButton key={tool.name} size="sm" emphasis="minimal" aria-label={tool.name}>
                             <Icon name={tool.icon} />
-                          </Button>
+                          </ToolbarButton>
                         ))}
                       </RibbonGroup>
                     </Fragment>

@@ -43,7 +43,7 @@ async function mount(props: Record<string, unknown> = {}) {
   while (!clip.querySelector('[data-part="input"]')) await frames(1)
   const input = clip.querySelector<HTMLInputElement>('[data-part="input"]')!
   const control = clip.querySelector<HTMLElement>('[data-part="control"]')!
-  const content = () => clip.querySelector<HTMLElement>('[data-part="content"]')!
+  const content = () => document.getElementById(input.id.replace('-input', '-content'))!
   return { clip, input, control, content, after }
 }
 

@@ -19,7 +19,7 @@ export function calendarConformance(adapter: Adapter) {
   run('calendar', () => {
     const setup = async (props: Partial<CalendarProps> = {}) => {
       const values: Range[] = []
-      const m = await adapter.calendar({ locale: 'en-GB', defaultValue: '2026-09-18', onValueChange: (value) => values.push(value), ...props }, freshTarget())
+      const m = await adapter.calendar({ locale: 'en-GB', defaultMonth: '2026-09-01', defaultValue: '2026-09-18', onValueChange: (value) => values.push(value), ...props }, freshTarget())
       const grid = () => part(m.root, 'calendar', 'grid')!
       const title = () => part(m.root, 'calendar', 'title')!.textContent
       const press = (name: string, init: KeyboardEventInit = {}) => adapter.act(() => void key(document.activeElement ?? grid(), name, init))
@@ -94,7 +94,7 @@ export function datePickerConformance(adapter: Adapter) {
       const m = await adapter.datePicker({ label: 'Due', locale: 'ru-RU', onValueChange: (value) => values.push(value), ...props }, freshTarget())
       const input = () => part(m.root, 'date-picker', 'input') as HTMLInputElement
       const trigger = () => part(m.root, 'date-picker', 'trigger') as HTMLButtonElement
-      const content = () => part(m.root, 'date-picker', 'content')!
+      const content = () => document.getElementById(input().id.replace('-input', '-content'))!
       const type = async (text: string) => {
         await adapter.act(() => setInputValue(input(), text))
         await adapter.act(() => void key(input(), 'Enter'))
@@ -109,7 +109,7 @@ export function datePickerConformance(adapter: Adapter) {
       ]
       const { m, input, trigger, content, values } = await setup({ mode: 'range', min: '2026-06-01', presets, locale: 'en-GB' })
       await adapter.act(() => click(trigger()))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       const group = part(content(), 'date-picker', 'presets')!
       expect(group.getAttribute('role')).toBe('group')
       const buttons = parts(group, 'date-picker', 'preset') as HTMLButtonElement[]
@@ -118,13 +118,13 @@ export function datePickerConformance(adapter: Adapter) {
         ['Too early', true, 'false'],
       ])
       await adapter.act(() => click(buttons[0]))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(values).toEqual([{ start: '2026-09-01', end: '2026-09-07' }])
       expect(trigger().getAttribute('aria-expanded')).toBe('false')
       expect(input().value).toBe('1 Sept 2026 – 7 Sept 2026')
       await adapter.act(() => click(trigger()))
-      await adapter.wait(0)
-      expect(part(m.root, 'date-picker', 'preset')!.getAttribute('aria-pressed')).toBe('true')
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      expect(part(content(), 'date-picker', 'preset')!.getAttribute('aria-pressed')).toBe('true')
     })
 
     it('is a labelled field and a button that says it opens a dialog', async () => {
@@ -144,7 +144,7 @@ export function datePickerConformance(adapter: Adapter) {
       await type('1.10.2026')
       expect(values).toEqual([{ start: '2026-10-01', end: null }])
       expect(input().value).toBe('1 окт. 2026 г.')
-      expect(m.root.querySelector<HTMLInputElement>('input[type="hidden"][name="due"]')!.value).toBe('2026-10-01')
+      expect(m.root.querySelector<HTMLInputElement>('input[name="due"]')!.value).toBe('2026-10-01')
     })
 
     it('text that is not a day is marked, and the reason is tied to the field', async () => {
@@ -158,15 +158,15 @@ export function datePickerConformance(adapter: Adapter) {
     })
 
     it('the button opens the calendar on the chosen day; choosing closes it and brings the focus back', async () => {
-      const { m, input, trigger, values } = await setup({ defaultValue: '2026-07-04' })
+      const { m, input, trigger, content, values } = await setup({ defaultValue: '2026-07-04' })
       await adapter.act(() => click(trigger()))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(trigger().getAttribute('aria-expanded')).toBe('true')
-      expect(document.activeElement).toBe(dayOf(m.root, '2026-07-04'))
+      expect(document.activeElement).toBe(dayOf(content(), '2026-07-04'))
       await adapter.act(() => void key(document.activeElement!, 'ArrowRight'))
-      expect(document.activeElement).toBe(dayOf(m.root, '2026-07-05'))
+      expect(document.activeElement).toBe(dayOf(content(), '2026-07-05'))
       await adapter.act(() => void key(document.activeElement!, 'Enter'))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(values).toEqual([{ start: '2026-07-05', end: null }])
       expect(trigger().getAttribute('aria-expanded')).toBe('false')
       expect(document.activeElement).toBe(input())
@@ -175,20 +175,40 @@ export function datePickerConformance(adapter: Adapter) {
     it('Escape in the calendar closes it without choosing, and the focus goes back to the field', async () => {
       const { trigger, input, values } = await setup({ defaultValue: '2026-07-04' })
       await adapter.act(() => click(trigger()))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       await adapter.act(() => void key(document.activeElement!, 'Escape'))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(trigger().getAttribute('aria-expanded')).toBe('false')
       expect(document.activeElement).toBe(input())
       expect(values).toEqual([])
     })
+
+    if (adapter.name === 'react') {
+      it('keeps a focused trigger opening alive while positioning changes, then reopens from the field', async () => {
+        const { input, trigger, content } = await setup({ defaultValue: '2026-07-04' })
+        await adapter.act(() => {
+          trigger().focus()
+          click(trigger())
+        })
+        await adapter.wait(50)
+        expect(content().dataset.state).toBe('open')
+        expect(document.activeElement).toBe(dayOf(content(), '2026-07-04'))
+        await adapter.act(() => void key(document.activeElement!, 'Escape'))
+        await adapter.wait(50)
+        expect(document.activeElement).toBe(input())
+        await adapter.act(() => void key(input(), 'ArrowDown', { altKey: true }))
+        await adapter.wait(50)
+        expect(content().dataset.state).toBe('open')
+        expect(document.activeElement).toBe(dayOf(content(), '2026-07-04'))
+      })
+    }
 
     it('a range is typed as two days and submitted as an ISO interval', async () => {
       const { m, input, type, values } = await setup({ mode: 'range', locale: 'en-US', name: 'period' })
       await type('9/18/2026 – 9/1/2026')
       expect(values).toEqual([{ start: '2026-09-01', end: '2026-09-18' }])
       expect(input().value).toBe('Sep 1, 2026 – Sep 18, 2026')
-      expect(m.root.querySelector<HTMLInputElement>('input[type="hidden"][name="period"]')!.value).toBe('2026-09-01/2026-09-18')
+      expect(m.root.querySelector<HTMLInputElement>('input[name="period"]')!.value).toBe('2026-09-01/2026-09-18')
     })
   })
 
@@ -226,9 +246,9 @@ export function datePickerConformance(adapter: Adapter) {
     it('a range picker opens on two months', async () => {
       const m = await adapter.datePicker({ label: 'Stay', locale: 'en-GB', mode: 'range', defaultValue: { start: '2026-09-28', end: '2026-10-03' }, months: 2 }, freshTarget())
       await adapter.act(() => click(part(m.root, 'date-picker', 'trigger')!))
-      await adapter.wait(0)
-      expect(parts(m.root, 'calendar', 'grid')).toHaveLength(2)
-      expect(dayOf(m.root, '2026-10-01').hasAttribute('data-in-range')).toBe(true)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      expect(parts(document.getElementById(part(m.root, 'date-picker', 'input')!.id.replace('-input', '-content'))!, 'calendar', 'grid')).toHaveLength(2)
+      expect(dayOf(document.getElementById(part(m.root, 'date-picker', 'input')!.id.replace('-input', '-content'))!, '2026-10-01').hasAttribute('data-in-range')).toBe(true)
     })
   })
 

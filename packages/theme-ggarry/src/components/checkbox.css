@@ -98,3 +98,36 @@
   :is([data-scope='checkbox'], [data-scope='radio'])[data-part='input'],
   [data-scope='data-grid'][data-part='checkbox'] { transition: none; }
 }
+
+
+/* React Base UI draws a focusable control; its native input only submits. */
+[data-scope='checkbox'][data-part='toggle'][data-backend='base-ui'] {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 16px;
+  block-size: 16px;
+  border: 1px solid var(--ggarry-border-control);
+  border-radius: var(--ggarry-radius-sm);
+  background: var(--ggarry-bg-surface);
+  cursor: inherit;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+[data-scope='checkbox'][data-part='toggle'][data-backend='base-ui']:is([data-state='checked'], [data-state='indeterminate']) {
+  background: var(--ggarry-bg-accent);
+  border-color: var(--ggarry-bg-accent-hover);
+}
+[data-scope='checkbox'][data-part='toggle'][data-backend='base-ui'][data-state='unchecked']:hover:not([data-disabled]):not([data-invalid]) {
+  border-color: var(--ggarry-border-accent);
+}
+[data-scope='checkbox'][data-part='toggle'][data-backend='base-ui'][data-state='unchecked'][data-invalid] {
+  border-color: var(--ggarry-border-danger);
+}
+[data-scope='checkbox'][data-part='toggle'][data-backend='base-ui'][data-state='unchecked'][data-readonly] {
+  background: var(--ggarry-bg-subtle);
+}
+[data-scope='checkbox'][data-part='indicator'][data-backend='base-ui'][data-state='unchecked'] {
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='checkbox'][data-part='toggle'][data-backend='base-ui'] { transition: none; }
+}

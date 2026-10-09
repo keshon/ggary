@@ -1,6 +1,6 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
-import { connect, createAccordionMachine, findableContent, type AccordionItem } from '@ggary/core/accordion'
-import { reactNormalizer, rovingFocus } from '@ggary/core'
+import { useId, type ReactNode } from 'react'
+import { Accordion as Primitive } from '@base-ui/react/accordion'
+import type { AccordionItem } from '@ggary/core/accordion'
 
 export interface AccordionProps {
   items: AccordionItem[]
@@ -21,63 +21,39 @@ export interface AccordionProps {
   keepMounted?: boolean
 }
 
-/** Headings that show and hide the section under each. */
+const part = (name: string) => ({ 'data-scope': 'accordion', 'data-part': name, 'data-backend': 'base-ui' })
+
+/** Base UI owns disclosure, focus semantics and find-in-page expansion. */
 export function Accordion(props: AccordionProps) {
-  const { items, children, value, defaultValue, onValueChange, multiple, collapsible, disabled, headingLevel, keepMounted = true } = props
-  const id = `gg-accordion-${useId().replace(/:/g, '')}`
-  const callbacks = useRef({ onValueChange })
-  callbacks.current = { onValueChange }
-  const [machine] = useState(() =>
-    createAccordionMachine({ id, items, value, defaultValue, multiple, collapsible, disabled, onValueChange: (next) => callbacks.current.onValueChange?.(next) })
-  )
-  const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { headingLevel })
-
-  useEffect(() => machine.send({ type: 'SYNC_ITEMS', items }), [machine, items])
-  useEffect(() => machine.send({ type: 'SYNC_OPTIONS', multiple, collapsible, disabled }), [machine, multiple, collapsible, disabled])
-  useEffect(() => {
-    if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value })
-  }, [machine, value])
-
-  const lastFocusNonce = useRef(0)
-  useLayoutEffect(() => {
-    if (api.focusNonce === 0 || api.focusNonce === lastFocusNonce.current || api.focusValue === null) return
-    lastFocusNonce.current = api.focusNonce
-    rovingFocus(document, api.ids.trigger(api.focusValue))
-  })
-
-  // A closed section stays findable: the browser's find-in-page opens it.
-  const contents = useRef(new Map<string, HTMLElement>())
-  useLayoutEffect(() => {
-    const cleanups = items.map((item) => findableContent(contents.current.get(item.value) ?? null, api.isOpen(item.value), () => api.reveal(item.value)))
-    return () => cleanups.forEach((cleanup) => cleanup())
-  })
-
-  return (
-    <div {...api.rootProps}>
-      {api.items.map((item) => {
-        const open = api.isOpen(item.value)
-        return (
-          <div key={item.value} {...api.getItemProps(item)}>
-            <div {...api.headingProps}>
-              <button {...api.getTriggerProps(item)}>
-                <span {...api.getLabelProps(item)}>{item.label}</span>
-                {item.description && <span {...api.getDescriptionProps(item)}>{item.description}</span>}
-                <span {...api.getIndicatorProps(item)} />
-              </button>
-            </div>
-            <div
-              ref={(element) => {
-                if (element) contents.current.set(item.value, element)
-                else contents.current.delete(item.value)
-              }}
-              {...api.getContentProps(item)}
-            >
-              {(open || keepMounted) && <div {...api.bodyProps}>{children(item)}</div>}
-            </div>
-          </div>
-        )
-      })}
-    </div>
-  )
+  const { items, children, value, defaultValue, onValueChange, multiple = false,
+    collapsible = true, disabled, headingLevel = 3, keepMounted = true } = props
+  const id = useId()
+  const itemId = (value: string) => `${id}-${encodeURIComponent(value)}`
+  return <Primitive.Root<string> {...part('root')} value={value} defaultValue={defaultValue}
+    disabled={disabled} multiple={multiple} hiddenUntilFound={keepMounted}
+    onValueChange={(next, details) => {
+      if (!multiple && !collapsible && next.length === 0) { details.cancel(); return }
+      onValueChange?.(next)
+    }}>
+    {items.map((item) => <Primitive.Item key={item.value} {...part('item')} value={item.value} disabled={item.disabled}
+      render={(itemProps, state) => <div {...itemProps} data-value={item.value} data-state={state.open ? 'open' : 'closed'} />}>
+      <Primitive.Header {...part('heading')} render={<div {...part('heading')} role="heading" aria-level={headingLevel} />}>
+        <Primitive.Trigger {...part('trigger')}
+          id={`${itemId(item.value)}-trigger`} aria-controls={`${itemId(item.value)}-panel`} aria-labelledby={`${itemId(item.value)}-label`}
+          aria-describedby={item.description ? `${itemId(item.value)}-description` : undefined}
+          render={(triggerProps, state) => <button {...triggerProps}
+            aria-disabled={state.disabled || (state.open && !multiple && !collapsible) ? true : undefined}
+            data-state={state.open ? 'open' : 'closed'}>
+            <span {...part('label')} id={`${itemId(item.value)}-label`}>{item.label}</span>
+            {item.description && <span {...part('description')} id={`${itemId(item.value)}-description`}>{item.description}</span>}
+            <span {...part('indicator')} data-icon="chevron-down" aria-hidden="true" data-state={state.open ? 'open' : 'closed'} />
+          </button>} />
+      </Primitive.Header>
+      <Primitive.Panel {...part('content')} id={`${itemId(item.value)}-panel`} keepMounted={keepMounted}
+        aria-labelledby={items.length <= 6 ? `${itemId(item.value)}-trigger` : undefined}
+        render={(panelProps, state) => <div {...panelProps} role={items.length <= 6 ? 'region' : undefined} data-state={state.open ? 'open' : 'closed'} />}>
+        <div {...part('body')}>{children(item)}</div>
+      </Primitive.Panel>
+    </Primitive.Item>)}
+  </Primitive.Root>
 }

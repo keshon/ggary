@@ -59,14 +59,14 @@
 }
 
 /* Entry only: a closed popover leaves at once, as a dialog does. */
-[data-scope='popover'][data-part='content']:popover-open {
+:is([data-scope='popover'][data-part='content']:popover-open, [data-scope='popover'][data-part='content'][data-backend='base-ui'][data-state='open']) {
   transition: opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 @starting-style {
-  [data-scope='popover'][data-part='content']:popover-open { opacity: 0; }
+  :is([data-scope='popover'][data-part='content']:popover-open, [data-scope='popover'][data-part='content'][data-backend='base-ui'][data-state='open']) { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-scope='popover'][data-part='content']:popover-open { transition: none; }
+  :is([data-scope='popover'][data-part='content']:popover-open, [data-scope='popover'][data-part='content'][data-backend='base-ui'][data-state='open']) { transition: none; }
 }

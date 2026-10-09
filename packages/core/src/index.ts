@@ -14,6 +14,7 @@ export { clampIndex, edgeEnabled, firstEnabled, lastEnabled, nextEnabled } from 
 export type { CollectionOptions } from './utils/collection'
 export { focusMenuItem, focusMenuTarget, focusTab, revealMenuTarget, rovingFocus } from './utils/focus'
 export { mergeProps } from './utils/merge-props'
+export { choiceGroupFrame } from './utils/choice-group'
 export { groupValidity } from './utils/group'
 export { onFormReset } from './utils/form-reset'
 export type { GroupContext } from './utils/group'

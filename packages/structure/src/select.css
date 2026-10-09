@@ -37,6 +37,18 @@
   outline: none;
 }
 
+/* Experimental React backend: Base UI owns placement and focus. These rules
+   adapt structural sizing without changing Svelte/vanilla popover behaviour. */
+[data-scope='select'][data-part='positioner'][data-backend='base-ui'] {
+  pointer-events: auto;
+  inset: auto;
+  z-index: var(--gg-z-popover, 1000);
+}
+[data-scope='select'][data-part='content'][data-backend='base-ui'] {
+  min-width: var(--gg-anchor-width, 200px);
+  max-height: min(var(--gg-available-height, 280px), 280px);
+}
+
 /* The cascader: a trigger like Select's, and a row of columns in the top layer. */
 [data-scope='cascader'][data-part='root'] {
   display: inline-flex;
@@ -96,4 +108,8 @@
 }
 [data-scope='cascader'][data-part='item-branch']:dir(rtl) {
   scale: -1 1;
+}
+
+[data-scope='cascader'][data-part='positioner'][data-backend='base-ui'] {
+  z-index: var(--gg-z-popover, 1100);
 }

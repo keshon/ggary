@@ -81,6 +81,8 @@ export function reducer(state: TimePickerState, event: TimePickerEvent): TimePic
       return isUnavailable(state, event.time) ? state : choose(state, event.time)
     case 'CLEAR':
       return state.value === null ? state : choose(state, null)
+    case 'RESET':
+      return { ...state, value: isISOTime(event.value) ? event.value : null, open: false, editing: false, invalid: false, text: '', highlighted: null }
     case 'SYNC_VALUE': {
       const value = isISOTime(event.value) ? event.value : null
       return value === state.value ? state : { ...state, value }

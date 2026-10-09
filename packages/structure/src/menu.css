@@ -51,3 +51,15 @@
 [data-scope='menu'][data-part='item-indicator'][data-state='unchecked'] {
   visibility: hidden;
 }
+
+[data-scope='menu'][data-part='positioner'][data-backend='base-ui'] {
+  z-index: var(--gg-z-menu, 1100);
+  pointer-events: auto;
+}
+[data-scope='menu'][data-part='content'][data-backend='base-ui'] {
+  position: relative;
+  inset: auto;
+}
+
+/* Keep-mounted Base UI surfaces must honor native hidden despite themed display. */
+[data-scope='menu'][data-backend='base-ui'][hidden] { display: none; }

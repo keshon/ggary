@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { type Adapter, type FormProps, click, freshTarget, part, parts, typeInto } from './harness'
 
 /**
@@ -38,9 +38,13 @@ export function formConformance(adapter: Adapter) {
         await adapter.wait(20)
       }
       const chooseRole = async (label: string) => {
-        await adapter.act(() => click(m.root.querySelector<HTMLElement>('[data-scope="select"][data-part="trigger"]')!))
+        await adapter.act(() => {
+          const trigger = m.root.querySelector<HTMLElement>('[data-scope="select"][data-part="trigger"]')!
+          trigger.focus()
+          click(trigger)
+        })
         await adapter.wait(0)
-        const option = parts(m.root, 'select', 'item').find((item) => item.textContent?.includes(label))!
+        const option = parts(adapter.name === 'react' ? document : m.root, 'select', 'item').find((item) => item.textContent?.includes(label))!
         await adapter.act(() => click(option))
         await adapter.wait(20)
       }
@@ -69,7 +73,7 @@ export function formConformance(adapter: Adapter) {
       const { m, input, submit } = await setup()
       await submit()
       await adapter.act(() => click(parts(m.root, 'form-summary', 'link')[1]))
-      expect(document.activeElement).toBe(input('password'))
+      await vi.waitFor(() => expect(document.activeElement).toBe(input('password')))
     })
 
     it('errors leave as they are fixed, the rules asked again as the person edits', async () => {
@@ -116,7 +120,7 @@ export function formConformance(adapter: Adapter) {
       const { input, submit, type } = await setup({ summary: false })
       await type('email', 'aigul@example.com')
       await submit()
-      expect(document.activeElement).toBe(input('password'))
+      await vi.waitFor(() => expect(document.activeElement).toBe(input('password')))
     })
   })
 }

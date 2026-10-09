@@ -52,3 +52,32 @@
   [data-scope='switch'][data-part='input'],
   [data-scope='switch'][data-part='thumb'] { transition: none; }
 }
+
+
+/* React Base UI's visible switch owns focus; the input is submission-only. */
+[data-scope='switch'][data-part='toggle'][data-backend='base-ui'] {
+  display: inline-grid;
+  align-items: center;
+  inline-size: 32px;
+  block-size: 18px;
+  border-radius: var(--ggarry-radius-full);
+  background: var(--ggarry-border-control);
+  cursor: inherit;
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+[data-scope='switch'][data-part='toggle'][data-backend='base-ui'][data-state='checked'] {
+  background: var(--ggarry-bg-accent);
+}
+[data-scope='switch'][data-part='toggle'][data-backend='base-ui'][data-state='checked']:hover:not([data-disabled]):not([data-readonly]) {
+  background: var(--ggarry-bg-accent-hover);
+}
+[data-scope='switch'][data-part='toggle'][data-backend='base-ui'][data-invalid] {
+  outline: 1px solid var(--ggarry-border-danger);
+  outline-offset: 1px;
+}
+[data-scope='switch'][data-part='toggle'][data-backend='base-ui'][data-state='checked'] > [data-part='thumb'] {
+  margin-inline-start: 16px;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='switch'][data-part='toggle'][data-backend='base-ui'] { transition: none; }
+}

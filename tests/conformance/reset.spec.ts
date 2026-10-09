@@ -13,8 +13,7 @@ export function resetConformance(adapter: Adapter) {
     // The reset is applied a task after the event; components follow a task later.
     const reset = async (target: HTMLFormElement) => {
       await adapter.act(() => target.reset())
-      await new Promise((resolve) => setTimeout(resolve, 20))
-      await adapter.act(() => {})
+      await adapter.wait(20)
     }
 
     it('a field forgets the error it was showing', async () => {
@@ -115,8 +114,9 @@ export function resetConformance(adapter: Adapter) {
       ]
       const m = await adapter.select({ items, name: 'pick', defaultValue: 'a', label: 'Pick' }, target)
       const trigger = () => part(m.root, 'select', 'trigger')!
-      await adapter.act(() => click(trigger()))
-      await adapter.act(() => click(parts(m.root, 'select', 'item')[1]))
+      await adapter.act(() => { (trigger() as HTMLElement).focus(); click(trigger()) })
+      if (adapter.name === 'react') await adapter.wait(20)
+      await adapter.act(() => click(parts(adapter.name === 'react' ? document : m.root, 'select', 'item')[1]))
       expect(trigger().textContent).toContain('Bravo')
       await reset(target)
       expect(trigger().textContent).toContain('Alpha')

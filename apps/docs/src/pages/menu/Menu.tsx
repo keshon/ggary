@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Menu } from '@ggary/react'
+import { Button, ConfigProvider, Dialog, Menu, Popover } from '@ggary/react'
 import { DemoPage, Specimen } from '../../react/DemoPage'
 import { applyView, documentMenu, initialView, viewMenu } from '../../data/actions'
 
@@ -8,7 +8,6 @@ function ViewMenu() {
   const [view, setView] = useState(initialView)
   return (
     <Menu
-      defaultOpen
       label="View options"
       closeOnSelect={false}
       items={viewMenu(view)}
@@ -25,13 +24,25 @@ function ViewMenu() {
 export default function MenuPage() {
   return (
     <DemoPage
-      states={
+      composition={
         <>
-          <Specimen label="defaultOpen">
-            <Menu defaultOpen items={documentMenu} trigger={(props) => <Button {...props}>Document</Button>} />
+          <Specimen label="Base UI · actions + links + submenus">
+            <Menu items={documentMenu} trigger={(props) => <Button {...props}>Document</Button>} />
           </Specimen>
-          <Specimen label="defaultOpen closeOnSelect={false}">
+          <Specimen label="Base UI · owner-controlled checkbox/radio">
             <ViewMenu />
+          </Specimen>
+          <Specimen label="Base UI · Dialog + Menu + local dark/RTL">
+            <ConfigProvider mode="dark" dir="rtl">
+              <Dialog title="Menu host" trigger={(props) => <Button {...props}>Open menu host</Button>}>
+                <Menu items={documentMenu} trigger={(props) => <Button {...props}>Hosted actions</Button>} />
+              </Dialog>
+            </ConfigProvider>
+          </Specimen>
+          <Specimen label="Base UI · Popover + Menu">
+            <Popover title="Actions host" trigger={(props) => <Button {...props}>Open actions popover</Button>}>
+              <Menu items={documentMenu} trigger={(props) => <Button {...props}>Popover actions</Button>} />
+            </Popover>
           </Specimen>
         </>
       }

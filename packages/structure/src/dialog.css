@@ -14,8 +14,8 @@
   overflow: hidden;
 }
 
-/* A sheet shown without a modal — show(), not showModal(), so the page beside
-   it stays usable, as a detail sheet beside a list — is not in the top layer,
+/* A sheet shown without a modal вЂ” show(), not showModal(), so the page beside
+   it stays usable, as a detail sheet beside a list вЂ” is not in the top layer,
    and the UA places such a dialog absolutely, wherever it sits in the page.
    A sheet belongs at the edge of the viewport either way; the theme's margins
    put it at its side, as they do for the modal one. */
@@ -49,4 +49,41 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
+}
+
+/* React Base UI overlays. Native Svelte/vanilla dialog rules remain separate. */
+[data-scope='dialog'][data-part='layer'][data-backend='base-ui'] {
+  position: fixed;
+  z-index: var(--gg-z-dialog, 1000);
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  pointer-events: none;
+}
+[data-scope='dialog'][data-part='backdrop'][data-backend='base-ui'] {
+  position: fixed;
+  inset: 0;
+  pointer-events: auto;
+}
+[data-scope='dialog'][data-part='content'][data-backend='base-ui'] {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  block-size: fit-content;
+  pointer-events: auto;
+}
+[data-scope='dialog'][data-part='content'][data-backend='base-ui']:is([data-placement='start'],[data-placement='end']) {
+  block-size: 100dvh;
+}
+[data-scope='dialog'][data-part='content'][data-backend='base-ui'][data-placement='end'] { inset-inline-start: auto; }
+[data-scope='dialog'][data-part='content'][data-backend='base-ui'][data-placement='start'] { inset-inline-end: auto; }
+
+[data-scope='dialog'][data-part='content'][data-backend='base-ui'][hidden] {
+  display: none;
 }

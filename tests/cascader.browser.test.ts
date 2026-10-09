@@ -34,8 +34,8 @@ async function mount(props: Record<string, unknown> = {}) {
   while (!clip.querySelector('[data-part="trigger"]')) await frames(1)
   return {
     trigger: clip.querySelector<HTMLButtonElement>('[data-part="trigger"]')!,
-    content: () => clip.querySelector<HTMLElement>('[data-scope="cascader"][data-part="content"]')!,
-    columns: () => [...clip.querySelectorAll<HTMLElement>('[data-scope="cascader"][data-part="column"]')],
+    content: () => document.querySelector<HTMLElement>('[data-scope="cascader"][data-part="content"]')!,
+    columns: () => [...document.querySelectorAll<HTMLElement>('[data-scope="cascader"][data-part="column"]')],
     focused: () => document.activeElement?.querySelector('[data-part="item-text"]')?.textContent,
   }
 }

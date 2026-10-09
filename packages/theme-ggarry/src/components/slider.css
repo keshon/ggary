@@ -131,3 +131,12 @@
 @media (prefers-reduced-motion: reduce) {
   [data-scope='slider'][data-part='input']::-webkit-slider-thumb { transition: none; }
 }
+
+/* React Base UI boundary: visible track and thumb, native input inside thumb. */
+[data-scope='slider'][data-part='control'][data-backend='base-ui'] { position: relative; grid-column: 1; min-inline-size: 0; block-size: 24px; touch-action: none; }
+[data-scope='slider'][data-part='track'][data-backend='base-ui'] { position: absolute; inset-inline: 0; inset-block-start: calc((24px - var(--slider-track)) / 2); block-size: var(--slider-track); border-radius: var(--ggarry-radius-full); background: var(--ggarry-border-control); }
+[data-scope='slider'][data-part='indicator'][data-backend='base-ui'] { block-size: 100%; border-radius: inherit; background: var(--ggarry-bg-accent); }
+[data-scope='slider'][data-part='thumb'][data-backend='base-ui'] { position: absolute; inset-block-start: 50%; inline-size: var(--slider-thumb); block-size: var(--slider-thumb); box-sizing: border-box; border: var(--ggarry-size-indicator) solid var(--ggarry-bg-accent); border-radius: var(--ggarry-radius-full); background: var(--ggarry-bg-thumb); box-shadow: var(--ggarry-shadow-thumb); }
+[data-scope='slider'][data-part='thumb'][data-backend='base-ui']:has(input:focus-visible) { outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring); outline-offset: var(--ggarry-focus-ring-offset); }
+[data-scope='slider'][data-part='root'][data-backend='base-ui'][data-disabled] { opacity: var(--ggarry-opacity-disabled); }
+[data-scope='slider'][data-part='root'][data-backend='base-ui'][data-invalid] [data-part='thumb'] { border-color: var(--ggarry-border-danger); }

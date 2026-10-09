@@ -18,6 +18,7 @@ export const rangeSliderAnatomy = createAnatomy('range-slider', [
   'track',
   'range',
   'thumb',
+  'thumb-handle',
   'marks',
   'mark',
   'fields',

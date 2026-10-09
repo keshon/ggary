@@ -1,13 +1,8 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
-import {
-  connect,
-  createDialogMachine,
-  type DialogChangeDetails,
-  type DialogPlacement,
-  type DialogRole,
-  type DialogSize,
-} from '@ggary/core/dialog'
-import { attachDialog, reactNormalizer, type AttachedDialog, type Dict } from '@ggary/core'
+import { useCallback, useId, useLayoutEffect, useRef, useState, type ReactElement, type ReactNode, type CSSProperties } from 'react'
+import { Dialog as Primitive } from '@base-ui/react/dialog'
+import type { DialogChangeReason, DialogChangeDetails, DialogPlacement, DialogRole, DialogSize } from '@ggary/core/dialog'
+import type { Dict } from '@ggary/core'
+import { useConfig } from '../config-provider'
 
 export interface DialogProps {
   /** Controlled. Omit and use `defaultOpen` for uncontrolled. */
@@ -33,91 +28,74 @@ export interface DialogProps {
   closeLabel?: string
 }
 
-export function Dialog(props: DialogProps) {
-  const {
-    open, defaultOpen, onOpenChange, title, description, children, footer, trigger, size, placement,
-    modal, role, closeOnEscape, closeOnOutside, closeButton = true, closeLabel,
-  } = props
-
-  const id = `gg-dialog-${useId().replace(/:/g, '')}`
-
-  const callbacks = useRef({ onOpenChange })
-  callbacks.current = { onOpenChange }
-
-  const [machine] = useState(() =>
-    createDialogMachine({
-      id, open, defaultOpen, modal, role, closeOnEscape, closeOnOutside,
-      onOpenChange: (next, details) => callbacks.current.onOpenChange?.(next, details),
-    })
-  )
-  const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, {
-    title: title != null,
-    description: description != null,
-    size,
-    placement,
-    closeLabel,
-  })
-
-  useEffect(() => {
-    if (open !== undefined) machine.send({ type: 'SYNC_OPEN', open })
-  }, [machine, open])
-  useEffect(
-    () => machine.send({ type: 'SYNC_OPTIONS', modal, role, closeOnEscape, closeOnOutside }),
-    [machine, modal, role, closeOnEscape, closeOnOutside]
-  )
-
-  const contentRef = useRef<HTMLDialogElement>(null)
-  const attached = useRef<AttachedDialog | null>(null)
-
-  // A layout effect: the body has just been committed, so showModal() finds
-  // something to focus, and the first paint is already the open dialog.
+/** Base UI interaction backend with GGary styling and callbacks. */
+export function Dialog({ open, defaultOpen = false, onOpenChange, title, description,
+  children, footer, trigger, size = 'md', placement = 'center', modal = true,
+  role = 'dialog', closeOnEscape = true, closeOnOutside = true,
+  closeButton = true, closeLabel = 'Close',
+}: DialogProps) {
+  const id = `gg-base-dialog-${useId().replace(/:/g, '')}`
+  const config = useConfig()
+  const anchor = useRef<HTMLDivElement>(null)
+  const [inheritedStyle, setInheritedStyle] = useState<CSSProperties>({})
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const [localOpen, setLocalOpen] = useState(defaultOpen)
+  const shown = open ?? localOpen
+  const request = useCallback((next: boolean, reason: DialogChangeReason, returnValue?: string) => {
+    if (open === undefined) setLocalOpen(next)
+    onOpenChange?.(next, returnValue === undefined ? { reason } : { reason, returnValue })
+  }, [open, onOpenChange])
   useLayoutEffect(() => {
-    const el = contentRef.current
-    if (!state.open || !el) return
-    const { modal, closeOnEscape, closeOnOutside } = machine.getState()
-    const instance = attachDialog(el, {
-      modal,
-      closeOnEscape,
-      closeOnOutside,
-      onDismiss: (reason) => machine.send({ type: 'CLOSE', reason }),
-      onNativeClose: (returnValue) => machine.send({ type: 'CLOSE', reason: 'native', returnValue }),
-      exclude: [document.getElementById(api.ids.trigger)],
-      finalFocus: document.getElementById(api.ids.trigger),
-    })
-    attached.current = instance
-    return () => {
-      instance.destroy()
-      attached.current = null
+    if (!shown || !anchor.current) return
+    const computed = getComputedStyle(anchor.current)
+    const inherited: Record<string, string> = { direction: config.dir ?? computed.direction }
+    for (let i = 0; i < computed.length; i++) {
+      const property = computed[i]
+      if (property.startsWith('--')) inherited[property] = computed.getPropertyValue(property)
     }
-  }, [machine, state.open])
-
-  useLayoutEffect(() => {
-    attached.current?.update({ modal: state.modal, closeOnEscape: state.closeOnEscape, closeOnOutside: state.closeOnOutside })
-  }, [state.modal, state.closeOnEscape, state.closeOnOutside])
-
-  return (
-    <>
-      {trigger?.(api.triggerProps)}
-      <dialog ref={contentRef} {...api.contentProps}>
-        {state.open && (
-          <>
-            {(title != null || closeButton) && (
-              <header {...api.headerProps}>
-                {title != null && <h2 {...api.titleProps}>{title}</h2>}
-                {description != null && <p {...api.descriptionProps}>{description}</p>}
-                {closeButton && (
-                  <button {...api.closeProps}>
-                    <span {...api.closeIconProps} />
-                  </button>
-                )}
-              </header>
-            )}
-            <div {...api.bodyProps}>{children}</div>
-            {footer != null && <footer {...api.footerProps}>{footer}</footer>}
-          </>
-        )}
-      </dialog>
-    </>
-  )
+    setInheritedStyle(inherited)
+  }, [shown, config])
+  const part = (name: string) => ({ 'data-scope': 'dialog', 'data-part': name, 'data-backend': 'base-ui' })
+  return <Primitive.Root open={shown} modal={modal} disablePointerDismissal={!closeOnOutside}
+    onOpenChange={(next, details) => {
+      if (details.reason === 'escape-key' && !closeOnEscape) { details.cancel(); return }
+      const reason: DialogChangeReason = details.reason === 'trigger-press' ? 'trigger'
+        : details.reason === 'close-press' ? 'close-button'
+        : details.reason === 'escape-key' ? 'escape'
+        : details.reason === 'outside-press' || details.reason === 'focus-out' ? 'outside' : 'api'
+      request(next, reason)
+    }}>
+    <div {...part('anchor')} ref={anchor} style={{ display: 'contents' }}>
+      {trigger && <Primitive.Trigger ref={triggerRef} id={`${id}-trigger`} render={(triggerProps) => trigger({ ...triggerProps, 'aria-expanded': shown ? 'true' : 'false' }) as ReactElement} />}
+    </div>
+    <Primitive.Portal keepMounted>
+      <div {...part('layer')} data-mode={config.mode} dir={config.dir} lang={config.locale} style={inheritedStyle}>
+        {modal && <Primitive.Backdrop {...part('backdrop')} />}
+        <Primitive.Popup {...part('content')} finalFocus={trigger ? triggerRef : true} role={role} id={`${id}-content`}
+          data-size={size} data-placement={placement} data-modal={modal ? '' : undefined}
+          data-state={shown ? 'open' : 'closed'}
+          onSubmit={(event) => {
+            const form = event.target as HTMLFormElement
+            if (form.tagName !== 'FORM' || form.closest('[data-scope="dialog"][data-part="content"]') !== event.currentTarget) return
+            const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | HTMLInputElement | null
+            const method = submitter?.getAttribute('formmethod') ?? form.getAttribute('method')
+            if (method?.toLowerCase() !== 'dialog' || event.defaultPrevented) return
+            event.preventDefault()
+            request(false, 'native', submitter?.value ?? '')
+          }}>
+          {shown && <>
+          {(title != null || description != null || closeButton) && <header {...part('header')}>
+            {title != null && <Primitive.Title {...part('title')}>{title}</Primitive.Title>}
+            {description != null && <Primitive.Description {...part('description')}>{description}</Primitive.Description>}
+            {closeButton && <Primitive.Close {...part('close')} aria-label={closeLabel}>
+              <span {...part('close-icon')} data-icon="close" aria-hidden="true" />
+            </Primitive.Close>}
+          </header>}
+          <div {...part('body')}>{children}</div>
+          {footer != null && <footer {...part('footer')}>{footer}</footer>}
+          </>}
+        </Primitive.Popup>
+      </div>
+    </Primitive.Portal>
+  </Primitive.Root>
 }

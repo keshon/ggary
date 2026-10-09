@@ -1,4 +1,4 @@
-import { Badge, Button, Composer, Icon, Stack, Toolbar, ToolbarSpacer } from '@ggary/react'
+import { Badge, Button, Composer, Icon, Stack, Toolbar, ToolbarButton, ToolbarSpacer } from '@ggary/react'
 import { DemoPage, Specimen } from '../../react/DemoPage'
 import { chatThread } from '../../data/agent'
 import { longDraft } from './data'
@@ -54,12 +54,12 @@ export default function ComposerPage() {
               {addContext}
             </Composer>
             <Toolbar label="Session">
-              <Button size="sm" emphasis="minimal">
+              <ToolbarButton size="sm" emphasis="minimal">
                 Auto
-              </Button>
-              <Button size="sm" emphasis="minimal">
+              </ToolbarButton>
+              <ToolbarButton size="sm" emphasis="minimal">
                 Opus 5
-              </Button>
+              </ToolbarButton>
               <ToolbarSpacer />
               <Badge tone="running">working</Badge>
               <Badge tone="warn">context 90%</Badge>

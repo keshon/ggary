@@ -1,4 +1,5 @@
 import { forwardRef, useLayoutEffect, useRef, type TextareaHTMLAttributes } from 'react'
+import { Field as BaseField } from '@base-ui/react/field'
 import { connect, type TextareaProps as CoreTextareaProps } from '@ggary/core/textarea'
 import { attachAutosize, mergeProps, reactNormalizer, type Autosize } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
@@ -22,10 +23,11 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
     resize, autoResize, maxRows, value, defaultValue, onValueChange, ...rest
   } = props
 
+  const field = useFieldControl()
   const api = connect(
     { size, name, placeholder, rows, minLength, maxLength, autoComplete, disabled, readOnly, required, invalid, resize, autoResize, maxRows },
     reactNormalizer,
-    { onValueChange, field: useFieldControl() ?? undefined }
+    { field: field ?? undefined }
   )
 
   const element = useRef<HTMLTextAreaElement | null>(null)
@@ -52,5 +54,9 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function 
   useLayoutEffect(() => autosize.current?.update(), [value])
 
   const valueProps = value !== undefined ? { value } : { defaultValue }
-  return <textarea ref={ref} {...mergeProps(rest, api.rootProps)} {...valueProps} />
+  return <BaseField.Control ref={ref} {...mergeProps(rest, api.rootProps)} {...valueProps} onValueChange={(next) => onValueChange?.(next)}
+    render={(controlProps) => <textarea {...controlProps as TextareaHTMLAttributes<HTMLTextAreaElement>}
+      aria-invalid={api.rootProps['aria-invalid'] as 'true' | undefined}
+      aria-describedby={(field ? field['aria-describedby'] : controlProps['aria-describedby']) as string | undefined}
+      data-invalid={api.rootProps['data-invalid'] as string | undefined} />} />
 })

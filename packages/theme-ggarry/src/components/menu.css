@@ -110,14 +110,14 @@
 }
 
 /* Entry only, as the popover. */
-[data-scope='menu'][data-part='content']:popover-open {
+:is([data-scope='menu'][data-part='content']:popover-open, [data-scope='menu'][data-part='content'][data-backend='base-ui'][data-state='open']) {
   transition: opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
 @starting-style {
-  [data-scope='menu'][data-part='content']:popover-open { opacity: 0; }
+  :is([data-scope='menu'][data-part='content']:popover-open, [data-scope='menu'][data-part='content'][data-backend='base-ui'][data-state='open']) { opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-scope='menu'][data-part='content']:popover-open { transition: none; }
+  :is([data-scope='menu'][data-part='content']:popover-open, [data-scope='menu'][data-part='content'][data-backend='base-ui'][data-state='open']) { transition: none; }
 }

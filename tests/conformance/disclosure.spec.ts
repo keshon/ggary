@@ -54,12 +54,36 @@ export function disclosureConformance(adapter: Adapter) {
       triggers()[1].focus()
       await adapter.act(() => {})
       await press('ArrowDown')
+      if (adapter.name === 'react') {
+        // Base UI follows the updated accordion pattern: ordinary Tab stops, no arrow shortcuts.
+        expect(document.activeElement).toBe(triggers()[1])
+        expect(triggers().map((trigger) => trigger.tabIndex)).toEqual([0, 0, 0, 0])
+        expect(triggers()[2].getAttribute('aria-disabled')).toBe('true')
+        return
+      }
       expect(document.activeElement).toBe(triggers()[3])
       await press('Home')
       expect(document.activeElement).toBe(triggers()[0])
       await press('ArrowUp')
       expect(document.activeElement).toBe(triggers()[3])
       expect(triggers()[2].getAttribute('aria-disabled')).toBe('true')
+    })
+
+    it('multiple sections can open together, including closing one when collapsible is false', async () => {
+      const { triggers, changes } = await setup({ multiple: true, collapsible: false })
+      await adapter.act(() => click(triggers()[0]))
+      await adapter.act(() => click(triggers()[1]))
+      expect(triggers()[0].getAttribute('aria-expanded')).toBe('true')
+      expect(triggers()[1].getAttribute('aria-expanded')).toBe('true')
+      await adapter.act(() => click(triggers()[0]))
+      expect(changes).toEqual([['shipping'], ['shipping', 'returns'], ['returns']])
+    })
+
+    if (adapter.supports.refusal) it('controlled disclosure reports a request while the owner keeps it closed', async () => {
+      const { triggers, changes } = await setup({ value: [] })
+      await adapter.act(() => click(triggers()[0]))
+      expect(changes).toEqual([['shipping']])
+      expect(triggers()[0].getAttribute('aria-expanded')).toBe('false')
     })
 
     it('not collapsible: the open section stays and its button says so', async () => {

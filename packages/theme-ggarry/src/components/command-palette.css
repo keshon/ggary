@@ -151,3 +151,15 @@
     color: HighlightText;
   }
 }
+
+[data-scope='command-palette'][data-part='backdrop'][data-backend='base-ui'] {
+  background: var(--ggarry-bg-scrim);
+}
+
+/* Inline palettes size to their container rather than the viewport. */
+[data-scope='command-palette'][data-part='content'][data-backend='base-ui']:not([data-modal]) {
+  margin: 0;
+  inline-size: 100%;
+  max-inline-size: 640px;
+  box-sizing: border-box;
+}

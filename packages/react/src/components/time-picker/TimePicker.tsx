@@ -1,11 +1,24 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { connect, createTimePickerMachine, type TimePickerWords } from '@ggary/core/time-picker'
-import { attachPopover, mergeProps, reactNormalizer, scrollIntoCenter, scrollIntoViewIfNeeded, type ControlSize, type ISOTime } from '@ggary/core'
+import { createContext, useContext, useLayoutEffect, useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react'
+import { connect, createTimePickerMachine, isUnavailable, type TimePickerEvent, type TimePickerWords } from '@ggary/core/time-picker'
+import { nowTime, mergeProps, reactNormalizer, scrollIntoCenter, scrollIntoViewIfNeeded, type ControlSize, type ISOTime } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 import { useFormField } from '../form/Form'
 import { useConfigured } from '../config-provider'
+import { Combobox as Primitive } from '@base-ui/react/combobox'
+import { DirectionProvider } from '@base-ui/react/direction-provider'
+import { useOverlayEnvironment } from '../../utils/use-overlay-environment'
+import { Field as BaseField } from '@base-ui/react/field'
+import { useFieldControl, useFieldComposition } from '../field/Field'
+import { useFieldsetGroup } from '../fieldset/Fieldset'
+import { SelectionConstraint } from '../../utils/selection-constraint'
+
+// Private compound-picker contract; embedded time does not own the enclosing Field.
+export const TimePickerComposition = createContext<{ disabled: boolean; readOnly: boolean; report: (message: string) => void } | null>(null)
 
 export interface TimePickerProps {
+  required?: boolean
+  disabled?: boolean
+  readOnly?: boolean
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
   size?: ControlSize
   label?: string
@@ -32,8 +45,19 @@ export interface TimePickerProps {
 /** A field for a time of day, typed or chosen from a list of times at a step. */
 export function TimePicker(props: TimePickerProps) {
   props = useConfigured(props, { locale: true, size: true, words: 'timePicker' })
-  const { size, label, value, defaultValue, onValueChange, step, min, max, isTimeDisabled, locale, name, placeholder, words, embedded } = props
+  const { size, label, value, defaultValue, onValueChange, step, min, max, isTimeDisabled, locale, name: ownName, placeholder, words, embedded } = props
   const id = `gg-time-${useId().replace(/:/g, '')}`
+  const outerField = useFieldControl()
+  const outerComposition = useFieldComposition()
+  const compound = useContext(TimePickerComposition)
+  const group = useFieldsetGroup()
+  const field = embedded ? null : outerField
+  const composition = embedded ? null : outerComposition
+  const name = embedded ? undefined : ownName ?? composition?.name
+  const required = !embedded && !!(props.required || field?.required)
+  const disabled = !!(props.disabled || outerField?.disabled || group?.disabled || compound?.disabled)
+  const readOnly = !!(props.readOnly || outerField?.readOnly || compound?.readOnly)
+  const controlId = String(field?.id ?? `${id}-input`)
   const callbacks = useRef<{ onValueChange?: typeof onValueChange; edited?: () => void }>({ onValueChange })
   callbacks.current.onValueChange = onValueChange
   const [machine] = useState(() =>
@@ -46,34 +70,37 @@ export function TimePicker(props: TimePickerProps) {
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, size, embedded, label })
+  const send = (event: TimePickerEvent) => {
+    if (disabled && event.type !== 'CLOSE') return
+    if (readOnly && ['INPUT', 'COMMIT_TEXT', 'CHOOSE', 'CLEAR'].includes(event.type)) return
+    machine.send(event)
+  }
+  const api = connect(state, send, reactNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, size, embedded, label })
   // Inside a Form, by name: the error its rules hold for this time.
-  const form = useFormField(name, api.ids.input, label)
-  callbacks.current.edited = () => form.edited(document.getElementById(api.ids.input))
+  const form = useFormField(composition?.name ? undefined : name, controlId, field?.['aria-labelledby'] ? undefined : label)
+  callbacks.current.edited = undefined
 
   useEffect(() => machine.send({ type: 'SYNC_OPTIONS', locale, step, min, max, isTimeDisabled }), [machine, locale, step, min, max, isTimeDisabled])
   useEffect(() => {
     if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value })
-  }, [machine, value])
+  }, [machine, value, state.value])
 
   const inputRef = useRef<HTMLInputElement>(null)
   const controlRef = useRef<HTMLDivElement>(null)
-  const positionerRef = useRef<HTMLDivElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
   useFormReset(inputRef, () => {
-    if (value === undefined) machine.send({ type: 'SYNC_VALUE', value: defaultValue ?? null })
+    machine.send({ type: 'RESET', value: value !== undefined ? value : defaultValue ?? null })
   })
 
-  useLayoutEffect(() => {
-    if (!state.open || !controlRef.current || !positionerRef.current) return
-    // The focus stays in the field: placement and dismissal only.
-    const popover = attachPopover(controlRef.current, positionerRef.current, {
-      sameWidth: true,
-      gutter: 4,
-      onDismiss: () => machine.send({ type: 'CLOSE' }),
-    })
-    return () => popover.destroy()
-  }, [machine, state.open])
+  const message = state.invalid ? api.errorText : state.editing ? 'Confirm the typed time with Enter or leave the field.'
+    : state.value && isUnavailable(state, state.value) ? 'Choose an available time.' : ''
+  useLayoutEffect(() => { if (embedded) compound?.report(message) }, [embedded, compound?.report, message])
+  const { required: _fieldRequired, readOnly: _fieldReadOnly, ...metadata } = field ?? {}
+  const describedBy = [api.inputProps['aria-describedby'], metadata['aria-describedby'], form.field.controlProps['aria-describedby'], embedded ? outerField?.['aria-describedby'] : undefined].filter(Boolean).join(' ') || undefined
+  const environment = useOverlayEnvironment(controlRef, state.open)
+  const { popover: _nativePopover, ...positionerProps } = api.positionerProps
+  const { onClick: _legacyToggle, ...triggerProps } = api.triggerProps
+  const { onInput: _legacyInput, onKeyDown, value: text, ...inputProps } = api.inputProps
 
   // Opening, the list stands its time in the middle; walking, it scrolls no more than it must.
   const wasOpen = useRef(false)
@@ -87,27 +114,63 @@ export function TimePicker(props: TimePickerProps) {
   }, [api.ids, state.open, state.highlighted])
 
   return (
+    <DirectionProvider direction={environment.dir ?? 'ltr'}>
+      <BaseField.Root render={rootProps => <div {...rootProps} style={{ display: 'contents' }} />}>
+      <Primitive.Root<ISOTime> open={state.open} modal={false} value={state.value} disabled={disabled} readOnly={readOnly}
+        items={api.times.map(item => item.time)} filteredItems={api.times.map(item => item.time)}
+        inputValue={text} itemToStringLabel={time => api.times.find(item => item.time === time)?.label ?? time}
+        onInputValueChange={(text, details) => {
+          if (details.reason === 'input-change') send({ type: 'INPUT', text })
+        }}
+        onOpenChange={next => send(next ? { type: 'OPEN', now: nowTime() } : { type: 'CLOSE' })}
+        onOpenChangeComplete={open => {
+          const highlighted = machine.getState().highlighted
+          if (open && highlighted) scrollIntoCenter(document.getElementById(api.ids.item(highlighted)), contentRef.current)
+        }}>
     <div {...api.rootProps}>
-      {label && !embedded && <label {...api.labelProps}>{label}</label>}
+      {label && !embedded && !field?.['aria-labelledby'] && <label {...api.labelProps} htmlFor={controlId}>{label}</label>}
       <div ref={controlRef} {...api.controlProps}>
-        <input ref={inputRef} {...mergeProps(api.inputProps, form.field.controlProps)} />
-        <button {...api.triggerProps}>
+        <Primitive.Input ref={inputRef} {...mergeProps(inputProps, form.field.controlProps, metadata)} id={controlId} disabled={disabled} readOnly={readOnly} aria-required={required || undefined} aria-describedby={describedBy}
+          onKeyDown={event => {
+            // Let Base UI consume popup Escape before an ancestor Dialog sees it.
+            if (event.key === 'Escape' && state.open) return
+            // The time machine distinguishes a typed off-step time from a walked option.
+            event.preventBaseUIHandler()
+            onKeyDown?.(event)
+          }} />
+        <Primitive.Trigger {...triggerProps} disabled={disabled}>
           <span {...api.triggerIconProps} />
-        </button>
+        </Primitive.Trigger>
       </div>
       {api.invalid && <span {...api.errorProps}>{api.errorText}</span>}
       <span {...form.field.errorProps}>{form.error}</span>
-      {name && <input {...api.hiddenInputProps} />}
-      <div ref={positionerRef} {...api.positionerProps}>
-        <div ref={contentRef} {...api.contentProps}>
+
+      <Primitive.Portal keepMounted container={environment.container}>
+        <Primitive.Positioner {...positionerProps} anchor={controlRef} side="bottom" align="start" sideOffset={4}
+          positionMethod="fixed" data-backend="base-ui" data-mode={environment.mode} dir={environment.dir} lang={environment.locale}
+          style={{ ...environment.style, width: 'var(--anchor-width)', '--gg-available-height': 'var(--available-height, 320px)' } as CSSProperties}>
+        <Primitive.Popup data-backend="base-ui" initialFocus={false} finalFocus={false}>
+          <Primitive.List ref={contentRef} {...api.contentProps}>
           {state.open &&
             api.times.map(({ time, label: words }) => (
               <div key={time} {...api.getItemProps(time)}>
                 {words}
               </div>
             ))}
-        </div>
-      </div>
+          </Primitive.List>
+        </Primitive.Popup>
+        </Primitive.Positioner>
+      </Primitive.Portal>
     </div>
+      </Primitive.Root>
+      </BaseField.Root>
+      {!embedded && <SelectionConstraint id={`${id}-constraint`} controlId={controlId} name={name}
+        value={state.value ?? ''} required={required} disabled={disabled} readOnly={readOnly}
+        message={message} focusTarget={inputRef} onValidityChange={() => {
+          composition?.edited()
+          if (!composition?.name) form.edited(inputRef.current)
+          group?.refresh()
+        }} />}
+    </DirectionProvider>
   )
 }

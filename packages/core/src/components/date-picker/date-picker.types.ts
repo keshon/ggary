@@ -23,6 +23,7 @@ export type DatePickerEvent =
   | { type: 'COMMIT_TEXT' }
   | { type: 'CALENDAR'; event: CalendarEvent }
   | { type: 'SYNC_VALUE'; value: DateRange }
+  | { type: 'RESET'; value: DateRange }
   | ({ type: 'SYNC_OPTIONS'; locale?: string } & Partial<CalendarOptions>)
 
 /** A choice made in one press beside the calendar: "Last 7 days". Its value may depend on today. */

@@ -83,3 +83,29 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* Base UI owns the modal layer; inline palettes stay in document flow. */
+[data-scope='command-palette'][data-part='content'][data-backend='base-ui'] {
+  display: flex;
+  flex-direction: column;
+  pointer-events: auto;
+}
+[data-scope='command-palette'][data-part='content'][data-backend='base-ui'][data-modal] {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  block-size: fit-content;
+}
+[data-scope='command-palette'][data-part='content'][data-backend='base-ui']:not([data-modal]) {
+  position: relative;
+}
+[data-scope='command-palette'][data-part='backdrop'][data-backend='base-ui'] {
+  position: fixed;
+  inset: 0;
+  pointer-events: auto;
+}
+[data-scope='command-palette'][data-part='content'][data-backend='base-ui'][data-state='closed'] {
+  display: none;
+}
+
+[data-scope='command-palette'][data-part='inline-host'] { inline-size: 100%; min-inline-size: 0; }

@@ -8,5 +8,5 @@ export type RadioGroupPart = (typeof radioGroupAnatomy.parts)[number]
  * Each option carries its own `radio` scope, as ChipGroup's chips carry `chip`:
  * it has Checkbox's parts, so themes style the two boxes from one rule set.
  */
-export const radioAnatomy = createAnatomy('radio', ['root', 'control', 'input', 'indicator', 'label'] as const)
+export const radioAnatomy = createAnatomy('radio', ['root', 'control', 'toggle', 'input', 'indicator', 'label'] as const)
 export type RadioPart = (typeof radioAnatomy.parts)[number]

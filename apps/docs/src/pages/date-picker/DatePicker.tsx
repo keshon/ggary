@@ -1,6 +1,25 @@
-import { DatePicker } from '@ggary/react'
+import { useState } from 'react'
+import { Button, Cluster, Field, Fieldset, Form, FormSummary, Stack, ConfigProvider, DatePicker } from '@ggary/react'
 import { rangePresets } from '@ggary/core/date-picker'
 import { DemoPage, Specimen } from '../../react/DemoPage'
+
+function DateForm() {
+  const [saved, setSaved] = useState('')
+  return <Form onReset={() => setSaved('')} onSubmit={data => {
+    if (data.get('due') === '2026-10-14') return { errors: { due: 'This date is fully booked. Choose another day.' } }
+    setSaved(`Saved date: ${data.get('due')}; period: ${data.get('period')}.`)
+  }}><Stack>
+    <FormSummary />
+    <Field name="due" label="Due date" required hint="14 October demonstrates a server error. Typed dates commit on blur or Enter.">
+      <DatePicker locale="en-GB" min="2026-10-01" max="2026-12-31" />
+    </Field>
+    <Field name="period" label="Date range" required><DatePicker mode="range" locale="en-GB" /></Field>
+    <Field name="fixed" label="Read-only date" readOnly><DatePicker defaultValue="2026-10-14" locale="en-GB" /></Field>
+    <Fieldset disabled legend="Disabled section"><DatePicker name="archived" label="Archived date" defaultValue="2026-10-14" /></Fieldset>
+    <Cluster><Button type="submit" emphasis="high">Save dates</Button><Button type="reset">Reset dates</Button></Cluster>
+    <p role="status">{saved || 'No dates saved yet.'}</p>
+  </Stack></Form>
+}
 
 const SIZES = ['sm', 'md', 'lg'] as const
 
@@ -34,9 +53,17 @@ export default function DatePickerPage() {
         </Specimen>
       }
       composition={
-        <Specimen label={`mode="range" presets={rangePresets()}`} wide>
-          <DatePicker label="Registered between" locale="en-GB" mode="range" presets={rangePresets()} />
-        </Specimen>
+        <>
+          <Specimen label="Field · required, ranges, server errors and reset" wide><DateForm /></Specimen>
+          <Specimen label={`mode="range" presets={rangePresets()}`} wide>
+            <DatePicker label="Registered between" locale="en-GB" mode="range" presets={rangePresets()} />
+          </Specimen>
+          <Specimen label='Base UI · local dark, dir="rtl"'>
+            <ConfigProvider mode="dark" dir="rtl">
+              <DatePicker label="RTL date" locale="en-GB" defaultValue="2026-10-14" />
+            </ConfigProvider>
+          </Specimen>
+        </>
       }
     />
   )

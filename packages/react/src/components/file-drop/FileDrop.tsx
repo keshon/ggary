@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useRef, useState, type InputHTMLAttributes } from 'react'
+import { Field as BaseField } from '@base-ui/react/field'
 import { connect, type FileDropProps as CoreFileDropProps } from '@ggary/core/file-drop'
 import { attachFileDrop, mergeProps, reactNormalizer } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
@@ -45,7 +46,10 @@ export const FileDrop = forwardRef<HTMLInputElement, FileDropProps>(function Fil
   return (
     <label ref={zone} {...api.rootProps}>
       <span {...api.iconProps} />
-      <input ref={ref} {...mergeProps(rest, api.inputProps)} />
+      <BaseField.Control ref={ref} {...mergeProps(rest, api.inputProps)}
+        render={(inputProps) => <input {...inputProps} aria-labelledby={api.inputProps['aria-labelledby'] as string | undefined}
+          aria-invalid={api.inputProps['aria-invalid'] as 'true' | undefined}
+          data-invalid={api.inputProps['data-invalid'] as string | undefined} />} />
       <span {...api.textProps}>{api.label}</span>
       {api.showFiles && <span {...api.filesProps}>{api.filesText}</span>}
       {api.showHint && <span {...api.hintProps}>{api.hint}</span>}

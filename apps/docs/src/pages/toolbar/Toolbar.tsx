@@ -1,4 +1,4 @@
-import { Badge, Button, Icon, Toolbar, ToolbarSeparator, ToolbarSpacer } from '@ggary/react'
+import { Badge, Button, Icon, Toolbar, ToolbarButton, ToolbarSeparator, ToolbarSpacer } from '@ggary/react'
 import { DemoPage, Specimen } from '../../react/DemoPage'
 
 export default function ToolbarPage() {
@@ -8,35 +8,35 @@ export default function ToolbarPage() {
         <>
           <Specimen label={`label="Edit"`}>
             <Toolbar label="Edit">
-              <Button size="sm" emphasis="minimal" aria-label="Cut">
+              <ToolbarButton size="sm" emphasis="minimal" aria-label="Cut">
                 <Icon name="cut" />
-              </Button>
-              <Button size="sm" emphasis="minimal" aria-label="Copy">
+              </ToolbarButton>
+              <ToolbarButton size="sm" emphasis="minimal" aria-label="Copy">
                 <Icon name="copy" />
-              </Button>
-              <Button size="sm" emphasis="minimal" aria-label="Paste">
+              </ToolbarButton>
+              <ToolbarButton size="sm" emphasis="minimal" aria-label="Paste">
                 <Icon name="paste" />
-              </Button>
+              </ToolbarButton>
             </Toolbar>
           </Specimen>
           <Specimen label={`label="Zoom" orientation="vertical"`}>
             <Toolbar label="Zoom" orientation="vertical">
-              <Button size="sm" emphasis="minimal" aria-label="Zoom in">
+              <ToolbarButton size="sm" emphasis="minimal" aria-label="Zoom in">
                 <Icon name="zoom-in" />
-              </Button>
-              <Button size="sm" emphasis="minimal" aria-label="Zoom out">
+              </ToolbarButton>
+              <ToolbarButton size="sm" emphasis="minimal" aria-label="Zoom out">
                 <Icon name="zoom-out" />
-              </Button>
+              </ToolbarButton>
               <ToolbarSeparator />
-              <Button size="sm" emphasis="minimal" aria-label="Fit to screen">
+              <ToolbarButton size="sm" emphasis="minimal" aria-label="Fit to screen">
                 <Icon name="expand" />
-              </Button>
+              </ToolbarButton>
             </Toolbar>
           </Specimen>
           <Specimen label="no label">
             <Toolbar>
-              <Button size="sm" emphasis="low">Filter</Button>
-              <Button size="sm" emphasis="low">Sort</Button>
+              <ToolbarButton size="sm" emphasis="low">Filter</ToolbarButton>
+              <ToolbarButton size="sm" emphasis="low">Sort</ToolbarButton>
             </Toolbar>
           </Specimen>
         </>
@@ -44,28 +44,28 @@ export default function ToolbarPage() {
       states={
         <Specimen label="disabled">
           <Toolbar label="History">
-            <Button size="sm" emphasis="minimal" aria-label="Undo">
+            <ToolbarButton size="sm" emphasis="minimal" aria-label="Undo">
               <Icon name="undo" />
-            </Button>
-            <Button size="sm" emphasis="minimal" aria-label="Redo" disabled>
+            </ToolbarButton>
+            <ToolbarButton size="sm" emphasis="minimal" aria-label="Redo" disabled>
               <Icon name="redo" />
-            </Button>
+            </ToolbarButton>
           </Toolbar>
         </Specimen>
       }
       composition={
         <Specimen label="ToolbarSeparator · ToolbarSpacer" wide>
           <Toolbar label="Run tools">
-            <Button size="sm" emphasis="minimal">
+            <ToolbarButton size="sm" emphasis="minimal">
               Filter
-            </Button>
-            <Button size="sm" emphasis="minimal">
+            </ToolbarButton>
+            <ToolbarButton size="sm" emphasis="minimal">
               Sort
-            </Button>
+            </ToolbarButton>
             <ToolbarSeparator />
-            <Button size="sm" emphasis="minimal">
+            <ToolbarButton size="sm" emphasis="minimal">
               Export
-            </Button>
+            </ToolbarButton>
             <ToolbarSpacer />
             <Badge tone="running">7 running</Badge>
           </Toolbar>

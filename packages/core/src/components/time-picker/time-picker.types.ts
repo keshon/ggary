@@ -39,6 +39,7 @@ export type TimePickerEvent =
   | { type: 'CHOOSE'; time: ISOTime }
   | { type: 'CLEAR' }
   | { type: 'SYNC_VALUE'; value: ISOTime | null }
+  | { type: 'RESET'; value: ISOTime | null }
   | ({ type: 'SYNC_OPTIONS'; locale?: string; isTimeDisabled?: (time: ISOTime) => boolean } & Partial<TimePickerOptions>)
 
 export interface TimePickerWords {

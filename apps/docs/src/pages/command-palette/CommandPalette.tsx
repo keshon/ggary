@@ -6,8 +6,8 @@ export default function CommandPalettePage() {
   return (
     <DemoPage
       states={
-        <Specimen label="defaultOpen" wide>
-          <div className="frame">
+        <Specimen label="defaultOpen modal={false}" wide>
+          <div style={{ width: '100%' }}>
             <CommandPalette defaultOpen modal={false} hotkey={false} commands={commands} />
           </div>
         </Specimen>

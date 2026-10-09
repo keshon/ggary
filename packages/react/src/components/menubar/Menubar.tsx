@@ -1,7 +1,11 @@
-import { Fragment, useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
-import { connect, createMenubarMachine, type MenubarMenu, type MenubarSelectDetails } from '@ggary/core/menubar'
-import { attachMenubarKeys, reactNormalizer, rovingFocus } from '@ggary/core'
-import { MenuContent } from '../menu/MenuContent'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { Menubar as Primitive } from '@base-ui/react/menubar'
+import { Menu as MenuPrimitive } from '@base-ui/react/menu'
+import { DirectionProvider } from '@base-ui/react/direction-provider'
+import type { MenubarMenu, MenubarSelectDetails } from '@ggary/core/menubar'
+import { attachMenubarKeys, matchesMnemonic, parseMnemonic } from '@ggary/core'
+import { Surface, Level, type Environment } from '../menu/Menu'
+import { useConfig } from '../config-provider'
 
 export interface MenubarProps {
   /** The bar's menus. A label may mark its access key with `&`: `&File`. */
@@ -21,76 +25,105 @@ export interface MenubarProps {
   closeOnSelect?: boolean
 }
 
-export function Menubar(props: MenubarProps) {
-  const { menus, onSelect, onOpenChange, label, mnemonics = false, closeOnSelect } = props
+const part = (name: string) => ({ 'data-scope': 'menubar', 'data-part': name, 'data-backend': 'base-ui' })
 
-  const id = `gg-menubar-${useId().replace(/:/g, '')}`
-  const callbacks = useRef({ onSelect, onOpenChange })
-  callbacks.current = { onSelect, onOpenChange }
-
-  const [machine] = useState(() =>
-    createMenubarMachine({
-      id, menus, closeOnSelect,
-      onSelect: (value, details) => callbacks.current.onSelect?.(value, details),
-      onOpenChange: (menu) => callbacks.current.onOpenChange?.(menu),
-    })
-  )
-  const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { label, mnemonics })
-
-  useEffect(() => machine.send({ type: 'SYNC_MENUS', menus }), [machine, menus])
-  useEffect(() => machine.send({ type: 'SYNC_OPTIONS', closeOnSelect }), [machine, closeOnSelect])
-
-  // The tab stop moves with the arrows while no menu is open; focus follows it,
-  // but only when it is already on the bar.
+export function Menubar({ menus, onSelect, onOpenChange, label, mnemonics = false, closeOnSelect = true }: MenubarProps) {
+  const id = `gg-base-menubar-${useId().replace(/:/g, '')}`
+  const config = useConfig()
   const root = useRef<HTMLDivElement>(null)
+  const [opened, setOpened] = useState<string | null>(null)
+  const current = useRef(opened)
+  const [underlined, setUnderlined] = useState(false)
+  const focusFirst = useRef(false)
+  const request = (next: string | null) => {
+    if (current.current === next) return
+    current.current = next; setOpened(next); onOpenChange?.(next)
+  }
+  const latest = useRef({ menus, request })
+  latest.current = { menus, request }
   useEffect(() => {
-    if (state.openIndex === -1 && root.current?.contains(document.activeElement)) {
-      rovingFocus(document, api.ids.item(state.focusIndex))
-    }
-  }, [state.focusIndex, state.openIndex])
-
+    if (opened !== null && !menus.some(menu => menu.value === opened && !menu.disabled)) request(null)
+  }, [menus, opened])
   useEffect(() => {
-    if (!mnemonics) return
+    if (!mnemonics) { setUnderlined(false); return }
     return attachMenubarKeys(document, {
+      onShowMnemonics: setUnderlined,
       onMnemonic: (key, code) => {
-        const before = machine.getState()
-        machine.send({ type: 'MNEMONIC', key, code })
-        return machine.getState() !== before
+        const index = latest.current.menus.findIndex(menu => !menu.disabled && matchesMnemonic(parseMnemonic(menu.label).key, key, code))
+        if (index < 0) return false
+        const trigger = root.current?.querySelectorAll<HTMLElement>('[data-scope="menubar"][data-part="item"]')[index]
+        trigger?.focus()
+        if (current.current !== latest.current.menus[index].value) trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
+        return true
       },
-      onShowMnemonics: (show) => machine.send({ type: 'SHOW_MNEMONICS', show }),
       onFocusBar: () => {
-        // Focus first, then close: a menu that closes with focus outside it hands nothing back.
-        document.getElementById(api.ids.item(0))?.focus()
-        machine.send({ type: 'ENTER_BAR' })
+        const alreadyClosed = current.current === null
+        focusFirst.current = !alreadyClosed
+        latest.current.request(null); setUnderlined(true)
+        if (alreadyClosed) root.current?.querySelector<HTMLElement>('[data-part="item"]')?.focus()
       },
     })
-  }, [machine, mnemonics])
+  }, [mnemonics])
+  return <DirectionProvider direction={config.dir ?? 'ltr'}>
+    <Primitive ref={root} {...part('root')} id={id} aria-label={label} modal={false} data-mnemonics={underlined ? '' : undefined}>
+      {menus.map(menu => <Entry key={menu.value} menu={menu} shown={opened === menu.value} id={`${id}-${menu.value}`}
+        onOpenChange={(next, reason) => {
+          if (next && reason === 'trigger-focus' && current.current === null) return false
+          if (next) request(menu.value)
+          else if (reason !== 'sibling-open' && reason !== 'list-navigation' && current.current === menu.value) request(null)
+          return true
+        }} closeOnSelect={closeOnSelect} mnemonics={mnemonics} focusTarget={() => {
+          if (current.current !== null) return false
+          if (focusFirst.current) { focusFirst.current = false; return root.current?.querySelector<HTMLElement>('[data-part="item"]') ?? null }
+          return true
+        }}
+        onSelect={(value, details) => onSelect?.(value, { ...details, menu: menu.value })} />)}
+    </Primitive>
+  </DirectionProvider>
+}
 
-  return (
-    <div ref={root} {...api.rootProps}>
-      {menus.map((menu, index) => {
-        const text = api.labelOf(menu)
-        return (
-          <Fragment key={menu.value}>
-            <button {...api.getItemProps(menu, index)}>
-              <span {...api.getItemTextProps()}>
-                {text.before}
-                {text.key && <span {...api.mnemonicProps}>{text.key}</span>}
-                {text.after}
-              </span>
-            </button>
-            {state.openIndex === index && (
-              <MenuContent
-                key={state.menu.id}
-                api={api.menu}
-                getState={() => machine.getState().menu}
-                reference={() => document.getElementById(api.ids.item(index))}
-              />
-            )}
-          </Fragment>
-        )
-      })}
-    </div>
-  )
+function Entry({ menu, shown, id, onOpenChange, closeOnSelect, mnemonics, onSelect, focusTarget }: {
+  menu: MenubarMenu; shown: boolean; id: string; onOpenChange: (open: boolean, reason: string) => boolean;
+  closeOnSelect: boolean; mnemonics: boolean; onSelect: (value: string, details: Omit<MenubarSelectDetails, 'menu'>) => void;
+  focusTarget: () => HTMLElement | boolean | null;
+}) {
+  const config = useConfig()
+  const trigger = useRef<HTMLButtonElement>(null)
+  const [environment, setEnvironment] = useState<Environment>({ style: {} })
+  useLayoutEffect(() => {
+    if (!shown || !trigger.current) return
+    const computed = getComputedStyle(trigger.current)
+    const style: Record<string, string> = {}
+    for (const key of Array.from(computed)) if (key.startsWith('--')) style[key] = computed.getPropertyValue(key)
+    setEnvironment({ style, mode: config.mode, dir: config.dir, locale: config.locale,
+      container: trigger.current.closest<HTMLElement>('[data-backend="base-ui"]:is([data-scope="dialog"][data-part="layer"], [data-scope="popover"][data-part="positioner"])') ?? undefined })
+  }, [shown, config])
+  const lastRow = useRef(false)
+  const text = parseMnemonic(menu.label)
+  const dismiss = (reason: string) => {
+    onOpenChange(false, reason)
+  }
+  const env = { ...environment, onTab: () => dismiss('tab') }
+  return <MenuPrimitive.Root open={shown} disabled={menu.disabled} triggerId={`${id}-trigger`}
+    onOpenChangeComplete={next => {
+      if (!next || !lastRow.current) return
+      lastRow.current = false
+      const rows = document.getElementById(`${id}-content`)?.querySelectorAll<HTMLElement>('[role^="menuitem"]:not([aria-disabled="true"])')
+      rows?.[rows.length - 1]?.focus()
+    }} onOpenChange={(next, details) => {
+      if (next) { if (!onOpenChange(true, details.reason)) details.cancel() }
+      else dismiss(details.reason)
+    }}>
+    <MenuPrimitive.Trigger ref={trigger} {...part('item')} id={`${id}-trigger`} data-state={shown ? 'open' : 'closed'}
+      onKeyDown={event => {
+        if (event.key === 'ArrowUp' && !shown && !menu.disabled) {
+          event.preventDefault(); event.preventBaseUIHandler(); lastRow.current = true; onOpenChange(true, 'trigger-press')
+        }
+      }} aria-expanded={shown ? 'true' : 'false'} aria-keyshortcuts={mnemonics && text.key ? `Alt+${text.key.toUpperCase()}` : undefined}>
+      <span {...part('item-text')}>{text.index < 0 ? text.text : <>{text.text.slice(0, text.index)}<span {...part('mnemonic')}>{text.key}</span>{text.text.slice(text.index + 1)}</>}</span>
+    </MenuPrimitive.Trigger>
+    <Surface shown={shown} focusTarget={focusTarget} environment={env} level={0} id={`${id}-content`} triggerRef={trigger}>
+      <Level items={menu.items} closeOnSelect={closeOnSelect} onSelect={onSelect} environment={env} level={0} />
+    </Surface>
+  </MenuPrimitive.Root>
 }

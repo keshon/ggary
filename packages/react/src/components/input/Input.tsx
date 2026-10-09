@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useRef, useState, type InputHTMLAttributes } from 'react'
+import { Input as BaseInput } from '@base-ui/react/input'
 import { connect, hideOnSubmit, type InputProps as CoreInputProps, type InputWords } from '@ggary/core/input'
 import { mergeProps, reactNormalizer } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
@@ -24,10 +25,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(pro
   } = props
   const [revealed, setRevealed] = useState(false)
 
+  const field = useFieldControl()
   const api = connect(
     { type, size, name, placeholder, autoComplete, inputMode, disabled, readOnly, required, invalid, reveal },
     reactNormalizer,
-    { onValueChange, field: useFieldControl() ?? undefined, revealed, onRevealChange: setRevealed, words }
+    { field: field ?? undefined, revealed, onRevealChange: setRevealed, words }
   )
 
   // Uncontrolled, the browser resets the value itself; controlled, the re-render
@@ -40,7 +42,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(pro
   const valueProps = value !== undefined ? { value } : { defaultValue }
   // Merged, not spread: a caller's own onBlur must run alongside the Field's
   // validation handler instead of silently replacing it (or being replaced).
-  const input = <input ref={ref} {...mergeProps(rest, api.rootProps)} {...valueProps} />
+  const input = <BaseInput ref={ref} {...mergeProps(rest, api.rootProps)} {...valueProps} onValueChange={(next) => onValueChange?.(next)}
+    render={(inputProps) => <input {...inputProps}
+      aria-invalid={api.rootProps['aria-invalid'] as 'true' | undefined}
+      aria-describedby={(field ? field['aria-describedby'] : inputProps['aria-describedby']) as string | undefined}
+      data-invalid={api.rootProps['data-invalid'] as string | undefined} />} />
   if (!api.canReveal) return input
   return (
     <span {...api.fieldProps}>

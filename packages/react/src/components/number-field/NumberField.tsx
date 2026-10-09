@@ -1,6 +1,8 @@
-import { forwardRef, useEffect, useId, useLayoutEffect, useRef, type InputHTMLAttributes } from 'react'
-import { connect, readNumber, type NumberFieldProps as CoreNumberFieldProps } from '@ggary/core/number-field'
-import { attachScrub, mergeProps, reactNormalizer } from '@ggary/core'
+import { useFieldsetGroup } from '../fieldset/Fieldset'
+import { forwardRef, useId, useRef, useState, type InputHTMLAttributes } from 'react'
+import { NumberField as Primitive } from '@base-ui/react/number-field'
+import type { NumberFieldProps as CoreNumberFieldProps } from '@ggary/core/number-field'
+import { mergeProps, reactNormalizer } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
 import { useMergedRef } from '../../utils/use-merged-ref'
 import { useFormReset } from '../../utils/use-form-reset'
@@ -16,49 +18,37 @@ export interface NumberFieldProps
   onValueChange?: (value: number | null) => void
 }
 
-const text = (value: number | null | undefined) => (value === null || value === undefined ? '' : String(value))
+const part = (name: string) => ({ 'data-scope': 'number-field', 'data-part': name, 'data-backend': 'base-ui' })
 
 export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(function NumberField(props, forwardedRef) {
   props = useConfigured(props, { size: true })
-  const {
-    min, max, step, name, label, axis, placeholder, size, disabled, readOnly, required, invalid,
-    value, defaultValue, onValueChange, ...rest
-  } = props
-  const id = `gg-number-${useId().replace(/:/g, '')}`
-
-  const api = connect(
-    { id, min, max, step, name, label, axis, placeholder, size, disabled, readOnly, required, invalid },
-    reactNormalizer,
-    { onValueChange, field: useFieldControl() ?? undefined }
-  )
-
-  const element = useRef<HTMLInputElement | null>(null)
+  const { min, max, step = 1, name, label, axis, placeholder, size = 'md', disabled, readOnly, required, invalid,
+    value, defaultValue, onValueChange, form, ...rest } = props
+  const field = useFieldControl()
+  const group = useFieldsetGroup()
+  const id = useId()
+  const [own, setOwn] = useState(defaultValue ?? null)
+  const element = useRef<HTMLInputElement>(null)
   const ref = useMergedRef(element, forwardedRef)
-  const axisHandle = useRef<HTMLSpanElement | null>(null)
-
-  // Not a controlled input in React's sense. Typing "1." holds no new number,
-  // and writing the owner's 1 back would eat the dot under the caret; so the
-  // owner's value is written only when it differs from what the input holds.
-  const sync = () => {
-    const input = element.current
-    if (input && value !== undefined && readNumber(input) !== value) input.value = text(value)
-  }
-  useLayoutEffect(sync, [value])
-  useFormReset(element, sync)
-
-  useEffect(() => {
-    const handle = axisHandle.current
-    return handle ? attachScrub(handle, () => element.current) : undefined
-  }, [api.showAxis])
-
-  return (
-    <span {...api.rootProps}>
-      {api.showAxis && (
-        <span ref={axisHandle} {...api.axisProps}>
-          {api.axis}
-        </span>
-      )}
-      <input ref={ref} {...mergeProps(rest, api.inputProps)} defaultValue={text(value === undefined ? defaultValue : value)} />
-    </span>
-  )
+  useFormReset(element, () => setOwn(defaultValue ?? null))
+  const isDisabled = Boolean(disabled || field?.disabled || group?.disabled)
+  const isReadOnly = Boolean(readOnly || field?.readOnly)
+  const isInvalid = Boolean(invalid || field?.['aria-invalid'] === 'true')
+  const state = { 'data-size': size, 'data-disabled': isDisabled ? '' : undefined,
+    'data-readonly': isReadOnly ? '' : undefined, 'data-invalid': isInvalid ? '' : undefined }
+  return <Primitive.Root {...part('root')} {...state} render={(rootProps) => <span {...rootProps} data-invalid={isInvalid ? '' : undefined} />}
+    id={field?.id ?? `gg-number-${id}`} min={min} max={max} step={step}
+    largeStep={step * 10} smallStep={step * .1} allowOutOfRange format={{ useGrouping: false }}
+    name={name} form={form} disabled={isDisabled} readOnly={isReadOnly} required={Boolean(required || field?.required)}
+    value={value === undefined ? own : value}
+    onValueChange={(next) => { if (value === undefined) setOwn(next); onValueChange?.(next) }}>
+    {axis && <Primitive.ScrubArea {...part('axis')} {...state} aria-hidden="true"
+      data-scrub={!isDisabled && !isReadOnly ? '' : undefined} pixelSensitivity={2}>{axis}</Primitive.ScrubArea>}
+    <Primitive.Input {...mergeProps(rest, reactNormalizer(field ?? {}))} {...part('input')} {...state}
+      ref={ref} placeholder={placeholder} aria-label={field ? undefined : label ?? rest['aria-label']}
+      aria-invalid={isInvalid || undefined}
+      render={(inputProps) => <input {...inputProps} aria-invalid={isInvalid || undefined}
+        aria-describedby={(field ? field['aria-describedby'] : inputProps['aria-describedby']) as string | undefined}
+        data-invalid={isInvalid ? '' : undefined} />} />
+  </Primitive.Root>
 })

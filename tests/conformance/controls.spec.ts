@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { setInputValue } from '../../packages/core/src/index'
-import { type Adapter, type NumberFieldProps, type SegmentedControlProps, type SliderProps, click, freshTarget, part } from './harness'
+import { type Adapter, type NumberFieldProps, type SegmentedControlProps, type SliderProps, click, freshTarget, part, keydown } from './harness'
 
 const views = [
   { value: 'list', label: 'List' },
@@ -110,6 +110,19 @@ export function sliderConformance(adapter: Adapter) {
       expect(m.root.querySelector('[class]')).toBeNull()
     })
 
+    if (adapter.name === 'react') it('Base UI keyboard steps, clamps and respects controlled refusal', async () => {
+      const onValueChange = vi.fn()
+      const { input } = await setup({ value: 4, step: 2, onValueChange })
+      await adapter.act(() => keydown(input(), 'ArrowRight'))
+      expect(onValueChange).toHaveBeenLastCalledWith(6)
+      expect(input().value).toBe('4')
+      const uncontrolled = await setup({ defaultValue: 14, step: 2 })
+      await adapter.act(() => keydown(uncontrolled.input(), 'End'))
+      expect(uncontrolled.input().value).toBe('16')
+      await adapter.act(() => keydown(uncontrolled.input(), 'ArrowRight'))
+      expect(uncontrolled.input().value).toBe('16')
+    })
+
     it('hands the fill to the theme as a share of the track', async () => {
       const { m, root } = await setup({ defaultValue: 4 })
       expect(root().style.getPropertyValue('--slider-fill')).toBe('25%')
@@ -180,9 +193,16 @@ export function numberFieldConformance(adapter: Adapter) {
 
     it('is a native number input behind an axis letter that names nothing', async () => {
       const { m, axis, input } = await setup({ step: 0.5, min: -10, max: 10, name: 'x' })
-      expect(input().type).toBe('number')
-      expect([input().min, input().max, input().step]).toEqual(['-10', '10', '0.5'])
-      expect(input().name).toBe('x')
+      if (adapter.name === 'react') {
+        expect(input().type).toBe('text')
+        const submission = m.root.querySelector<HTMLInputElement>('input[type=number]')!
+        expect([submission.min, submission.max, submission.step, submission.name]).toEqual(['-10', '10', '0.5', 'x'])
+        expect(submission.getAttribute('aria-hidden')).toBe('true')
+      } else {
+        expect(input().type).toBe('number')
+        expect([input().min, input().max, input().step]).toEqual(['-10', '10', '0.5'])
+        expect(input().name).toBe('x')
+      }
       expect(input().value).toBe('128')
       expect(input().getAttribute('aria-label')).toBe('Position X')
       expect(axis().textContent).toBe('X')
@@ -190,6 +210,16 @@ export function numberFieldConformance(adapter: Adapter) {
       expect(axis().tagName).not.toBe('LABEL')
       expect(axis().getAttribute('aria-hidden')).toBe('true')
       expect(m.root.querySelector('[class]')).toBeNull()
+    })
+
+    if (adapter.name === 'react') it('Base UI steps decimals and submits one numeric value', async () => {
+      const form = freshTarget('form') as HTMLFormElement
+      const { input } = await setup({ axis: undefined, defaultValue: 1.5, step: .5, min: 0, max: 2, name: 'quantity' }, form)
+      await adapter.act(() => keydown(input(), 'ArrowUp'))
+      expect(input().value).toBe('2')
+      await adapter.act(() => keydown(input(), 'ArrowUp'))
+      expect(input().value).toBe('2')
+      expect(new FormData(form).getAll('quantity')).toEqual(['2'])
     })
 
     it('reports a number while it is typed into, and null when it is emptied', async () => {
@@ -204,6 +234,23 @@ export function numberFieldConformance(adapter: Adapter) {
     it('drags the value from the axis letter: ten steps for twenty pixels, Shift ten times faster', async () => {
       const onValueChange = vi.fn()
       const { axis, input } = await setup({ step: 1, onValueChange })
+      if (adapter.name === 'react') {
+        await adapter.act(() => pointer(axis(), 'pointerdown', { clientX: 100 }))
+        const move = (movementX: number, shiftKey = false) => {
+          const event = new MouseEvent('pointermove', { bubbles: true, shiftKey })
+          Object.defineProperty(event, 'movementX', { value: movementX })
+          axis().dispatchEvent(event)
+        }
+        await adapter.act(() => move(20))
+        expect(input().value).toBe('148')
+        expect(onValueChange).toHaveBeenLastCalledWith(148)
+        await adapter.act(() => move(2, true))
+        expect(input().value).toBe('168')
+        await adapter.act(() => pointer(axis(), 'pointerup'))
+        await adapter.act(() => move(20))
+        expect(input().value).toBe('168')
+        return
+      }
       await adapter.act(() => {
         pointer(axis(), 'pointerdown', { clientX: 100 })
         pointer(axis(), 'pointermove', { clientX: 120 })
@@ -225,9 +272,11 @@ export function numberFieldConformance(adapter: Adapter) {
 
     it('a drag stays within the bounds, and does not start on a field that cannot change', async () => {
       const { axis, input } = await setup({ min: 0, max: 130, defaultValue: 128 })
+      await adapter.act(() => pointer(axis(), 'pointerdown', { clientX: 0 }))
       await adapter.act(() => {
-        pointer(axis(), 'pointerdown', { clientX: 0 })
-        pointer(axis(), 'pointermove', { clientX: 40 })
+        const event = new MouseEvent('pointermove', { bubbles: true, clientX: 40 })
+        Object.defineProperty(event, 'movementX', { value: 40 })
+        axis().dispatchEvent(event)
       })
       expect(input().value).toBe('130')
 

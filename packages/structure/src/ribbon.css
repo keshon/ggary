@@ -17,6 +17,11 @@
 }
 
 [data-scope='ribbon'][data-part='tab'] {
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  font: inherit;
   display: inline-flex;
   align-items: center;
   flex: none;

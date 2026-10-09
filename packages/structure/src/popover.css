@@ -21,6 +21,13 @@
 }
 
 /* A tooltip is text; a long one wraps instead of running off the screen. */
+[data-scope='tooltip'][data-part='positioner'][data-backend='base-ui'] {
+  z-index: var(--gg-z-menu, 1100);
+}
+[data-scope='tooltip'][data-part='content'][data-backend='base-ui'] {
+  position: relative;
+  inset: auto;
+}
 [data-scope='tooltip'][data-part='content'] {
   max-inline-size: min(320px, var(--gg-available-width, 100vw));
 }
@@ -32,4 +39,24 @@
 }
 [data-scope='popconfirm'][data-part='content'] :is([data-part='title'], [data-part='description'], [data-part='error']) {
   margin: 0;
+}
+
+/* Base UI places the wrapper; the themed surface stays in normal flow. */
+[data-scope='popover'][data-part='positioner'][data-backend='base-ui'] {
+  z-index: var(--gg-z-popover, 1100);
+  pointer-events: auto;
+}
+[data-scope='popover'][data-part='content'][data-backend='base-ui'] {
+  position: relative;
+  inset: auto;
+  max-inline-size: min(var(--gg-available-width, 100vw), calc(100vw - 16px));
+}
+[data-scope='popover'][data-part='content'][data-backend='base-ui'][hidden] { display: none; }
+
+[data-scope='popconfirm'][data-part='positioner'][data-backend='base-ui'] {
+  z-index: var(--gg-z-popover, 1100);
+}
+[data-scope='popconfirm'][data-part='content'][data-backend='base-ui'] {
+  position: relative;
+  inset: auto;
 }

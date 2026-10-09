@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactElement, type ReactNode } from 'react'
 import {
   attachPaletteHotkey,
   attachPaletteSource,
@@ -9,7 +9,9 @@ import {
   type PaletteLoad,
   type PaletteWords,
 } from '@ggary/core/command-palette'
-import { attachDialog, reactNormalizer, type Dict } from '@ggary/core'
+import { reactNormalizer, type Dict } from '@ggary/core'
+import { Dialog as Primitive } from '@base-ui/react/dialog'
+import { useOverlayEnvironment } from '../../utils/use-overlay-environment'
 import { useConfigured } from '../config-provider'
 
 export interface CommandPaletteProps {
@@ -67,29 +69,17 @@ export function CommandPalette(props: CommandPaletteProps) {
   const minLength = loadOptions?.minLength
   useEffect(() => (hasLoad ? attachPaletteSource(machine, (query, signal) => callbacks.current.load!(query, signal), { debounce, minLength }) : undefined), [machine, hasLoad, debounce, minLength])
 
-  const contentRef = useRef<HTMLDialogElement>(null)
-  useLayoutEffect(() => {
-    const element = contentRef.current
-    if (!state.open || !element) return
-    const instance = attachDialog(element, {
-      modal,
-      closeOnEscape: true,
-      closeOnOutside: modal,
-      // Escape goes up a level first, and closes only at the top.
-      onDismiss: (reason) => machine.send({ type: reason === 'escape' ? 'ESCAPE' : 'CLOSE' }),
-      onNativeClose: () => machine.send({ type: 'CLOSE' }),
-    })
-    document.getElementById(api.ids.input)?.focus()
-    return () => instance.destroy()
-  }, [machine, state.open, api.ids.input, modal])
+  const anchorRef = useRef<HTMLDivElement>(null)
+  const [inlineHost, setInlineHost] = useState<HTMLDivElement | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const environment = useOverlayEnvironment(anchorRef, state.open)
 
   const listRef = useRef<HTMLDivElement>(null)
   useLayoutEffect(() => revealPaletteItem(listRef.current, state.highlighted ? api.ids.item(state.highlighted) : null))
 
-  return (
-    <>
-      {trigger?.(api.triggerProps)}
-      <dialog ref={contentRef} {...api.contentProps}>
+  const popup = (
+      <Primitive.Popup {...api.contentProps} data-backend="base-ui" data-modal={modal ? '' : undefined}
+        initialFocus={inputRef} finalFocus={true}>
         {state.open && (
           <>
             <div {...api.controlProps}>
@@ -99,7 +89,7 @@ export function CommandPalette(props: CommandPaletteProps) {
                   {page.label}
                 </span>
               ))}
-              <input {...api.inputProps} />
+              <input ref={inputRef} {...api.inputProps} />
             </div>
             <div ref={listRef} {...api.listProps}>
               {api.groups.map((group, index) => (
@@ -137,7 +127,25 @@ export function CommandPalette(props: CommandPaletteProps) {
             </div>
           </>
         )}
-      </dialog>
-    </>
+      </Primitive.Popup>
   )
+  return <Primitive.Root open={state.open} modal={modal} disablePointerDismissal={!modal}
+    onOpenChange={(next, details) => {
+      if (details.reason === 'escape-key') {
+        details.cancel()
+        machine.send({ type: 'ESCAPE' })
+      } else machine.send({ type: next ? 'OPEN' : 'CLOSE' })
+    }}>
+    <div ref={anchorRef} data-scope="command-palette" data-part="anchor" style={{ display: 'contents' }}>
+      {trigger && <Primitive.Trigger render={p => trigger({ ...p,
+        'aria-expanded': state.open ? 'true' : 'false', 'aria-keyshortcuts': hotkey === false ? undefined : `Control+${hotkey.toUpperCase()} Meta+${hotkey.toUpperCase()}` }) as ReactElement} />}
+    </div>
+    {modal ? <Primitive.Portal keepMounted container={environment.container}>
+      <div data-scope="dialog" data-part="layer" data-backend="base-ui"
+        data-mode={environment.mode} dir={environment.dir} lang={environment.locale} style={environment.style}>
+        <Primitive.Backdrop data-scope="command-palette" data-part="backdrop" data-backend="base-ui" />
+        {popup}
+      </div>
+    </Primitive.Portal> : <><div ref={setInlineHost} data-scope="command-palette" data-part="inline-host" />{inlineHost && <Primitive.Portal keepMounted container={inlineHost}>{popup}</Primitive.Portal>}</>}
+  </Primitive.Root>
 }

@@ -209,7 +209,7 @@ export function gridToolsConformance(adapter: Adapter) {
       const forms = [...document.querySelectorAll<HTMLFormElement>('[data-scope="grid-filters"][data-part="editor"]')]
       const form = forms[forms.length - 1]
       // The field, not the column picker's hidden form input.
-      const input = form.querySelector<HTMLInputElement>('input:not([type="hidden"])')!
+      const input = form.querySelector<HTMLInputElement>('input[data-scope="input"][data-part="root"]')!
       await adapter.act(() => setInputValue(input, 'acme'))
       await adapter.act(() => form.requestSubmit())
       await adapter.wait(0)
@@ -224,7 +224,7 @@ export function gridToolsConformance(adapter: Adapter) {
       await adapter.act(() => click(button('Add a filter')))
       const forms = [...document.querySelectorAll<HTMLFormElement>('[data-scope="grid-filters"][data-part="editor"]')]
       const form = forms[forms.length - 1]
-      await adapter.act(() => setInputValue(form.querySelector<HTMLInputElement>('input:not([type="hidden"])')!, 'borealis'))
+      await adapter.act(() => setInputValue(form.querySelector<HTMLInputElement>('input[data-scope="input"][data-part="root"]')!, 'borealis'))
       await adapter.act(() => form.requestSubmit())
       await adapter.wait(0)
       expect(chips()).toHaveLength(1)
@@ -350,7 +350,7 @@ export function gridRowsConformance(adapter: Adapter) {
           .querySelectorAll<HTMLElement>('[data-part="cell"]')[column]
       const editor = () => part(m.root, 'data-grid', 'editor') as (HTMLInputElement & HTMLSelectElement) | null
       const status = () => part(m.root, 'data-grid', 'status')!.textContent
-      const menu = () => part(m.root, 'menu', 'content')!
+      const menu = () => adapter.name === 'react' ? document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"][aria-label="Row actions"]')! : part(m.root, 'menu', 'content')!
       const sheet = () => part(m.root, 'dialog', 'content') as HTMLDialogElement
       const press = (target: Element, name: string, init: KeyboardEventInit = {}) => adapter.act(() => void key(target, name, init))
       const focusCell = async (column: number) => {
@@ -455,7 +455,7 @@ export function gridRowsConformance(adapter: Adapter) {
       expect(event.defaultPrevented).toBe(true)
       expect(menu().dataset.state).toBe('open')
       expect(menu().getAttribute('aria-label')).toBe('Row actions')
-      const items = parts(m.root, 'menu', 'item')
+      const items = parts(menu(), 'menu', 'item')
       expect(items.map((item) => part(item, 'menu', 'item-text')!.textContent)).toEqual(['Open', 'Archive'])
       await adapter.act(() => click(items[1]))
       await adapter.wait(0)
@@ -478,22 +478,24 @@ export function gridRowsConformance(adapter: Adapter) {
       await focusCell(3)
       await press(grid(), 'Enter')
       await adapter.wait(0)
-      expect(sheet().open).toBe(true)
-      expect(part(m.root, 'dialog', 'title')!.textContent).toBe('Acme')
-      expect(part(m.root, 'dialog', 'body')!.textContent).toBe('Lead number 1')
-      expect(part(m.root, 'grid-detail', 'position')!.textContent).toBe('1 of 3')
-      expect(part(m.root, 'grid-detail', 'prev')!.getAttribute('aria-disabled')).toBe('true')
+      const surface = adapter.name === 'react' ? document : m.root
+      const isOpen = () => adapter.name === 'react' ? part(surface, 'dialog', 'content')?.dataset.state === 'open' : sheet().open
+      expect(isOpen()).toBe(true)
+      expect(part(surface, 'dialog', 'title')!.textContent).toBe('Acme')
+      expect(part(surface, 'dialog', 'body')!.textContent).toBe('Lead number 1')
+      expect(part(surface, 'grid-detail', 'position')!.textContent).toBe('1 of 3')
+      expect(part(surface, 'grid-detail', 'prev')!.getAttribute('aria-disabled')).toBe('true')
 
-      await adapter.act(() => click(part(m.root, 'grid-detail', 'next')!))
+      await adapter.act(() => click(part(surface, 'grid-detail', 'next')!))
       await adapter.wait(0)
-      expect(part(m.root, 'dialog', 'title')!.textContent).toBe('Borealis')
-      expect(part(m.root, 'grid-detail', 'position')!.textContent).toBe('2 of 3')
+      expect(part(surface, 'dialog', 'title')!.textContent).toBe('Borealis')
+      expect(part(surface, 'grid-detail', 'position')!.textContent).toBe('2 of 3')
       // The grid's active row went along.
       expect(grid().getAttribute('aria-activedescendant')).toMatch(/r1c3$/)
 
-      await adapter.act(() => click(part(m.root, 'dialog', 'close')!))
+      await adapter.act(() => click(part(surface, 'dialog', 'close')!))
       await adapter.wait(0)
-      expect(sheet().open).toBe(false)
+      expect(isOpen()).toBe(false)
     })
   })
 }

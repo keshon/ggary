@@ -57,6 +57,8 @@ export function reducer(state: DatePickerState, event: DatePickerEvent): DatePic
       // A day chosen, or a range closed, is the end of the visit.
       return chosen ? closedState(next) : next
     }
+    case 'RESET':
+      return closedState({ ...state, editing: false, invalid: false, text: '', calendar: calendarReducer(state.calendar, { type: 'SYNC_VALUE', value: event.value }) })
     case 'SYNC_VALUE':
       return { ...state, calendar: calendarReducer(state.calendar, { type: 'SYNC_VALUE', value: event.value }) }
     case 'SYNC_OPTIONS': {

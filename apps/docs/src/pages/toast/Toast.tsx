@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Button, Toaster } from '@ggary/react'
+import { Button, Toaster, createToaster } from '@ggary/react'
 import { DemoPage, Specimen } from '../../react/DemoPage'
-import { KINDS, pageToaster } from './data'
+import { KINDS } from './data'
 
 export default function ToastPage() {
-  const [queue] = useState(pageToaster)
+  const [queue] = useState(() => { const queue = createToaster({ max: KINDS.length }); KINDS.forEach(kind => queue.toast(kind.toast)); return queue })
   return (
     <>
       <DemoPage

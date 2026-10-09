@@ -12,9 +12,9 @@ import {
   type KanbanMove,
   type KanbanWords,
 } from '@ggary/core/kanban'
-import { connect as connectMenu, createMenuMachine, type MenuEntry } from '@ggary/core/menu'
+import { type MenuEntry } from '@ggary/core/menu'
 import { reactNormalizer, type VirtualElement } from '@ggary/core'
-import { MenuContent } from '../menu/MenuContent'
+import { AnchoredMenu } from '../menu/AnchoredMenu'
 import { useConfigured } from '../config-provider'
 
 export interface KanbanProps<T extends KanbanCard> {
@@ -100,28 +100,22 @@ export function Kanban<T extends KanbanCard>(props: KanbanProps<T>) {
   // One menu for the board, opened for a card: at the pointer, under its button, or under the card.
   const menuCard = useRef<string | null>(null)
   const menuAnchor = useRef<Element | VirtualElement | null>(null)
-  const [menu] = useState(() =>
-    createMenuMachine({
-      id: `${id}-menu`,
-      items: [],
-      onSelect: (value) => {
-        const key = menuCard.current
-        if (!key) return
-        const place = cardMenuPlace(machine.getState(), key, value)
-        if (place) {
-          const move = () => machine.send({ type: 'MOVE', card: key, to: place })
-          if (rootRef.current) flipKanban(rootRef.current, move)
-          else move()
-          return
-        }
-        const card = machine.getState().cards.find((candidate) => candidate.id === key)
-        if (card) callbacks.current.onCardMenuSelect?.(value, card)
-      },
-    })
-  )
-  const menuState = useSyncExternalStore(menu.subscribe, menu.getState, menu.getState)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [menuEntries, setMenuEntries] = useState<MenuEntry[]>([])
   const menuTitle = state.cards.find((card) => card.id === state.menu.card)?.title ?? ''
-  const menuApi = connectMenu(menuState, menu.send, reactNormalizer, { label: api.words.menu(menuTitle) })
+  const selectMenu = (value: string) => {
+    const key = menuCard.current
+    if (!key) return
+    const place = cardMenuPlace(machine.getState(), key, value)
+    if (place) {
+      const move = () => machine.send({ type: 'MOVE', card: key, to: place })
+      if (rootRef.current) flipKanban(rootRef.current, move)
+      else move()
+      return
+    }
+    const card = machine.getState().cards.find((candidate) => candidate.id === key)
+    if (card) callbacks.current.onCardMenuSelect?.(value, card)
+  }
   const menuNonce = api.menuRequest.nonce
   const ids = api.ids
   const idsRef = useRef(ids)
@@ -141,11 +135,10 @@ export function Kanban<T extends KanbanCard>(props: KanbanProps<T>) {
       : request.via === 'button'
         ? document.getElementById(ids.cardMenu(key))
         : element
-    menu.send({ type: 'SYNC_ITEMS', items: cardMenuItems(machine.getState(), key, callbacks.current.words, callbacks.current.cardMenu?.(card) ?? []) })
-    // The keyboard lands on the first item; a pointer, on the menu itself.
-    menu.send({ type: 'OPEN', reason: 'api', focus: request.via === 'pointer' ? 'none' : 'first' })
+    setMenuEntries(cardMenuItems(machine.getState(), key, callbacks.current.words, callbacks.current.cardMenu?.(card) ?? []))
+    setMenuOpen(true)
     // Only a new request opens it: a re-render is not one.
-  }, [machine, menu, menuNonce])
+  }, [machine, menuNonce])
 
   return (
     <div ref={rootRef} {...api.rootProps}>
@@ -191,12 +184,10 @@ export function Kanban<T extends KanbanCard>(props: KanbanProps<T>) {
       ))}
       <div {...api.liveProps}>{api.announcement}</div>
       <div {...api.instructionsProps}>{api.words.instructions}</div>
-      <MenuContent
-        api={menuApi}
-        getState={menu.getState}
+      <AnchoredMenu id={`${id}-menu`} open={menuOpen} items={menuEntries}
+        label={api.words.menu(menuTitle)} onClose={() => setMenuOpen(false)} onSelect={selectMenu}
         reference={() => (menuCard.current ? document.getElementById(api.ids.card(menuCard.current)) : null)}
         anchor={() => menuAnchor.current}
-        dismissOnReference
       />
     </div>
   )

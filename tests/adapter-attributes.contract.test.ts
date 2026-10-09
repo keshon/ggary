@@ -22,7 +22,7 @@ const files = (dir: string, ext: string): string[] =>
  * doc shows `{...props}` spread onto a Button.
  */
 const handsOn = (text: string) =>
-  /\{\.\.\.(rest|props)\}|\{\s*\.\.\.rest\b/.test(text.replace(/\/\*[\s\S]*?\*\/|\/\/.*$|<!--[\s\S]*?-->/gm, ''))
+  /\{\.\.\.(rest|props)\}|\{\s*\.\.\.rest\b|mergeProps\(rest\s*,/.test(text.replace(/\/\*[\s\S]*?\*\/|\/\/.*$|<!--[\s\S]*?-->/gm, ''))
 
 it('a component that hands its other props on in React does in Svelte, and the other way round', () => {
   const svelte = new Map(files(join(root, 'packages/svelte/src/components'), '.svelte').map((path) => [basename(path, '.svelte'), path]))

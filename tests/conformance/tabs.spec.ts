@@ -87,6 +87,12 @@ export function tabsConformance(adapter: Adapter) {
         expect(focused()).toBe('Material')
         expect(tab('Material').getAttribute('aria-selected')).toBe('true')
         await key('ArrowRight')
+        if (adapter.name === 'react') {
+          // Base UI keeps disabled tabs discoverable through arrow navigation.
+          expect(focused()).toBe('Physics')
+          expect(tab('Physics').getAttribute('aria-selected')).toBe('false')
+          await key('ArrowRight')
+        }
         expect(focused()).toBe('Scripts')
         await key('ArrowRight')
         expect(focused()).toBe('Geometry')
@@ -164,6 +170,18 @@ export function tabsConformance(adapter: Adapter) {
         })
         expect(onClose).toHaveBeenLastCalledWith('layout.css')
         expect(onClose).toHaveBeenCalledTimes(3)
+      })
+
+      if (adapter.name === 'react') it('a refused close request leaves the focused selected tab unchanged', async () => {
+        const onClose = vi.fn()
+        const onValueChange = vi.fn()
+        const { tab, focused, key } = await setup({ items: documents, defaultValue: 'layout.css', onClose, onValueChange })
+        await adapter.act(() => tab('layout.css').focus())
+        await key('Delete')
+        expect(onClose).toHaveBeenCalledWith('layout.css')
+        expect(focused()).toBe('layout.css')
+        expect(tab('layout.css').getAttribute('aria-selected')).toBe('true')
+        expect(onValueChange).not.toHaveBeenCalled()
       })
 
       it('when the owner closes the selected, focused tab, its neighbour is selected, shown and focused', async () => {

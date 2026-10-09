@@ -119,6 +119,83 @@ export function fieldConformance(adapter: Adapter) {
       })
     })
 
+    describe('validation continuity', () => {
+      it('keeps a malformed value invalid after a required error has already shown', async () => {
+        const { control, error, blur, type } = await setup({ required: true, input: { type: 'email' } })
+        await blur()
+        await type('still-not-an-email')
+        expect(control().getAttribute('aria-invalid')).toBe('true')
+        expect(error().hidden).toBe(false)
+        await type('person@example.com')
+        expect(control().hasAttribute('aria-invalid')).toBe(false)
+      })
+
+      if (adapter.name === 'react') it('a refused controlled edit leaves the field valid and reports the request once', async () => {
+        let requests = 0
+        const { control, blur, type } = await setup({ input: { type: 'email', value: 'person@example.com', onValueChange: () => { requests++ } } })
+        await blur()
+        await type('invalid')
+        expect(control().value).toBe('person@example.com')
+        expect(control().hasAttribute('aria-invalid')).toBe(false)
+        expect(requests).toBe(1)
+      })
+
+      it('reset keeps the control node and lets it validate again on the next blur', async () => {
+        const { m, control, error, blur } = await setup({ required: true, error: 'Required' })
+        const original = control()
+        await blur()
+        await adapter.act(() => (m.root.closest('form') as HTMLFormElement).reset())
+        await adapter.wait(20)
+        expect(control()).toBe(original)
+        expect(original.hasAttribute('aria-invalid')).toBe(false)
+        expect(error().hidden).toBe(true)
+        await blur()
+        expect(original.getAttribute('aria-invalid')).toBe('true')
+        expect(error().hidden).toBe(false)
+      })
+
+      if (adapter.name === 'react') it('a Base UI NumberField reports native bounds and resets without stale ARIA', async () => {
+        const m = await adapter.field({ label: 'Radius', error: 'Too large', numberField: { defaultValue: 45, max: 40 } }, freshTarget('form'))
+        const input = part(m.root, 'number-field', 'input') as HTMLInputElement
+        await adapter.act(() => { input.focus(); input.blur() })
+        expect(input.getAttribute('aria-invalid')).toBe('true')
+        expect(part(m.root, 'field', 'error')!.textContent).toBe('Too large')
+        await adapter.act(() => (m.root.closest('form') as HTMLFormElement).reset())
+        await adapter.wait(20)
+        expect(input.hasAttribute('aria-invalid')).toBe(false)
+        expect(part(m.root, 'field', 'error')!.hidden).toBe(true)
+      })
+
+      if (adapter.name === 'react') it('a Base UI choice validates on visible blur and clears its ARIA on reset', async () => {
+        const m = await adapter.field({ label: 'Terms', required: true, error: 'Accept the terms', checkbox: { label: 'I agree' } }, freshTarget('form'))
+        const toggle = part(m.root, 'checkbox', 'toggle')!
+        const input = part(m.root, 'checkbox', 'input') as HTMLInputElement
+        await adapter.act(() => input.focus())
+        expect(document.activeElement).toBe(toggle)
+        expect(toggle.hasAttribute('aria-invalid')).toBe(false)
+        expect(part(m.root, 'field', 'error')!.hidden).toBe(true)
+        await adapter.act(() => toggle.blur())
+        expect(toggle.getAttribute('aria-invalid')).toBe('true')
+        expect(input.getAttribute('aria-invalid')).toBe('true')
+        await adapter.act(() => (m.root.closest('form') as HTMLFormElement).reset())
+        await adapter.wait(20)
+        expect(part(m.root, 'checkbox', 'toggle')).toBe(toggle)
+        expect(toggle.hasAttribute('aria-invalid')).toBe(false)
+        expect(input.hasAttribute('aria-invalid')).toBe(false)
+        expect(part(m.root, 'field', 'error')!.hidden).toBe(true)
+      })
+
+      it('search participates in the same native validation boundary', async () => {
+        const m = await adapter.field({ label: 'Search', required: true, error: 'Enter a query', search: {} }, freshTarget('form'))
+        const input = part(m.root, 'input', 'root') as HTMLInputElement
+        await adapter.act(() => { input.focus(); input.blur() })
+        expect(input.getAttribute('aria-invalid')).toBe('true')
+        expect(part(m.root, 'field', 'error')!.textContent).toBe('Enter a query')
+        await adapter.act(() => typeInto(input, 'query'))
+        expect(input.hasAttribute('aria-invalid')).toBe(false)
+      })
+    })
+
     describe('around a textarea', () => {
       const withTextarea = (props: FieldProps = {}) =>
         adapter.field({ label: 'Message', ...props, textarea: { rows: 3, ...props.textarea } }, freshTarget('form'))
@@ -173,8 +250,9 @@ export function fieldConformance(adapter: Adapter) {
         const input = part(m.root, 'checkbox', 'input') as HTMLInputElement
         expect(input.required).toBe(true)
         await adapter.act(() => {
-          input.focus()
-          input.blur()
+          const focusable = adapter.name === 'react' ? part(m.root, 'checkbox', 'toggle')! : input
+          focusable.focus()
+          focusable.blur()
         })
         expect(input.getAttribute('aria-invalid')).toBe('true')
         expect(part(m.root, 'checkbox', 'root')!.hasAttribute('data-invalid')).toBe(true)

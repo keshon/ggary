@@ -116,7 +116,7 @@ export function kanbanConformance(adapter: Adapter) {
       await adapter.act(() => {})
       await adapter.act(() => void card('a').dispatchEvent(new KeyboardEvent('keydown', { key: 'F10', shiftKey: true, bubbles: true, cancelable: true })))
       await adapter.wait(0)
-      const menu = part(m.root, 'menu', 'content')!
+      const menu = (adapter.name === 'react' ? document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"][aria-label^="Actions for"]')! : part(m.root, 'menu', 'content')!)
       expect(menu.dataset.state).toBe('open')
       expect(menu.getAttribute('aria-label')).toBe('Actions for Call Aigul')
       const items = parts(menu, 'menu', 'item')
@@ -139,11 +139,36 @@ export function kanbanConformance(adapter: Adapter) {
       await adapter.act(() => void card('c').dispatchEvent(event))
       await adapter.wait(0)
       expect(event.defaultPrevented).toBe(true)
-      const items = parts(part(m.root, 'menu', 'content')!, 'menu', 'item')
+      const items = parts((adapter.name === 'react' ? document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"][aria-label^="Actions for"]')! : part(m.root, 'menu', 'content')!), 'menu', 'item')
       expect(items.map((item) => part(item, 'menu', 'item-text')!.textContent)).toEqual(['Move to', 'Move to top', 'Move to bottom', 'Archive'])
       await adapter.act(() => click(items[3]))
       await adapter.wait(0)
       expect(chosen).toEqual(['archive:c'])
+    })
+
+    if (adapter.name === 'react') it('keeps the parent menu open while its submenu navigates, then moves the original card', async () => {
+      const { card, titles } = await setup()
+      await adapter.act(() => void card('a').dispatchEvent(new KeyboardEvent('keydown', { key: 'F10', shiftKey: true, bubbles: true, cancelable: true })))
+      await adapter.wait(50)
+      const parent = document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"][aria-label="Actions for Call Aigul"]')!
+      const branch = parts(parent, 'menu', 'item')[0]
+      await adapter.act(() => void keydown(branch, 'ArrowRight'))
+      await adapter.wait(50)
+      expect(parent.dataset.state).toBe('open')
+      const submenu = document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"][data-level="1"]')!
+      expect(submenu.dataset.state).toBe('open')
+      await adapter.act(() => void keydown(document.activeElement!, 'Escape'))
+      await adapter.wait(50)
+      expect(parent.dataset.state).toBe('open')
+      expect(document.activeElement).toBe(branch)
+      await adapter.act(() => void keydown(branch, 'ArrowRight'))
+      await adapter.wait(50)
+      const destination = [...document.querySelectorAll<HTMLElement>('[data-scope="menu"][data-part="content"][data-level="1"] [role="menuitem"]')].find(item => item.textContent === 'Review')!
+      await adapter.act(() => click(destination))
+      await adapter.wait(50)
+      expect(titles('review')).toEqual(['Call Aigul'])
+      expect(parent.dataset.state).toBe('closed')
+      expect(document.activeElement).toBe(card('a'))
     })
 
     it('Add a card: typed and sent with Enter, it stands faded at the column’s end; the field stays open and empty', async () => {

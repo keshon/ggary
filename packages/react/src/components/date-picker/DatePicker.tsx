@@ -1,22 +1,30 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode, type RefObject, type CSSProperties } from 'react'
 import {
   connect as connectCalendar,
   createCalendarMachine,
   focusCalendarDay,
+  isUnavailable,
   toRange,
   type CalendarApi,
   type CalendarMode,
   type CalendarWords,
   type DateRange,
 } from '@ggary/core/calendar'
-import { connect, createDatePickerMachine, type DatePickerWords, type DatePreset } from '@ggary/core/date-picker'
-import { attachPopover, joinDateTime, mergeProps, reactNormalizer, splitDateTime, type Dict, type ISODate, type ISODateTime, type ISOTime } from '@ggary/core'
+import { connect, createDatePickerMachine, type DatePickerWords, type DatePreset, type DatePickerEvent } from '@ggary/core/date-picker'
+import { joinDateTime, mergeProps, reactNormalizer, splitDateTime, type Dict, type ISODate, type ISODateTime, type ISOTime } from '@ggary/core'
 import type { TimePickerWords } from '@ggary/core/time-picker'
-import { TimePicker } from '../time-picker'
+import { TimePicker, TimePickerComposition } from '../time-picker/TimePicker'
+import { useCallback } from 'react'
 import type { ControlSize } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 import { useFormField } from '../form/Form'
 import { useConfigured } from '../config-provider'
+import { Popover as Primitive } from '@base-ui/react/popover'
+import { DirectionProvider } from '@base-ui/react/direction-provider'
+import { useOverlayEnvironment } from '../../utils/use-overlay-environment'
+import { useFieldControl, useFieldComposition } from '../field/Field'
+import { useFieldsetGroup } from '../fieldset/Fieldset'
+import { SelectionConstraint } from '../../utils/selection-constraint'
 
 interface CalendarOptionsProps {
   mode?: CalendarMode
@@ -116,6 +124,9 @@ export function Calendar(props: CalendarProps) {
 }
 
 interface DateFieldProps extends CalendarOptionsProps {
+  required?: boolean
+  disabled?: boolean
+  readOnly?: boolean
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
   size?: ControlSize
   label?: string
@@ -161,6 +172,12 @@ export function DatePicker(props: DatePickerProps) {
  */
 function DateTimeField(props: DateTimePickerProps) {
   const { value, defaultValue, onValueChange, step, timeLabel = 'Time', timeWords, time: _time, size, locale, name, ...rest } = props
+  const field = useFieldControl()
+  const group = useFieldsetGroup()
+  const disabled = !!(rest.disabled || field?.disabled || group?.disabled)
+  const readOnly = !!(rest.readOnly || field?.readOnly)
+  const [timeMessage, setTimeMessage] = useState('')
+  const reportTime = useCallback((message: string) => setTimeMessage(message), [])
   const controlled = value !== undefined
   const initial = useRef(splitDateTime(controlled ? value : defaultValue))
   const [own, setOwn] = useState(initial.current)
@@ -172,8 +189,7 @@ function DateTimeField(props: DateTimePickerProps) {
 
   const update = (patch: { date?: ISODate | null; time?: ISOTime | null }) => {
     const next = { ...latest.current, ...patch }
-    latest.current = next
-    if (!controlled) setOwn(next)
+    if (!controlled) { latest.current = next; setOwn(next) }
     callbacks.current.onValueChange?.(joinDateTime(next.date, next.time))
   }
 
@@ -187,11 +203,12 @@ function DateTimeField(props: DateTimePickerProps) {
       value={parts.date}
       onValueChange={(range) => update({ date: range.start })}
       submitAs={joinDateTime(parts.date, parts.time) ?? ''}
+      timeMessage={timeMessage || (parts.date !== null && parts.time === null || parts.date === null && parts.time !== null ? 'Choose both a date and a time.' : '')}
       onReset={() => {
-        if (!controlled) setOwn(initial.current)
+        if (!controlled) setOwn(splitDateTime(defaultValue))
       }}
       timeSlot={
-        <TimePicker
+        <TimePickerComposition.Provider value={{ disabled, readOnly, report: reportTime }}><TimePicker
           embedded
           label={timeLabel}
           size={size}
@@ -200,16 +217,25 @@ function DateTimeField(props: DateTimePickerProps) {
           value={parts.time}
           onValueChange={(time) => update({ time })}
           words={timeWords}
-        />
+        /></TimePickerComposition.Provider>
       }
     />
   )
 }
 
 /** A field for a day or a range of days, typed or chosen from a calendar. */
-function DateField(props: DateFieldProps & { timeSlot?: ReactNode; submitAs?: string; onReset?: () => void }) {
-  const { size, label, value, defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, months, locale, name, placeholder, presets, words, timeSlot, submitAs, onReset } = props
+function DateField(props: DateFieldProps & { timeSlot?: ReactNode; submitAs?: string; timeMessage?: string; onReset?: () => void }) {
+  const { size, label, value, defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, months, locale, name: ownName, placeholder, presets, words, timeSlot, submitAs, timeMessage, onReset } = props
   const id = `gg-date-${useId().replace(/:/g, '')}`
+  const field = useFieldControl()
+  const composition = useFieldComposition()
+  const group = useFieldsetGroup()
+  const name = ownName ?? composition?.name
+  const required = !!(props.required || field?.required)
+  const disabled = !!(props.disabled || field?.disabled || group?.disabled)
+  const readOnly = !!(props.readOnly || field?.readOnly)
+  const controlId = String(field?.id ?? `${id}-input`)
+
   const callbacks = useRef<{ onValueChange?: typeof onValueChange; edited?: () => void }>({ onValueChange })
   callbacks.current.onValueChange = onValueChange
   const [machine] = useState(() =>
@@ -222,71 +248,82 @@ function DateField(props: DateFieldProps & { timeSlot?: ReactNode; submitAs?: st
     })
   )
   const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, presets, size })
+  const send = (event: DatePickerEvent) => {
+    if (disabled && event.type !== 'CLOSE') return
+    if (readOnly && (event.type === 'INPUT' || event.type === 'COMMIT_TEXT' ||
+      (event.type === 'CALENDAR' && ['SELECT', 'SET', 'CLEAR'].includes(event.event.type)))) return
+    machine.send(event)
+  }
+  const api = connect(state, send, reactNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, presets, size })
   // Inside a Form, by name: the error its rules hold for this day.
-  const form = useFormField(name, api.ids.input, label)
-  callbacks.current.edited = () => form.edited(document.getElementById(api.ids.input))
+  const form = useFormField(composition?.name ? undefined : name, controlId, field?.['aria-labelledby'] ? undefined : label)
+  callbacks.current.edited = undefined
 
   useEffect(
     () => machine.send({ type: 'SYNC_OPTIONS', locale, mode, min, max, weekStart, isDateDisabled, months }),
     [machine, locale, mode, min, max, weekStart, isDateDisabled, months]
   )
   useEffect(() => {
-    if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value: toRange(value) })
-  }, [machine, value])
+    if (value !== undefined) {
+      const accepted = toRange(value)
+      if (accepted.start !== state.calendar.value.start || accepted.end !== state.calendar.value.end) machine.send({ type: 'SYNC_VALUE', value: accepted })
+    }
+  }, [machine, value, state.calendar.value.start, state.calendar.value.end])
 
   const inputRef = useRef<HTMLInputElement>(null)
   const controlRef = useRef<HTMLDivElement>(null)
-  const positionerRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
   useFormReset(inputRef, () => {
-    if (value === undefined) machine.send({ type: 'SYNC_VALUE', value: toRange(defaultValue) })
+    machine.send({ type: 'RESET', value: toRange(value !== undefined ? value : defaultValue) })
     onReset?.()
   })
 
-  useLayoutEffect(() => {
-    const positioner = positionerRef.current
-    if (!state.open || !controlRef.current || !positioner) return
-    const popover = attachPopover(controlRef.current, positioner, {
-      placement: 'bottom-start',
-      gutter: 4,
-      sameWidth: false,
-      onDismiss: () => machine.send({ type: 'CLOSE' }),
-    })
-    // Into the calendar, on its day.
-    document.getElementById(api.calendar.focusedId)?.focus({ preventScroll: true })
-    return () => {
-      const active = document.activeElement
-      const inside = !active || active === document.body || positioner.contains(active)
-      popover.destroy()
-      // Back to the field it came from, unless the person went elsewhere.
-      if (inside) inputRef.current?.focus({ preventScroll: true })
-    }
-  }, [machine, state.open])
+  const selected = state.calendar.value
+  const incomplete = !!selected.start && state.calendar.mode === 'range' && !selected.end
+  const unavailable = [selected.start, selected.end].some(date => date !== null && isUnavailable(state.calendar, date))
+  // Drafts are accepted on blur/Enter. A programmatic submit must not silently use an older value.
+  const message = timeMessage || (state.invalid ? api.errorText : state.editing ? 'Confirm the typed date with Enter or leave the field.'
+    : incomplete ? 'Choose both dates.' : unavailable ? 'Choose an available date.' : '')
+  const { required: _fieldRequired, readOnly: _fieldReadOnly, ...metadata } = field ?? {}
+  const describedBy = [api.inputProps['aria-describedby'], metadata['aria-describedby'], form.field.controlProps['aria-describedby']].filter(Boolean).join(' ') || undefined
+  const environment = useOverlayEnvironment(controlRef, state.open)
+  const { onClick: _legacyToggle, ...triggerProps } = api.triggerProps
+  const { popover: _nativePopover, ...positionerProps } = api.positionerProps
+  // Changing the positioning anchor can restart Base UI's focus manager while
+  // open. Restore to the text field only when this visit actually ends.
+  const finalFocus = () => machine.getState().open ? false : inputRef.current
 
   useLayoutEffect(() => focusCalendarDay(gridRef.current, api.calendar.focusedId), [api.calendar.focusedId])
 
   return (
+    <DirectionProvider direction={environment.dir ?? 'ltr'}>
+    <Primitive.Root open={state.open} modal={false} onOpenChange={next => send({ type: next ? 'OPEN' : 'CLOSE' })}>
     <div {...api.rootProps}>
-      {label && <label {...api.labelProps}>{label}</label>}
+      {label && !field?.['aria-labelledby'] && <label {...api.labelProps} htmlFor={controlId}>{label}</label>}
       <div ref={controlRef} {...api.controlProps}>
-        <input ref={inputRef} {...mergeProps(api.inputProps, form.field.controlProps)} />
-        <button {...api.triggerProps}>
+        <input ref={inputRef} {...mergeProps(api.inputProps, form.field.controlProps, metadata)} id={controlId}
+          disabled={disabled} readOnly={readOnly} aria-required={required || undefined} aria-describedby={describedBy} />
+        <Primitive.Trigger {...triggerProps} disabled={disabled}>
           <span {...api.triggerIconProps} />
-        </button>
+        </Primitive.Trigger>
         {timeSlot}
       </div>
       {api.invalid && <span {...api.errorProps}>{api.errorText}</span>}
       <span {...form.field.errorProps}>{form.error}</span>
-      <div ref={positionerRef} {...api.positionerProps}>
-        <div {...api.contentProps}>
+      <Primitive.Portal keepMounted container={environment.container}>
+        <Primitive.Positioner {...positionerProps} anchor={controlRef} side="bottom" align="start" sideOffset={4}
+          positionMethod="fixed" data-backend="base-ui" data-mode={environment.mode} dir={environment.dir} lang={environment.locale}
+          style={{ ...environment.style, '--gg-available-height': 'var(--available-height, 320px)' } as CSSProperties}>
+        <Primitive.Popup ref={contentRef} {...api.contentProps} data-backend="base-ui" finalFocus={finalFocus}
+          initialFocus={() => document.getElementById(api.calendar.focusedId) ?? contentRef.current}>
           {state.open && (
             <>
               <CalendarView api={api.calendar} gridRef={gridRef} />
               {api.presets.length > 0 && (
                 <div {...api.presetsProps}>
                   {api.presets.map(({ preset }) => (
-                    <button key={preset.label} {...api.getPresetProps(preset)}>
+                    <button key={preset.label} {...api.getPresetProps(preset)} disabled={readOnly || undefined}>
                       {preset.label}
                     </button>
                   ))}
@@ -294,9 +331,18 @@ function DateField(props: DateFieldProps & { timeSlot?: ReactNode; submitAs?: st
               )}
             </>
           )}
-        </div>
-      </div>
-      {name && <input {...mergeProps(api.hiddenInputProps, submitAs !== undefined ? { value: submitAs } : {})} />}
+        </Primitive.Popup>
+        </Primitive.Positioner>
+      </Primitive.Portal>
+      <SelectionConstraint id={`${id}-constraint`} controlId={controlId} name={name}
+        value={submitAs ?? String(api.hiddenInputProps.value ?? '')} required={required} disabled={disabled} readOnly={readOnly}
+        message={message} focusTarget={inputRef} onValidityChange={() => {
+          composition?.edited()
+          if (!composition?.name) form.edited(inputRef.current)
+          group?.refresh()
+        }} />
     </div>
+    </Primitive.Root>
+    </DirectionProvider>
   )
 }

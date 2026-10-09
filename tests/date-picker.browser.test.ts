@@ -41,8 +41,8 @@ async function mount(props: Record<string, unknown> = {}, component: typeof Date
     input: clip.querySelector<HTMLInputElement>('[data-part="input"]')!,
     trigger: clip.querySelector<HTMLButtonElement>('[data-part="trigger"]')!,
     control: clip.querySelector<HTMLElement>('[data-part="control"]')!,
-    content: () => clip.querySelector<HTMLElement>('[data-scope="date-picker"][data-part="content"]')!,
-    day: (date: string) => clip.querySelector<HTMLElement>(`[data-part="day"][data-date="${date}"]`)!,
+    content: () => document.querySelector<HTMLElement>('[data-scope="date-picker"][data-part="content"]')!,
+    day: (date: string) => document.querySelector<HTMLElement>(`[data-part="day"][data-date="${date}"]`)!,
   }
 }
 
@@ -70,6 +70,19 @@ describe('date picker', () => {
     expect(chosen).toEqual([{ start: '2025-11-05', end: null }])
     expect(document.activeElement).toBe(input)
     expect(input.value).toBe('5 Nov 2025')
+  })
+
+  it('repeated trigger opens survive anchor setup and Escape returns to the text field', async () => {
+    const { trigger, input, content, day } = await mount({ defaultValue: '2026-09-18' })
+    for (let visit = 0; visit < 2; visit++) {
+      await userEvent.click(trigger)
+      await frames(4)
+      expect(content().dataset.state).toBe('open')
+      expect(document.activeElement).toBe(day('2026-09-18'))
+      await userEvent.keyboard('{Escape}')
+      await frames(3)
+      expect(document.activeElement).toBe(input)
+    }
   })
 
   it('typing in the field and moving on chooses the day; Tab goes on as usual', async () => {
@@ -125,7 +138,7 @@ describe('time', () => {
     await userEvent.click(input)
     await userEvent.keyboard('21:37')
     await frames(3)
-    const list = clip.querySelector<HTMLElement>('[data-scope="time-picker"][data-part="content"]')!
+    const list = document.querySelector<HTMLElement>('[data-scope="time-picker"][data-part="content"]')!
     const box = list.getBoundingClientRect()
     const field = control.getBoundingClientRect()
     expect(box.top).toBeGreaterThanOrEqual(field.bottom)
@@ -146,7 +159,7 @@ describe('time', () => {
     await userEvent.click(input)
     await userEvent.keyboard('{ArrowDown}')
     await frames(3)
-    const list = clip.querySelector<HTMLElement>('[data-scope="time-picker"][data-part="content"]')!
+    const list = document.querySelector<HTMLElement>('[data-scope="time-picker"][data-part="content"]')!
     const box = list.getBoundingClientRect()
     expect(box.height).toBeLessThan(300)
     const centre = (el: Element) => { const r = el.getBoundingClientRect(); return r.top + r.height / 2 }
@@ -156,6 +169,23 @@ describe('time', () => {
     await userEvent.keyboard('{ArrowDown}')
     await frames(2)
     expect(list.scrollTop).toBe(scrolled)
+  })
+
+  it('the pointer opens into the input, keeps its selected time visible, and Tab leaves naturally', async () => {
+    const { trigger, input, after } = await mount({ label: 'Starts at', defaultValue: '14:30' }, TimePicker)
+    await userEvent.click(trigger)
+    await frames(4)
+    expect(document.activeElement).toBe(input)
+    const list = document.querySelector<HTMLElement>('[data-scope="time-picker"][data-part="content"]')!
+    const selected = list.querySelector<HTMLElement>('[data-selected]')!
+    const box = list.getBoundingClientRect()
+    const item = selected.getBoundingClientRect()
+    expect(item.top).toBeGreaterThanOrEqual(box.top)
+    expect(item.bottom).toBeLessThanOrEqual(box.bottom)
+    await userEvent.keyboard('{Tab}')
+    await frames(3)
+    expect(document.activeElement).toBe(after)
+    expect(input.getAttribute('aria-expanded')).toBe('false')
   })
 
   it('with a date picker, the time sits in the same box on the same line, and the box is one field tall', async () => {

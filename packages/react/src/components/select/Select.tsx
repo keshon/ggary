@@ -1,14 +1,15 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react'
-import {
-  connect,
-  createSelectMachine,
-  type SelectItem,
-} from '@ggary/core/select'
-import { attachPopover, mergeProps, reactNormalizer, scrollIntoViewIfNeeded } from '@ggary/core'
-import type { ControlSize } from '@ggary/core'
-import { useFormReset } from '../../utils/use-form-reset'
-import { useFormField } from '../form/Form'
+import { useId, useRef, useState, type CSSProperties } from 'react'
+import { DirectionProvider } from '@base-ui/react/direction-provider'
+import { useOverlayEnvironment } from '../../utils/use-overlay-environment'
+import { Select as Primitive } from '@base-ui/react/select'
+import { mergeProps } from '@base-ui/react/merge-props'
 import { useConfigured } from '../config-provider'
+import { useFieldControl, useFieldComposition } from '../field/Field'
+import { useFieldsetGroup } from '../fieldset/Fieldset'
+import { useFormField } from '../form/Form'
+import { useFormReset } from '../../utils/use-form-reset'
+import type { ControlSize } from '@ggary/core'
+import type { SelectItem } from '@ggary/core/select'
 
 export interface SelectProps {
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
@@ -20,103 +21,63 @@ export interface SelectProps {
   value?: string | null
   defaultValue?: string | null
   disabled?: boolean
+  required?: boolean
+  readOnly?: boolean
   name?: string
   onValueChange?: (value: string | null, item: SelectItem | null) => void
 }
 
+/** React interaction backend. Keeps GGary's public value/item and styling contract. */
 export function Select(props: SelectProps) {
-  props = useConfigured(props, { size: true })
-  const { size, items, label, placeholder, value, defaultValue, disabled = false, name, onValueChange } = props
+  const { size = 'md', items, label, placeholder = 'Select…', value, defaultValue, disabled: ownDisabled, required: ownRequired, readOnly: ownReadOnly, name: ownName, onValueChange } = useConfigured(props, { size: true })
+  const id = `gg-base-select-${useId().replace(/:/g, '')}`
+  const field = useFieldControl()
+  const composition = useFieldComposition()
+  const group = useFieldsetGroup()
+  const name = composition?.name ?? ownName
+  const disabled = Boolean(ownDisabled || field?.disabled || group?.disabled)
+  const required = Boolean(ownRequired || field?.required)
+  const readOnly = Boolean(ownReadOnly || field?.readOnly)
+  const triggerId = (field?.id as string | undefined) ?? `${id}-trigger`
+  const trigger = useRef<HTMLButtonElement>(null)
+  const root = useRef<HTMLDivElement>(null)
+  const [localValue, setLocalValue] = useState(defaultValue ?? null)
+  const [open, setOpen] = useState(false)
+  const selected = value === undefined ? localValue : value
+  const selectedItem = items.find((item) => item.value === selected)
+  const form = useFormField(composition?.name ? undefined : name, triggerId, label)
+  useFormReset(trigger, () => { if (value === undefined) setLocalValue(defaultValue ?? null); setOpen(false) })
+  const part = (name: string) => ({ 'data-scope': 'select', 'data-part': name, 'data-backend': 'base-ui' })
+  const state = open ? 'open' : 'closed'
+  const environment = useOverlayEnvironment(trigger, open)
 
-  const reactId = useId()
-  const id = `gg-select-${reactId.replace(/:/g, '')}`
-
-  // Callbacks change every render; the machine is created once. A ref is the
-  // seam between the two.
-  const callbacks = useRef<{ onValueChange?: typeof onValueChange; edited?: () => void }>({ onValueChange })
-  callbacks.current.onValueChange = onValueChange
-
-  const [machine] = useState(() =>
-    createSelectMachine({
-      id,
-      items,
-      value,
-      defaultValue,
-      disabled,
-      onValueChange: (next, item) => {
-        callbacks.current.onValueChange?.(next, item)
-        callbacks.current.edited?.()
-      },
-    })
-  )
-
-  const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { placeholder, name, size })
-  // Inside a Form, by name: the error its rules hold for this choice.
-  const form = useFormField(name, api.ids.trigger, label)
-  callbacks.current.edited = () => form.edited(document.getElementById(api.ids.trigger))
-
-  // Props flow in as events. The machine never reads props directly.
-  useEffect(() => machine.send({ type: 'SYNC_ITEMS', items }), [machine, items])
-  useEffect(() => machine.send({ type: 'SYNC_DISABLED', disabled }), [machine, disabled])
-  useEffect(() => {
-    if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value })
-  }, [machine, value])
-
-  const triggerRef = useRef<HTMLButtonElement>(null)
-  useFormReset(triggerRef, () => {
-    if (value === undefined) machine.send({ type: 'SYNC_VALUE', value: defaultValue ?? null })
-  })
-  const positionerRef = useRef<HTMLDivElement>(null)
-  const contentRef = useRef<HTMLUListElement>(null)
-
-  useLayoutEffect(() => {
-    if (!state.open || !triggerRef.current || !positionerRef.current) return
-    // Focus stays on the trigger (aria-activedescendant), so no focus management.
-    const popover = attachPopover(triggerRef.current, positionerRef.current, {
-      sameWidth: true,
-      gutter: 4,
-      // Placement is asynchronous and shortens the list: keep the highlight in view after it.
-      onPlaced: () => {
-        const { highlightedIndex } = machine.getState()
-        if (highlightedIndex >= 0) scrollIntoViewIfNeeded(document.getElementById(api.ids.item(highlightedIndex)), contentRef.current)
-      },
-      onDismiss: () => {
-        machine.send({ type: 'CLOSE' })
-        triggerRef.current?.focus()
-      },
-    })
-    return () => popover.destroy()
-  }, [machine, state.open])
-
-  useEffect(() => {
-    if (!state.open || state.highlightedIndex < 0) return
-    scrollIntoViewIfNeeded(document.getElementById(api.ids.item(state.highlightedIndex)), contentRef.current)
-  }, [api.ids, state.open, state.highlightedIndex])
-
-  return (
-    <div {...api.rootProps}>
-      {label && <label {...api.labelProps}>{label}</label>}
-
-      <button ref={triggerRef} {...mergeProps(api.triggerProps, form.field.controlProps)}>
-        <span {...api.valueProps}>{api.displayText}</span>
-        <span {...api.indicatorProps} />
-      </button>
-
-      <div ref={positionerRef} {...api.positionerProps}>
-        <ul ref={contentRef} {...api.contentProps}>
-          {api.items.length === 0 && <li {...api.emptyProps}>No options</li>}
-          {api.items.map((item, index) => (
-            <li key={item.value} {...api.getItemProps(item, index)}>
-              <span {...api.getItemTextProps()}>{item.label}</span>
-              <span {...api.getItemIndicatorProps()} />
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <span {...form.field.errorProps}>{form.error}</span>
-      {name && <input {...api.hiddenInputProps} />}
+  return <DirectionProvider direction={environment.dir ?? 'ltr'}><Primitive.Root<string> items={items} value={selected} disabled={disabled} required={required} readOnly={readOnly} name={name} open={open} onOpenChange={setOpen} modal={false}
+    onValueChange={(next) => {
+      if (value === undefined) setLocalValue(next)
+      onValueChange?.(next, items.find((item) => item.value === next) ?? null)
+      if (composition?.name) composition.edited()
+      else form.edited(trigger.current)
+    }}>
+    <div ref={root} {...part('root')} data-size={size} data-state={state} data-disabled={disabled ? '' : undefined}>
+      {label && !field && <label {...part('label')} id={`${id}-label`} htmlFor={triggerId} data-disabled={disabled ? '' : undefined}>{label}</label>}
+      <Primitive.Trigger ref={trigger} {...mergeProps(form.field.controlProps, field ?? {}, { id: triggerId, 'aria-labelledby': field?.['aria-labelledby'] as string | undefined ?? (label ? `${id}-label` : undefined) })} {...part('trigger')} data-state={state}>
+        <Primitive.Value {...part('value')} placeholder={placeholder} data-placeholder={selectedItem ? undefined : ''}>
+          {selectedItem?.label ?? placeholder}
+        </Primitive.Value>
+        <Primitive.Icon {...part('indicator')} data-icon="chevron-down" aria-hidden="true" data-state={state}>{''}</Primitive.Icon>
+      </Primitive.Trigger>
+      {!composition?.name && <span {...form.field.errorProps}>{form.error}</span>}
     </div>
-  )
+    <Primitive.Portal container={environment.container}>
+      <Primitive.Positioner {...part('positioner')} positionMethod="fixed" sideOffset={4} alignItemWithTrigger={false} data-mode={environment.mode} dir={environment.dir} lang={environment.locale} style={{ ...environment.style, '--gg-anchor-width': 'var(--anchor-width, 200px)', '--gg-available-height': 'var(--available-height, 280px)' } as CSSProperties}>
+        <Primitive.Popup {...part('content')}>
+          {items.length === 0 && <div {...part('empty')}>No options</div>}
+          {items.map((item) => <Primitive.Item key={item.value} value={item.value} label={item.label} disabled={item.disabled} {...part('item')}>
+            <Primitive.ItemText {...part('item-text')}>{item.label}</Primitive.ItemText>
+            <Primitive.ItemIndicator keepMounted {...part('item-indicator')} data-icon="check" aria-hidden="true">{''}</Primitive.ItemIndicator>
+          </Primitive.Item>)}
+        </Primitive.Popup>
+      </Primitive.Positioner>
+    </Primitive.Portal>
+  </Primitive.Root></DirectionProvider>
 }

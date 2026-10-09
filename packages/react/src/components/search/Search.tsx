@@ -1,4 +1,5 @@
 import { forwardRef, useRef, type InputHTMLAttributes } from 'react'
+import { Input as BaseInput } from '@base-ui/react/input'
 import { connect, type SearchProps as CoreSearchProps } from '@ggary/core/search'
 import { mergeProps, reactNormalizer } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
@@ -19,10 +20,11 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   props = useConfigured(props, { size: true })
   const { size, name, placeholder, label, disabled, readOnly, required, invalid, value, defaultValue, onValueChange, ...rest } = props
 
+  const field = useFieldControl()
   const api = connect(
     { size, name, placeholder, label, disabled, readOnly, required, invalid },
     reactNormalizer,
-    { onValueChange, field: useFieldControl() ?? undefined }
+    { field: field ?? undefined }
   )
 
   const element = useRef<HTMLInputElement | null>(null)
@@ -33,7 +35,11 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(function Search(
   return (
     <span {...api.rootProps}>
       <span {...api.iconProps} />
-      <input ref={ref} {...mergeProps(rest, api.inputProps)} {...valueProps} />
+      <BaseInput ref={ref} {...mergeProps(rest, api.inputProps)} {...valueProps} onValueChange={(next) => onValueChange?.(next)}
+        render={(inputProps) => <input {...inputProps}
+          aria-invalid={api.inputProps['aria-invalid'] as 'true' | undefined}
+          aria-describedby={(field ? field['aria-describedby'] : inputProps['aria-describedby']) as string | undefined}
+          data-invalid={api.inputProps['data-invalid'] as string | undefined} />} />
     </span>
   )
 })

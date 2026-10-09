@@ -8,10 +8,10 @@ import {
   type RowMenuTarget,
   type VirtualAnchor,
 } from '@ggary/core/data-grid'
-import { connect as connectMenu, createMenuMachine, type MenuEntry, type MenuSelectDetails } from '@ggary/core/menu'
+import { type MenuEntry, type MenuSelectDetails } from '@ggary/core/menu'
 import type { DialogSize } from '@ggary/core/dialog'
 import { reactNormalizer } from '@ggary/core'
-import { MenuContent } from '../menu/MenuContent'
+import { AnchoredMenu } from '../menu/AnchoredMenu'
 import { Sheet } from '../dialog/Sheet'
 import { useConfigured } from '../config-provider'
 
@@ -39,17 +39,8 @@ export function GridRowMenu<Row>({ grid, items, onSelect, label = 'Row actions' 
   const callbacks = useRef({ items, onSelect })
   callbacks.current = { items, onSelect }
 
-  const [machine] = useState(() =>
-    createMenuMachine({
-      id,
-      items: [],
-      onSelect: (value, details) => {
-        if (target.current) callbacks.current.onSelect(value, target.current, details)
-      },
-    })
-  )
-  const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connectMenu(state, machine.send, reactNormalizer, { label })
+  const [open, setOpen] = useState(false)
+  const [entries, setEntries] = useState<MenuEntry[]>([])
 
   useEffect(() => grid.provide('menu'), [grid])
 
@@ -62,12 +53,13 @@ export function GridRowMenu<Row>({ grid, items, onSelect, label = 'Row actions' 
     if (!found) return
     target.current = found
     anchor.current = rowMenuAnchor(snapshot, grid as DataGridController<unknown>)
-    machine.send({ type: 'SYNC_ITEMS', items: callbacks.current.items(found) })
-    // The keyboard lands on the first item; a pointer, on the menu itself.
-    machine.send({ type: 'OPEN', reason: 'api', focus: snapshot.grid.menu?.point ? 'none' : 'first' })
-  }, [grid, machine, nonce])
+    setEntries(callbacks.current.items(found))
+    setOpen(true)
+  }, [grid, nonce])
 
-  return <MenuContent api={api} getState={machine.getState} reference={() => grid.element} anchor={() => anchor.current} dismissOnReference />
+  return <AnchoredMenu id={id} open={open} items={entries} label={label}
+    reference={() => grid.element} anchor={() => anchor.current} onClose={() => setOpen(false)}
+    onSelect={(value, details) => { if (target.current) callbacks.current.onSelect(value, target.current, details) }} />
 }
 
 export interface GridDetailProps<Row> {

@@ -91,6 +91,13 @@ export function reducer(state: CascaderState, event: CascaderEvent): CascaderSta
     }
     case 'SELECT': {
       const level = event.level ?? state.focusLevel
+      const requested = event.value ?? state.active[level]
+      if (state.disabled || requested === undefined) return state
+      const path = [...state.active.slice(0, level), requested]
+      const nodes = nodesOf(state.items, path)
+      // Failed HIGHLIGHT must not turn a disabled/missing click into selecting
+      // the previously highlighted neighbor. Disabled ancestors also invalidate a path.
+      if (nodes.length !== path.length || nodes.some(node => node.disabled)) return state
       const base = event.value !== undefined ? reducer(state, { type: 'HIGHLIGHT', level, value: event.value }) : state
       const node = nodesOf(base.items, base.active)[level]
       if (!node || node.disabled) return base

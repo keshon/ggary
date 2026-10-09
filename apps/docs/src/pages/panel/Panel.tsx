@@ -1,4 +1,4 @@
-import { Badge, Button, CodeBlock, List, ListItem, Panel, Toolbar, ToolbarSeparator, ToolbarSpacer } from '@ggary/react'
+import { Badge, Button, CodeBlock, List, ListItem, Panel, Toolbar, ToolbarButton, ToolbarSeparator, ToolbarSpacer } from '@ggary/react'
 import { DemoPage, Specimen } from '../../react/DemoPage'
 import { leads, runners } from '../../data/layout'
 
@@ -83,16 +83,16 @@ export default function PanelPage() {
               headingLevel={3}
               toolbar={
                 <Toolbar label="Run tools">
-                  <Button size="sm" emphasis="minimal">
+                  <ToolbarButton size="sm" emphasis="minimal">
                     Filter
-                  </Button>
-                  <Button size="sm" emphasis="minimal">
+                  </ToolbarButton>
+                  <ToolbarButton size="sm" emphasis="minimal">
                     Sort
-                  </Button>
+                  </ToolbarButton>
                   <ToolbarSeparator />
-                  <Button size="sm" emphasis="minimal">
+                  <ToolbarButton size="sm" emphasis="minimal">
                     Export
-                  </Button>
+                  </ToolbarButton>
                   <ToolbarSpacer />
                   <Badge tone="running">7 running</Badge>
                 </Toolbar>

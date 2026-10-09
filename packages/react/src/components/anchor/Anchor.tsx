@@ -1,6 +1,7 @@
+import { Popover as Primitive } from '@base-ui/react/popover'
 import { useEffect, useId, useRef, useState, type HTMLAttributes } from 'react'
 import { anchorFloatQuery, anchorHrefs, connect, type AnchorItem, type AnchorProps as CoreAnchorProps } from '@ggary/core/anchor'
-import { attachAnchorPanel, reactNormalizer, watchMedia, watchScrollSpy } from '@ggary/core'
+import { reactNormalizer, watchMedia, watchScrollSpy } from '@ggary/core'
 import { useConfigured } from '../config-provider'
 
 export interface AnchorProps extends Omit<CoreAnchorProps, 'id'>, Omit<HTMLAttributes<HTMLElement>, 'children'> {
@@ -37,13 +38,9 @@ export function Anchor(own: AnchorProps) {
   useEffect(() => watchScrollSpy(document, hrefs.split(' '), { offset, onChange: follow }), [hrefs, offset])
   useEffect(() => watchMedia(document, anchorFloatQuery(float), setNarrow), [float])
 
-  const panelRef = useRef<HTMLDivElement>(null)
+  const [portalHost, setPortalHost] = useState<HTMLElement | null>(null)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const engaged = floating && shown
-  useEffect(() => {
-    if (!engaged || !panelRef.current) return
-    return attachAnchorPanel(panelRef.current, triggerRef.current, () => setOpen(false))
-  }, [engaged])
 
   const api = connect(
     { id, label, items, words, onCurrentChange: follow, onOpenChange: setOpen },
@@ -65,17 +62,23 @@ export function Anchor(own: AnchorProps) {
     </ul>
   )
 
+  const { onClick: _toggle, ...triggerProps } = api.triggerProps
   return (
-    <nav {...rest} {...api.rootProps}>
-      <div ref={panelRef} {...api.panelProps}>
-        {list(items, 1)}
-      </div>
-      {api.showTrigger && (
-        <button ref={triggerRef} {...api.triggerProps}>
+    <nav {...rest} {...api.rootProps} ref={setPortalHost}>
+      {floating ? <Primitive.Root open={engaged} modal={false} triggerId={`${id}-trigger`}
+        onOpenChange={next => setOpen(next)}>
+        <Primitive.Trigger {...triggerProps} id={`${id}-trigger`} ref={triggerRef}>
           <span {...api.triggerIconProps} />
           <span {...api.triggerLabelProps}>{api.triggerText}</span>
-        </button>
-      )}
+        </Primitive.Trigger>
+        {portalHost && <Primitive.Portal container={portalHost} keepMounted>
+        <Primitive.Positioner side="top" align="end" sideOffset={8} positionMethod="fixed">
+          <Primitive.Popup {...api.panelProps} aria-label={label}>
+            {list(items, 1)}
+          </Primitive.Popup>
+        </Primitive.Positioner>
+        </Primitive.Portal>}
+      </Primitive.Root> : <div {...api.panelProps}>{list(items, 1)}</div>}
     </nav>
   )
 }

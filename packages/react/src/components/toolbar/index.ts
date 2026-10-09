@@ -1,2 +1,2 @@
-export { Toolbar, ToolbarSeparator, ToolbarSpacer } from './Toolbar'
+export { Toolbar, ToolbarButton, ToolbarSeparator, ToolbarSpacer } from './Toolbar'
 export type { ToolbarProps } from './Toolbar'

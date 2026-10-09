@@ -46,7 +46,7 @@ export function feedbackConformance(adapter: Adapter) {
     const setup = async (props: Partial<Parameters<Adapter['popconfirm']>[0]> = {}) => {
       const m = await adapter.popconfirm({ triggerLabel: 'Delete', title: 'Delete this lead?', ...props }, freshTarget())
       const trigger = () => m.root.querySelector('button')!
-      const content = () => part(m.root, 'popconfirm', 'content')!
+      const content = () => adapter.name === 'react' ? document.getElementById(trigger().id.replace('-trigger', '-content'))! : part(m.root, 'popconfirm', 'content')!
       const answer = (which: 'cancel' | 'confirm') => content().querySelector<HTMLButtonElement>(`[data-answer='${which}']`)!
       return { m, trigger, content, answer }
     }
@@ -122,7 +122,7 @@ export function feedbackConformance(adapter: Adapter) {
     const setup = async (onSelect = vi.fn()) => {
       const m = await adapter.contextMenu({ targetLabel: 'report.pdf', items, onSelect }, freshTarget())
       const target = () => m.root.querySelector<HTMLElement>('[data-context-menu]')!
-      const menu = () => part(m.root, 'menu', 'content')!
+      const menu = () => adapter.name === 'react' ? document.getElementById(target().id.replace('-trigger', '-content'))! : part(m.root, 'menu', 'content')!
       return { m, target, menu, onSelect }
     }
 

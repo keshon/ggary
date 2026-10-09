@@ -1,15 +1,9 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
-import {
-  connect,
-  createTabsMachine,
-  type TabItem,
-  type TabsActivation,
-  type TabsOrientation,
-  type TabsVariant,
-} from '@ggary/core/tabs'
-import { focusTab, reactNormalizer } from '@ggary/core'
+import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { Tabs as Primitive } from '@base-ui/react/tabs'
+import { DirectionProvider } from '@base-ui/react/direction-provider'
+import type { TabItem, TabsActivation, TabsOrientation, TabsVariant } from '@ggary/core/tabs'
 import type { ControlSize } from '@ggary/core'
-import { useConfigured } from '../config-provider'
+import { useConfigured, useConfig } from '../config-provider'
 
 export interface TabsProps {
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
@@ -34,64 +28,58 @@ export interface TabsProps {
   closeLabel?: (label: string) => string
 }
 
+const part = (name: string) => ({ 'data-scope': 'tabs', 'data-part': name, 'data-backend': 'base-ui' })
+
 export function Tabs(props: TabsProps) {
   props = useConfigured(props, { size: true })
-  const {
-    size,
-    items, value, defaultValue, onValueChange, onClose, label, orientation, activation, variant,
-    children, keepMounted = false, closeLabel,
-  } = props
-
-  const id = `gg-tabs-${useId().replace(/:/g, '')}`
-  const callbacks = useRef({ onValueChange, onClose })
-  callbacks.current = { onValueChange, onClose }
-
-  const [machine] = useState(() =>
-    createTabsMachine({
-      id, items, value, defaultValue, orientation, activation,
-      onValueChange: (next) => callbacks.current.onValueChange?.(next),
-      onClose: (closed) => callbacks.current.onClose?.(closed),
-    })
-  )
-  const state = useSyncExternalStore(machine.subscribe, machine.getState, machine.getState)
-  const api = connect(state, machine.send, reactNormalizer, { label, variant, panels: children !== undefined, closeLabel, size })
-
-  useEffect(() => machine.send({ type: 'SYNC_ITEMS', items }), [machine, items])
-  useEffect(() => {
-    if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value })
-  }, [machine, value])
-  useEffect(() => machine.send({ type: 'SYNC_OPTIONS', orientation, activation }), [machine, orientation, activation])
-
-  // Roving focus moves only when the machine asks (the nonce), never on a re-render.
-  const lastFocusNonce = useRef(0)
+  const { items, value, defaultValue, onValueChange, onClose, label,
+    orientation = 'horizontal', activation = 'automatic', variant = 'sections',
+    size = 'md', children, keepMounted = false, closeLabel = (text: string) => `Close ${text}` } = props
+  const config = useConfig()
+  const refs = useRef(new Map<string, HTMLElement>())
+  const pendingClose = useRef<{ value: string; next?: string } | null>(null)
   useLayoutEffect(() => {
-    if (api.focusNonce === 0 || api.focusNonce === lastFocusNonce.current || api.focusValue === null) return
-    lastFocusNonce.current = api.focusNonce
-    focusTab(document, api.ids.tab(api.focusValue))
-  })
-
-  return (
-    <div {...api.rootProps}>
-      <div {...api.listProps}>
-        {api.items.map((item) => (
-          <div key={item.value} {...api.getTabProps(item)}>
-            <span {...api.getTabTextProps()}>{item.label}</span>
-            {item.closable && (
-              <button {...api.getCloseProps(item)}>
-                <span {...api.closeIconProps} />
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-      {children &&
-        api.items.map((item) =>
-          keepMounted || item.value === state.value ? (
-            <div key={item.value} {...api.getPanelProps(item)}>
-              {children(item)}
-            </div>
-          ) : null
-        )}
-    </div>
-  )
+    const pending = pendingClose.current
+    if (pending && !items.some((item) => item.value === pending.value)) {
+      pendingClose.current = null
+      if (pending.next) refs.current.get(pending.next)?.focus()
+    }
+  }, [items])
+  const close = (item: TabItem) => {
+    if (item.disabled || !item.closable) return
+    // Document closing is a GGary feature. Base UI owns ordinary tab navigation.
+    if (document.activeElement === refs.current.get(item.value)) {
+      const index = items.indexOf(item)
+      const next = items.slice(index + 1).find((candidate) => !candidate.disabled)
+        ?? items.slice(0, index).reverse().find((candidate) => !candidate.disabled)
+      pendingClose.current = { value: item.value, next: next?.value }
+    }
+    onClose?.(item.value)
+  }
+  return <DirectionProvider direction={config.dir ?? 'ltr'}>
+    <Primitive.Root {...part('root')} value={value} defaultValue={defaultValue}
+      orientation={orientation} data-size={size} data-variant={variant}
+      onValueChange={(next, details) => { if (typeof next === 'string' && details.reason !== 'initial') onValueChange?.(next) }}>
+      <Primitive.List {...part('list')} aria-label={label} data-variant={variant} activateOnFocus={activation === 'automatic'}>
+        {items.map((item) => <Primitive.Tab key={item.value} {...part('tab')} value={item.value}
+          disabled={item.disabled} nativeButton={false} render={(tabProps, state) => <div {...tabProps} data-state={state.active ? 'active' : 'inactive'} />}
+          ref={(element) => { if (element) refs.current.set(item.value, element); else refs.current.delete(item.value) }}
+          data-value={item.value} data-closable={item.closable ? '' : undefined} data-modified={item.modified ? '' : undefined}
+          onKeyDown={(event) => { if (event.key === 'Delete' && item.closable && !item.disabled) { event.preventDefault(); close(item) } }}
+          onAuxClick={(event) => { if (event.button === 1) { event.preventDefault(); close(item) } }}
+        >
+          <span {...part('tab-text')}>{item.label}</span>
+          {item.closable && <button {...part('close')} type="button" tabIndex={-1} disabled={item.disabled}
+            aria-label={closeLabel(item.label)} onPointerDown={(event) => event.preventDefault()}
+            onClick={(event) => { event.stopPropagation(); close(item) }}>
+            <span {...part('close-icon')} data-icon="close" aria-hidden="true" />
+          </button>}
+        </Primitive.Tab>)}
+      </Primitive.List>
+      {children && items.map((item) => <Primitive.Panel key={item.value} {...part('panel')} value={item.value} keepMounted={keepMounted} data-value={item.value}
+        render={(panelProps, state) => <div {...panelProps} data-state={state.hidden ? 'inactive' : 'active'} />}>
+        {children(item)}
+      </Primitive.Panel>)}
+    </Primitive.Root>
+  </DirectionProvider>
 }

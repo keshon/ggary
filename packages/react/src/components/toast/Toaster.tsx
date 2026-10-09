@@ -1,50 +1,40 @@
-import { useLayoutEffect, useRef, useSyncExternalStore } from 'react'
-import { connect, keepRegionOpen, toaster as pageToaster, type Toaster as ToasterStore, type ToastPlacement } from '@ggary/core/toast'
-import { reactNormalizer } from '@ggary/core'
+import { useEffect, useLayoutEffect, useRef } from 'react'
+import { Toast as Primitive } from '@base-ui/react/toast'
+import { keepRegionOpen, type ToastOptions, type ToastPlacement } from '@ggary/core/toast'
+import { TONE_ICONS } from '@ggary/core'
+import { toaster as pageToaster, type ToasterStore } from './toaster-store'
 
 export interface ToasterProps {
-  /** The queue to show. Default: the page's, which `toast()` adds to. */
   toaster?: ToasterStore
   placement?: ToastPlacement
-  /** The region's accessible name. Default "Notifications". */
   label?: string
   closeLabel?: string
 }
-
-/**
- * The region toasts appear in. Render one per page, anywhere: it lives in the
- * top layer. Show a toast from anywhere with `toast({ title })`.
- */
-export function Toaster({ toaster = pageToaster, placement, label, closeLabel }: ToasterProps) {
-  const state = useSyncExternalStore(toaster.subscribe, toaster.getState, toaster.getState)
-  const api = connect(state, toaster, reactNormalizer, { placement, label, closeLabel })
-
-  // Opened once and kept open: a closed popover is display: none, and a live
-  // region that is not displayed announces nothing.
-  const region = useRef<HTMLElement>(null)
-  useLayoutEffect(() => {
-    if (region.current) keepRegionOpen(region.current)
-  })
-
-  return (
-    <section ref={region} {...api.regionProps}>
-      <div {...api.politeProps}>{api.politeText && <p key={state.announcement.nonce} {...api.announcementProps}>{api.politeText}</p>}</div>
-      <div {...api.assertiveProps}>{api.assertiveText && <p key={state.announcement.nonce} {...api.announcementProps}>{api.assertiveText}</p>}</div>
-      <ol {...api.listProps}>
-        {api.toasts.map((toast) => (
-          <li key={toast.id} {...api.getToastProps(toast)}>
-            {toast.tone && <span {...api.getIconProps(toast)} />}
-            <div {...api.bodyProps}>
-              <p {...api.titleProps}>{toast.title}</p>
-              {toast.text && <p {...api.textProps}>{toast.text}</p>}
-            </div>
-            {toast.action && <button {...api.getActionProps(toast)}>{toast.action.label}</button>}
-            <button {...api.getCloseProps(toast)}>
-              <span {...api.closeIconProps} />
-            </button>
-          </li>
-        ))}
-      </ol>
-    </section>
-  )
+const part = (name: string) => ({ 'data-scope': 'toast', 'data-part': name })
+function ToastRegion({ placement = 'bottom-end', label = 'Notifications', closeLabel = 'Dismiss' }: Omit<ToasterProps, 'toaster'>) {
+  const { toasts } = Primitive.useToastManager<ToastOptions>()
+  const region = useRef<HTMLDivElement>(null)
+  useLayoutEffect(() => { if (region.current) keepRegionOpen(region.current) })
+  return <Primitive.Portal>
+    <Primitive.Viewport ref={element => { region.current = element; if (element) keepRegionOpen(element) }} {...part('region')} popover="manual" role="region" aria-label={label} data-placement={placement} data-backend="base-ui">
+      <div {...part('list')} data-placement={placement}>
+        {[...toasts].reverse().map(toast => <Primitive.Root key={toast.id} toast={toast} {...part('toast')} id={toast.id}
+          data-tone={toast.type} data-state={toast.transitionStatus === 'ending' ? 'leaving' : 'open'} data-placement={placement}
+          style={toast.limited ? { display: 'none' } : undefined}>
+          {toast.data?.tone && <span {...part('icon')} data-icon={TONE_ICONS[toast.data.tone]} aria-hidden="true" />}
+          <Primitive.Content {...part('body')}>
+            <Primitive.Title {...part('title')} />
+            {toast.description && <Primitive.Description {...part('text')} />}
+          </Primitive.Content>
+          {toast.actionProps && <Primitive.Action {...part('action')} />}
+          <Primitive.Close {...part('close')} aria-label={closeLabel}><span {...part('close-icon')} data-icon="close" aria-hidden="true" /></Primitive.Close>
+        </Primitive.Root>)}
+      </div>
+    </Primitive.Viewport>
+  </Primitive.Portal>
+}
+export function Toaster({ toaster = pageToaster, ...props }: ToasterProps) {
+  // Child provider subscriptions mount before this parent effect flushes pre-mount commands.
+  useEffect(() => toaster.attach(), [toaster])
+  return <Primitive.Provider toastManager={toaster.manager} limit={toaster.max}><ToastRegion {...props} /></Primitive.Provider>
 }

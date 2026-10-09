@@ -203,3 +203,9 @@
 @media (prefers-reduced-motion: reduce) {
   [data-scope='range-slider'][data-part='thumb']::-webkit-slider-thumb { transition: none; }
 }
+
+/* React Base UI owns track positioning and pointer/keyboard interaction. */
+[data-scope='range-slider'][data-part='thumb-handle'][data-backend='base-ui'] { position: absolute; inset-block-start: 50%; inline-size: var(--range-thumb); block-size: var(--range-thumb); box-sizing: border-box; border: var(--ggarry-size-indicator) solid var(--ggarry-bg-accent); border-radius: var(--ggarry-radius-full); background: var(--ggarry-bg-thumb); box-shadow: var(--ggarry-shadow-thumb); }
+[data-scope='range-slider'][data-part='thumb-handle'][data-backend='base-ui']:has(input:focus-visible) { outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring); outline-offset: var(--ggarry-focus-ring-offset); }
+[data-scope='range-slider'][data-part='thumb-handle'][data-backend='base-ui'] > input { pointer-events: auto; }
+[data-scope='range-slider'][data-part='root'][data-backend='base-ui'][data-invalid] [data-part='thumb-handle'] { border-color: var(--ggarry-border-danger); }

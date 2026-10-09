@@ -1,6 +1,8 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useState, useSyncExternalStore, type ReactElement, type ReactNode } from 'react'
 import { connect, createPopconfirmMachine, type PopconfirmChangeDetails, type PopconfirmWords } from '@ggary/core/popconfirm'
-import { attachPopover, reactNormalizer, type AttachedPopover, type Dict, type Placement } from '@ggary/core'
+import { reactNormalizer, type Dict, type Placement } from '@ggary/core'
+import { Popover as Primitive } from '@base-ui/react/popover'
+import { useOverlayEnvironment } from '../../utils/use-overlay-environment'
 import { Button } from '../button'
 import { useConfigured } from '../config-provider'
 
@@ -53,32 +55,26 @@ export function Popconfirm(props: PopconfirmProps) {
 
   useEffect(() => machine.send({ type: 'SYNC_OPTIONS', placement }), [machine, placement])
 
+  const reference = useRef<HTMLButtonElement>(null)
   const contentRef = useRef<HTMLDivElement>(null)
-  const attached = useRef<AttachedPopover | null>(null)
-  useLayoutEffect(() => {
-    const content = contentRef.current
-    const reference = document.getElementById(api.ids.trigger)
-    if (!state.open || !content || !reference) return
-    const instance = attachPopover(reference, content, {
-      placement: machine.getState().placement,
-      gutter: 6,
-      manageFocus: true,
-      onDismiss: (reason) => api.dismiss(reason),
-    })
-    attached.current = instance
-    return () => {
-      instance.destroy()
-      attached.current = null
-    }
-  }, [machine, state.open])
-  useLayoutEffect(() => {
-    attached.current?.update({ placement: state.placement })
-  }, [state.placement])
+  const environment = useOverlayEnvironment(reference, state.open)
+  const [side, align] = state.placement.split('-')
+  const { popover: _nativePopover, ...contentProps } = api.contentProps
 
   return (
-    <>
-      {trigger(api.triggerProps)}
-      <div ref={contentRef} {...api.contentProps}>
+    <Primitive.Root open={state.open} triggerId={api.ids.trigger} onOpenChange={(next, details) => {
+      machine.send(next ? { type: 'OPEN', reason: 'trigger' } : { type: 'CLOSE',
+        reason: details.reason === 'escape-key' ? 'escape' : details.reason === 'trigger-press' ? 'trigger' : 'outside' })
+    }}>
+      <Primitive.Trigger ref={reference} id={api.ids.trigger} render={p => trigger({ ...p,
+        'aria-expanded': state.open ? 'true' : 'false' }) as ReactElement} />
+      <Primitive.Portal keepMounted container={environment.container}>
+        <Primitive.Positioner data-scope="popconfirm" data-part="positioner" data-backend="base-ui"
+          positionMethod="fixed" side={side as 'top' | 'bottom' | 'left' | 'right'}
+          align={(align ?? 'center') as 'start' | 'end' | 'center'} sideOffset={6}
+          data-mode={environment.mode} dir={environment.dir} lang={environment.locale} style={environment.style}>
+      <Primitive.Popup ref={contentRef} {...contentProps} data-backend="base-ui" finalFocus={reference}
+        initialFocus={() => contentRef.current?.querySelector<HTMLElement>('[data-autofocus]') ?? false}>
         {state.open && (
           <>
             <p {...api.titleProps}>{title}</p>
@@ -94,7 +90,9 @@ export function Popconfirm(props: PopconfirmProps) {
             </div>
           </>
         )}
-      </div>
-    </>
+      </Primitive.Popup>
+        </Primitive.Positioner>
+      </Primitive.Portal>
+    </Primitive.Root>
   )
 }

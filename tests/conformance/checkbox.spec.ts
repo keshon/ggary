@@ -108,6 +108,54 @@ function choiceConformance(adapter: Adapter, scope: 'checkbox' | 'switch') {
       expect(root().dataset.state).toBe('unchecked')
     })
 
+    if (adapter.name === 'react') describe('Base UI interaction boundary', () => {
+      const space = (target: HTMLElement) => {
+        target.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true, cancelable: true }))
+        target.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', bubbles: true, cancelable: true }))
+      }
+
+      it('focus belongs to the visible control and Space activates once', async () => {
+        const onCheckedChange = vi.fn()
+        const { m, input } = await setup({ onCheckedChange })
+        const toggle = part(m.root, scope, 'toggle')!
+        await adapter.act(() => input().focus())
+        expect(document.activeElement).toBe(toggle)
+        expect(toggle.getAttribute('role')).toBe(scope)
+        expect(input().getAttribute('aria-hidden')).toBe('true')
+        await adapter.act(() => space(toggle))
+        expect(input().checked).toBe(true)
+        expect(toggle.getAttribute('aria-checked')).toBe('true')
+        expect(onCheckedChange).toHaveBeenCalledExactlyOnceWith(true)
+      })
+
+      it('a controlled owner can refuse activation without changing submitted data', async () => {
+        const onCheckedChange = vi.fn()
+        const form = freshTarget('form') as HTMLFormElement
+        const { m, input } = await setup({ checked: false, name: 'choice', onCheckedChange }, form)
+        await adapter.act(() => click(part(m.root, scope, 'toggle')!))
+        expect(onCheckedChange).toHaveBeenCalledExactlyOnceWith(true)
+        expect(input().checked).toBe(false)
+        expect(new FormData(form).has('choice')).toBe(false)
+      })
+
+      it('readonly keyboard activation stays silent', async () => {
+        const onCheckedChange = vi.fn()
+        const { m, input } = await setup({ readOnly: true, onCheckedChange })
+        const toggle = part(m.root, scope, 'toggle')!
+        await adapter.act(() => { toggle.focus(); space(toggle) })
+        expect(document.activeElement).toBe(toggle)
+        expect(input().checked).toBe(false)
+        expect(onCheckedChange).not.toHaveBeenCalled()
+      })
+
+      it('one activation contributes exactly one form value', async () => {
+        const form = freshTarget('form') as HTMLFormElement
+        const { m } = await setup({ name: 'choice', value: 'yes' }, form)
+        await adapter.act(() => click(part(m.root, scope, 'toggle')!))
+        expect(new FormData(form).getAll('choice')).toEqual(['yes'])
+      })
+    })
+
     it('starts from defaultChecked', async () => {
       const { root, input } = await setup({ defaultChecked: true })
       expect(input().checked).toBe(true)

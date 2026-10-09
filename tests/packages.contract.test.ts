@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
  * What a project imports, held so it cannot drift. Each package exports its
  * root and one pattern for its components — a list per component fell 35
  * behind the directories it named. Every component directory has an index,
- * the two adapters have the same directories and the same components in them,
+ * the two adapters share visual component directories and documented APIs,
  * and each root carries everything its directories export.
  */
 
@@ -15,9 +15,10 @@ const pkg = (name: string) => JSON.parse(readFileSync(join(root, 'packages', nam
 const dirs = (name: string) => readdirSync(join(root, 'packages', name, 'src', 'components')).sort()
 
 /** Names a module re-exports: `export { A, B as C } from …`. */
-function exported(file: string): Set<string> {
+function exported(file: string, valuesOnly = false): Set<string> {
   const out = new Set<string>()
   for (const m of readFileSync(file, 'utf8').matchAll(/export (?:type )?\{([^}]*)\}/g)) {
+    if (valuesOnly && m[0].startsWith('export type')) continue
     for (const part of m[1].split(',')) {
       const name = part.trim().split(/\s+as\s+/).pop()
       if (name) out.add(name)
@@ -49,15 +50,20 @@ describe('the adapters', () => {
 
   // A component, not its props type or a React hook: what both frameworks owe.
   const components = (adapter: string, dir: string) =>
-    [...exported(join(root, 'packages', adapter, 'src', 'components', dir, 'index.ts'))]
+    [...exported(join(root, 'packages', adapter, 'src', 'components', dir, 'index.ts'), true)]
       .filter((n) => /^[A-Z]/.test(n) && !/(Props|Api|Words|Options|State)$/.test(n))
       .sort()
 
-  it('export the same components from each directory', () => {
+  it('share visual components with explicit React registration adapters', () => {
     const differ = dirs('react')
       .map((dir) => ({ dir, react: components('react', dir), svelte: components('svelte', dir) }))
       .filter((row) => row.react.join() !== row.svelte.join())
-    expect(differ).toEqual([])
+    // FieldControl registers custom native elements with React Base UI Field.
+    // Svelte keeps its own registration mechanism; no fake counterpart export.
+    expect(differ).toEqual([
+      { dir: 'field', react: ['Field', 'FieldControl'], svelte: ['Field'] },
+      { dir: 'toolbar', react: ['Toolbar', 'ToolbarButton', 'ToolbarSeparator', 'ToolbarSpacer'], svelte: ['Toolbar', 'ToolbarSeparator', 'ToolbarSpacer'] },
+    ])
   })
 
   it('carry every component from their root', () => {

@@ -97,3 +97,9 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* Base UI owns fixed placement; retain the existing list geometry and tokens. */
+[data-scope='combobox'][data-part='positioner'][data-backend='base-ui'] {
+  z-index: var(--gg-z-menu, 1100);
+  pointer-events: auto;
+}

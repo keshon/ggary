@@ -1,5 +1,6 @@
 import '../theme'
 import '../site.css'
+import { implementationFor, implementationBadge } from './implementation'
 
 import { lazy, StrictMode, Suspense, useEffect, useMemo, useState, type ComponentType } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -21,6 +22,7 @@ function App() {
   const [mode, setShownMode] = useState<Mode>(getMode)
   useEffect(() => onRouteChange(setPage), [])
   useEffect(() => onModeChange(setShownMode), [])
+  const implementation = implementationFor(page.id)
   const Demo = useMemo(() => load(page.id), [page.id])
 
   return (
@@ -52,6 +54,9 @@ function App() {
       <main className="main">
         <article className="page" key={page.id}>
           <h1 className="page-title">{page.title}</h1>
+          <aside className="component-guidance" aria-label="Component information">
+            <span className="implementation-badge">{implementationBadge(implementation.label)}</span>
+          </aside>
           <Suspense fallback={null}>{Demo && <Demo />}</Suspense>
         </article>
       </main>

@@ -16,8 +16,8 @@ export function timeConformance(adapter: Adapter) {
       const onValueChange = vi.fn()
       const m = await adapter.timePicker({ label: 'Starts at', locale: 'en-US', step: 30, onValueChange, ...props }, freshTarget())
       const input = () => part(m.root, 'time-picker', 'input') as HTMLInputElement
-      const list = () => part(m.root, 'time-picker', 'content')!
-      const options = () => parts(m.root, 'time-picker', 'item')
+      const list = () => document.getElementById(input().id.replace('-input', '-content'))!
+      const options = () => parts(list(), 'time-picker', 'item')
       return { m, input, list, options, onValueChange }
     }
 
@@ -69,7 +69,7 @@ export function timeConformance(adapter: Adapter) {
 
     it('says a typed text that is not a time, in the locale’s clock, and submits HH:mm by name', async () => {
       const { m, input } = await setup({ name: 'starts', defaultValue: '08:15' })
-      expect((m.root.querySelector('input[type="hidden"]') as HTMLInputElement).value).toBe('08:15')
+      expect((m.root.querySelector('input[name]') as HTMLInputElement).value).toBe('08:15')
       await adapter.act(() => type(input(), 'soon'))
       await adapter.act(() => key(input(), 'Enter'))
       expect(input().getAttribute('aria-invalid')).toBe('true')
@@ -77,6 +77,28 @@ export function timeConformance(adapter: Adapter) {
       expect(input().getAttribute('aria-describedby')).toBe(error.id)
       expect(error.textContent).toMatch(/2:30\sPM/)
     })
+
+    if (adapter.name === 'react') {
+      it('the button keeps input focus, selection avoids blur, and Escape keeps focus', async () => {
+        const { m, input, list, options, onValueChange } = await setup({ defaultValue: '14:00' })
+        const trigger = part(m.root, 'time-picker', 'trigger')!
+        await adapter.act(() => { input().focus(); click(trigger) })
+        await adapter.wait(50)
+        expect(list().dataset.state).toBe('open')
+        expect(document.activeElement).toBe(input())
+        expect(trigger.getAttribute('aria-haspopup')).toBe('listbox')
+        await adapter.act(() => click(options().find(o => o.id.endsWith('-time-1430'))!))
+        await adapter.wait(50)
+        expect(onValueChange).toHaveBeenLastCalledWith('14:30')
+        expect(document.activeElement).toBe(input())
+        await adapter.act(() => { input().focus(); click(trigger) })
+        await adapter.wait(50)
+        await adapter.act(() => key(input(), 'Escape'))
+        await adapter.wait(50)
+        expect(list().dataset.state).toBe('closed')
+        expect(document.activeElement).toBe(input())
+      })
+    }
 
     it('reads and writes in twenty-four hours where the locale does', async () => {
       const { input, onValueChange } = await setup({ locale: 'de-DE', defaultValue: '14:00' })
