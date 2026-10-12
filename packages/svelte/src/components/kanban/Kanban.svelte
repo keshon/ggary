@@ -14,10 +14,10 @@
     type KanbanMove,
     type KanbanWords,
   } from '@ggary/core/kanban'
-  import { connect as connectMenu, createMenuMachine, type MenuEntry } from '@ggary/core/menu'
+  import type { MenuEntry } from '@ggary/core/menu'
   import { svelteNormalizer, uid, type VirtualElement } from '@ggary/core'
   import { untrack, type Snippet } from 'svelte'
-  import MenuContent from '../menu/MenuContent.svelte'
+  import AnchoredMenu from '../menu/AnchoredMenu.svelte'
 
   type Props = {
     columns: KanbanColumn[]
@@ -104,12 +104,13 @@
   })
 
   // One menu for the board, opened for a card: at the pointer, under its button, or under the card.
-  let menuCard: string | null = null
-  let menuAnchor: Element | VirtualElement | null = null
-  const menu = createMenuMachine({
-    id: `${id}-menu`,
-    items: [],
-    onSelect: (value) => {
+  let menuCard = $state<string | null>(null)
+  let menuAnchor = $state<Element | VirtualElement | null>(null)
+  let menuOpen = $state(false)
+  let menuItems = $state<MenuEntry[]>([])
+  let menuFocus = $state<'first' | 'none'>('first')
+  const menuTitle = $derived(snapshot.cards.find((card) => card.id === menuCard)?.title ?? '')
+  function selectMenu(value: string) {
       const key = menuCard
       if (!key) return
       const place = cardMenuPlace(machine.getState(), key, value)
@@ -121,12 +122,7 @@
       }
       const card = machine.getState().cards.find((candidate) => candidate.id === key)
       if (card) onCardMenuSelect?.(value, card)
-    },
-  })
-  let menuState = $state.raw(menu.getState())
-  $effect(() => menu.subscribe(() => (menuState = menu.getState())))
-  const menuTitle = $derived(snapshot.cards.find((card) => card.id === snapshot.menu.card)?.title ?? '')
-  const menuApi = $derived(connectMenu(menuState, menu.send, svelteNormalizer, { label: api.words.menu(menuTitle) }))
+  }
 
   let lastMenuNonce = 0
   $effect(() => {
@@ -145,9 +141,10 @@
         : request.via === 'button'
           ? document.getElementById(api.ids.cardMenu(key))
           : element
-      menu.send({ type: 'SYNC_ITEMS', items: cardMenuItems(machine.getState(), key, words, cardMenu?.(card) ?? []) })
+      menuItems = cardMenuItems(machine.getState(), key, words, cardMenu?.(card) ?? [])
       // The keyboard lands on the first item; a pointer, on the menu itself.
-      menu.send({ type: 'OPEN', reason: 'api', focus: request.via === 'pointer' ? 'none' : 'first' })
+      menuFocus = request.via === 'pointer' ? 'none' : 'first'
+      menuOpen = true
     })
   })
 </script>
@@ -189,11 +186,7 @@
   {/each}
   <div {...api.liveProps}>{api.announcement}</div>
   <div {...api.instructionsProps}>{api.words.instructions}</div>
-  <MenuContent
-    api={menuApi}
-    getState={menu.getState}
-    reference={() => (menuCard ? document.getElementById(api.ids.card(menuCard)) : null)}
-    anchor={() => menuAnchor}
-    dismissOnReference
-  />
+  <AnchoredMenu id={`${id}-menu`} open={menuOpen} items={menuItems} label={api.words.menu(menuTitle)}
+    focus={menuFocus} onClose={() => menuOpen = false} onSelect={selectMenu}
+    reference={() => menuCard !== null ? document.getElementById(api.ids.card(menuCard)) : null} anchor={menuAnchor} />
 </div>

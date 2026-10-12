@@ -181,3 +181,35 @@ MenuContent.svelte. Those two consumers still use the old renderer; the three
 public menu components do not. Follow with confirmation/command composites,
 then selection/form family and the compiled installed-Svelte-consumer release
 gates. The whole Svelte migration is not complete yet.
+
+
+## Domain menu checkpoint (2026-10-12)
+
+Previous menu-family hosted CI passed on run 38260278312. DataGrid GridRowMenu
+and Kanban card menus now use an internal Bits-based AnchoredMenu with the
+shared BitsMenuItems/BitsMenuSub renderer. Their domain controllers still own
+row targeting/selection, card movement and requests. Removed createMenuMachine,
+connectMenu and attachPopover menu wiring from both consumers. Deleted
+MenuContent.svelte; no Svelte source references it or createMenuMachine remain.
+
+AnchoredMenu accepts the controller's real/virtual anchor, copies theme variables,
+normalizes its rectangle for Bits, opens pointer requests on the menu surface
+and keyboard/button requests on the first enabled row. Closing returns focus
+to the grid or the card's current DOM element after a move. Bits owns keyboard,
+submenus, typeahead, positioning and dismissal; no backend switch was added.
+
+Full fast run: 102 files passed; one newly enabled Svelte Kanban submenu test
+failed because it searched whole item text including whitespace. The other
+2,784 tests passed with nine existing skips. Fixed that lookup to use the named
+item-text part. Final focused React/Svelte grid-row and Kanban rerun: 40 passed.
+Final Chromium pilot: 15 passed, including both domain-menu workflows inside
+Dialog (row identity/focus return, submenu Escape, card move and callback).
+Seven SSR checks passed, including standalone Kanban and closed AnchoredMenu.
+TypeScript/Svelte checks have zero diagnostics; production docs build passed.
+Real Kanban menu/submenu visuals were checked in the running docs site.
+Existing React act warnings remain. No full-suite rerun after the test-only
+lookup correction is claimed; hosted CI remains the final whole-suite gate.
+
+Next: confirmation and command composites (Popconfirm and CommandPalette),
+then selection/form widgets and the installed-Svelte-consumer release gates.
+The menu family is migrated; the complete Svelte foundation is still in progress.

@@ -115,15 +115,15 @@ export function kanbanConformance(adapter: Adapter) {
       card('a').focus()
       await adapter.act(() => {})
       await adapter.act(() => void card('a').dispatchEvent(new KeyboardEvent('keydown', { key: 'F10', shiftKey: true, bubbles: true, cancelable: true })))
-      await adapter.wait(0)
-      const menu = (adapter.name === 'react' ? document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"][aria-label^="Actions for"]')! : part(m.root, 'menu', 'content')!)
+      await adapter.wait(60)
+      const menu = document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"][aria-label^="Actions for"]')!
       expect(menu.dataset.state).toBe('open')
       expect(menu.getAttribute('aria-label')).toBe('Actions for Call Aigul')
       const items = parts(menu, 'menu', 'item')
       expect(items.map((item) => part(item, 'menu', 'item-text')!.textContent)).toEqual(['Move to', 'Move to top', 'Move to bottom'])
       expect(part(document.activeElement!, 'menu', 'item-text')?.textContent).toBe('Move to')
       await adapter.act(() => click(items[2]))
-      await adapter.wait(0)
+      await adapter.wait(60)
       expect(titles('todo')).toEqual(['Send the offer', 'Book the demo', 'Call Aigul'])
       expect(document.activeElement).toBe(card('a'))
     })
@@ -137,16 +137,16 @@ export function kanbanConformance(adapter: Adapter) {
       expect(button.tabIndex).toBe(-1)
       const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 30, clientY: 40 })
       await adapter.act(() => void card('c').dispatchEvent(event))
-      await adapter.wait(0)
+      await adapter.wait(60)
       expect(event.defaultPrevented).toBe(true)
-      const items = parts((adapter.name === 'react' ? document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"][aria-label^="Actions for"]')! : part(m.root, 'menu', 'content')!), 'menu', 'item')
+      const items = parts(document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"][aria-label^="Actions for"]')!, 'menu', 'item')
       expect(items.map((item) => part(item, 'menu', 'item-text')!.textContent)).toEqual(['Move to', 'Move to top', 'Move to bottom', 'Archive'])
       await adapter.act(() => click(items[3]))
-      await adapter.wait(0)
+      await adapter.wait(60)
       expect(chosen).toEqual(['archive:c'])
     })
 
-    if (adapter.name === 'react') it('keeps the parent menu open while its submenu navigates, then moves the original card', async () => {
+    it('keeps the parent menu open while its submenu navigates, then moves the original card', async () => {
       const { card, titles } = await setup()
       await adapter.act(() => void card('a').dispatchEvent(new KeyboardEvent('keydown', { key: 'F10', shiftKey: true, bubbles: true, cancelable: true })))
       await adapter.wait(50)
@@ -163,11 +163,11 @@ export function kanbanConformance(adapter: Adapter) {
       expect(document.activeElement).toBe(branch)
       await adapter.act(() => void keydown(branch, 'ArrowRight'))
       await adapter.wait(50)
-      const destination = [...document.querySelectorAll<HTMLElement>('[data-scope="menu"][data-part="content"][data-level="1"] [role="menuitem"]')].find(item => item.textContent === 'Review')!
+      const destination = [...document.querySelectorAll<HTMLElement>('[data-scope="menu"][data-part="content"][data-level="1"] [role="menuitem"]')].find(item => part(item, 'menu', 'item-text')?.textContent === 'Review')!
       await adapter.act(() => click(destination))
       await adapter.wait(50)
       expect(titles('review')).toEqual(['Call Aigul'])
-      expect(parent.dataset.state).toBe('closed')
+      if (adapter.name === 'svelte') expect(parent.isConnected).toBe(false); else expect(parent.dataset.state).toBe('closed')
       expect(document.activeElement).toBe(card('a'))
     })
 

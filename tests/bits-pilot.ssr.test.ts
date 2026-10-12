@@ -3,6 +3,10 @@ import { render } from 'svelte/server'
 import Combobox from '../packages/svelte/src/components/combobox/Combobox.svelte'
 import Select from '../packages/svelte/src/components/select/Select.svelte'
 import OverlaysPilot from './fixtures/BitsOverlaysPilot.svelte'
+import AnchoredMenu from '../packages/svelte/src/components/menu/AnchoredMenu.svelte'
+import Kanban from '../packages/svelte/src/components/kanban/Kanban.svelte'
+import { columns, tasks } from './conformance/board'
+import DomainMenusPilot from './fixtures/BitsDomainMenusPilot.svelte'
 import MenusPilot from './fixtures/BitsMenusPilot.svelte'
 import Pilot from './fixtures/BitsPilot.svelte'
 
@@ -45,4 +49,18 @@ it('server-renders menus with usable triggers and no floating contents', () => {
   expect(body).toContain('Context target')
   expect(body).toContain('role="menubar"')
   expect(body).not.toContain('role="menu"')
+})
+
+it('server-renders a closed domain menu Dialog without browser globals', () => {
+  const { body } = render(DomainMenusPilot)
+  expect(body).toContain('Open domain menus')
+  expect(body).not.toContain('role="menu"')
+})
+
+it('server-renders Kanban cards and a closed anchored menu without DOM APIs', () => {
+  const board = render(Kanban, { props: { columns, cards: tasks } }).body
+  expect(board).toContain('Call Aigul')
+  expect(board).not.toContain('role="menu"')
+  const anchored = render(AnchoredMenu, { props: { id: 'row', open: false, items: [], anchor: null, reference: () => null, label: 'Row actions', onClose: () => {}, onSelect: () => {} } }).body
+  expect(anchored).not.toContain('role="menu"')
 })

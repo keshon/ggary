@@ -1,9 +1,9 @@
 <script lang="ts" generics="Row">
   import { rowMenuAnchor, rowMenuTarget, type DataGridController, type RowMenuTarget, type VirtualAnchor } from '@ggary/core/data-grid'
-  import { connect, createMenuMachine, type MenuEntry, type MenuSelectDetails } from '@ggary/core/menu'
-  import { svelteNormalizer, uid } from '@ggary/core'
+  import type { MenuEntry, MenuSelectDetails } from '@ggary/core/menu'
+  import { uid } from '@ggary/core'
   import { untrack } from 'svelte'
-  import MenuContent from '../menu/MenuContent.svelte'
+  import AnchoredMenu from '../menu/AnchoredMenu.svelte'
 
   type Props = {
     grid: DataGridController<Row>
@@ -21,19 +21,12 @@
    * It stands at the pointer, or under the active cell for the keyboard, and
    * gives the focus back to the grid when it closes.
    */
-  let target: RowMenuTarget<Row> | null = null
-  let anchor: VirtualAnchor | null = null
-
-  const machine = createMenuMachine({
-    id: uid('gg-grid-menu'),
-    items: [],
-    onSelect: (value, details) => {
-      if (target) onSelect(value, target, details)
-    },
-  })
-  let snapshot = $state.raw(machine.getState())
-  machine.subscribe(() => (snapshot = machine.getState()))
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label }))
+  let target = $state<RowMenuTarget<Row> | null>(null)
+  let anchor = $state<VirtualAnchor | null>(null)
+  let open = $state(false)
+  let menuItems = $state<MenuEntry[]>([])
+  let focus = $state<'first' | 'none'>('first')
+  const id = uid('gg-grid-menu')
 
   $effect(() => grid.provide('menu'))
 
@@ -49,12 +42,14 @@
       target = found
       anchor = rowMenuAnchor(snapshot, grid as DataGridController<unknown>)
       untrack(() => {
-        machine.send({ type: 'SYNC_ITEMS', items: items(found) })
+        menuItems = items(found)
         // The keyboard lands on the first item; a pointer, on the menu itself.
-        machine.send({ type: 'OPEN', reason: 'api', focus: snapshot.grid.menu?.point ? 'none' : 'first' })
+        focus = snapshot.grid.menu?.point ? 'none' : 'first'
+        open = true
       })
     })
   })
 </script>
 
-<MenuContent {api} getState={machine.getState} reference={() => grid.element} anchor={() => anchor} dismissOnReference />
+<AnchoredMenu {id} {open} items={menuItems} {focus} {label} {anchor} reference={() => grid.element}
+  onClose={() => open = false} onSelect={(value, details) => { if (target) onSelect(value, target, details) }} />

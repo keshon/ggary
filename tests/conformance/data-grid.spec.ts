@@ -350,7 +350,7 @@ export function gridRowsConformance(adapter: Adapter) {
           .querySelectorAll<HTMLElement>('[data-part="cell"]')[column]
       const editor = () => part(m.root, 'data-grid', 'editor') as (HTMLInputElement & HTMLSelectElement) | null
       const status = () => part(m.root, 'data-grid', 'status')!.textContent
-      const menu = () => adapter.name === 'react' ? document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"][aria-label="Row actions"]')! : part(m.root, 'menu', 'content')!
+      const menu = () => document.querySelector<HTMLElement>('[data-scope="menu"][data-part="content"][aria-label="Row actions"]')!
       const sheet = () => part(m.root, 'dialog', 'content') as HTMLDialogElement
       const press = (target: Element, name: string, init: KeyboardEventInit = {}) => adapter.act(() => void key(target, name, init))
       const focusCell = async (column: number) => {
@@ -448,19 +448,19 @@ export function gridRowsConformance(adapter: Adapter) {
 
     it('a right click opens the row menu at the pointer; a choice reports the row', async () => {
       const { chosen, grid, cell, menu, m } = await setup()
-      expect(menu().dataset.state).toBe('closed')
+      if (adapter.name === 'svelte') expect(menu()).toBeNull(); else expect(menu().dataset.state).toBe('closed')
       const event = new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: 40, clientY: 60 })
       await adapter.act(() => void cell(1, 0).dispatchEvent(event))
-      await adapter.wait(0)
+      await adapter.wait(60)
       expect(event.defaultPrevented).toBe(true)
       expect(menu().dataset.state).toBe('open')
       expect(menu().getAttribute('aria-label')).toBe('Row actions')
       const items = parts(menu(), 'menu', 'item')
       expect(items.map((item) => part(item, 'menu', 'item-text')!.textContent)).toEqual(['Open', 'Archive'])
       await adapter.act(() => click(items[1]))
-      await adapter.wait(0)
+      await adapter.wait(60)
       expect(chosen).toEqual([{ value: 'archive', id: 2, selection: null }])
-      expect(menu().dataset.state).toBe('closed')
+      if (adapter.name === 'svelte') expect(menu()).toBeNull(); else expect(menu().dataset.state).toBe('closed')
       expect(document.activeElement).toBe(grid())
     })
 
@@ -468,7 +468,7 @@ export function gridRowsConformance(adapter: Adapter) {
       const { grid, menu, press, focusCell } = await setup()
       await focusCell(3)
       await press(grid(), 'F10', { shiftKey: true })
-      await adapter.wait(0)
+      await adapter.wait(60)
       expect(menu().dataset.state).toBe('open')
       expect(part(document.activeElement!, 'menu', 'item-text')?.textContent).toBe('Open')
     })
