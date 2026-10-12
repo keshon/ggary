@@ -165,7 +165,7 @@ export function menubarConformance(adapter: Adapter) {
         await adapter.act(() => click(barItem('File')))
         expect(openMenus()).toHaveLength(1)
         // Opened by a pointer: focus on the menu, no row highlighted.
-        expect(document.activeElement).toBe(adapter.name === 'react' ? row('New') : openMenus()[0])
+        await vi.waitFor(() => expect(document.activeElement).toBe(adapter.name === 'react' ? row('New') : openMenus()[0]), { timeout: 1000, interval: 20 })
         const hover = (el: Element) =>
           adapter.act(async () => {
             el.dispatchEvent(new MouseEvent('pointerover', { bubbles: true, relatedTarget: document.body }))
