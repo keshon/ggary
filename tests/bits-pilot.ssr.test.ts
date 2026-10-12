@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest'
 import { render } from 'svelte/server'
+import Combobox from '../packages/svelte/src/components/combobox/Combobox.svelte'
 import Select from '../packages/svelte/src/components/select/Select.svelte'
 import Pilot from './fixtures/BitsPilot.svelte'
 
@@ -18,4 +19,12 @@ it('renders a closed dialog opener without browser globals or live overlay conte
   expect(body).toContain('Open pilot')
   expect(body).toContain('aria-expanded="false"')
   expect(body).not.toContain('role="dialog"')
+})
+
+it('renders Combobox selected labels and public submission values on the server', () => {
+  const { body } = render(Combobox, { props: { multiple: true, name: 'tags', defaultValue: ['a'], selectedItems: [{ value: 'a', label: 'Alpha' }] } })
+  expect(body).toContain('Alpha')
+  expect(body).toContain('name="tags"')
+  expect(body).toContain('value="a"')
+  expect(body).not.toContain('role="listbox"')
 })

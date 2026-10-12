@@ -1399,7 +1399,7 @@ export const click = (target: Element) => {
   // Base UI rejects a bare MouseEvent on an unhighlighted option as an
   // accidental release after opening. An explicit virtual pointer click is
   // its supported keyboard/assistive-technology activation path.
-  if (target.getAttribute('data-backend') === 'bits-ui' && target.getAttribute('data-scope') === 'select') {
+  if (target.getAttribute('data-backend') === 'bits-ui' && (target.getAttribute('data-scope') === 'select' || (target.getAttribute('data-scope') === 'combobox' && target.getAttribute('role') === 'option'))) {
     target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'mouse', button: 0 }))
     target.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, cancelable: true, pointerType: 'mouse', button: 0 }))
     return

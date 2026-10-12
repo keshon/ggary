@@ -239,3 +239,8 @@ body {
   .bar-end { flex-basis: 100%; justify-content: flex-end; }
   .section { scroll-margin-block-start: 116px; }
 }
+
+/* A Combobox needs room for its editor plus the preview's padding. */
+.combobox-pilot-page .specimens {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+}

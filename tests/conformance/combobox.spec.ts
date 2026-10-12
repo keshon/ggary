@@ -26,27 +26,28 @@ export function comboboxConformance(adapter: Adapter) {
       const changes: string[][] = []
       const m = await adapter.combobox({ label: 'Manager', items: managers, onValueChange: (value) => changes.push(value), ...props }, freshTarget())
       const input = () => part(m.root, 'combobox', 'input') as HTMLInputElement
-      const content = () => adapter.name === 'react' ? document.getElementById(input().id.replace('-input', '-content'))! : part(m.root, 'combobox', 'content')!
+      const content = () => (adapter.name === 'react' || adapter.name === 'svelte') ? document.getElementById(input().id.replace('-input', '-content'))! : part(m.root, 'combobox', 'content')!
       const options = () => parts(content(), 'combobox', 'item')
       const texts = () => options().map((option) => part(option, 'combobox', 'item-text')!.textContent)
-      const type = (text: string) => adapter.act(async () => {
+      const type = async (text: string) => { await adapter.act(async () => {
         if (adapter.name === 'react') {
           Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(input(), text)
           input().dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }))
           await new Promise(r => setTimeout(r, 60))
         } else setInputValue(input(), text)
-      })
-      const press = (name: string, init: KeyboardEventInit = {}) => adapter.act(async () => { key(input(), name, init); if (adapter.name === 'react') await new Promise(r => setTimeout(r, 60)) })
+      }); if (adapter.name === 'svelte') await adapter.wait(30) }
+      const press = async (name: string, init: KeyboardEventInit = {}) => { await adapter.act(async () => { key(input(), name, init); if (adapter.name === 'react') await new Promise(r => setTimeout(r, 60)) }); if (adapter.name === 'svelte') await adapter.wait(30) }
       return { m, input, content, options, texts, type, press, changes }
     }
 
     it('is a combobox field named by its label, controlling a listbox, with a live status', async () => {
-      const { m, input, content } = await setup()
+      const { m, input, content, press } = await setup()
       const field = input()
       expect(field.getAttribute('role')).toBe('combobox')
       expect(field.getAttribute('aria-autocomplete')).toBe('list')
       expect(field.getAttribute('aria-expanded')).toBe('false')
-      expect(field.getAttribute('aria-controls')).toBe(adapter.name === 'react' ? null : content().id)
+      expect(field.getAttribute('aria-controls')).toBe(null)
+      await press('ArrowDown')
       expect(content().getAttribute('role')).toBe('listbox')
       const label = part(m.root, 'combobox', 'label') as HTMLLabelElement
       expect(label.htmlFor).toBe(field.id)
@@ -136,6 +137,7 @@ export function comboboxConformance(adapter: Adapter) {
 
     it('several values: chips in the field, each with a named remove, and Backspace takes the last', async () => {
       const { m, input, type, press, changes, content } = await setup({ multiple: true, defaultValue: ['daria'] })
+      await press('ArrowDown')
       expect(content().getAttribute('aria-multiselectable')).toBe('true')
       const chips = () => parts(m.root, 'combobox', 'chip').map((chip) => part(chip, 'combobox', 'chip-text')!.textContent)
       expect(chips()).toEqual(['Daria Morozova'])

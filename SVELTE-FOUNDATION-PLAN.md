@@ -28,7 +28,7 @@ open overlays are client-rendered; do not claim server-rendered dialog contents
 or exhaustive hydration coverage. Existing core machines remain for unmigrated
 Svelte/vanilla components, but these migrated Svelte adapters do not use them.
 
-## 2. Combobox
+## 2. Combobox (implemented; verification checkpoint below)
 
 Validate filtering, async/dynamic items, single/multiple values, keyboard and
 form/reset before removing the old implementation. Reuse the pilot's portal,
@@ -77,3 +77,35 @@ and 544 light/dark measurements, docs production build, and React inventory/CSS
 audit. No React inventory drift. Shared theme CSS is 372,283 bytes / 44,190 gzip;
 structure is 80,181 / 10,801 gzip. No installed Svelte consumer/release artifact
 is claimed yet; that remains phase 5. Pilot browser tests are now part of hosted CI.
+
+
+## Combobox checkpoint (2026-10-12)
+
+Dialog/Select pilot hosted CI passed on run 38245764464. Combobox now uses Bits UI
+for input navigation, highlighting, selection and floating layers. Removed
+createComboboxMachine, attachComboboxSource, attachPopover and manual highlighted
+scroll wiring from this Svelte adapter. GGary retains ranked filtering, abortable
+remote search, creation, selected-label retention, chips, binding callbacks and
+canonical named submission inputs. Internal prefixed keys preserve empty-string
+public values and keep the create option distinct from real item keys.
+
+Remote results are ignored after abort, closure, disabling or query changes.
+Creation is guarded against reset, disable and unmount. The input keeps its
+committed label on blur; multiple choices clear the search and keep the list open.
+The docs page marks Bits ownership and exposes Dialog, form/reset and creation
+examples. Its specimen grid now allows room for the editor and preview padding.
+
+Focused checks passed: 26 Combobox conformance cases; four adapter edge-case tests
+(stale remote answers, creation after reset, retained remote labels, empty keys
+and dynamic owner updates); three Node SSR cases across the pilot; four actual
+Chromium pilot cases including nested Combobox, binding, submission/reset and
+layered Escape. Full fast-suite and final type/theme/build checks follow.
+Next batch: the overlay family, starting with Popover and Tooltip.
+
+
+Final Combobox local gates passed: 102 fast test files, 2,776 passed / nine
+existing skips; four Chromium pilot tests; TypeScript/Svelte zero diagnostics;
+theme checks; docs production build; React inventory/CSS audit with no inventory
+drift. Shared theme CSS is 372,457 bytes / 44,196 gzip; structure is 80,355 /
+10,808 gzip. Existing React act warnings remain. Live docs checks exercised local
+filtering, keyboard selection, multiple chips and the Dialog composition.

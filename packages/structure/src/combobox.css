@@ -103,3 +103,9 @@
   z-index: var(--gg-z-menu, 1100);
   pointer-events: auto;
 }
+
+/* Bits UI owns placement. Adapter aliases isolate its geometry variables. */
+[data-scope='combobox'][data-part='content'][data-backend='bits-ui'] {
+  z-index: calc(var(--gg-z-dialog, 1000) + var(--gg-z-popover, 50));
+  min-inline-size: var(--gg-anchor-width, 200px);
+}
