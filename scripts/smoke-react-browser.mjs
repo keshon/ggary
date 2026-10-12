@@ -48,6 +48,7 @@ export async function checkConsumerBrowser(consumer, stage) {
     await page.waitForFunction(() => !!document.activeElement?.closest('[role=dialog]'))
     await page.mouse.click(5, 5)
     await dialog.waitFor({ state: 'hidden' })
+    await page.waitForFunction(() => document.activeElement?.textContent === 'Open settings')
     await page.getByRole('button', { name: 'Save', exact: true }).focus()
     await page.keyboard.press('Alt+e')
     await page.getByRole('menuitem', { name: 'Undo edit', exact: true }).waitFor()
