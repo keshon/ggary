@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { pathToFileURL } from 'node:url'
 import { join } from 'node:path'
@@ -47,6 +48,7 @@ export async function checkConsumerBrowser(consumer, stage) {
     await page.waitForFunction(() => !!document.activeElement?.closest('[role=dialog]'))
     await page.mouse.click(5, 5)
     await dialog.waitFor({ state: 'hidden' })
+    await page.getByRole('button', { name: 'Save', exact: true }).focus()
     await page.keyboard.press('Alt+e')
     await page.getByRole('menuitem', { name: 'Undo edit', exact: true }).waitFor()
     await page.waitForFunction(() => document.activeElement?.textContent === 'Undo edit')
@@ -62,7 +64,11 @@ export async function checkConsumerBrowser(consumer, stage) {
     console.log('Browser passed: native validation, submission/reset, toolbar arrows, nested Select/Dialog Escape and focus return, Menubar Alt activation/repeat.')
   } catch (error) {
     const page = browser?.contexts()[0]?.pages()[0]
-    if (page) await page.screenshot({ path: join(stage, 'consumer-browser-failure.png'), fullPage: true }).catch(() => {})
+    if (page) {
+      await page.screenshot({ path: join(stage, 'consumer-browser-failure.png'), fullPage: true }).catch(() => {})
+      const state = await page.evaluate(() => ({ activeElement: document.activeElement?.outerHTML, html: document.body.innerHTML })).catch(() => null)
+      writeFileSync(join(stage, 'consumer-browser-failure.json'), JSON.stringify(state, null, 2))
+    }
     throw error
   } finally {
     await browser?.close()
