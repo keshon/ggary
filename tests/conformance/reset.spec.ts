@@ -116,7 +116,7 @@ export function resetConformance(adapter: Adapter) {
       const trigger = () => part(m.root, 'select', 'trigger')!
       await adapter.act(() => { (trigger() as HTMLElement).focus(); click(trigger()) })
       if (adapter.name === 'react') await adapter.wait(20)
-      await adapter.act(() => click(parts(adapter.name === 'react' ? document : m.root, 'select', 'item')[1]))
+      await adapter.act(() => click(parts((adapter.name === 'react' || adapter.name === 'svelte') ? document : m.root, 'select', 'item')[1]))
       expect(trigger().textContent).toContain('Bravo')
       await reset(target)
       expect(trigger().textContent).toContain('Alpha')

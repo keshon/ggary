@@ -44,7 +44,7 @@ export function formConformance(adapter: Adapter) {
           click(trigger)
         })
         await adapter.wait(0)
-        const option = parts(adapter.name === 'react' ? document : m.root, 'select', 'item').find((item) => item.textContent?.includes(label))!
+        const option = parts((adapter.name === 'react' || adapter.name === 'svelte') ? document : m.root, 'select', 'item').find((item) => item.textContent?.includes(label))!
         await adapter.act(() => click(option))
         await adapter.wait(20)
       }

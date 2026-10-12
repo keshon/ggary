@@ -16,6 +16,13 @@ export default defineConfig({
         test: { name: 'contract', environment: 'node', include: ['tests/*.contract.test.ts'], globals: true },
       },
       {
+        plugins: [svelte({ hot: false })],
+        test: {
+          name: 'svelte-ssr', environment: 'node', include: ['tests/*.ssr.test.ts'], globals: true,
+          server: { deps: { inline: [/bits-ui/, /runed/, /svelte-toolbelt/] } },
+        },
+      },
+      {
         // DOM conformance, run against all three adapters (tests/conformance),
         // plus element-only API tests.
         //
@@ -26,7 +33,7 @@ export default defineConfig({
         resolve: { conditions: ['browser'] },
         test: {
           name: 'dom',
-          server: { deps: { inline: [/@base-ui\//, /@floating-ui\//] } },
+          server: { deps: { inline: [/@base-ui\//, /@floating-ui\//, /bits-ui/, /runed/, /svelte-toolbelt/] } },
           environment: 'jsdom',
           include: ['tests/*.dom.test.ts'],
           globals: true,

@@ -44,6 +44,7 @@
     {#key page.id}
       <article class="page">
         <h1 class="page-title">{page.title}</h1>
+        {#if ['dialog', 'sheet', 'select'].includes(page.id)}<span class="implementation-badge">Built with Bits UI</span>{/if}
         {#await demo then loaded}
           {#if loaded}<loaded.default />{/if}
         {/await}

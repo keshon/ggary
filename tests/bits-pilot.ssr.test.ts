@@ -1,0 +1,21 @@
+import { expect, it } from 'vitest'
+import { render } from 'svelte/server'
+import Select from '../packages/svelte/src/components/select/Select.svelte'
+import Pilot from './fixtures/BitsPilot.svelte'
+
+it('renders the select value, label and named field without browser globals', () => {
+  expect(typeof window).toBe('undefined')
+  const { body } = render(Select, { props: { items: [{ value: 'a', label: 'Alpha' }], defaultValue: 'a', label: 'Stage', name: 'stage' } })
+  expect(body).toContain('Alpha')
+  expect(body).toContain('Stage')
+  expect(body).toContain('name="stage"')
+  expect(body).toContain('value="a"')
+  expect(body).toContain('role="combobox"')
+  expect(body).not.toContain('role="listbox"')
+})
+it('renders a closed dialog opener without browser globals or live overlay content', () => {
+  const { body } = render(Pilot)
+  expect(body).toContain('Open pilot')
+  expect(body).toContain('aria-expanded="false"')
+  expect(body).not.toContain('role="dialog"')
+})

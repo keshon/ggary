@@ -17,10 +17,11 @@
     }
   },
   "peerDependencies": {
-    "svelte": "^5.0.0"
+    "svelte": "^5.33.0"
   },
   "dependencies": {
     "@ggary/core": "*",
-    "@ggary/icons": "*"
+    "@ggary/icons": "*",
+    "bits-ui": "^2.19.5"
   }
 }

@@ -1,11 +1,10 @@
 <script lang="ts">
   import { Button, Dialog, Field, Input, Select } from '@ggary/svelte'
+  import DialogSpecimen from '../../svelte/DialogSpecimen.svelte'
   import DemoPage from '../../svelte/DemoPage.svelte'
   import Specimen from '../../svelte/Specimen.svelte'
   import { roles, terms } from '../../data/overlays'
 
-  /** Shown with the page, beside it rather than over it, so it can be seen without being opened. */
-  const shown = { defaultOpen: true, modal: false, closeOnOutside: false } as const
 </script>
 
 {#snippet actions(save: string, destructive = false)}
@@ -17,19 +16,19 @@
   {#snippet variants()}
     <Specimen label="title, description, footer" wide>
       <div class="frame">
-        <Dialog {...shown} title="Edit profile" description="Changes show on your public profile.">
+        <DialogSpecimen title="Edit profile" description="Changes show on your public profile.">
           <Field label="Display name"><Input defaultValue="Garry" /></Field>
           <Select label="Role" items={roles} defaultValue="editor" />
           {#snippet footer()}{@render actions('Save')}{/snippet}
-        </Dialog>
+        </DialogSpecimen>
       </div>
     </Specimen>
     <Specimen label={`role="alertdialog" closeButton={false}`} wide>
       <div class="frame">
-        <Dialog {...shown} role="alertdialog" size="sm" closeButton={false} title="Delete project?" description="This cannot be undone.">
+        <DialogSpecimen role="alertdialog" size="sm" closeButton={false} title="Delete project?" description="This cannot be undone.">
           <p>Everything in “Atlas” goes, including its run history and settings.</p>
           {#snippet footer()}{@render actions('Delete', true)}{/snippet}
-        </Dialog>
+        </DialogSpecimen>
       </div>
     </Specimen>
   {/snippet}
@@ -37,10 +36,10 @@
     {#each ['sm', 'md', 'lg'] as const as size (size)}
       <Specimen label={`size="${size}"`} wide>
         <div class="frame">
-          <Dialog {...shown} {size} title="Terms of service">
+          <DialogSpecimen {size} title="Terms of service">
             {#each terms as clause (clause)}<p>{clause}</p>{/each}
             {#snippet footer()}<Button emphasis="high">Accept</Button>{/snippet}
-          </Dialog>
+          </DialogSpecimen>
         </div>
       </Specimen>
     {/each}
@@ -49,7 +48,10 @@
     <Specimen label="trigger">
       <Dialog title="Edit profile" description="Changes show on your public profile.">
         {#snippet trigger(props)}<Button {...props}>Edit profile</Button>{/snippet}
+        <div class="select-pilot-layout">
         <Field label="Display name"><Input defaultValue="Garry" /></Field>
+        <Select label="Role" items={roles} defaultValue="editor" />
+        </div>
         {#snippet footer()}{@render actions('Save')}{/snippet}
       </Dialog>
     </Specimen>

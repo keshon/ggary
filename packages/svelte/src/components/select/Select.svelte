@@ -1,143 +1,94 @@
 <script lang="ts">
-  import { getConfig } from '../config-provider/context'
-  import type { ControlSize } from '@ggary/core'
-  import { connect, createSelectMachine, type SelectItem } from '@ggary/core/select'
-  import { attachPopover, mergeProps, onFormReset, scrollIntoViewIfNeeded, svelteNormalizer, uid } from '@ggary/core'
-  import { useFormField } from '../form/context.svelte'
+  import { Select as Primitive, mergeProps } from 'bits-ui'
   import { untrack } from 'svelte'
+  import { getConfig } from '../config-provider/context'
+  import { onFormReset, type ControlSize } from '@ggary/core'
+  import type { SelectItem } from '@ggary/core/select'
+  import { useFormField } from '../form/context.svelte'
 
   type Props = {
-    /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
     size?: ControlSize
     items: SelectItem[]
     label?: string
     placeholder?: string
-    /** Bindable: `bind:value`. A one-way `value` works too. */
+    /** Two-way with bind:value; callbacks report user choices without echoing owner updates. */
     value?: string | null
     defaultValue?: string | null
     disabled?: boolean
     name?: string
     onValueChange?: (value: string | null, item: SelectItem | null) => void
   }
-
-  let {
-    size: ownSize,
-    items,
-    label,
-    placeholder,
-    value = $bindable(),
-    defaultValue,
-    disabled = false,
-    name,
-    onValueChange,
-  }: Props = $props()
+  let { size: ownSize, items, label, placeholder = 'Select...', value = $bindable(),
+    defaultValue, disabled = false, name, onValueChange }: Props = $props()
   const kit = getConfig()
-  const size = $derived(ownSize ?? kit().size)
-
-  const id = uid('gg-select')
-
-  // Built once from the props at mount; items, disabled and value reach it
-  // afterwards through the SYNC effects below. See ChipGroup.svelte for why
-  // this is `untrack`. Uncontrolled at heart, as `bind:value` is (and as
-  // RadioGroup and Dialog are): a choice moves the select and writes the
-  // binding, and a new `value` from outside arrives through SYNC_VALUE.
-  const initial = untrack(() => (value !== undefined ? value : (defaultValue ?? null)))
-  const machine = untrack(() =>
-    createSelectMachine({
-      id,
-      items,
-      defaultValue: initial,
-      disabled,
-      onValueChange: (next, item) => {
-        value = next
-        onValueChange?.(next, item)
-        form.edited()
-      },
-    })
-  )
-
-  let snapshot = $state(machine.getState())
-  $effect(() => machine.subscribe((next) => (snapshot = next)))
-  // Effects that attach on open read this, not the snapshot: a new snapshot on every
-  // change would detach and attach them again on each key.
-  const isOpen = $derived(snapshot.open)
-
-  // Identical to the React adapter's `connect()` call — different normalizer.
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { placeholder, name, size }))
-  // Inside a Form, by name: the error its rules hold for this choice.
-  const form = useFormField(() => name, () => api.ids.trigger, () => label)
-
-  // Props flow in as events, exactly as in React.
-  $effect(() => machine.send({ type: 'SYNC_ITEMS', items }))
-  $effect(() => machine.send({ type: 'SYNC_DISABLED', disabled }))
-  $effect(() => {
-    if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value })
-  })
-
+  const size = $derived(ownSize ?? kit().size ?? 'md')
+  const componentId = $props.id()
+  const id = `gg-bits-select-${componentId}`
+  const initial = untrack(() => value !== undefined ? value : (defaultValue ?? null))
+  let localValue = $state(initial)
+  let isOpen = $state(false)
+  const selected = $derived(value !== undefined ? value : localValue)
+  // Bits reserves an empty string for no selection; GGary allows it as an item value.
+  const bitsItems = $derived(items.map(item => ({ ...item, value: `gg:${item.value}` })))
+  const bitsValue = $derived(selected == null ? '' : `gg:${selected}`)
+  const selectedItem = $derived(items.find(item => item.value === selected))
+  const form = useFormField(() => name, () => `${id}-trigger`, () => label)
   let triggerEl = $state<HTMLButtonElement | null>(null)
-
-  // A reset form puts the select back where it started.
-  $effect(() =>
-    onFormReset(triggerEl, () => {
-      value = initial
-      machine.send({ type: 'SYNC_VALUE', value: initial })
-    })
-  )
-  let positionerEl = $state<HTMLDivElement | null>(null)
-  let contentEl = $state<HTMLUListElement | null>(null)
-
+  $effect(() => onFormReset(triggerEl, () => { value = initial; localValue = initial }))
+  const part = (name: string) => ({ 'data-scope': 'select', 'data-part': name, 'data-backend': 'bits-ui' })
+  function changed(next: string) {
+    const nextValue = next === '' ? null : next.slice(3)
+    value = nextValue; localValue = nextValue
+    onValueChange?.(nextValue, items.find(item => item.value === nextValue) ?? null)
+    form.edited()
+  }
+  let inheritedStyle = $state('')
+  let inheritedDir = $state<'ltr' | 'rtl'>('ltr')
   $effect(() => {
-    if (!isOpen || !triggerEl || !positionerEl) return
-    // Focus stays on the trigger (aria-activedescendant), so no focus management.
-    const popover = attachPopover(triggerEl, positionerEl, {
-      sameWidth: true,
-      gutter: 4,
-      // Placement is asynchronous and shortens the list: keep the highlight in view after it.
-      onPlaced: () => {
-        const { highlightedIndex } = machine.getState()
-        if (highlightedIndex >= 0) scrollIntoViewIfNeeded(document.getElementById(api.ids.item(highlightedIndex)), contentEl)
-      },
-      onDismiss: () => {
-        machine.send({ type: 'CLOSE' })
-        triggerEl?.focus()
-      },
-    })
-    return () => popover.destroy()
-  })
-
-  $effect(() => {
-    if (!isOpen || snapshot.highlightedIndex < 0) return
-    scrollIntoViewIfNeeded(document.getElementById(api.ids.item(snapshot.highlightedIndex)), contentEl)
+    if (!isOpen || !triggerEl) return
+    const computed = getComputedStyle(triggerEl)
+    const vars: string[] = []
+    for (let i = 0; i < computed.length; i++) {
+      const key = computed[i]
+      if (key.startsWith('--')) vars.push(`${key}:${computed.getPropertyValue(key)}`)
+    }
+    inheritedDir = kit().dir ?? (computed.direction === 'rtl' ? 'rtl' : 'ltr')
+    inheritedStyle = `direction:${inheritedDir};${vars.join(';')}`
   })
 </script>
 
-<div {...api.rootProps}>
-  {#if label}
-    <!-- svelte-ignore a11y_label_has_associated_control -->
-    <label {...api.labelProps}>{label}</label>
-  {/if}
-
-  <button bind:this={triggerEl} {...mergeProps(api.triggerProps, form.field.controlProps)}>
-    <span {...api.valueProps}>{api.displayText}</span>
-    <span {...api.indicatorProps}></span>
-  </button>
-
-  <div bind:this={positionerEl} {...api.positionerProps}>
-    <ul bind:this={contentEl} {...api.contentProps}>
-      {#if api.items.length === 0}
-        <li {...api.emptyProps}>No options</li>
-      {/if}
-      {#each api.items as item, index (item.value)}
-        <li {...api.getItemProps(item, index)}>
-          <span {...api.getItemTextProps()}>{item.label}</span>
-          <span {...api.getItemIndicatorProps()}></span>
-        </li>
-      {/each}
-    </ul>
-  </div>
-
+<div {...part('root')} data-size={size} data-disabled={disabled ? '' : undefined}>
+  <Primitive.Root type="single" value={bitsValue} onValueChange={changed} bind:open={isOpen}
+    items={bitsItems} {disabled} allowDeselect={false} loop>
+    {#if label}
+      <label {...part('label')} id={`${id}-label`} for={`${id}-trigger`} data-disabled={disabled ? '' : undefined}>{label}</label>
+    {/if}
+    <Primitive.Trigger {...part('trigger')} id={`${id}-trigger`} bind:ref={triggerEl}
+      role="combobox" aria-controls={isOpen ? `${id}-content` : undefined}
+      aria-invalid={form.error ? 'true' : undefined} aria-describedby={form.field.controlProps['aria-describedby']}
+      data-invalid={form.error ? '' : undefined}
+      aria-labelledby={label ? `${id}-label` : undefined}>
+      <span {...part('value')} data-placeholder={!selectedItem ? '' : undefined}>{selectedItem?.label ?? placeholder}</span>
+      <span {...part('indicator')} data-icon="chevron-down" aria-hidden="true" data-state={isOpen ? 'open' : 'closed'}></span>
+    </Primitive.Trigger>
+    <Primitive.Portal>
+      <Primitive.Content id={`${id}-content`} sideOffset={4} align="start" strategy="fixed" dir={inheritedDir} style={inheritedStyle}>
+        {#snippet child({ props: contentProps, wrapperProps })}
+          <div {...wrapperProps} {...part('positioner')} data-state={isOpen ? 'open' : 'closed'}>
+            <div {...mergeProps(contentProps, part('content'), { style: { '--gg-anchor-width': 'var(--bits-floating-anchor-width)', '--gg-available-height': 'var(--bits-floating-available-height)' } })} aria-labelledby={label ? `${id}-label` : undefined}>
+              {#if items.length === 0}<div {...part('empty')}>No options</div>{/if}
+              {#each items as item (item.value)}
+                <Primitive.Item {...part('item')} value={`gg:${item.value}`} label={item.label} disabled={item.disabled} aria-disabled={item.disabled ? 'true' : undefined}>
+                  <span {...part('item-text')}>{item.label}</span>
+                  <span {...part('item-indicator')} data-icon="check" aria-hidden="true"></span>
+                </Primitive.Item>
+              {/each}
+            </div>
+          </div>
+        {/snippet}
+      </Primitive.Content>
+    </Primitive.Portal>
+  </Primitive.Root>
   <span {...form.field.errorProps}>{form.error}</span>
-  {#if name}
-    <input {...api.hiddenInputProps} />
-  {/if}
+  {#if name}<input type="hidden" {name} value={selected ?? ''} {disabled} data-scope="select" data-part="hidden-input" />{/if}
 </div>

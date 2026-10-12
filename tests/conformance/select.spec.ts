@@ -16,14 +16,16 @@ const items: SelectItem[] = [
  */
 export function selectConformance(adapter: Adapter) {
   const base = adapter.name === 'react'
+  const bits = adapter.name === 'svelte'
+  const portalled = base || bits
   describe('select', () => {
     const setup = async (props: Partial<SelectProps> = {}, target = freshTarget()) => {
       const m = await adapter.select({ items, label: 'Framework', placeholder: 'Pick one', ...props }, target)
       const trigger = () => part(m.root, 'select', 'trigger')!
-      const scope = () => base ? document : m.root
+      const scope = () => portalled ? document : m.root
       const activate = async (el: Element) => {
         await adapter.act(() => { (el as HTMLElement).focus(); click(el) })
-        if (base) await adapter.wait(20)
+        if (portalled) await adapter.wait(20)
       }
       return {
         m,
@@ -37,7 +39,7 @@ export function selectConformance(adapter: Adapter) {
             keydown(target, k)
             if (base && target === trigger() && k === 'Enter') { (target as HTMLElement).focus(); click(target) }
           })
-          if (base) await adapter.wait(20)
+          if (portalled) await adapter.wait(20)
         },
         click: activate,
       }
@@ -46,7 +48,7 @@ export function selectConformance(adapter: Adapter) {
     describe('anatomy', () => {
       it('renders every part the stylesheets target', async () => {
         const { m, options, trigger, click, scope } = await setup()
-        if (base) await click(trigger())
+        if (portalled) await click(trigger())
         for (const name of ['root', 'label', 'trigger', 'value', 'indicator', 'positioner', 'content']) {
           expect(part(scope(), 'select', name), `missing [data-part="${name}"]`).toBeTruthy()
         }
@@ -59,7 +61,7 @@ export function selectConformance(adapter: Adapter) {
 
       it('names its glyphs for the theme to draw, and hides them from assistive tech', async () => {
         const { m, options, trigger, click } = await setup()
-        if (base) await click(trigger())
+        if (portalled) await click(trigger())
         const indicator = part(m.root, 'select', 'indicator')!
         expect(indicator.dataset.icon).toBe('chevron-down')
         expect(indicator.getAttribute('aria-hidden')).toBe('true')
@@ -73,7 +75,7 @@ export function selectConformance(adapter: Adapter) {
       // empty list, while React and Svelte rendered the empty part.
       it('renders the empty part for an empty list, and drops it when items arrive', async () => {
         const { m, options, trigger, click, scope } = await setup({ items: [] })
-        if (base) await click(trigger())
+        if (portalled) await click(trigger())
         expect(part(scope(), 'select', 'empty')).toBeTruthy()
         expect(options()).toHaveLength(0)
 
@@ -95,7 +97,7 @@ export function selectConformance(adapter: Adapter) {
         expect(trigger().getAttribute('role')).toBe('combobox')
         expect(trigger().getAttribute('aria-haspopup')).toBe('listbox')
         expect(trigger().getAttribute('aria-expanded')).toBe('false')
-        if (base) await click(trigger())
+        if (portalled) await click(trigger())
         expect(trigger().getAttribute('aria-controls')).toBe(part(scope(), 'select', 'content')!.id)
         expect(part(scope(), 'select', 'content')!.getAttribute('role')).toBe('listbox')
       })
@@ -113,9 +115,9 @@ export function selectConformance(adapter: Adapter) {
         const { trigger, options, click } = await setup()
         await click(trigger())
         await click(options()[1])
-        if (base) await click(trigger())
+        if (portalled) await click(trigger())
         expect(options()[1].getAttribute('aria-selected')).toBe('true')
-        expect(options()[0].getAttribute('aria-selected')).toBe('false')
+        expect(options()[0].getAttribute('aria-selected') ?? 'false').toBe('false')
         expect(options()[2].getAttribute('aria-disabled')).toBe('true')
       })
     })

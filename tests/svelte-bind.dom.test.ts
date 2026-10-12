@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { flushSync, mount, unmount, type Component } from 'svelte'
 import { CheckboxGroup, ChipGroup, RadioGroup, Select } from '../packages/svelte/src/index'
+import { click } from './conformance/harness'
 import { reactiveProps } from './conformance/adapters/svelte-props.svelte'
 
 /**
@@ -39,8 +40,8 @@ describe('Svelte bind:value', () => {
 
   it('Select writes the chosen value into the binding, and follows it back', () => {
     const { target, props } = render(Select as Component<any>, { items, value: null as string | null })
-    act(() => (target.querySelector('[data-part="trigger"]') as HTMLElement).click())
-    act(() => (target.querySelectorAll('[data-part="item"]')[1] as HTMLElement).click())
+    act(() => click(target.querySelector('[data-part="trigger"]')!))
+    act(() => click(document.querySelectorAll('[data-scope="select"][data-part="item"]')[1]))
     expect(props.value).toBe('b')
     act(() => (props.value = 'a'))
     expect(target.querySelector('[data-part="trigger"]')!.textContent).toContain('Alpha')
@@ -61,4 +62,18 @@ describe('Svelte bind:value', () => {
     act(() => (boxes.target.querySelectorAll('input')[1] as HTMLInputElement).click())
     expect(boxes.props.value).toEqual(['b'])
   })
+})
+
+
+it('Select distinguishes an empty item value from no selection', () => {
+  const changed = vi.fn()
+  const { target } = render(Select as Component<any>, {
+    items: [{ value: '', label: 'Empty key' }, { value: 'other', label: 'Other' }],
+    defaultValue: null, name: 'pick', onValueChange: changed,
+  })
+  act(() => click(target.querySelector('[data-part="trigger"]')!))
+  act(() => click(document.querySelector('[data-scope="select"][data-part="item"]')!))
+  expect(changed).toHaveBeenCalledWith('', { value: '', label: 'Empty key' })
+  expect(target.querySelector('[data-part="trigger"]')!.textContent).toContain('Empty key')
+  expect(target.querySelector<HTMLInputElement>('[name="pick"]')!.value).toBe('')
 })

@@ -1,11 +1,10 @@
 <script lang="ts">
   import { Button, Field, Input, Select, Sheet, Switch } from '@ggary/svelte'
+  import DialogSpecimen from '../../svelte/DialogSpecimen.svelte'
   import DemoPage from '../../svelte/DemoPage.svelte'
   import Specimen from '../../svelte/Specimen.svelte'
   import { roles } from '../../data/overlays'
 
-  /** Shown with the page, beside it rather than over it, so it can be seen without being opened. */
-  const shown = { defaultOpen: true, modal: false, closeOnOutside: false } as const
 </script>
 
 {#snippet parameters()}
@@ -21,7 +20,7 @@
     {#each ['end', 'start'] as const as side (side)}
       <Specimen label={`side="${side}"`} wide>
         <div class="frame">
-          <Sheet {...shown} {side} title="Run parameters" description="Applied to the next run." footer={apply}>{@render parameters()}</Sheet>
+          <DialogSpecimen placement={side} title="Run parameters" description="Applied to the next run." footer={apply}>{@render parameters()}</DialogSpecimen>
         </div>
       </Specimen>
     {/each}
@@ -30,7 +29,7 @@
     {#each ['sm', 'md', 'lg'] as const as size (size)}
       <Specimen label={`size="${size}"`} wide>
         <div class="frame">
-          <Sheet {...shown} {size} title="Run parameters" footer={apply}>{@render parameters()}</Sheet>
+          <DialogSpecimen {size} placement="end" title="Run parameters" footer={apply}>{@render parameters()}</DialogSpecimen>
         </div>
       </Specimen>
     {/each}

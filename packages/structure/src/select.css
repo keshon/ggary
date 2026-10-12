@@ -113,3 +113,15 @@
 [data-scope='cascader'][data-part='positioner'][data-backend='base-ui'] {
   z-index: var(--gg-z-popover, 1100);
 }
+
+/* Bits UI's floating wrapper owns placement; GGary owns the list surface. */
+[data-scope='select'][data-part='positioner'][data-backend='bits-ui'] {
+  inset: auto;
+  z-index: var(--gg-z-popover, 1100);
+}
+[data-scope='select'][data-part='content'][data-backend='bits-ui'] {
+  /* Bits copies the content's computed z-index onto its floating wrapper. */
+  z-index: calc(var(--gg-z-dialog, 1000) + var(--gg-z-popover, 50));
+  min-inline-size: var(--gg-anchor-width, 200px);
+  max-block-size: min(var(--gg-available-height, 280px), 280px);
+}

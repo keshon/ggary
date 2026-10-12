@@ -478,8 +478,8 @@ export function gridRowsConformance(adapter: Adapter) {
       await focusCell(3)
       await press(grid(), 'Enter')
       await adapter.wait(0)
-      const surface = adapter.name === 'react' ? document : m.root
-      const isOpen = () => adapter.name === 'react' ? part(surface, 'dialog', 'content')?.dataset.state === 'open' : sheet().open
+      const surface = document
+      const isOpen = () => (adapter.name === 'react' || adapter.name === 'svelte') ? part(surface, 'dialog', 'content')?.dataset.state === 'open' : sheet().open
       expect(isOpen()).toBe(true)
       expect(part(surface, 'dialog', 'title')!.textContent).toBe('Acme')
       expect(part(surface, 'dialog', 'body')!.textContent).toBe('Lead number 1')

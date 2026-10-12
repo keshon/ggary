@@ -13,35 +13,33 @@ import { type Adapter, type DialogProps, click, freshTarget, part } from './harn
 export function dialogConformance(adapter: Adapter) {
   describe('dialog', () => {
     const react = adapter.name === 'react'
+    const headless = react || adapter.name === 'svelte'
     const setup = async (props: DialogProps = {}) => {
       const m = await adapter.dialog({ trigger: 'Open', title: 'Rename', description: 'Pick a new name', ...props }, freshTarget())
-      const content = () => (react
+      const content = () => (headless
         ? document.getElementById(m.root.querySelector('[aria-haspopup="dialog"]')!.id.replace(/-trigger$/, '-content'))
         : part(m.root, 'dialog', 'content')) as HTMLDialogElement
-      const isOpen = () => react ? content().dataset.state === 'open' : content().open
+      const isOpen = () => headless ? content().dataset.state === 'open' : content().open
       return {
         m,
         content,
         isOpen,
         // Found by its ARIA: the trigger carries no dialog part, it is the page's button.
         trigger: () => m.root.querySelector('[aria-haspopup="dialog"]') as HTMLButtonElement,
-        open: () => adapter.act(async () => {
+        open: async () => { await adapter.act(async () => {
           const trigger = m.root.querySelector<HTMLButtonElement>('[aria-haspopup="dialog"]')!
           trigger.focus(); click(trigger)
-          if (react) await adapter.wait(30)
-        }),
-        escape: () =>
-          adapter.act(async () => {
+        }); if (headless) await adapter.wait(50) },
+        escape: async () => { await adapter.act(async () => {
             const target = document.activeElement ?? document.body
             target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
-            if (react) await adapter.wait(30)
-          }),
+          }); if (headless) await adapter.wait(50) },
         // A press on the backdrop is targeted at the dialog element, outside its box.
         pressBackdrop: () =>
           adapter.act(() => {
-            if (react) {
+            if (headless) {
               const backdrop = part(document, 'dialog', 'backdrop') ?? document.body
-              backdrop.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'mouse', button: 0 }))
+              backdrop.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'mouse', button: 0, clientX: 1, clientY: 1 }))
               backdrop.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 }))
               backdrop.click()
             } else content().dispatchEvent(new MouseEvent('pointerdown', { bubbles: true, clientX: 1, clientY: 1 }))
@@ -52,7 +50,7 @@ export function dialogConformance(adapter: Adapter) {
 
     it('rests closed, with a trigger that says what it opens', async () => {
       const { m, content, trigger, isOpen } = await setup()
-      expect(content().tagName).toBe(react ? 'DIV' : 'DIALOG')
+      expect(content().tagName).toBe(headless ? 'DIV' : 'DIALOG')
       expect(isOpen()).toBe(false)
       expect(content().dataset.state).toBe('closed')
       expect(trigger().getAttribute('aria-haspopup')).toBe('dialog')
@@ -73,7 +71,7 @@ export function dialogConformance(adapter: Adapter) {
       expect(document.getElementById(content().getAttribute('aria-labelledby')!)!.textContent).toBe('Rename')
       expect(document.getElementById(content().getAttribute('aria-describedby')!)!.textContent).toBe('Pick a new name')
       expect(content().contains(document.activeElement)).toBe(true)
-      expect(part(react ? document : m.root, 'dialog', 'close')!.getAttribute('aria-label')).toBe('Close')
+      expect(part(headless ? document : m.root, 'dialog', 'close')!.getAttribute('aria-label')).toBe('Close')
     })
 
     it('Escape closes it, once, and focus goes back to the trigger', async () => {
@@ -95,6 +93,7 @@ export function dialogConformance(adapter: Adapter) {
       await adapter.act(() => action().dispatchEvent(new MouseEvent('pointerdown', { bubbles: true })))
       expect(isOpen()).toBe(true)
       await pressBackdrop()
+      if (headless) await adapter.wait(50)
       expect(isOpen()).toBe(false)
       expect(onOpenChange).toHaveBeenLastCalledWith(false, { reason: 'outside' })
     })
@@ -103,7 +102,7 @@ export function dialogConformance(adapter: Adapter) {
       const onOpenChange = vi.fn()
       const { m, content, open, isOpen } = await setup({ onOpenChange })
       await open()
-      await adapter.act(() => click(part(react ? document : m.root, 'dialog', 'close')!))
+      await adapter.act(() => click(part(headless ? document : m.root, 'dialog', 'close')!))
       expect(isOpen()).toBe(false)
       expect(onOpenChange).toHaveBeenLastCalledWith(false, { reason: 'close-button' })
     })
@@ -113,8 +112,9 @@ export function dialogConformance(adapter: Adapter) {
       await open()
       await escape()
       await pressBackdrop()
+      if (headless) await adapter.wait(50)
       expect(isOpen()).toBe(true)
-      await adapter.act(() => click(part(react ? document : m.root, 'dialog', 'close')!))
+      await adapter.act(() => click(part(headless ? document : m.root, 'dialog', 'close')!))
       expect(isOpen()).toBe(false)
     })
 
@@ -122,7 +122,7 @@ export function dialogConformance(adapter: Adapter) {
       const { m, content, isOpen } = await setup({ role: 'alertdialog', footer: 'Confirm', defaultOpen: true })
       expect(isOpen()).toBe(true)
       expect(content().getAttribute('role')).toBe('alertdialog')
-      expect(part(react ? document : m.root, 'dialog', 'footer')!.textContent).toContain('Confirm')
+      expect(part(headless ? document : m.root, 'dialog', 'footer')!.textContent).toContain('Confirm')
     })
 
     it('a non-modal dialog is marked so, and closes on a press anywhere outside it', async () => {
@@ -130,7 +130,8 @@ export function dialogConformance(adapter: Adapter) {
       await open()
       expect(isOpen()).toBe(true)
       expect(content().hasAttribute('data-modal')).toBe(false)
-      await adapter.act(() => { document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType: 'mouse', button: 0 })); document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 })); document.body.click() })
+      await adapter.act(() => { document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'mouse', button: 0, clientX: 1, clientY: 1 })); document.body.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, button: 0 })); document.body.click() })
+      if (headless) await adapter.wait(50)
       expect(isOpen()).toBe(false)
     })
 
@@ -172,7 +173,7 @@ export function dialogConformance(adapter: Adapter) {
       it('Sheet is the same modal dialog at the end edge by default, and at the start edge on request', async () => {
         const onOpenChange = vi.fn()
         const end = await setup({ sheet: true, onOpenChange })
-        expect(end.content().tagName).toBe(react ? 'DIV' : 'DIALOG')
+        expect(end.content().tagName).toBe(headless ? 'DIV' : 'DIALOG')
         expect(end.content().dataset.placement).toBe('end')
         await end.open()
         expect(end.isOpen()).toBe(true)
@@ -192,7 +193,7 @@ export function dialogConformance(adapter: Adapter) {
     it('unmounted while open, it leaves nothing listening', async () => {
       const { m, open } = await setup()
       await open()
-      expect(openLayerCount()).toBe(adapter.name === 'react' ? 0 : 1)
+      expect(openLayerCount()).toBe(headless ? 0 : 1)
       await m.unmount()
       expect(openLayerCount()).toBe(0)
     })

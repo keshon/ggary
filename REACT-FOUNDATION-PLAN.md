@@ -842,3 +842,11 @@ The one-time sidebar remount remains a documented public-portal constraint.
 The planned React migration is complete. Next development phase is the separate
 Svelte foundation decision; public release version/registry and publishing are
 still separate decisions. Detailed accessibility audits remain follow-up work.
+
+
+### Svelte foundation pilot (2026-10-12)
+
+The React branch was merged and pushed to main at dc81d41. Svelte now has its
+own migration branch and plan in SVELTE-FOUNDATION-PLAN.md. The first batch is
+Dialog/Sheet and Select on Bits UI; shared styling supports both foundations.
+This is a pilot, not a completed Svelte migration or a publishing step.

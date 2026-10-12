@@ -92,3 +92,10 @@ if (typeof element.showPopover !== 'function') {
   /** jsdom cannot match :popover-open; tests read this instead. */
   ;(globalThis as { isPopoverOpen?: (el: HTMLElement) => boolean }).isPopoverOpen = (el) => open.has(el)
 }
+
+// jsdom lacks pointer capture. Geometry and pointer capture are browser checks.
+if (!HTMLElement.prototype.hasPointerCapture) {
+  HTMLElement.prototype.hasPointerCapture = () => false
+  HTMLElement.prototype.setPointerCapture = () => {}
+  HTMLElement.prototype.releasePointerCapture = () => {}
+}
