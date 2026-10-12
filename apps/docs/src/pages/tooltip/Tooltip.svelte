@@ -9,8 +9,8 @@
 <DemoPage>
   {#snippet variants()}
     {#each PLACEMENTS as placement (placement)}
-      <Specimen label={`placement="${placement}" open`}>
-        <Tooltip open {placement} content="Bold (Ctrl+B)">
+      <Specimen label={`placement="${placement}"`}>
+        <Tooltip {placement} content="Bold (Ctrl+B)">
           {#snippet trigger(props)}<Button emphasis="minimal" aria-label="Bold" {...props}><b>B</b></Button>{/snippet}
         </Tooltip>
       </Specimen>

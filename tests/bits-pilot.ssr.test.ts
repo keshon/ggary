@@ -2,6 +2,7 @@ import { expect, it } from 'vitest'
 import { render } from 'svelte/server'
 import Combobox from '../packages/svelte/src/components/combobox/Combobox.svelte'
 import Select from '../packages/svelte/src/components/select/Select.svelte'
+import OverlaysPilot from './fixtures/BitsOverlaysPilot.svelte'
 import Pilot from './fixtures/BitsPilot.svelte'
 
 it('renders the select value, label and named field without browser globals', () => {
@@ -27,4 +28,12 @@ it('renders Combobox selected labels and public submission values on the server'
   expect(body).toContain('name="tags"')
   expect(body).toContain('value="a"')
   expect(body).not.toContain('role="listbox"')
+})
+
+it('server-renders overlay triggers without mounting floating contents', () => {
+  const { body } = render(OverlaysPilot)
+  expect(body).toContain('Open overlays')
+  expect(body).toContain('Outside help trigger')
+  expect(body).not.toContain('role="tooltip"')
+  expect(body).not.toContain('role="dialog"')
 })

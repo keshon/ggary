@@ -28,20 +28,16 @@
 <DemoPage>
   {#snippet variants()}
     <Specimen label="title" wide>
-      <div class="frame">
-        <Popover defaultOpen closeOnOutside={false} title="Filters">
+        <Popover closeOnOutside={false} title="Filters">
           {#snippet trigger(props)}<Button {...props}>Filters</Button>{/snippet}
           {@render filters()}
         </Popover>
-      </div>
     </Specimen>
     <Specimen label={`title, closeButton, placement="bottom-end"`} wide>
-      <div class="frame frame-end">
-        <Popover defaultOpen closeOnOutside={false} title="Share" closeButton placement="bottom-end">
+        <Popover closeOnOutside={false} title="Share" closeButton placement="bottom-end">
           {#snippet trigger(props)}<Button emphasis="low" {...props}>Share…</Button>{/snippet}
           <Field label="Link" hint="Anyone with the link can view"><Input readOnly defaultValue="https://example.com/p/atlas" /></Field>
         </Popover>
-      </div>
     </Specimen>
   {/snippet}
   {#snippet composition()}

@@ -1,7 +1,9 @@
 <script lang="ts">
-  import { connect, createPopoverMachine, type PopoverChangeDetails, type PopoverPlacement } from '@ggary/core/popover'
-  import { attachPopover, svelteNormalizer, uid, type AttachedPopover, type Dict } from '@ggary/core'
+  import { Popover as Primitive, mergeProps } from 'bits-ui'
+  import type { PopoverChangeDetails, PopoverPlacement } from '@ggary/core/popover'
+  import type { Dict } from '@ggary/core'
   import { untrack, type Snippet } from 'svelte'
+  import { getConfig } from '../config-provider/context'
 
   type Props = {
     /** Bindable: `bind:open`. */
@@ -20,90 +22,56 @@
     closeLabel?: string
   }
 
-  let {
-    open = $bindable(),
-    defaultOpen,
-    onOpenChange,
-    trigger,
-    title,
-    children,
-    placement,
-    closeOnEscape,
-    closeOnOutside,
-    closeButton = false,
-    closeLabel,
-  }: Props = $props()
-
-  const id = uid('gg-popover')
-
-  // As Dialog: uncontrolled at heart, as `bind:open` is.
-  const machine = untrack(() =>
-    createPopoverMachine({
-      id,
-      defaultOpen: open ?? defaultOpen,
-      placement,
-      closeOnEscape,
-      closeOnOutside,
-      onOpenChange: (next, details) => {
-        open = next
-        onOpenChange?.(next, details)
-      },
-    })
-  )
-
-  let snapshot = $state(machine.getState())
-  $effect(() => machine.subscribe((next) => (snapshot = next)))
-  // Effects that attach on open read this, not the snapshot: a new snapshot on every
-  // change would detach and attach them again on each key.
-  const isOpen = $derived(snapshot.open)
-
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { title: title != null, closeLabel }))
-
+  let { open = $bindable(), defaultOpen = false, onOpenChange, trigger, title,
+    children, placement = 'bottom-start', closeOnEscape = true, closeOnOutside = true,
+    closeButton = false, closeLabel = 'Close' }: Props = $props()
+  let localOpen = $state(untrack(() => open ?? defaultOpen))
+  const shown = $derived(open ?? localOpen)
+  let reason: PopoverChangeDetails['reason'] = 'api'
+  function changed(next: boolean) {
+    localOpen = next; open = next; onOpenChange?.(next, { reason }); reason = 'api'
+  }
+  const componentId = $props.id()
+  const id = `gg-bits-popover-${componentId}`
+  const kit = getConfig()
+  let anchor = $state<HTMLElement | null>(null)
+  let inheritedStyle = $state('')
+  let inheritedDir = $state<'ltr' | 'rtl'>('ltr')
+  const side = $derived(placement.split('-')[0] as 'top' | 'bottom' | 'left' | 'right')
+  const align = $derived((placement.split('-')[1] ?? 'center') as 'start' | 'center' | 'end')
+  const part = (name: string) => ({ 'data-scope': 'popover', 'data-part': name, 'data-backend': 'bits-ui' })
   $effect(() => {
-    if (open !== undefined) machine.send({ type: 'SYNC_OPEN', open })
-  })
-  $effect(() => machine.send({ type: 'SYNC_OPTIONS', placement, closeOnEscape, closeOnOutside }))
-
-  let content: HTMLDivElement
-  let attached: AttachedPopover | null = null
-
-  $effect(() => {
-    if (!isOpen) return
-    const instance = untrack(() => {
-      const reference = document.getElementById(api.ids.trigger)
-      if (!reference) return null
-      const { placement, closeOnEscape, closeOnOutside } = machine.getState()
-      return attachPopover(reference, content, {
-        placement,
-        gutter: 6,
-        closeOnEscape,
-        closeOnOutside,
-        manageFocus: true,
-        onDismiss: (reason) => machine.send({ type: 'CLOSE', reason }),
-      })
-    })
-    attached = instance
-    return () => {
-      instance?.destroy()
-      attached = null
-    }
-  })
-
-  $effect(() => {
-    const options = { placement: snapshot.placement, closeOnEscape: snapshot.closeOnEscape, closeOnOutside: snapshot.closeOnOutside }
-    untrack(() => attached?.update(options))
+    if (!shown || !anchor) return
+    const computed = getComputedStyle(anchor)
+    const vars: string[] = []
+    for (let i = 0; i < computed.length; i++) { const key = computed[i]; if (key.startsWith('--')) vars.push(`${key}:${computed.getPropertyValue(key)}`) }
+    inheritedDir = kit().dir ?? (computed.direction === 'rtl' ? 'rtl' : 'ltr')
+    inheritedStyle = `direction:${inheritedDir};${vars.join(';')}`
   })
 </script>
 
-{@render trigger(api.triggerProps)}
-<div bind:this={content} {...api.contentProps}>
-  {#if snapshot.open}
-    {#if title != null}
-      <h2 {...api.titleProps}>{title}</h2>
-    {/if}
-    {#if closeButton}
-      <button {...api.closeProps}><span {...api.closeIconProps}></span></button>
-    {/if}
-    {@render children?.()}
-  {/if}
-</div>
+<Primitive.Root bind:open={() => shown, changed}>
+  <div {...part('anchor')} bind:this={anchor} style="display:contents">
+    <Primitive.Trigger type="button" id={`${id}-trigger`} onclick={() => reason = 'trigger'} onkeydown={() => reason = 'trigger'}>
+      {#snippet child({ props: triggerProps })}{@render trigger(triggerProps)}{/snippet}
+    </Primitive.Trigger>
+  </div>
+  <Primitive.Portal>
+    <Primitive.Content id={`${id}-content`} {side} {align} sideOffset={6} strategy="fixed" dir={inheritedDir} style={inheritedStyle}
+      trapFocus={false} preventScroll={false}
+      onEscapeKeydown={event => { reason = 'escape'; if (!closeOnEscape) { event.preventDefault(); reason = 'api' } }}
+      onInteractOutside={event => { reason = 'outside'; if (!closeOnOutside) { event.preventDefault(); reason = 'api' } }}>
+      {#snippet child({ props: contentProps, wrapperProps })}
+        <div {...wrapperProps} {...part('positioner')} hidden={!shown}>
+          <div {...mergeProps(contentProps, part('content'), { style: { '--gg-available-width': 'var(--bits-floating-available-width)' } })} role="dialog" hidden={!shown} data-state={shown ? 'open' : 'closed'} aria-labelledby={title != null ? `${id}-title` : undefined}>
+            {#if shown}
+              {#if title != null}<h2 {...part('title')} id={`${id}-title`}>{title}</h2>{/if}
+              {#if closeButton}<Primitive.Close {...part('close')} type="button" aria-label={closeLabel} onclick={() => reason = 'close-button'} onkeydown={() => reason = 'close-button'}><span {...part('close-icon')} data-icon="close" aria-hidden="true"></span></Primitive.Close>{/if}
+              {@render children?.()}
+            {/if}
+          </div>
+        </div>
+      {/snippet}
+    </Primitive.Content>
+  </Primitive.Portal>
+</Primitive.Root>

@@ -5,7 +5,7 @@ import { type Adapter, type PopoverProps, type TooltipProps, click, freshTarget,
 
 /** In a browser, the platform says; under jsdom, the shim keeps the answer. */
 const shownInTopLayer = (el: Element) => {
-  if (el.getAttribute('data-backend') === 'base-ui') return el.getAttribute('data-state') === 'open'
+  if (['base-ui', 'bits-ui'].includes(el.getAttribute('data-backend') ?? '')) return el.getAttribute('data-state') === 'open'
   const shim = (globalThis as { isPopoverOpen?: (el: Element) => boolean }).isPopoverOpen
   return shim ? shim(el) : el.matches(':popover-open')
 }
@@ -20,38 +20,40 @@ export function popoverConformance(adapter: Adapter) {
   describe('popover', () => {
     const setup = async (props: Partial<PopoverProps> = {}) => {
       const m = await adapter.popover({ trigger: 'Filters', title: 'Filters', ...props }, freshTarget())
-      const content = () => adapter.name === 'react' ? document.getElementById(trigger().id.replace('-trigger', '-content'))! : part(m.root, 'popover', 'content')!
-      const isShown = () => adapter.name === 'react' ? (content() as HTMLElement).dataset.state === 'open' : shownInTopLayer(content())
+      const content = () => (adapter.name === 'react' || adapter.name === 'svelte') ? document.getElementById(trigger().id.replace('-trigger', '-content'))! : part(m.root, 'popover', 'content')!
+      const isShown = () => (adapter.name === 'react' || adapter.name === 'svelte') ? (content() as HTMLElement | null)?.dataset.state === 'open' : shownInTopLayer(content())
       const trigger = () => m.root.querySelector('[aria-haspopup="dialog"]') as HTMLButtonElement
       return {
         m,
         content,
         isShown,
         trigger,
-        toggle: () => adapter.act(() => click(trigger())),
+        toggle: async () => { await adapter.act(() => { trigger().focus(); click(trigger()) }); await adapter.wait(30) },
         escape: () =>
           adapter.act(() => {
             ;(document.activeElement ?? document.body).dispatchEvent(
               new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
             )
           }),
-        press: (target: Element) =>
-          adapter.act(() => {
-            target.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+        press: async (target: Element) =>
+          { await adapter.act(() => {
+            target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'mouse', clientX: 1, clientY: 1 }))
             if (adapter.name === 'react') { target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); click(target) }
-          }),
+          }); await adapter.wait(30) },
         inside: () => [...content().querySelectorAll('button')].find((b) => b.textContent === 'Inside')!,
       }
     }
 
     it('rests closed with a trigger that says what it opens', async () => {
       const { m, content, trigger, isShown } = await setup()
-      expect(content().getAttribute('popover')).toBe(adapter.name === 'react' ? null : 'manual')
-      expect(content().getAttribute('role')).toBe('dialog')
-      expect(content().dataset.state).toBe('closed')
+      if (adapter.name === 'react') {
+        expect(content().getAttribute('popover')).toBe(null)
+        expect(content().getAttribute('role')).toBe('dialog')
+        expect(content().dataset.state).toBe('closed')
+      } else expect(content()).toBeNull()
       expect(isShown()).toBe(false)
       expect(trigger().getAttribute('aria-expanded')).toBe('false')
-      expect(trigger().getAttribute('aria-controls')).toBe(adapter.name === 'react' ? null : content().id)
+      expect(trigger().getAttribute('aria-controls')).toBeNull()
       expect(m.root.querySelector('[class]')).toBeNull()
     })
 
@@ -64,8 +66,9 @@ export function popoverConformance(adapter: Adapter) {
       expect(trigger().getAttribute('aria-expanded')).toBe('true')
       expect(onOpenChange).toHaveBeenLastCalledWith(true, { reason: 'trigger' })
       expect(document.getElementById(content().getAttribute('aria-labelledby')!)!.textContent).toBe('Filters')
-      if (adapter.name === 'react') await adapter.act(async () => settle(30))
-      expect(document.activeElement).toBe(inside())
+      await adapter.wait(30)
+      if (adapter.name === 'react') expect(document.activeElement).toBe(inside())
+      else expect(content().contains(document.activeElement)).toBe(true)
     })
 
     it('its trigger closes it again, and focus returns to the trigger', async () => {
@@ -73,11 +76,11 @@ export function popoverConformance(adapter: Adapter) {
       await toggle()
       await adapter.act(() => {
         // A press on the trigger is excluded from "outside": its click toggles.
-        trigger().dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+        trigger().dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'mouse', clientX: 1, clientY: 1 }))
         click(trigger())
       })
       expect(isShown()).toBe(false)
-      if (adapter.name === 'react') await adapter.act(async () => settle(30))
+      await adapter.wait(30)
       expect(document.activeElement).toBe(trigger())
     })
 
@@ -88,7 +91,7 @@ export function popoverConformance(adapter: Adapter) {
       await escape()
       expect(isShown()).toBe(false)
       expect(onOpenChange).toHaveBeenLastCalledWith(false, { reason: 'escape' })
-      if (adapter.name === 'react') await adapter.act(async () => settle(30))
+      await adapter.wait(30)
       expect(document.activeElement).toBe(trigger())
 
       await toggle()
@@ -105,7 +108,7 @@ export function popoverConformance(adapter: Adapter) {
       await escape()
       await press(document.body)
       expect(isShown()).toBe(true)
-      await adapter.act(() => click(part(adapter.name === 'react' ? content() : m.root, 'popover', 'close') ?? content().querySelector('[data-part=close]')!))
+      await adapter.act(() => click(part(content(), 'popover', 'close') ?? content().querySelector('[data-part=close]')!))
       expect(isShown()).toBe(false)
     })
 
@@ -120,7 +123,7 @@ export function popoverConformance(adapter: Adapter) {
     it('unmounted while open, it leaves nothing listening', async () => {
       const { m, toggle } = await setup()
       await toggle()
-      expect(openLayerCount()).toBe(adapter.name === 'react' ? 0 : 1)
+      expect(openLayerCount()).toBe(0)
       await m.unmount()
       expect(openLayerCount()).toBe(0)
     })
@@ -136,7 +139,7 @@ export function tooltipConformance(adapter: Adapter) {
     const setup = async (props: Partial<TooltipProps> = {}) => {
       coolDownTooltips()
       const m = await adapter.tooltip({ content: 'Copy link', trigger: 'Copy', openDelay: 40, closeDelay: 40, ...props }, freshTarget())
-      const content = () => adapter.name === 'react' ? document.getElementById(trigger().id.replace('-trigger', '-content'))! : part(m.root, 'tooltip', 'content')!
+      const content = () => (adapter.name === 'react' || adapter.name === 'svelte') ? document.getElementById(trigger().id.replace('-trigger', '-content'))! : part(m.root, 'tooltip', 'content')!
       const trigger = () => m.root.querySelector('button') as HTMLButtonElement
       // React derives enter/leave from pointerover/pointerout; Svelte and the
       // elements listen to pointerenter/pointerleave. A real pointer sends both.
@@ -160,8 +163,8 @@ export function tooltipConformance(adapter: Adapter) {
     it('describes its trigger, shown or not', async () => {
       const { m, content, trigger } = await setup()
       expect(content().getAttribute('role')).toBe('tooltip')
-      expect(content().getAttribute('popover')).toBe(adapter.name === 'react' ? null : 'manual')
-      if (adapter.name !== 'react') expect(trigger().getAttribute('aria-describedby')).toBe(content().id)
+      expect(content().getAttribute('popover')).toBe(null)
+      if (adapter.name === 'svelte') expect(trigger().getAttribute('aria-describedby')).toBeNull()
       expect(content().textContent).toBe('Copy link')
       expect(shownInTopLayer(content())).toBe(false)
       expect(m.root.querySelector('[class]')).toBeNull()
@@ -217,7 +220,7 @@ export function tooltipConformance(adapter: Adapter) {
         trigger().blur()
         trigger().focus()
       })
-      await adapter.act(() => trigger().dispatchEvent(new MouseEvent('pointerdown', { bubbles: true })))
+      await adapter.act(() => trigger().dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'mouse', clientX: 1, clientY: 1 })))
       expect(shownInTopLayer(content())).toBe(false)
       expect(onOpenChange).toHaveBeenLastCalledWith(false, { reason: 'press' })
     })

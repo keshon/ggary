@@ -60,3 +60,11 @@
   position: relative;
   inset: auto;
 }
+
+/* Bits floating wrappers own placement and inherit surface stacking. */
+:is([data-scope='popover'], [data-scope='tooltip'])[data-part='content'][data-backend='bits-ui'] {
+  position: relative;
+  inset: auto;
+  z-index: calc(var(--gg-z-dialog, 1000) + var(--gg-z-popover, 50));
+}
+:is([data-scope='popover'], [data-scope='tooltip'])[data-part='content'][data-backend='bits-ui'][hidden] { display: none; }

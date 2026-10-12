@@ -109,3 +109,35 @@ theme checks; docs production build; React inventory/CSS audit with no inventory
 drift. Shared theme CSS is 372,457 bytes / 44,196 gzip; structure is 80,355 /
 10,808 gzip. Existing React act warnings remain. Live docs checks exercised local
 filtering, keyboard selection, multiple chips and the Dialog composition.
+
+
+## Popover and Tooltip checkpoint (2026-10-12)
+
+Combobox hosted CI passed. Svelte Popover and Tooltip now use Bits UI root,
+trigger, floating content and portal primitives. Removed their core interaction
+machines and attachPopover wiring. Preserve bind:open, placement, callback reasons,
+close controls and dismissal flags. Public Popover remains a non-modal dialog;
+Tooltip remains non-interactive descriptive content. GGary owns their anatomy,
+theme inheritance and CSS geometry aliases.
+
+Popover content mounts only while open, allowing Bits' normal focus lifecycle.
+In the real browser initial focus reaches its first control and closing returns
+to the opener. jsdom only asserts contained focus because it cannot measure
+visibility. Tooltip preserves explicit closeDelay through a small cancelable
+policy timer; pointer-corridor callbacks cannot close a newly keyboard-focused
+tip. Timers are canceled on unmount and disabling. Each Tooltip currently has its
+own Bits provider; cross-tooltip warm starts are not shared. Explicit delays and
+keyboard-focus behavior are covered; provider grouping remains a future decision.
+
+Popover/Tooltip demos now start closed and open through interaction. Removed
+empty preview frames from Popover and marked migrated pages Built with Bits UI.
+Six Chromium pilot cases passed, including Select -> Popover -> Dialog Escape
+routing/focus return and Tooltip keyboard behavior. Closed SSR overlay rendering
+passed. Two additional timing tests cover focus during delayed closure and unmount.
+
+Full fast run: 2,776 passed, nine skips and one missing wrapper anatomy marker.
+Added the marker; the contract plus 32 focused overlay/timing cases passed on the
+final code. Existing React act warnings remain. Final type checks passed with
+zero Svelte diagnostics; theme checks and the docs build passed. All six Chromium
+pilot cases passed again on the final code.
+Next: Menu/ContextMenu/Menubar, then the remaining confirmation composites.
