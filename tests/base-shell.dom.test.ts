@@ -1,6 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest'
 import { act, createElement as h } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import { createRoot, hydrateRoot, type Root } from 'react-dom/client'
+import { renderToString } from 'react-dom/server'
 import { Shell } from '../packages/react/src/components/layout/Shell'
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 const originalMatchMedia = window.matchMedia
@@ -41,4 +42,18 @@ it('controlled owners can refuse Escape without losing the open drawer', async (
   })
   expect(changed).toHaveBeenCalledWith(false, { reason: 'escape' })
   expect(host.querySelector('[data-part=aside]')!.hasAttribute('hidden')).toBe(false)
+})
+
+it('renders navigation on the server and hydrates without mismatch', async () => {
+  const props = { brand: 'Brand marker', aside: h('input', { defaultValue: 'draft', 'aria-label': 'Draft' }), children: 'Work' }
+  const markup = renderToString(h(Shell, props))
+  expect(markup).toContain('Brand marker')
+  expect(markup).toContain('aria-label="Draft"')
+  expect(markup).toContain('data-part="aside"')
+  const host = document.createElement('div'); host.innerHTML = markup; document.body.append(host)
+  const recoverable = vi.fn()
+  await act(async () => { root = hydrateRoot(host, h(Shell, props), { onRecoverableError: recoverable }); await settle() })
+  expect(recoverable).not.toHaveBeenCalled()
+  expect(host.querySelectorAll('input')).toHaveLength(1)
+  expect(host.querySelector('input')!.value).toBe('draft')
 })

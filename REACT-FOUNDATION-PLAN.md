@@ -807,3 +807,24 @@ warnings remain in some legacy conformance cases. Hosted CI has been configured
 but not executed on GitHub; these changes are local and uncommitted. Candidate
 policy is private 0.0.0 artifacts with pinned sibling versions. A public version,
 registry and publishing authorization remain separate from this migration.
+
+
+### Review corrections (2026-10-12)
+
+The branch's hosted verification passed on run 38231981152. The subsequent
+review found a Shell SSR regression: the Dialog portal omitted navigation from
+server HTML. Shell now emits an inline aside until the client host is available,
+with the same initial responsive snapshot for SSR and hydration. Public Base UI
+portals remain client-only, so sidebar children remount once when transferred to
+the portal; consumers must keep persistent draft state above Shell if it must
+survive that initial handoff. Desktop/mobile resizing retains the mounted sidebar.
+No legacy drawer bridge or private Base UI internals were introduced.
+
+The docs header now places colour-mode settings on a second row below 540px,
+with matching navigation and scroll offsets. At a 390px viewport the document
+width is 390px (previously 456px); both settings groups remain visible.
+
+Validation: 11 targeted Shell DOM/conformance tests passed, including server
+markup/hydration, controlled dismissal and responsive state retention. Full
+TypeScript/Svelte checks and clean installed-package types/build/ESM/browser
+smoke passed. Responsive header verified in the running docs browser.

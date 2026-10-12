@@ -50,12 +50,16 @@ export function Shell(props: ShellProps) {
   useEffect(() => machine.send({ type: 'SYNC_OPTIONS', collapse }), [machine, collapse])
 
   const [host, setHost] = useState<HTMLDivElement | null>(null)
-  const [narrow, setNarrow] = useState(() => typeof window === 'undefined' ? false : (window.matchMedia?.(SHELL_NARROW).matches ?? true))
+  // Use the same desktop snapshot on the server and the first hydration render.
+  const [narrow, setNarrow] = useState(false)
   const toggleRef = useRef<HTMLButtonElement>(null)
-  useEffect(() => watchMedia(document, SHELL_NARROW, next => {
-    setNarrow(next)
-    if (!next && machine.getState().open) machine.send({ type: 'CLOSE', reason: 'resize' })
-  }), [machine])
+  useEffect(() => {
+    if (!window.matchMedia) { setNarrow(true); return }
+    return watchMedia(document, SHELL_NARROW, next => {
+      setNarrow(next)
+      if (!next && machine.getState().open) machine.send({ type: 'CLOSE', reason: 'resize' })
+    })
+  }, [machine])
 
   const column = brand != null || aside != null
   const modal = column && api.drawer && narrow
@@ -69,6 +73,14 @@ export function Shell(props: ShellProps) {
       }}>
     <div ref={setHost} {...rest} {...api.rootProps}>
       <a {...api.skipLinkProps}>{api.skipLabel}</a>
+      {/* Dialog portals are client-only. Keep navigation in the server markup
+          until the host is available; sidebar children remount at this handoff. */}
+      {column && !host && (
+        <aside {...api.asideProps} aria-label={asideLabel ?? "Navigation"}>
+          {brand != null && <div {...api.brandProps}>{brand}</div>}
+          {aside}
+        </aside>
+      )}
       {column && host && (
         <Primitive.Portal container={host} keepMounted data-scope="shell" data-part="column" style={{ display: 'contents' }}>
         <Primitive.Popup {...api.asideProps} role={modal ? "dialog" : "complementary"} aria-label={asideLabel ?? "Navigation"} initialFocus={modal} finalFocus={modal ? toggleRef : false}>
