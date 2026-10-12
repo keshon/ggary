@@ -46,7 +46,7 @@ export function feedbackConformance(adapter: Adapter) {
     const setup = async (props: Partial<Parameters<Adapter['popconfirm']>[0]> = {}) => {
       const m = await adapter.popconfirm({ triggerLabel: 'Delete', title: 'Delete this lead?', ...props }, freshTarget())
       const trigger = () => m.root.querySelector('button')!
-      const content = () => adapter.name === 'react' ? document.getElementById(trigger().id.replace('-trigger', '-content'))! : part(m.root, 'popconfirm', 'content')!
+      const content = () => document.getElementById(trigger().id.replace('-trigger', '-content'))!
       const answer = (which: 'cancel' | 'confirm') => content().querySelector<HTMLButtonElement>(`[data-answer='${which}']`)!
       return { m, trigger, content, answer }
     }
@@ -87,7 +87,7 @@ export function feedbackConformance(adapter: Adapter) {
       expect(onConfirm).toHaveBeenCalledTimes(1)
       finish()
       await adapter.wait(0)
-      expect(content().dataset.state).toBe('closed')
+      if (adapter.name === 'svelte') expect(content()).toBeNull(); else expect(content().dataset.state).toBe('closed')
       expect(trigger().getAttribute('aria-expanded')).toBe('false')
     })
 

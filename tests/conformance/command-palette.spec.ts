@@ -16,9 +16,9 @@ export function commandPaletteConformance(adapter: Adapter) {
       before.textContent = 'Before'
       document.body.append(before)
       const m = await adapter.commandPalette({ commands, onRun: (command) => void ran.push(command.id), ...props }, freshTarget())
-      const scope = () => adapter.name === 'react' ? document.body : m.root
+      const scope = () => document.body
       const content = () => part(scope(), 'command-palette', 'content') as HTMLDialogElement
-      const isOpen = () => adapter.name === 'react' ? content().dataset.state === 'open' : content().open
+      const isOpen = () => content()?.dataset.state === 'open'
       const input = () => part(scope(), 'command-palette', 'input') as HTMLInputElement
       const texts = () => parts(scope(), 'command-palette', 'item').map((item) => item.firstElementChild!.firstChild!.textContent)
       const highlighted = () => document.getElementById(input().getAttribute('aria-activedescendant')!)?.firstElementChild?.firstChild?.textContent
@@ -27,12 +27,12 @@ export function commandPaletteConformance(adapter: Adapter) {
       const open = async () => {
         before.focus()
         await adapter.act(() => void document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true, bubbles: true, cancelable: true })))
-        await adapter.wait(adapter.name === 'react' ? 25 : 0)
+        await adapter.wait(25)
       }
       return { m, scope, isOpen, before, content, input, texts, highlighted, press, open, ran }
     }
 
-    if (adapter.name === 'react') it('mounts a default-open inline palette inside its own host', async () => {
+    it('mounts a default-open inline palette inside its own host', async () => {
       const { m, content } = await setup({ defaultOpen: true, modal: false, hotkey: false })
       await adapter.wait(25)
       expect(content().closest('[data-part="inline-host"]')).not.toBeNull()

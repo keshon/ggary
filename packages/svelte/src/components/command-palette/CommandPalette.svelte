@@ -11,8 +11,9 @@
     type PaletteLoad,
     type PaletteWords,
   } from '@ggary/core/command-palette'
-  import { attachDialog, svelteNormalizer, uid, type Dict } from '@ggary/core'
-  import { untrack, type Snippet } from 'svelte'
+  import { svelteNormalizer, uid, type Dict } from '@ggary/core'
+  import { tick, untrack, type Snippet } from 'svelte'
+  import { Dialog as Primitive } from 'bits-ui'
 
   type Props = {
     commands: PaletteCommand[]
@@ -78,23 +79,17 @@
     return untrack(() => attachPaletteSource(machine, (query, signal) => load!(query, signal), options))
   })
 
-  let contentEl = $state<HTMLDialogElement | null>(null)
+  let anchor = $state<HTMLElement | null>(null)
+  let inheritedStyle = $state('')
+  let dir = $state<'ltr' | 'rtl'>('ltr')
+  const part = (name: string) => ({ 'data-scope': 'command-palette', 'data-part': name, 'data-backend': 'bits-ui' })
   $effect(() => {
-    const element = contentEl
-    if (!isOpen || !element) return
-    const shownModal = modal
-    return untrack(() => {
-      const instance = attachDialog(element, {
-        modal: shownModal,
-        closeOnEscape: true,
-        closeOnOutside: shownModal,
-        // Escape goes up a level first, and closes only at the top.
-        onDismiss: (reason) => machine.send({ type: reason === 'escape' ? 'ESCAPE' : 'CLOSE' }),
-        onNativeClose: () => machine.send({ type: 'CLOSE' }),
-      })
-      document.getElementById(api.ids.input)?.focus()
-      return () => instance.destroy()
-    })
+    if (!isOpen || !anchor) return
+    const computed = getComputedStyle(anchor)
+    const vars: string[] = []
+    for (let i = 0; i < computed.length; i++) { const key = computed[i]; if (key.startsWith('--')) vars.push(`${key}:${computed.getPropertyValue(key)}`) }
+    dir = kit().dir ?? (computed.direction === 'rtl' ? 'rtl' : 'ltr')
+    inheritedStyle = `direction:${dir};${vars.join(';')}`
   })
 
   let listEl = $state<HTMLDivElement | null>(null)
@@ -104,8 +99,11 @@
   })
 </script>
 
-{#if trigger}{@render trigger(api.triggerProps)}{/if}
-<dialog bind:this={contentEl} {...api.contentProps}>
+{#snippet popup()}
+<Primitive.Content {...api.contentProps} data-backend="bits-ui" data-modal={modal ? '' : undefined} trapFocus={modal} preventScroll={modal}
+  onOpenAutoFocus={event => { event.preventDefault(); void tick().then(() => document.getElementById(api.ids.input)?.focus()) }}
+  onEscapeKeydown={event => { event.preventDefault(); machine.send({ type: 'ESCAPE' }) }}
+  onInteractOutside={event => { if (!modal) event.preventDefault() }}>
   {#if snapshot.open}
     <div {...api.controlProps}>
       <span {...api.searchIconProps}></span>
@@ -134,4 +132,22 @@
       <span {...api.hintProps}><kbd {...api.keyProps}>Esc</kbd>{api.pages.length > 0 ? api.words.hintBack : api.words.hintClose}</span>
     </div>
   {/if}
-</dialog>
+</Primitive.Content>
+{/snippet}
+<Primitive.Root bind:open={() => isOpen, next => machine.send({ type: next ? 'OPEN' : 'CLOSE' })}>
+  <div {...part('anchor')} bind:this={anchor} style="display:contents">
+    {#if trigger}<Primitive.Trigger type="button" aria-keyshortcuts={hotkey === false ? undefined : `Control+${hotkey.toUpperCase()} Meta+${hotkey.toUpperCase()}`}>
+      {#snippet child({ props: triggerProps })}{@render trigger(triggerProps)}{/snippet}
+    </Primitive.Trigger>{/if}
+  </div>
+  {#if modal}
+    <Primitive.Portal>
+      <div data-scope="dialog" data-part="layer" data-backend="bits-ui" dir={dir} style={inheritedStyle}>
+        <Primitive.Overlay {...part('backdrop')} />
+        {@render popup()}
+      </div>
+    </Primitive.Portal>
+  {:else}
+    <div {...part('inline-host')} dir={dir} style={inheritedStyle}>{@render popup()}</div>
+  {/if}
+</Primitive.Root>

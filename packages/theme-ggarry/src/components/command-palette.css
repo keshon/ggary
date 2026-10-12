@@ -152,12 +152,12 @@
   }
 }
 
-[data-scope='command-palette'][data-part='backdrop'][data-backend='base-ui'] {
+[data-scope='command-palette'][data-part='backdrop']:is([data-backend='base-ui'], [data-backend='bits-ui']) {
   background: var(--ggarry-bg-scrim);
 }
 
 /* Inline palettes size to their container rather than the viewport. */
-[data-scope='command-palette'][data-part='content'][data-backend='base-ui']:not([data-modal]) {
+[data-scope='command-palette'][data-part='content']:is([data-backend='base-ui'], [data-backend='bits-ui']):not([data-modal]) {
   margin: 0;
   inline-size: 100%;
   max-inline-size: 640px;

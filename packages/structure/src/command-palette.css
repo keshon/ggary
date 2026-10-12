@@ -85,26 +85,26 @@
 }
 
 /* Base UI owns the modal layer; inline palettes stay in document flow. */
-[data-scope='command-palette'][data-part='content'][data-backend='base-ui'] {
+[data-scope='command-palette'][data-part='content']:is([data-backend='base-ui'], [data-backend='bits-ui']) {
   display: flex;
   flex-direction: column;
   pointer-events: auto;
 }
-[data-scope='command-palette'][data-part='content'][data-backend='base-ui'][data-modal] {
+[data-scope='command-palette'][data-part='content']:is([data-backend='base-ui'], [data-backend='bits-ui'])[data-modal] {
   position: fixed;
   inset-block-start: 0;
   inset-inline: 0;
   block-size: fit-content;
 }
-[data-scope='command-palette'][data-part='content'][data-backend='base-ui']:not([data-modal]) {
+[data-scope='command-palette'][data-part='content']:is([data-backend='base-ui'], [data-backend='bits-ui']):not([data-modal]) {
   position: relative;
 }
-[data-scope='command-palette'][data-part='backdrop'][data-backend='base-ui'] {
+[data-scope='command-palette'][data-part='backdrop']:is([data-backend='base-ui'], [data-backend='bits-ui']) {
   position: fixed;
   inset: 0;
   pointer-events: auto;
 }
-[data-scope='command-palette'][data-part='content'][data-backend='base-ui'][data-state='closed'] {
+[data-scope='command-palette'][data-part='content']:is([data-backend='base-ui'], [data-backend='bits-ui'])[data-state='closed'] {
   display: none;
 }
 

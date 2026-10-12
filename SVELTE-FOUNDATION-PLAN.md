@@ -213,3 +213,32 @@ lookup correction is claimed; hosted CI remains the final whole-suite gate.
 Next: confirmation and command composites (Popconfirm and CommandPalette),
 then selection/form widgets and the installed-Svelte-consumer release gates.
 The menu family is migrated; the complete Svelte foundation is still in progress.
+
+
+## Confirmation/command composite checkpoint (2026-10-12)
+
+Previous domain-menu hosted CI passed on run 38261759694. Popconfirm now composes
+Bits Popover; CommandPalette composes Bits Dialog. Removed attachPopover and
+attachDialog wiring from these Svelte components. Their shared core machines
+remain deliberate workflow owners, as in React: pending confirmation/retry/errors,
+ranked command filtering, hierarchical pages, abortable remote search and hotkey
+policy. They are not compatibility bridges or alternative overlay backends.
+Bits owns portal/modal focus, dismissal and positioning.
+
+Preserved alertdialog naming and safe initial focus for destructive confirmation.
+Palette Escape goes back one page before closing. Commands run after closure and
+focus return; Ctrl+K restores the element that previously held focus. Nonmodal
+palettes render in their inline host and ignore outside clicks. Shared structure
+and GGarry theme rules now support Bits backdrop and inline sizing as well as
+Base UI. Removed Popconfirm staged default-open/auto-confirm demos; retained the
+inline palette preview but removed its fixed-height frame.
+
+Final local verification: 28 React/Svelte conformance/anatomy checks; eight Node
+SSR cases; 19 Chromium pilot tests (four new composite cases) passed. TypeScript
+and Svelte checks have zero diagnostics, 544 theme measurements passed, and docs
+production build passed. Real confirmation and modal/inline palette visuals were
+checked in the running docs site. No full fast-suite rerun is claimed for this
+checkpoint; hosted CI remains the whole-suite gate after push.
+
+Next: Tabs and Accordion, followed by slider/option/form widgets, remaining
+custom-widget ownership inventory and compiled installed-Svelte-consumer gates.

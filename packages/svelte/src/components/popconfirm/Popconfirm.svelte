@@ -2,8 +2,9 @@
   import { getConfig } from '../config-provider/context'
   import { configWords } from '@ggary/core/config-provider'
   import { connect, createPopconfirmMachine, type PopconfirmChangeDetails, type PopconfirmWords } from '@ggary/core/popconfirm'
-  import { attachPopover, svelteNormalizer, uid, type AttachedPopover, type Dict, type Placement } from '@ggary/core'
-  import { untrack, type Snippet } from 'svelte'
+  import { svelteNormalizer, uid, type Dict, type Placement } from '@ggary/core'
+  import { tick, untrack, type Snippet } from 'svelte'
+  import { Popover as Primitive, mergeProps } from 'bits-ui'
   import Button from '../button/Button.svelte'
 
   type Props = {
@@ -57,43 +58,46 @@
 
   $effect(() => machine.send({ type: 'SYNC_OPTIONS', placement }))
 
-  let content: HTMLDivElement
-  let attached: AttachedPopover | null = null
-
+  let anchor = $state<HTMLElement | null>(null)
+  let inheritedStyle = $state('')
+  let dir = $state<'ltr' | 'rtl'>('ltr')
+  let reason: 'trigger' | 'escape' | 'outside' = 'trigger'
+  const part = (name: string) => ({ 'data-scope': 'popconfirm', 'data-part': name, 'data-backend': 'bits-ui' })
+  const side = $derived(snapshot.placement.split('-')[0] as 'top' | 'bottom' | 'left' | 'right')
+  const align = $derived((snapshot.placement.split('-')[1] ?? 'center') as 'start' | 'center' | 'end')
+  const contentProps = $derived.by(() => { const { popover, ...props } = api.contentProps; return props })
   $effect(() => {
-    if (!isOpen) return
-    const instance = untrack(() => {
-      const reference = document.getElementById(api.ids.trigger)
-      if (!reference) return null
-      return attachPopover(reference, content, {
-        placement: machine.getState().placement,
-        gutter: 6,
-        manageFocus: true,
-        onDismiss: (reason) => api.dismiss(reason),
-      })
-    })
-    attached = instance
-    return () => {
-      instance?.destroy()
-      attached = null
-    }
-  })
-
-  $effect(() => {
-    const options = { placement: snapshot.placement }
-    untrack(() => attached?.update(options))
+    if (!isOpen || !anchor) return
+    const computed = getComputedStyle(anchor)
+    const vars: string[] = []
+    for (let i = 0; i < computed.length; i++) { const key = computed[i]; if (key.startsWith('--')) vars.push(`${key}:${computed.getPropertyValue(key)}`) }
+    dir = kit().dir ?? (computed.direction === 'rtl' ? 'rtl' : 'ltr')
+    inheritedStyle = `direction:${dir};${vars.join(';')}`
   })
 </script>
-
-{@render trigger(api.triggerProps)}
-<div bind:this={content} {...api.contentProps}>
-  {#if snapshot.open}
-    <p {...api.titleProps}>{title}</p>
-    {#if description != null}<p {...api.descriptionProps}>{description}</p>{/if}
-    {#if api.failed}<p {...api.errorProps}>{api.errorText}</p>{/if}
-    <div {...api.actionsProps}>
-      <Button size="sm" emphasis="medium" {...api.cancelProps}>{api.cancelText}</Button>
-      <Button size="sm" emphasis="high" destructive={api.destructive} loading={api.pending} {...api.confirmProps}>{api.confirmText}</Button>
-    </div>
-  {/if}
-</div>
+<Primitive.Root bind:open={() => isOpen, next => machine.send(next ? { type: 'OPEN', reason: 'trigger' } : { type: 'CLOSE', reason })}>
+  <div {...part('anchor')} bind:this={anchor} style="display:contents">
+    <Primitive.Trigger id={api.ids.trigger} type="button" onclick={() => reason = 'trigger'} onkeydown={() => reason = 'trigger'}>
+      {#snippet child({ props: triggerProps })}{@render trigger(triggerProps)}{/snippet}
+    </Primitive.Trigger>
+  </div>
+  <Primitive.Portal>
+    <Primitive.Content id={api.ids.content} {side} {align} sideOffset={6} strategy="fixed" {dir} style={inheritedStyle} trapFocus={false} preventScroll={false}
+      onEscapeKeydown={() => reason = 'escape'} onInteractOutside={() => reason = 'outside'}
+      onOpenAutoFocus={event => { event.preventDefault(); void tick().then(() => document.getElementById(api.ids.content)?.querySelector<HTMLElement>('[data-autofocus]')?.focus()) }}>
+      {#snippet child({ props: primitiveProps, wrapperProps })}
+        <div {...wrapperProps} {...part('positioner')}>
+          <div {...mergeProps(primitiveProps, contentProps, { 'data-backend': 'bits-ui' })}>
+            <p {...api.titleProps}>{title}</p>
+            {#if description != null}<p {...api.descriptionProps}>{description}</p>{/if}
+            {#if api.failed}<p {...api.errorProps}>{api.errorText}</p>{/if}
+            <div {...api.actionsProps}>
+              <Button size="sm" emphasis="medium" {...api.cancelProps}>{api.cancelText}</Button>
+              <Button size="sm" emphasis="high" destructive={api.destructive} loading={api.pending} {...api.confirmProps}>{api.confirmText}</Button>
+            </div>
+          </div>
+        </div>
+      {/snippet}
+    </Primitive.Content>
+  </Primitive.Portal>
+</Primitive.Root>

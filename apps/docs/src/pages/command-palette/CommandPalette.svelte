@@ -8,7 +8,7 @@
 <DemoPage>
   {#snippet states()}
     <Specimen label="defaultOpen" wide>
-      <div class="frame">
+      <div style="width:100%;max-width:640px">
         <CommandPalette defaultOpen modal={false} hotkey={false} {commands} />
       </div>
     </Specimen>

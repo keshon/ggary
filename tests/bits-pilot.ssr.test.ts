@@ -3,6 +3,7 @@ import { render } from 'svelte/server'
 import Combobox from '../packages/svelte/src/components/combobox/Combobox.svelte'
 import Select from '../packages/svelte/src/components/select/Select.svelte'
 import OverlaysPilot from './fixtures/BitsOverlaysPilot.svelte'
+import CompositesPilot from './fixtures/BitsCompositesPilot.svelte'
 import AnchoredMenu from '../packages/svelte/src/components/menu/AnchoredMenu.svelte'
 import Kanban from '../packages/svelte/src/components/kanban/Kanban.svelte'
 import { columns, tasks } from './conformance/board'
@@ -63,4 +64,12 @@ it('server-renders Kanban cards and a closed anchored menu without DOM APIs', ()
   expect(board).not.toContain('role="menu"')
   const anchored = render(AnchoredMenu, { props: { id: 'row', open: false, items: [], anchor: null, reference: () => null, label: 'Row actions', onClose: () => {}, onSelect: () => {} } }).body
   expect(anchored).not.toContain('role="menu"')
+})
+
+it('server-renders composite triggers and an inline command palette without floating contents', () => {
+  const { body } = render(CompositesPilot)
+  expect(body).toContain('Open palette')
+  expect(body).toContain('Inline commands')
+  expect(body).toContain('Move card')
+  expect(body).not.toContain('role="alertdialog"')
 })
