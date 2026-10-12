@@ -52,8 +52,13 @@ export function Menubar({ menus, onSelect, onOpenChange, label, mnemonics = fals
         const index = latest.current.menus.findIndex(menu => !menu.disabled && matchesMnemonic(parseMnemonic(menu.label).key, key, code))
         if (index < 0) return false
         const trigger = root.current?.querySelectorAll<HTMLElement>('[data-scope="menubar"][data-part="item"]')[index]
-        trigger?.focus()
-        if (current.current !== latest.current.menus[index].value) trigger?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true }))
+        const value = latest.current.menus[index].value
+        if (current.current === value) {
+          document.getElementById(`${id}-${value}-content`)?.querySelector<HTMLElement>('[role^="menuitem"]:not([aria-disabled="true"])')?.focus()
+        } else {
+          trigger?.focus()
+          trigger?.click()
+        }
         return true
       },
       onFocusBar: () => {

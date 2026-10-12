@@ -3,7 +3,7 @@ import { SelectionConstraint } from '../../utils/selection-constraint'
 import { useFormField } from '../form/Form'
 import { useFieldsetGroup } from '../fieldset/Fieldset'
 import { useId, useRef, useState } from 'react'
-import { connect, type RangeSliderProps as CoreRangeSliderProps, type RangeSliderWords, type RangeValue } from '@ggary/core/range-slider'
+import { connect, rangeSliderAnatomy, type RangeSliderProps as CoreRangeSliderProps, type RangeSliderWords, type RangeValue } from '@ggary/core/range-slider'
 import { reactNormalizer } from '@ggary/core'
 import { Input } from '../input'
 import { InputGroup } from '../input-group'
@@ -134,7 +134,7 @@ export function RangeSlider(props: RangeSliderProps) {
         if (!composition?.name) form.edited(first.current)
         group?.refresh()
       }} />
-    {names[1] && <input type="hidden" name={names[1]} value={api.value[1]} disabled={!!rest.disabled} />}
+    {names[1] && <input {...rangeSliderAnatomy.attrs('endpoint')} type="hidden" name={names[1]} value={api.value[1]} disabled={!!rest.disabled} />}
     <span {...form.field.errorProps}>{form.error}</span>
     </DirectionProvider>
   )

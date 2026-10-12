@@ -14,3 +14,8 @@ it('React overlays do not reintroduce legacy dismissal or native top-layer fallb
     expect(code, file).not.toMatch(/dialog\[open\]|\[popover\]/)
   }
 })
+
+it('Menubar mnemonic activation does not synthesize keyboard events', () => {
+  const code = readFileSync(join(__dirname, '../packages/react/src/components/menubar/Menubar.tsx'), 'utf8')
+  expect(code).not.toMatch(/dispatchEvent|new KeyboardEvent/)
+})

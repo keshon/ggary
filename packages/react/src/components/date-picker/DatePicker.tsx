@@ -323,7 +323,7 @@ function DateField(props: DateFieldProps & { timeSlot?: ReactNode; submitAs?: st
               {api.presets.length > 0 && (
                 <div {...api.presetsProps}>
                   {api.presets.map(({ preset }) => (
-                    <button key={preset.label} {...api.getPresetProps(preset)} disabled={readOnly || undefined}>
+                    <button key={preset.label} {...api.getPresetProps(preset)} {...(readOnly ? { disabled: true } : {})}>
                       {preset.label}
                     </button>
                   ))}

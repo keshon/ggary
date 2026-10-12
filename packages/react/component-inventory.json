@@ -1,0 +1,986 @@
+[
+  {
+    "directory": "accordion",
+    "primitives": [
+      "accordion"
+    ],
+    "internalComponents": [],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "anchor",
+    "primitives": [
+      "popover"
+    ],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "approval",
+    "primitives": [],
+    "internalComponents": [
+      "button",
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "avatar",
+    "primitives": [
+      "avatar"
+    ],
+    "internalComponents": [],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "badge",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "banner",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "breadcrumbs",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain native browser semantics with GGary presentation/integration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "budget",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider",
+      "meter"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "button",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain native browser semantics with GGary presentation/integration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "button-group",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain native browser semantics with GGary presentation/integration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "card",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "cascader",
+    "primitives": [
+      "direction-provider",
+      "merge-props",
+      "popover"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "field",
+      "fieldset",
+      "form"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "checkbox",
+    "primitives": [
+      "checkbox"
+    ],
+    "internalComponents": [
+      "..",
+      "field",
+      "fieldset"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "checkbox-group",
+    "primitives": [
+      "checkbox-group"
+    ],
+    "internalComponents": [
+      "..",
+      "checkbox",
+      "fieldset",
+      "form"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "chip",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "chip-group",
+    "primitives": [],
+    "internalComponents": [
+      "..",
+      "config-provider"
+    ],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "choice-card",
+    "primitives": [],
+    "internalComponents": [
+      "..",
+      "fieldset"
+    ],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "code",
+    "primitives": [],
+    "internalComponents": [
+      "..",
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "combobox",
+    "primitives": [
+      "combobox",
+      "direction-provider",
+      "merge-props"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "field",
+      "fieldset",
+      "form"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "command-palette",
+    "primitives": [
+      "dialog"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "composer",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider",
+      "textarea"
+    ],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "config-provider",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "context-menu",
+    "primitives": [
+      "context-menu",
+      "direction-provider"
+    ],
+    "internalComponents": [
+      "config-provider",
+      "menu"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "copyable",
+    "primitives": [],
+    "internalComponents": [
+      "..",
+      "config-provider"
+    ],
+    "decision": "Retain native browser semantics with GGary presentation/integration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "data-grid",
+    "primitives": [],
+    "internalComponents": [
+      "button",
+      "checkbox-group",
+      "config-provider",
+      "date-picker",
+      "dialog",
+      "field",
+      "input",
+      "menu",
+      "number-field",
+      "popover",
+      "select"
+    ],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "date-picker",
+    "primitives": [
+      "direction-provider",
+      "popover"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "field",
+      "fieldset",
+      "form",
+      "time-picker"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "dialog",
+    "primitives": [
+      "dialog"
+    ],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "diff",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider",
+      "file-change"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "divider",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "empty-state",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "failure",
+    "primitives": [],
+    "internalComponents": [
+      "button",
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "field",
+    "primitives": [
+      "field",
+      "use-render"
+    ],
+    "internalComponents": [
+      "..",
+      "form"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "fieldset",
+    "primitives": [
+      "fieldset"
+    ],
+    "internalComponents": [
+      "..",
+      "form"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "file-change",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "file-drop",
+    "primitives": [
+      "field"
+    ],
+    "internalComponents": [
+      "..",
+      "field"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "form",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "gantt",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "heatmap",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "history",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "icon",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "input",
+    "primitives": [
+      "input"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "field"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "input-group",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "inserts",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "kanban",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider",
+      "menu"
+    ],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "kv",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "lanes",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "layout",
+    "primitives": [
+      "dialog"
+    ],
+    "internalComponents": [],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "legend",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "link",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain native browser semantics with GGary presentation/integration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "list",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "log",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "menu",
+    "primitives": [
+      "context-menu",
+      "direction-provider",
+      "menu"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "menubar",
+    "primitives": [
+      "direction-provider",
+      "menu",
+      "menubar"
+    ],
+    "internalComponents": [
+      "config-provider",
+      "menu"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "meter",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "metric",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "nav",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain native browser semantics with GGary presentation/integration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "note",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "number-field",
+    "primitives": [
+      "number-field"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "field",
+      "fieldset"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "pagination",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain native browser semantics with GGary presentation/integration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "panel",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "popconfirm",
+    "primitives": [
+      "popover"
+    ],
+    "internalComponents": [
+      "..",
+      "button",
+      "config-provider"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "popover",
+    "primitives": [
+      "popover"
+    ],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "progress",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "prose",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "radio-group",
+    "primitives": [
+      "radio",
+      "radio-group"
+    ],
+    "internalComponents": [
+      "..",
+      "fieldset",
+      "form"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "range-slider",
+    "primitives": [
+      "direction-provider",
+      "slider"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "field",
+      "fieldset",
+      "form",
+      "input",
+      "input-group"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "result",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "ribbon",
+    "primitives": [
+      "tabs"
+    ],
+    "internalComponents": [
+      "config-provider",
+      "toolbar"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "ring",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "run",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "search",
+    "primitives": [
+      "input"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "field"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "segmented-control",
+    "primitives": [],
+    "internalComponents": [
+      "..",
+      "config-provider"
+    ],
+    "decision": "Retain native browser semantics with GGary presentation/integration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "select",
+    "primitives": [
+      "direction-provider",
+      "merge-props",
+      "select"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "field",
+      "fieldset",
+      "form"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "share",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "skeleton",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "slider",
+    "primitives": [
+      "direction-provider",
+      "slider"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "field",
+      "fieldset"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "sparkline",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "spinner",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "states",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "step",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider",
+      "states"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "steps",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "switch",
+    "primitives": [
+      "switch"
+    ],
+    "internalComponents": [
+      "..",
+      "field",
+      "fieldset"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "table",
+    "primitives": [],
+    "internalComponents": [
+      "checkbox",
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "tabs",
+    "primitives": [
+      "direction-provider",
+      "tabs"
+    ],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "task",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "text",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "textarea",
+    "primitives": [
+      "field"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "field"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "thinking",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider",
+      "states"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "time-picker",
+    "primitives": [
+      "combobox",
+      "direction-provider",
+      "field"
+    ],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "field",
+      "fieldset",
+      "form"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "timeline",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "toast",
+    "primitives": [
+      "toast"
+    ],
+    "internalComponents": [],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "toolbar",
+    "primitives": [
+      "toolbar"
+    ],
+    "internalComponents": [
+      "button"
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "tooltip",
+    "primitives": [
+      "tooltip"
+    ],
+    "internalComponents": [
+      ".."
+    ],
+    "decision": "Base UI adapter or composite; retain GGary API and domain extensions",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "tree",
+    "primitives": [],
+    "internalComponents": [],
+    "decision": "Retain GGary domain behavior; inspect internal components for foundation composition",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "turn",
+    "primitives": [],
+    "internalComponents": [
+      "config-provider",
+      "states"
+    ],
+    "decision": "Retain GGary presentation or small utility; no blanket primitive migration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  },
+  {
+    "directory": "upload",
+    "primitives": [],
+    "internalComponents": [
+      "..",
+      "config-provider",
+      "file-drop"
+    ],
+    "decision": "Retain native browser semantics with GGary presentation/integration",
+    "verification": "Ownership inventory only; not an accessibility certification"
+  }
+]

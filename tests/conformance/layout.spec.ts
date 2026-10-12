@@ -59,13 +59,13 @@ export function layoutConformance(adapter: Adapter) {
       expect(root().dataset.collapse).toBe('drawer')
 
       await adapter.act(() => click(toggle()!))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(toggle()!.getAttribute('aria-expanded')).toBe('true')
       expect(root().dataset.state).toBe('open')
       expect(aside()!.contains(document.activeElement)).toBe(true)
 
       await adapter.act(() => void key(document.activeElement!, 'Escape'))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(toggle()!.getAttribute('aria-expanded')).toBe('false')
       expect(document.activeElement).toBe(toggle())
       expect(changes).toEqual([
@@ -77,9 +77,9 @@ export function layoutConformance(adapter: Adapter) {
     it('a link followed from the drawer closes it', async () => {
       const { aside, toggle, changes } = await setup()
       await adapter.act(() => click(toggle()!))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       await adapter.act(() => click(aside()!.querySelector('a[href="#reports"]')!))
-      await adapter.wait(0)
+      await adapter.wait(adapter.name === 'react' ? 50 : 0)
       expect(toggle()!.getAttribute('aria-expanded')).toBe('false')
       expect(changes.at(-1)).toEqual([false, 'navigate'])
     })

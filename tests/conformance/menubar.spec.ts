@@ -254,6 +254,25 @@ export function menubarConformance(adapter: Adapter) {
         expect(focused()).toBe('Undo')
       })
 
+      if (adapter.name === 'react') it('repeated access keys return to the first row without reopening; switching requests once', async () => {
+        const onOpenChange = vi.fn()
+        const { focused, key } = await setup({ mnemonics: true, onOpenChange })
+        await adapter.act(() => alt('e', 'KeyE'))
+        await adapter.wait(60)
+        await key('ArrowDown')
+        expect(focused()).toBe('Redo')
+        await adapter.act(() => alt('e', 'KeyE'))
+        await adapter.wait(60)
+        expect(focused()).toBe('Undo')
+        expect(onOpenChange.mock.calls).toEqual([['edit']])
+        await adapter.act(() => alt('t', 'KeyT'))
+        expect(focused()).toBe('Undo')
+        await adapter.act(() => alt('f', 'KeyF'))
+        await adapter.wait(60)
+        expect(focused()).toBe('New')
+        expect(onOpenChange.mock.calls).toEqual([['edit'], ['file']])
+      })
+
       it('F10 moves focus to the first menu of the bar', async () => {
         const { barItem, focused, key } = await setup({ mnemonics: true })
         await adapter.act(() => barItem('Help').focus())

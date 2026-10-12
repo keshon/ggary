@@ -15,7 +15,9 @@
     "typecheck": "npm run assets && tsc -p tsconfig.json --noEmit && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings --threshold warning",
     "check:themes": "npm run assets && node packages/checks/src/cli.ts",
     "build:react-packages": "npm run assets && node scripts/build-react-packages.mjs",
-    "smoke:react-packages": "npm run build:react-packages && node scripts/smoke-react-packages.mjs"
+    "smoke:react-packages": "npm run build:react-packages && node scripts/smoke-react-packages.mjs",
+    "audit:react-foundation": "npm run assets && node scripts/audit-react-foundation.mjs",
+    "verify:react": "node scripts/verify-react-foundation.mjs"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^5.1.1",

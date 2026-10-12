@@ -51,19 +51,6 @@ export function implementationFor(id: string): Implementation {
   return { label: 'GGary custom', detail: 'GGary implementation; this label does not imply custom keyboard behavior in purely presentational components.', decision }
 }
 
-/** Consumer guidance, kept separate from migration decisions and ownership. */
-export function usageFor(id: string): string | undefined {
-  const notes: Record<string, string> = {
-    ribbon: 'Button groups support arrow-key navigation. Use ToolbarButton for their actions. For groups containing selects or other controls, set managed={false} so those controls retain their keyboard behavior.',
-    toolbar: 'Give action toolbars a label and use ToolbarButton for their buttons to enable arrow-key navigation. Omit the label for a simple layout strip.',
-    toast: 'Create a queue with the React createToaster export and mount one Toaster for that queue. Call toast, update or dismiss to manage notifications.',
-    toaster: 'Create a queue with the React createToaster export and mount one Toaster for that queue.',
-    field: 'Wrap a control in Field to connect its label, hint and validation messages. Use FieldControl for a custom native input.',
-    fieldset: 'Use a named Fieldset for grouped form values, such as checkbox or radio options.',
-    form: 'Give controls names for submission and errors. Form supports asynchronous validation and server errors.',
-  }
-  return notes[id]
-}
 export function implementationBadge(label: string): string {
   return label.includes('Base UI') ? 'Built with Base UI'
     : label.includes('Native HTML') ? 'Native HTML'

@@ -9,9 +9,9 @@ listener is not itself a bridge: inspect the behavior it implements.
 - CommandPalette: `attachPaletteHotkey` opens the palette from a global shortcut;
   `attachPaletteSource` handles asynchronous search. Base UI Dialog owns its overlay.
 - Menubar: `attachMenubarKeys` supplies optional Alt mnemonics and F10 activation.
-  Base UI owns ordinary menu navigation. The mnemonic adapter currently invokes
-  the trigger through a synthetic ArrowDown event; this is explicit integration
-  debt, not a second keyboard-navigation backend.
+  Base UI owns ordinary menu navigation. Mnemonic activation uses the native trigger button activation API. Repeating
+  a shortcut focuses the first enabled row without reopening the menu. No
+  synthetic keyboard event is dispatched.
 - FileDrop: `attachFileDrop` handles dropped files; native selection and Base UI
   Field registration remain separate responsibilities.
 - Kanban/Gantt: drag helpers implement domain moves and scheduling edits.
@@ -45,5 +45,34 @@ Run `npm run smoke:react-packages` to build compiled candidates and verify packe
 tarballs outside workspace resolution. Output lives under
 `node_modules/.cache/react-release/<build-id>`; `latest.json` identifies the last
 build and `smoke-result.json` records a successful consumer check. Development
-exports intentionally remain source-based. This check does not publish packages
-or replace browser interaction coverage.
+exports intentionally remain source-based. The smoke also runs representative form, toolbar and nested-overlay interactions
+in headless Chrome against the consumer production build. It does not publish
+packages or certify every component/browser combination. Set GG_BROWSER_CHANNEL
+to use another installed Playwright browser channel.
+
+## Inventory and CSS payload
+
+`component-inventory.json` covers all 96 React component directories. It records
+34 direct Base UI importers plus internal composition dependencies. Directory
+counts are not counts of public components, and indirect wrappers also use Base
+UI. Decisions describe ownership, not full accessibility certification. Run
+`npm run audit:react-foundation` to refresh the inventory and CSS measurements.
+
+Measured minified full-theme CSS: 371,718 bytes / 44,113 gzip. Structure alone:
+79,644 / 10,744; icons alone: 42,157 / 4,296. These independent compressed totals
+are not additive. The full theme imports structure, tokens, icons, reset, all
+component styles and forced-color rules. Component-level JavaScript imports do
+not tree-shake that CSS. Retain this reliable default for now. Any optional
+subset entry must include an explicit dependency map for shared anatomy,
+composites, focus and forced-color rules before claiming safe per-component CSS.
+
+## Candidate policy and CI
+
+`npm run verify:react` runs the sequential local release checks. GitHub Actions
+runs the same command on PRs and main/codex branches under Node 24 and installed
+Chromium. CI also checks inventory drift and retains candidate artifacts for
+seven days, including browser screenshots when available. No publish permission
+or publishing job is configured. Compiled candidate manifests stay private and
+pin internal GGary dependencies to their sibling package versions. Source
+manifests remain development entry points. A publishable version/registry policy
+is a separate decision; passing this gate does not publish anything.

@@ -42,6 +42,15 @@ for (const name of ['core', 'react', 'icons', 'structure', 'theme-ggarry']) {
   mkdirSync(dest, { recursive: true })
   const manifest = JSON.parse(readFileSync(join(src, 'package.json'), 'utf8'))
   delete manifest.scripts
+  // Candidate manifests are intentionally non-publishable; sibling versions
+  // must match the artifacts packed together, rather than resolve arbitrary releases.
+  manifest.private = true
+  for (const [dependency, version] of Object.entries(manifest.dependencies ?? {})) {
+    if (dependency.startsWith('@ggary/')) {
+      const sibling = JSON.parse(readFileSync(join(root, 'packages', dependency.slice(7), 'package.json'), 'utf8'))
+      manifest.dependencies[dependency] = sibling.version
+    }
+  }
   manifest.files = ['dist', 'src', '*.mjs', 'contract.json']
   if (name === 'core' || name === 'react') {
     cpSync(join(compiled, 'packages', name, 'src'), join(dest, 'dist'), { recursive: true })

@@ -259,7 +259,7 @@ export function datePickerConformance(adapter: Adapter) {
       const m = await adapter.datePicker({ label: 'Starts', locale: 'en-GB', time: true, name: 'starts', onValueChange, ...props }, freshTarget())
       const dateInput = () => part(m.root, 'date-picker', 'input') as HTMLInputElement
       const timeInput = () => part(m.root, 'time-picker', 'input') as HTMLInputElement
-      const hidden = () => m.root.querySelector<HTMLInputElement>('input[type="hidden"][name="starts"]')!
+      const hidden = () => m.root.querySelector<HTMLInputElement>('input[name="starts"]')!
       return { m, dateInput, timeInput, hidden, values }
     }
 
@@ -271,7 +271,7 @@ export function datePickerConformance(adapter: Adapter) {
       expect(timeInput().getAttribute('aria-label')).toBe('Time')
       expect(timeInput().value).toBe('14:30')
       expect(dateInput().value).not.toBe('')
-      expect(m.root.querySelectorAll('input[type="hidden"][name="starts"]')).toHaveLength(1)
+      expect(m.root.querySelectorAll('input[name="starts"]')).toHaveLength(1)
     })
 
     it('reports the pair once both halves are set, and submits it as one value', async () => {

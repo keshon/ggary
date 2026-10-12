@@ -23,5 +23,6 @@ export const rangeSliderAnatomy = createAnatomy('range-slider', [
   'mark',
   'fields',
   'separator',
+  'endpoint',
 ] as const)
 export type RangeSliderPart = (typeof rangeSliderAnatomy.parts)[number]

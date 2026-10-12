@@ -4,10 +4,11 @@ React uses Base UI where it reduces interaction ownership. GGary owns design,
 public APIs and domain widgets. Svelte has a separate behavior implementation;
 share visual contracts and genuinely framework-independent domain logic.
 
-Status: React overlay migration is complete. Whole-library primitive migration
-is not complete. Leads is retired as a test bench; do not update it.
+Status: Planned React foundation migration and local candidate verification are
+complete. Custom/native components are retained deliberately. Hosted CI and
+publication have not run. Leads is retired as a test bench; do not update it.
 
-## 1. Inventory and transparent demo metadata (in progress)
+## 1. Ownership inventory and demo metadata (completed; detailed accessibility audits separate)
 
 Record implementation and migration decision for every documented React
 component: native HTML, Base UI, GGary custom, or GGary + Base UI. Describe
@@ -37,7 +38,7 @@ Retain tables, trees, Kanban, uploads, calendars and agent UI. Compose standard
 React controls from the chosen foundation. Separate framework DOM interaction
 from shared domain logic.
 
-## 6. Packaging and release checks (in progress)
+## 6. Packaging and release checks (local gates completed; hosted CI pending)
 
 Ship compiled JS/declarations and reliable component exports. Validate a clean
 consumer installation. Automate representative browser overlay/form/keyboard
@@ -51,8 +52,7 @@ anatomy, styling and domain types; verify equivalent observable behavior.
 ## Working rules
 
 Update demo metadata and this plan with each completed batch. No claim of full
-migration until counterpart decisions and release checks are complete. Form
-integration is the largest remaining uncertainty. Do not rewrite unrelated
+migration until counterpart decisions and release checks are complete. Browser verification of packaged consumers remains a release gate. Do not rewrite unrelated
 presentation components. Current metadata is a baseline, not an accessibility
 certification or a completed component-by-component behavior audit.
 
@@ -722,3 +722,88 @@ fixture JavaScript: 386.66 kB raw / 126.11 kB gzip (includes React and demonstra
 controls). These are fixture measurements, not isolated package payload sizes.
 Ten package/backend contract tests also passed. Next: browser consumer coverage,
 CSS payload review and remaining inventory/mnemonic integration debt.
+
+### Packaged consumer browser checkpoint (2026-10-12)
+
+The clean-consumer smoke now serves the installed tarballs' production build in
+headless Chrome. It checks required-field rejection and summary focus, accepted
+submission, reset, ToolbarButton arrow focus, Select selection inside a Dialog,
+inner Escape isolation, dialog focus return, Tab containment and outside-click
+dismissal. Runtime exceptions and failed HTTP resources fail the check. A browser
+screenshot is saved next to the candidate artifacts. The consumer installs only
+packed GGary dependencies; the test driver remains repository tooling.
+
+This is representative consumer coverage, not a complete component/browser
+matrix. CSS payload review, inventory completion, Menubar mnemonic integration
+debt and final release-manifest decisions remain open. Svelte migration remains
+separate. Development manifests still export source; nothing was published.
+
+Complete smoke rerun passed types, Vite build, Node ESM imports and all consumer
+browser checks. Next: Menubar mnemonic integration cleanup.
+
+### Menubar mnemonic checkpoint (2026-10-12)
+
+Removed simulated ArrowDown dispatch from React Menubar. Alt mnemonics activate
+Base UI's native trigger; directly forcing controlled open alone did not initialize
+its list-navigation index reliably, so it was not retained. Repeated shortcuts
+focus the first enabled row without duplicate open callbacks. Base UI retains
+ordinary menu interaction. Global mnemonic/F10 recognition stays a deliberate
+GGary extension. React-only regression covers repeat, disabled and switching keys;
+existing Svelte semantics are unchanged. A contract guards against synthetic keys.
+27 Menubar conformance cases and 11 package/backend contracts passed. Added the
+mnemonic path to the installed-package browser fixture; full smoke verification
+is the completion gate. Next: component inventory and CSS payload review.
+
+Full installed-package smoke passed types, production build, Node ESM imports
+and browser checks including Alt activation, repeat navigation and Escape return.
+
+### Inventory and CSS review checkpoint (2026-10-12)
+
+Recorded all 96 React component directories in component-inventory.json: direct
+Base UI primitives, internal composition and retention decisions. 34 directories
+import Base UI directly; indirect wrappers must not be counted as independent
+legacy implementations. This completes ownership enumeration, not a blanket
+component accessibility audit. Package contract coverage prevents missing new
+directories. Removed unused demo prose generator after user requested badge-only
+pages.
+
+Added audit:react-foundation to regenerate the inventory and minified/gzip CSS
+measurements through Vite. Full theme is 371,718 / 44,113 bytes; structure alone
+79,644 / 10,744; icons alone 42,157 / 4,296. Default CSS is deliberately full-kit;
+JavaScript tree shaking does not imply stylesheet tree shaking. Keep the working
+full entry; optional subsets require a shared-style dependency map. CSS review
+is complete at this boundary, with no speculative splitting introduced.
+
+Remaining React foundation release work: make final distribution manifests and
+version policy concrete, wire release gates into CI, and run the consolidated
+required checks. Optional granular CSS and exhaustive widget accessibility audits
+are follow-up work, not covered by this migration. Svelte remains separate.
+
+### CI and consolidated release gate checkpoint (2026-10-12)
+
+Added verify:react, a fail-fast sequential runner for type checks, all
+machine/contract/DOM tests, theme checks, docs build, inventory/CSS audit and
+installed-package browser smoke. Added a read-only GitHub Actions workflow for
+PR/main/codex branches using Node 24 and Chromium. It checks inventory drift and
+retains candidate artifacts/screenshots for seven days. No publishing job exists.
+Compiled candidate manifests stay private and pin sibling GGary versions.
+
+The first full run reported 2,761 passes and six failures. Corrected a real
+DatePicker regression: readOnly=false had overwritten disabled preset props.
+RangeSlider's secondary submission input now has an explicit anatomy marker.
+Updated DateTime tests to verify canonical named inputs rather than insist on
+input[type=hidden]; canonical constraint inputs are visually hidden instead.
+The attribute-forwarding scanner distinguishes internal Base UI render-prop bags
+from consumer props in Field/Toaster. Shell conformance waits for asynchronous
+focus completion. All 31 targeted cases passed after these corrections. Some
+legacy conformance tests still emit React act warnings; do not claim warning-free
+verification. The complete gate rerun is the completion check.
+
+Complete verify:react rerun passed: TypeScript/Svelte (zero diagnostics), 100 test
+files with 2,767 passed / nine skipped, theme checks, docs production build,
+inventory/CSS audit, candidate version/private assertions, clean consumer types,
+Node ESM imports, production build and real-browser interactions. React act
+warnings remain in some legacy conformance cases. Hosted CI has been configured
+but not executed on GitHub; these changes are local and uncommitted. Candidate
+policy is private 0.0.0 artifacts with pinned sibling versions. A public version,
+registry and publishing authorization remain separate from this migration.

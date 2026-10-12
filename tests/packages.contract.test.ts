@@ -77,3 +77,13 @@ describe('the adapters', () => {
     expect(missing).toEqual([])
   })
 })
+
+describe('React ownership inventory', () => {
+  it('covers every public component directory, including adapters with internal composition', () => {
+    const inventory = JSON.parse(readFileSync(join(root, 'packages/react/component-inventory.json'), 'utf8')) as { directory: string; primitives: string[]; internalComponents: string[]; decision: string }[]
+    expect(inventory.map(row => row.directory)).toEqual(dirs('react'))
+    expect(inventory.find(row => row.directory === 'dialog')!.primitives).toContain('dialog')
+    expect(inventory.find(row => row.directory === 'toolbar')!.primitives).toContain('toolbar')
+    expect(inventory.every(row => row.decision.length > 0)).toBe(true)
+  })
+})
