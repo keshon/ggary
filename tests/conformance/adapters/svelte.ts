@@ -79,7 +79,7 @@ export const svelte: Adapter = {
   supports: { controlled: true, refusal: false, linkRoot: true },
 
   async act(interaction) {
-    interaction()
+    await interaction()
     flushSync()
   },
 

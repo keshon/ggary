@@ -141,3 +141,43 @@ final code. Existing React act warnings remain. Final type checks passed with
 zero Svelte diagnostics; theme checks and the docs build passed. All six Chromium
 pilot cases passed again on the final code.
 Next: Menu/ContextMenu/Menubar, then the remaining confirmation composites.
+
+
+## Menu family checkpoint (2026-10-12)
+
+Menu, ContextMenu and Menubar now use Bits UI. Removed their interaction-machine,
+connect and attachPopover wiring. Shared BitsMenuItems/BitsMenuSub render actions,
+links, owner-held checkbox/radio state, labelled groups and recursive submenus.
+GGary retains item data, callback details/reasons, styling/theme inheritance,
+closeOnSelect, access keys, ArrowUp last-item opening and one-level Escape policy.
+Bits owns roving focus, typeahead, pointer corridors, positioning and dismissal.
+Portal submenu forward-navigation in Menubar is forwarded to its Bits parent;
+it does not introduce a second navigation machine. Internal encoding preserves
+empty-string radio and Menubar keys without colliding with Bits' closed state.
+
+Bits skips disabled entries during arrow navigation. Menu's bind:open remains
+Svelte two-way binding, rather than React's request/refusal model. ContextMenu
+preserves Shift+right-click for the browser and explicitly supports ContextMenu
+and Shift+F10 keys. Menu/ContextMenu/Menubar docs start closed and are interactive;
+removed staged opening and synthetic mnemonic events from these pages.
+
+Conformance tests now find portal contents and await framework effects. Fixed
+the Svelte act helper to await async interactions. Full fast suite passed:
+103 files, 2,783 tests, nine existing skips. After the final key-encoding and
+Tooltip disposal changes, 110 focused contract/conformance/SSR/timing cases
+passed; all 13 Chromium pilot cases passed, including seven menu-family cases.
+Final TypeScript/Svelte checks have zero diagnostics; theme checks (544
+measurements) and the production docs build passed. Real docs Menu/submenu,
+ContextMenu and Menubar opening were checked visually. Existing React act
+warnings remain.
+
+Previous checkpoint CI run 38255198948 failed on Tooltip unmount cancellation.
+Added a disposal guard so late Bits callbacks cannot restart the close timer or
+publish after teardown; the focused timing checks pass. Hosted CI for this new
+checkpoint is still a separate gate after push.
+
+Next: migrate the internal DataGrid row and Kanban card menus, then delete
+MenuContent.svelte. Those two consumers still use the old renderer; the three
+public menu components do not. Follow with confirmation/command composites,
+then selection/form family and the compiled installed-Svelte-consumer release
+gates. The whole Svelte migration is not complete yet.

@@ -5,7 +5,8 @@ import { type Adapter, type MenuProps, click, freshTarget, keydown, part, parts 
 
 /** In a browser, the platform says; under jsdom, the shim keeps the answer. */
 const shownInTopLayer = (el: Element) => {
-  if (el?.getAttribute('data-backend') === 'base-ui') return el.getAttribute('data-state') === 'open'
+  if (!el) return false
+  if (['base-ui', 'bits-ui'].includes(el.getAttribute('data-backend') ?? '')) return el.getAttribute('data-state') === 'open'
   const shim = (globalThis as { isPopoverOpen?: (el: Element) => boolean }).isPopoverOpen
   return shim ? shim(el) : el.matches(':popover-open')
 }
@@ -32,8 +33,8 @@ export function menuConformance(adapter: Adapter) {
   describe('menu', () => {
     const setup = async (props: Partial<MenuProps> = {}) => {
       const m = await adapter.menu({ trigger: 'Actions', items, ...props }, freshTarget())
-      const scope = () => adapter.name === 'react' ? document.body : m.root
-      const content = () => adapter.name === 'react' ? document.getElementById(trigger().id.replace('-trigger', '-content'))! : part(m.root, 'menu', 'content')!
+      const scope = () => document.body
+      const content = () => document.getElementById(trigger().id.replace('-trigger', '-content'))!
       const trigger = () => m.root.querySelector('[aria-haspopup="menu"]') as HTMLButtonElement
       const rows = () => parts(scope(), 'menu', 'item')
       const row = (label: string) => rows().find((el) => part(el, 'menu', 'item-text')!.textContent === label)!
@@ -52,24 +53,27 @@ export function menuConformance(adapter: Adapter) {
             target.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
             await new Promise((r) => setTimeout(r, 180))
           }
+          if (adapter.name === 'svelte') await new Promise(r => setTimeout(r, 180))
         }),
         focused: () => {
           const active = document.activeElement
           return active && active !== document.body ? part(active, 'menu', 'item-text')?.textContent : undefined
         },
-        key: (k: string, target: Element = document.activeElement ?? document.body) => adapter.act(async () => { if (adapter.name === 'react' && target === trigger()) (target as HTMLElement).focus(); keydown(target, k); if (adapter.name === 'react' && k === 'Enter' && target === trigger()) click(target); if (adapter.name === 'react') await new Promise((resolve) => setTimeout(resolve, 60)) }),
-        open: () => adapter.act(async () => { click(trigger()); if (adapter.name === 'react') await new Promise((resolve) => setTimeout(resolve, 60)) }),
+        key: (k: string, target: Element = document.activeElement ?? document.body) => adapter.act(async () => { if (target === trigger()) (target as HTMLElement).focus(); keydown(target, k); if (adapter.name === 'react' && k === 'Enter' && target === trigger()) click(target); await new Promise((resolve) => setTimeout(resolve, 60)) }),
+        open: () => adapter.act(async () => { click(trigger()); await new Promise((resolve) => setTimeout(resolve, 60)) }),
         press: (target: Element) =>
-          adapter.act(() => {
-            target.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
+          adapter.act(async () => {
+            target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'mouse', clientX: 1, clientY: 1 }))
             if (adapter.name === 'react') { target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); if (target === document.body) click(target) }
+            await new Promise(resolve => setTimeout(resolve, 60))
           }),
       }
     }
 
     describe('anatomy', () => {
-      it('rests closed: a manual popover with role menu, and a trigger that says what it opens', async () => {
+      it('rests closed with a trigger that says what it opens', async () => {
         const { m, content, trigger } = await setup()
+        if (adapter.name === 'svelte') { expect(content()).toBeNull(); expect(trigger().getAttribute('aria-expanded')).toBe('false'); expect(trigger().getAttribute('aria-controls')).toBeNull(); return }
         expect(content().getAttribute('popover')).toBe(adapter.name === 'react' ? null : 'manual')
         expect(content().getAttribute('role')).toBe('menu')
         expect(content().dataset.state).toBe('closed')
@@ -81,7 +85,8 @@ export function menuConformance(adapter: Adapter) {
       })
 
       it('renders every part the stylesheets target, with the role each item needs', async () => {
-        const { scope, row } = await setup()
+        const { scope, row, open } = await setup()
+        await open()
         for (const name of ['separator', 'group', 'group-label', 'item', 'item-text', 'item-shortcut', 'item-indicator']) {
           expect(part(scope(), 'menu', name), `missing [data-part="${name}"]`).toBeTruthy()
         }
@@ -131,11 +136,11 @@ export function menuConformance(adapter: Adapter) {
         const { trigger, row, focused, key } = await setup()
         await key('Enter', trigger())
         await key('ArrowDown')
-        expect(focused()).toBe('Archive')
-        expect(row('Archive').hasAttribute('data-highlighted')).toBe(true)
+        expect(focused()).toBe(adapter.name === 'svelte' ? 'Show grid' : 'Archive')
+        expect(row('Archive').hasAttribute('data-highlighted')).toBe(adapter.name !== 'svelte')
         expect(row('Edit').hasAttribute('data-highlighted')).toBe(false)
         await key('ArrowDown')
-        expect(focused()).toBe('Show grid')
+        expect(focused()).toBe(adapter.name === 'svelte' ? 'Docs' : 'Show grid')
         await key('End')
         expect(focused()).toBe('Delete')
         await key('ArrowDown')
@@ -170,8 +175,7 @@ export function menuConformance(adapter: Adapter) {
         const onSelect = vi.fn()
         const { content, trigger, row, key } = await setup({ onSelect })
         await key('Enter', trigger())
-        await key('ArrowDown')
-        await key('Enter')
+        if (adapter.name === 'react') { await key('ArrowDown'); await key('Enter') }
         await adapter.act(() => click(row('Archive')))
         expect(onSelect).not.toHaveBeenCalled()
         expect(shownInTopLayer(content())).toBe(true)
@@ -200,7 +204,7 @@ export function menuConformance(adapter: Adapter) {
         await open()
         await adapter.act(async () => {
           row('Delete').dispatchEvent(new PointerEvent('pointermove', { bubbles: true, pointerType: 'mouse' }))
-          if (adapter.name === 'react') { row('Delete').dispatchEvent(new MouseEvent('mousemove', { bubbles: true })); await new Promise((r) => setTimeout(r, 30)) }
+          if (adapter.name === 'react') row('Delete').dispatchEvent(new MouseEvent('mousemove', { bubbles: true })); await new Promise((r) => setTimeout(r, 30))
         })
         expect(row('Delete').hasAttribute('data-highlighted')).toBe(true)
         expect(document.activeElement).toBe(row('Delete'))
@@ -208,7 +212,8 @@ export function menuConformance(adapter: Adapter) {
         // pointerleave. A real pointer sends both.
         await adapter.act(async () => {
           row('Delete').dispatchEvent(new MouseEvent('pointerout', { bubbles: true, relatedTarget: content() }))
-          row('Delete').dispatchEvent(new MouseEvent('pointerleave', { bubbles: false, relatedTarget: content() }))
+          row('Delete').dispatchEvent(new PointerEvent('pointerleave', { bubbles: false, pointerType: 'mouse', relatedTarget: content() }))
+          await new Promise(resolve => setTimeout(resolve, 30))
         })
         expect(row('Delete').hasAttribute('data-highlighted')).toBe(false)
         expect(document.activeElement).toBe(content())
@@ -239,7 +244,7 @@ export function menuConformance(adapter: Adapter) {
         const { m, trigger, row, focused, key } = await setup({ onSelect, closeOnSelect: false })
         await key('Enter', trigger())
         await key('ArrowDown')
-        await key('ArrowDown')
+        if (adapter.name === 'react') await key('ArrowDown')
         expect(focused()).toBe('Show grid')
         await key('Enter')
         expect(onSelect).toHaveBeenCalledWith('grid', { item: expect.objectContaining({ value: 'grid' }), checked: true })
@@ -275,16 +280,17 @@ export function menuConformance(adapter: Adapter) {
         return id ? document.getElementById(id) : null
       }
       const shownSubmenus = (root: HTMLElement) =>
-        parts(adapter.name === 'react' ? document.body : root, 'menu', 'content').filter((el) => el.hasAttribute('data-level') && shownInTopLayer(el))
+        parts(document.body, 'menu', 'content').filter((el) => el.hasAttribute('data-level') && shownInTopLayer(el))
 
       it('a submenu row says it opens a menu, draws a chevron, and renders no submenu while closed', async () => {
-        const { m, scope, row } = await setup({ items: tree })
+        const { m, scope, row, open } = await setup({ items: tree })
+        await open()
         expect(row('Open Recent').getAttribute('role')).toBe('menuitem')
         expect(row('Open Recent').getAttribute('aria-haspopup')).toBe('menu')
         expect(row('Open Recent').getAttribute('aria-expanded')).toBe('false')
         expect(part(row('Open Recent'), 'menu', 'submenu-indicator')!.dataset.icon).toBe('chevron-right')
         expect(part(row('Open Recent'), 'menu', 'submenu-indicator')!.getAttribute('aria-hidden')).toBe('true')
-        expect(parts(adapter.name === 'react' ? document.body : m.root, 'menu', 'content')).toHaveLength(1)
+        expect(parts(document.body, 'menu', 'content')).toHaveLength(1)
       })
 
       it('ArrowRight opens it on its first row, ArrowLeft and Escape close one level at a time', async () => {
@@ -300,7 +306,7 @@ export function menuConformance(adapter: Adapter) {
         expect(submenu.getAttribute('aria-labelledby')).toBe(row('Open Recent').id)
         expect(row('Open Recent').getAttribute('aria-expanded')).toBe('true')
         // Inside the menu, so a press in it is a press inside the menu.
-        expect(content().contains(submenu)).toBe(adapter.name !== 'react')
+        expect(content().contains(submenu)).toBe(false)
 
         await key('End')
         await key('ArrowRight')
@@ -339,16 +345,16 @@ export function menuConformance(adapter: Adapter) {
         expect(document.activeElement).toBe(trigger())
       })
 
-      it('successive keys navigate from the focused row (Svelte also supports a render-free batch)', async () => {
+      it('successive keys navigate from the focused row', async () => {
         const { trigger, focused, key } = await setup({ items: tree })
         await key('Enter', trigger())
         // One batch, no render in between: the second key must not see the first row.
         await adapter.act(() => {
           const menu = document.activeElement!
           keydown(menu, 'ArrowDown')
-          if (adapter.name !== 'react') keydown(menu, 'ArrowRight')
+
         })
-        if (adapter.name === 'react') await key('ArrowRight')
+        await key('ArrowRight')
         expect(focused()).toBe('a.txt')
       })
 
@@ -360,7 +366,7 @@ export function menuConformance(adapter: Adapter) {
         expect(shownInTopLayer(submenuOf(row('Open Recent'))!)).toBe(true)
         await hover(row('b.txt'))
         expect(focused()).toBe('b.txt')
-        expect(row('Open Recent').hasAttribute('data-highlighted')).toBe(adapter.name !== 'react')
+        expect(row('Open Recent').hasAttribute('data-highlighted')).toBe(false)
         // Back on another row of the menu: the submenu closes.
         await hover(row('Quit'))
         expect(focused()).toBe('Quit')
@@ -372,14 +378,14 @@ export function menuConformance(adapter: Adapter) {
         await key('Enter', trigger())
         await key('ArrowDown')
         await key('ArrowDown')
-        expect(focused()).toBe('Export')
+        expect(focused()).toBe(adapter.name === 'svelte' ? 'Quit' : 'Export')
         await key('ArrowRight')
-        await key('Enter')
+        if (adapter.name === 'react') await key('Enter')
         await adapter.act(() => {
           row('Export').dispatchEvent(new PointerEvent('pointermove', { bubbles: true, pointerType: 'mouse' }))
         })
         expect(row('Export').getAttribute('aria-expanded')).toBe('false')
-        expect(focused()).toBe('Export')
+        expect(focused()).toBe(adapter.name === 'svelte' ? 'Quit' : 'Export')
       })
 
       it('a press inside a submenu keeps the menu; a press outside closes the whole tree', async () => {
@@ -400,8 +406,7 @@ export function menuConformance(adapter: Adapter) {
         await key('Enter', trigger())
         await key('ArrowDown')
         await key('ArrowRight')
-        if (adapter.name === 'react') expect(openLayerCount()).toBe(0)
-        else expect(openLayerCount()).toBeGreaterThanOrEqual(1)
+        expect(openLayerCount()).toBe(0)
         await m.unmount()
         expect(openLayerCount()).toBe(0)
       })
@@ -417,7 +422,8 @@ export function menuConformance(adapter: Adapter) {
       })
 
       it('an explicit label names the menu instead of the trigger', async () => {
-        const { content } = await setup({ label: 'Row actions' })
+        const { content, open } = await setup({ label: 'Row actions' })
+        await open()
         expect(content().getAttribute('aria-label')).toBe('Row actions')
         expect(content().hasAttribute('aria-labelledby')).toBe(false)
       })
@@ -425,8 +431,7 @@ export function menuConformance(adapter: Adapter) {
       it('unmounted while open, it leaves nothing listening', async () => {
         const { m, open } = await setup()
         await open()
-        if (adapter.name === 'react') expect(openLayerCount()).toBe(0)
-        else expect(openLayerCount()).toBeGreaterThanOrEqual(1)
+        expect(openLayerCount()).toBe(0)
         await m.unmount()
         expect(openLayerCount()).toBe(0)
       })

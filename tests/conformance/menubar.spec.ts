@@ -5,7 +5,8 @@ import { type Adapter, type MenubarProps, click, freshTarget, keydown, part, par
 
 /** In a browser, the platform says; under jsdom, the shim keeps the answer. */
 const shownInTopLayer = (el: Element) => {
-  if ((el as HTMLElement).dataset.backend === 'base-ui') return (el as HTMLElement).dataset.state === 'open'
+  if (!el) return false
+  if (['base-ui', 'bits-ui'].includes((el as HTMLElement).dataset.backend ?? '')) return (el as HTMLElement).dataset.state === 'open'
   const shim = (globalThis as { isPopoverOpen?: (el: Element) => boolean }).isPopoverOpen
   return shim ? shim(el) : el.matches(':popover-open')
 }
@@ -38,7 +39,7 @@ export function menubarConformance(adapter: Adapter) {
       const bar = () => part(m.root, 'menubar', 'root')!
       const barItems = () => parts(m.root, 'menubar', 'item')
       const barItem = (text: string) => barItems().find((el) => el.textContent === text)!
-      const scope = () => adapter.name === 'react' ? document.body : m.root
+      const scope = () => document.body
       const openMenus = () => parts(scope(), 'menu', 'content').filter((el) => !el.hasAttribute('data-level') && shownInTopLayer(el))
       const row = (label: string) =>
         parts(scope(), 'menu', 'item').find((el) => part(el, 'menu', 'item-text')!.textContent === label)!
@@ -60,12 +61,12 @@ export function menubarConformance(adapter: Adapter) {
             keydown(target, k)
             if (adapter.name === 'react' && k === 'Enter' && target.matches('[data-scope="menubar"][data-part="item"]')) click(target)
           })
-          if (adapter.name === 'react') await adapter.act(async () => { await new Promise(r => setTimeout(r, 60)) })
+          await adapter.act(async () => { await new Promise(r => setTimeout(r, 60)) })
         },
         press: (target: Element) =>
           adapter.act(async () => {
-            target.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }))
-            if (adapter.name === 'react') { target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await new Promise(r => setTimeout(r, 60)) }
+            target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'mouse', clientX: 1, clientY: 1 }))
+            if (adapter.name === 'react') target.dispatchEvent(new MouseEvent('mousedown', { bubbles: true })); await new Promise(r => setTimeout(r, 60))
           }),
       }
     }
@@ -95,8 +96,8 @@ export function menubarConformance(adapter: Adapter) {
         await key('ArrowRight')
         expect(focused()).toBe('Edit')
         await key('ArrowRight')
-        expect(focused()).toBe(adapter.name === 'react' ? 'Help' : 'Tools')
-        expect(barItems().map((el) => el.tabIndex)).toEqual(adapter.name === 'react' ? [-1, -1, -1, 0] : [-1, -1, 0, -1])
+        expect(focused()).toBe('Help')
+        expect(barItems().map((el) => el.tabIndex)).toEqual([-1, -1, -1, 0])
         await key('End')
         expect(focused()).toBe('Help')
         await key('ArrowRight')
@@ -120,10 +121,8 @@ export function menubarConformance(adapter: Adapter) {
         expect(focused()).toBe('Redo')
         await key('Escape')
         await key('ArrowRight')
-        if (adapter.name === 'react') {
-          expect(focused()).toBe('Help')
-          await adapter.act(() => barItem('Tools').focus())
-        }
+        expect(focused()).toBe('Help')
+        await adapter.act(() => barItem('Tools').focus())
         await key('Enter')
         expect(openMenus()).toHaveLength(0)
         expect(focused()).toBe('Tools')
@@ -162,7 +161,7 @@ export function menubarConformance(adapter: Adapter) {
       it('a press opens a menu and a second press closes it; hovering another item while open switches', async () => {
         const onOpenChange = vi.fn()
         const { barItem, openMenus, focused, row } = await setup({ onOpenChange })
-        await adapter.act(() => click(barItem('File')))
+        await adapter.act(async () => { click(barItem('File')); await new Promise(r => setTimeout(r, 60)) })
         expect(openMenus()).toHaveLength(1)
         // Opened by a pointer: focus on the menu, no row highlighted.
         await vi.waitFor(() => expect(document.activeElement).toBe(adapter.name === 'react' ? row('New') : openMenus()[0]), { timeout: 1000, interval: 20 })
@@ -176,7 +175,7 @@ export function menubarConformance(adapter: Adapter) {
         expect(barItem('Help').getAttribute('aria-expanded')).toBe('true')
         expect(barItem('File').getAttribute('aria-expanded')).toBe('false')
         expect(openMenus()).toHaveLength(1)
-        await adapter.act(() => click(barItem('Help')))
+        await adapter.act(async () => { click(barItem('Help')); await new Promise(r => setTimeout(r, 60)) })
         expect(openMenus()).toHaveLength(0)
         expect(onOpenChange.mock.calls).toEqual([['file'], ['help'], [null]])
         // Nothing open: hovering opens nothing.
@@ -203,7 +202,7 @@ export function menubarConformance(adapter: Adapter) {
 
       it('a press inside a menu keeps it; a press outside closes it', async () => {
         const { barItem, openMenus, row, press } = await setup()
-        await adapter.act(() => click(barItem('Edit')))
+        await adapter.act(async () => { click(barItem('Edit')); await new Promise(r => setTimeout(r, 60)) })
         await press(row('Undo'))
         expect(openMenus()).toHaveLength(1)
         await press(document.body)
@@ -212,8 +211,8 @@ export function menubarConformance(adapter: Adapter) {
 
       it('unmounted while a menu is open, it leaves nothing listening', async () => {
         const { m, barItem } = await setup()
-        await adapter.act(() => click(barItem('File')))
-        expect(openLayerCount()).toBe(adapter.name === 'react' ? 0 : 1)
+        await adapter.act(async () => { click(barItem('File')); await new Promise(r => setTimeout(r, 60)) })
+        expect(openLayerCount()).toBe(0)
         await m.unmount()
         expect(openLayerCount()).toBe(0)
       })
@@ -243,14 +242,14 @@ export function menubarConformance(adapter: Adapter) {
         expect(bar().hasAttribute('data-mnemonics')).toBe(false)
 
         await adapter.act(() => alt('e', 'KeyE'))
-        if (adapter.name === 'react') await adapter.act(async () => { await new Promise(r => setTimeout(r, 60)) })
+        await adapter.act(async () => { await new Promise(r => setTimeout(r, 60)) })
         expect(focused()).toBe('Undo')
         await adapter.act(() => {
           ;(document.activeElement as HTMLElement).dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }))
         })
         // A Cyrillic layout types "у" on the E key.
         await adapter.act(() => alt('у', 'KeyE'))
-        if (adapter.name === 'react') await adapter.act(async () => { await new Promise(r => setTimeout(r, 60)) })
+        await adapter.act(async () => { await new Promise(r => setTimeout(r, 60)) })
         expect(focused()).toBe('Undo')
       })
 
@@ -284,6 +283,7 @@ export function menubarConformance(adapter: Adapter) {
         await adapter.act(() => {
           outside.dispatchEvent(new KeyboardEvent('keydown', { key: 'F10', bubbles: true, cancelable: true }))
         })
+        await adapter.wait(60)
         expect(focused()).toBe('File')
         expect(document.activeElement).toBe(barItem('File'))
       })
@@ -295,7 +295,7 @@ export function menubarConformance(adapter: Adapter) {
         await adapter.act(() => {
           ;(document.activeElement as HTMLElement).dispatchEvent(new KeyboardEvent('keydown', { key: 'F10', bubbles: true, cancelable: true }))
         })
-        await new Promise((resolve) => setTimeout(resolve, 0))
+        await new Promise((resolve) => setTimeout(resolve, 60))
         await adapter.act(() => {})
         expect(openMenus()).toHaveLength(0)
         expect(document.activeElement).toBe(barItem('File'))

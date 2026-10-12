@@ -1396,6 +1396,12 @@ export const keydown = (target: Element, key: string) =>
   target.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }))
 
 export const click = (target: Element) => {
+  // Bits Menubar opens on pointerdown, not click.
+  if (target.getAttribute('data-backend') === 'bits-ui' && target.getAttribute('data-scope') === 'menubar') {
+    target.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, cancelable: true, pointerType: 'mouse', button: 0 }))
+    return
+  }
+
   // Base UI rejects a bare MouseEvent on an unhighlighted option as an
   // accidental release after opening. An explicit virtual pointer click is
   // its supported keyboard/assistive-technology activation path.

@@ -122,7 +122,7 @@ export function feedbackConformance(adapter: Adapter) {
     const setup = async (onSelect = vi.fn()) => {
       const m = await adapter.contextMenu({ targetLabel: 'report.pdf', items, onSelect }, freshTarget())
       const target = () => m.root.querySelector<HTMLElement>('[data-context-menu]')!
-      const menu = () => adapter.name === 'react' ? document.getElementById(target().id.replace('-trigger', '-content'))! : part(m.root, 'menu', 'content')!
+      const menu = () => document.getElementById(target().id.replace('-trigger', '-content'))!
       return { m, target, menu, onSelect }
     }
 
@@ -153,7 +153,7 @@ export function feedbackConformance(adapter: Adapter) {
         prevented = !rightClick(target(), { shiftKey: true })
       })
       expect(prevented).toBe(false)
-      expect(menu().dataset.state).toBe('closed')
+      if (adapter.name === 'svelte') expect(menu()).toBeNull(); else expect(menu().dataset.state).toBe('closed')
     })
 
     it('opens from the keyboard — Shift+F10 or the menu key — on the first item, and a choice is heard', async () => {

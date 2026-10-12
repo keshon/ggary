@@ -3,6 +3,7 @@ import { render } from 'svelte/server'
 import Combobox from '../packages/svelte/src/components/combobox/Combobox.svelte'
 import Select from '../packages/svelte/src/components/select/Select.svelte'
 import OverlaysPilot from './fixtures/BitsOverlaysPilot.svelte'
+import MenusPilot from './fixtures/BitsMenusPilot.svelte'
 import Pilot from './fixtures/BitsPilot.svelte'
 
 it('renders the select value, label and named field without browser globals', () => {
@@ -36,4 +37,12 @@ it('server-renders overlay triggers without mounting floating contents', () => {
   expect(body).toContain('Outside help trigger')
   expect(body).not.toContain('role="tooltip"')
   expect(body).not.toContain('role="dialog"')
+})
+
+it('server-renders menus with usable triggers and no floating contents', () => {
+  const { body } = render(MenusPilot)
+  expect(body).toContain('Actions')
+  expect(body).toContain('Context target')
+  expect(body).toContain('role="menubar"')
+  expect(body).not.toContain('role="menu"')
 })

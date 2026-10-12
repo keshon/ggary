@@ -2,7 +2,7 @@
   import { Tooltip as Primitive, mergeProps } from 'bits-ui'
   import type { TooltipChangeDetails, TooltipPlacement } from '@ggary/core/tooltip'
   import type { Dict } from '@ggary/core'
-  import { untrack, type Snippet } from 'svelte'
+  import { onDestroy, untrack, type Snippet } from 'svelte'
   import { getConfig } from '../config-provider/context'
 
   type Props = {
@@ -23,17 +23,19 @@
     disabled = false, open = $bindable(), defaultOpen = false, onOpenChange }: Props = $props()
   let localOpen = $state(untrack(() => open ?? defaultOpen))
   const shown = $derived(!disabled && (open ?? localOpen))
+  let disposed = false
   let reason: TooltipChangeDetails['reason'] = 'api'
   let closeTimer: ReturnType<typeof setTimeout> | undefined
   function cancelClose() { if (closeTimer !== undefined) clearTimeout(closeTimer); closeTimer = undefined }
   function publish(next: boolean) {
     cancelClose()
-    if (next === shown || (next && disabled)) return
+    if (disposed || next === shown || (next && disabled)) return
     localOpen = next; open = next; onOpenChange?.(next, { reason }); reason = 'api'
   }
   // Bits owns hover/focus and its safe pointer corridor. Retain GGary's explicit
   // closeDelay as a narrow policy extension, not a parallel interaction machine.
   function changed(next: boolean) {
+    if (disposed) return
     cancelClose()
     // A late pointer-corridor callback must not hide a newly keyboard-focused tip.
     if (!next && reason !== 'escape' && reason !== 'press' && anchor?.contains(document.activeElement)) return
@@ -42,7 +44,7 @@
     } else publish(next)
   }
   $effect(() => { if (disabled) { cancelClose(); localOpen = false; open = false } })
-  $effect(() => () => cancelClose())
+  onDestroy(() => { disposed = true; cancelClose() })
   const componentId = $props.id()
   const id = `gg-bits-tooltip-${componentId}`
   const kit = getConfig()

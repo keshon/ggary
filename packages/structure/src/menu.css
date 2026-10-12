@@ -63,3 +63,11 @@
 
 /* Keep-mounted Base UI surfaces must honor native hidden despite themed display. */
 [data-scope='menu'][data-backend='base-ui'][hidden] { display: none; }
+
+/* Bits owns placement; its wrapper copies the surface's stacking level. */
+[data-scope='menu'][data-part='content'][data-backend='bits-ui'] {
+  position: relative;
+  inset: auto;
+  z-index: var(--gg-z-menu, 1100);
+}
+[data-scope='menu'][data-backend='bits-ui'][hidden] { display: none; }

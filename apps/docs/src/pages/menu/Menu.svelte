@@ -10,13 +10,13 @@
 
 <DemoPage>
   {#snippet states()}
-    <Specimen label="defaultOpen">
-      <Menu defaultOpen items={documentMenu}>
+    <Specimen label="Actions">
+      <Menu items={documentMenu}>
         {#snippet trigger(props)}<Button {...props}>Document</Button>{/snippet}
       </Menu>
     </Specimen>
-    <Specimen label={"defaultOpen closeOnSelect={false}"}>
-      <Menu defaultOpen label="View options" closeOnSelect={false} items={viewMenu(view)} onSelect={(value, { checked }) => (view = applyView(view, value, checked))}>
+    <Specimen label={"closeOnSelect={false}"}>
+      <Menu label="View options" closeOnSelect={false} items={viewMenu(view)} onSelect={(value, { checked }) => (view = applyView(view, value, checked))}>
         {#snippet trigger(props)}<Button emphasis="low" {...props}>View</Button>{/snippet}
       </Menu>
     </Specimen>
