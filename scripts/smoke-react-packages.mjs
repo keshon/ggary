@@ -63,6 +63,31 @@ console.log(npm(['exec', '--', 'tsc', '-p', 'tsconfig.json'], consumer))
 console.log(npm(['exec', '--', 'vite', 'build'], consumer))
 const esm = spawnSync(process.execPath, ['--input-type=module', '-e', "await import('@ggary/react'); await import('@ggary/react/select'); await import('@ggary/core'); await import('@ggary/icons'); await import('@ggary/theme-ggarry/tokens');"], { cwd: consumer, encoding: 'utf8' })
 if (esm.status !== 0) throw new Error(esm.stderr + esm.stdout)
+// Run outside the workspace and without jsdom: package SSR must not need globals.
+writeFileSync(join(consumer, 'ssr.mjs'), `import assert from 'node:assert/strict';
+import { createElement as h } from 'react';
+import { renderToString } from 'react-dom/server';
+import { Shell } from '@ggary/react';
+assert.equal(typeof window, 'undefined');
+assert.equal(typeof document, 'undefined');
+for (const collapse of ['drawer', 'bar']) {
+ for (const defaultOpen of [false, true]) {
+  const html = renderToString(h(Shell, { collapse, defaultOpen,
+   brand: 'SSR_BRAND', aside: h('nav', { 'aria-label': 'SSR_NAV' }, h('a', { href: '/work' }, 'Work')),
+   header: 'SSR_HEADER', footer: 'SSR_FOOTER', children: 'SSR_MAIN' }));
+  for (const marker of ['SSR_BRAND', 'SSR_NAV', 'SSR_HEADER', 'SSR_FOOTER', 'SSR_MAIN']) assert.ok(html.includes(marker), marker);
+  assert.equal((html.match(/data-part="aside"/g) ?? []).length, 1);
+ }
+}
+const bare = renderToString(h(Shell, { children: 'Bare main' }));
+assert.ok(bare.includes('Bare main'));
+assert.ok(!bare.includes('data-part="aside"'));
+assert.ok(!bare.includes('data-part="toggle"'));
+console.log('Node SSR passed: Shell landmarks, navigation, drawer/bar, open/closed and no-column.');
+`)
+const ssr = spawnSync(process.execPath, ['ssr.mjs'], { cwd: consumer, encoding: 'utf8' })
+if (ssr.status !== 0) throw new Error(ssr.stderr + ssr.stdout)
+console.log(ssr.stdout.trim())
 await checkConsumerBrowser(consumer, stage)
-writeFileSync(join(stage, 'smoke-result.json'), JSON.stringify({ consumer, passed: true, checks: ['types', 'vite', 'node-esm', 'browser'] }))
-console.log(`Clean consumer passed types, Vite build, Node ESM imports and browser interactions: ${consumer}`)
+writeFileSync(join(stage, 'smoke-result.json'), JSON.stringify({ consumer, passed: true, checks: ['types', 'vite', 'node-esm', 'node-ssr', 'browser'] }))
+console.log(`Clean consumer passed types, Vite build, Node ESM imports, server rendering and browser interactions: ${consumer}`)

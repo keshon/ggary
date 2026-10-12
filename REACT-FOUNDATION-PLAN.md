@@ -5,8 +5,8 @@ public APIs and domain widgets. Svelte has a separate behavior implementation;
 share visual contracts and genuinely framework-independent domain logic.
 
 Status: Planned React foundation migration and local candidate verification are
-complete. Custom/native components are retained deliberately. Hosted CI and
-publication have not run. Leads is retired as a test bench; do not update it.
+complete. Custom/native components are retained deliberately. Hosted CI passed;
+publication has not run. Leads is retired as a test bench; do not update it.
 
 ## 1. Ownership inventory and demo metadata (completed; detailed accessibility audits separate)
 
@@ -38,7 +38,7 @@ Retain tables, trees, Kanban, uploads, calendars and agent UI. Compose standard
 React controls from the chosen foundation. Separate framework DOM interaction
 from shared domain logic.
 
-## 6. Packaging and release checks (local gates completed; hosted CI pending)
+## 6. Packaging and release checks (local and hosted gates completed)
 
 Ship compiled JS/declarations and reliable component exports. Validate a clean
 consumer installation. Automate representative browser overlay/form/keyboard
@@ -828,3 +828,17 @@ Validation: 11 targeted Shell DOM/conformance tests passed, including server
 markup/hydration, controlled dismissal and responsive state retention. Full
 TypeScript/Svelte checks and clean installed-package types/build/ESM/browser
 smoke passed. Responsive header verified in the running docs browser.
+
+
+### Packaged server-rendering gate (2026-10-12)
+
+Hosted CI passed for review correction 17f17b2 (run 38235586015). The clean
+consumer smoke now also runs React server rendering in a real Node process with
+no window/document globals. It asserts Shell brand/navigation and all landmarks
+for drawer/bar and open/closed variants, plus the no-column case. This guards the
+compiled installed artifact rather than only the workspace source under jsdom.
+The one-time sidebar remount remains a documented public-portal constraint.
+
+The planned React migration is complete. Next development phase is the separate
+Svelte foundation decision; public release version/registry and publishing are
+still separate decisions. Detailed accessibility audits remain follow-up work.
