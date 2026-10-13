@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 
 export default defineConfig({
+  base: '/ggary/',
   plugins: [react(), svelte()],
   server: { port: 5190 },
   // Workspace packages export raw .ts/.svelte: Vite compiles them from source,

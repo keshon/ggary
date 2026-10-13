@@ -14,14 +14,18 @@ export const LOGO = `<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" 
 </svg>`
 
 export const FRAMEWORKS = [
-  { value: 'react', label: 'React', href: '/react.html' },
-  { value: 'svelte', label: 'Svelte', href: '/svelte.html' },
+  { value: 'react', label: 'React', href: `${import.meta.env.BASE_URL}react.html` },
+  { value: 'svelte', label: 'Svelte', href: `${import.meta.env.BASE_URL}svelte.html` },
 ]
 
 /** The same page in the other framework. */
 export function goToFramework(value: string): void {
   const framework = FRAMEWORKS.find((candidate) => candidate.value === value)
-  if (framework && !location.pathname.endsWith(framework.href)) location.href = framework.href + location.hash
+  if (!framework) return
+  const file = framework.href.split('/').pop() as string
+  if (location.pathname.endsWith(`/${file}`)) return
+  const dir = location.pathname.slice(0, location.pathname.lastIndexOf('/') + 1)
+  location.href = dir + file + location.hash
 }
 
 /** A route starts #/; any other hash is a place on the page being read. */
