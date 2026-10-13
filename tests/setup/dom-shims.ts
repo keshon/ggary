@@ -99,3 +99,12 @@ if (!HTMLElement.prototype.hasPointerCapture) {
   HTMLElement.prototype.setPointerCapture = () => {}
   HTMLElement.prototype.releasePointerCapture = () => {}
 }
+
+// Bits sliders observe track size. jsdom has no layout; browser tests verify geometry.
+if (typeof globalThis.ResizeObserver !== 'function') {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver
+}

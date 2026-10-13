@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { connect, type RangeSliderProps, type RangeSliderWords, type RangeValue } from '@ggary/core/range-slider'
+  import { Slider as BitsSlider } from 'bits-ui'
+  import { connect, placeEnd, type RangeSliderProps, type RangeSliderWords, type RangeValue } from '@ggary/core/range-slider'
   import { onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { applyConfig } from '@ggary/core/config-provider'
   import { getConfig } from '../config-provider/context'
-  import { untrack } from 'svelte'
+  import { FIELDSET_CONTEXT, type FieldsetContext } from '../fieldset/context'
+  import { getContext, untrack } from 'svelte'
   import Input from '../input/Input.svelte'
   import InputGroup from '../input-group/InputGroup.svelte'
 
@@ -21,9 +23,10 @@
   /** A range between two ends, each a thumb on one track: a price from and to, a run time from and to. */
   let { value = $bindable(), defaultValue, onValueChange, formatValue, words: ownWords, ...own }: Props = $props()
   const kit = getConfig()
+  const group = getContext<FieldsetContext | undefined>(FIELDSET_CONTEXT)
   // The size travels with the rest of the props to core; the words are laid over the provider's.
   const configured = $derived(applyConfig({ ...own, words: ownWords }, kit(), { size: true, words: 'rangeSlider' }))
-  const rest = $derived({ ...configured, words: undefined })
+  const rest = $derived({ ...configured, disabled: Boolean(configured.disabled || group?.group.disabled), words: undefined })
   const words = $derived(configured.words)
 
   const id = uid('gg-range')
@@ -50,8 +53,17 @@
   $effect(() =>
     onFormReset(first, () => {
       value = initial
+      drafts = [null, null]
     })
   )
+  function change(next: number[]) {
+    if (rest.disabled) return
+    const index: 0 | 1 = next[0] !== api.value[0] ? 0 : 1
+    const placed = placeEnd(api.value, index, next[index], { min: rest.min ?? 0, max: rest.max ?? 100, step: rest.step ?? 1, minGap: rest.minGap ?? 0 })
+    if (placed[0] === api.value[0] && placed[1] === api.value[1]) return
+    value = placed
+    onValueChange?.(placed)
+  }
 </script>
 
 {#snippet field(index: 0 | 1)}
@@ -60,7 +72,7 @@
   </InputGroup>
 {/snippet}
 
-<div {...api.rootProps}>
+<div {...api.rootProps} data-backend="bits-ui">
   <div {...api.headerProps}>
     <span {...api.labelProps}>{api.label}</span>
     {#if api.valueDisplay === 'header'}<span {...api.valueProps}>{api.valueText}</span>{/if}
@@ -70,12 +82,15 @@
       {#each api.bubbles as bubble (bubble.which)}<span {...api.getBubbleProps(bubble.which)}>{bubble.text}</span>{/each}
     </div>
   {/if}
-  <div {...api.controlProps}>
+  <input bind:this={first} type="hidden" data-scope="range-slider" data-part="thumb" name={api.getThumbProps(0).name} value={api.value[0]} disabled={rest.disabled} />
+  <input type="hidden" data-scope="range-slider" data-part="thumb" name={api.getThumbProps(1).name} value={api.value[1]} disabled={rest.disabled} />
+  <BitsSlider.Root type="multiple" bind:value={() => [...api.value], change} min={rest.min ?? 0} max={rest.max ?? 100} step={rest.step ?? 1} disabled={rest.disabled} autoSort={false} thumbPositioning="exact" dir={kit().dir ?? 'ltr'} data-scope="range-slider" data-part="control" data-backend="bits-ui">
     <span {...api.trackProps}></span>
-    <span {...api.rangeProps}></span>
-    <input bind:this={first} {...api.getThumbProps(0)} />
-    <input {...api.getThumbProps(1)} />
-  </div>
+    <BitsSlider.Range {...api.rangeProps} />
+    {#each [0, 1] as index}
+      <BitsSlider.Thumb {index} aria-label={api.getThumbProps(index as 0 | 1)['aria-label']} aria-valuetext={api.getThumbProps(index as 0 | 1)['aria-valuetext']} data-scope="range-slider" data-part="thumb-handle" data-backend="bits-ui" />
+    {/each}
+  </BitsSlider.Root>
   {#if api.marks.length > 0}
     <div {...api.marksProps}>
       {#each api.marks as mark (mark.value)}<span {...api.getMarkProps(mark)}>{mark.label}</span>{/each}

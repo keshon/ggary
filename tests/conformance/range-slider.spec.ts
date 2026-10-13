@@ -26,7 +26,7 @@ export function rangeSliderConformance(adapter: Adapter) {
       expect(root().getAttribute('role')).toBe('group')
       expect(root().getAttribute('aria-labelledby')).toBe(part(m.root, 'range-slider', 'label')!.id)
       expect(part(m.root, 'range-slider', 'label')!.textContent).toBe('Price')
-      expect(thumbs().map((thumb) => [thumb.type, thumb.getAttribute('aria-label'), thumb.value, thumb.getAttribute('aria-valuetext')])).toEqual([
+      expect((adapter.name === 'svelte' ? [...m.root.querySelectorAll('[role=slider]')].map(thumb => ['range', thumb.getAttribute('aria-label'), thumb.getAttribute('aria-valuenow'), thumb.getAttribute('aria-valuetext')]) : thumbs().map((thumb) => [thumb.type, thumb.getAttribute('aria-label'), thumb.value, thumb.getAttribute('aria-valuetext')]))).toEqual([
         ['range', 'Minimum', '20', '€20'],
         ['range', 'Maximum', '80', '€80'],
       ])
@@ -38,11 +38,11 @@ export function rangeSliderConformance(adapter: Adapter) {
 
     it('a thumb moved reports the range; pushed past the other, it stops against it', async () => {
       const onValueChange = vi.fn()
-      const { root, thumbs } = await setup({ onValueChange })
-      await adapter.act(() => setInputValue(thumbs()[1], '120'))
+      const { m, root, thumbs } = await setup({ onValueChange })
+      if (adapter.name === 'svelte') { for (let i = 0; i < 8; i++) await adapter.act(() => void key(m.root.querySelectorAll('[role=slider]')[1], 'ArrowRight')) } else await adapter.act(() => setInputValue(thumbs()[1], '120'))
       expect(onValueChange).toHaveBeenLastCalledWith([20, 120])
       expect(root().style.getPropertyValue('--gg-range-end')).toBe('0.6')
-      await adapter.act(() => setInputValue(thumbs()[0], '180'))
+      await adapter.act(() => { if (adapter.name === 'svelte') key(m.root.querySelectorAll('[role=slider]')[0], 'End'); else setInputValue(thumbs()[0], '180') })
       expect(onValueChange).toHaveBeenLastCalledWith([120, 120])
       expect(thumbs()[0].value).toBe('120')
     })

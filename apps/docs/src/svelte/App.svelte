@@ -44,7 +44,7 @@
     {#key page.id}
       <article class="page">
         <h1 class="page-title">{page.title}</h1>
-        {#if ['dialog', 'sheet', 'select', 'combobox', 'popover', 'tooltip', 'menu', 'context-menu', 'menubar', 'popconfirm', 'command-palette', 'tabs', 'accordion'].includes(page.id)}<span class="implementation-badge">Built with Bits UI</span>{/if}
+        {#if ['dialog', 'sheet', 'select', 'combobox', 'popover', 'tooltip', 'menu', 'context-menu', 'menubar', 'popconfirm', 'command-palette', 'tabs', 'accordion', 'slider', 'range-slider'].includes(page.id)}<span class="implementation-badge">Built with Bits UI</span>{/if}
         {#await demo then loaded}
           {#if loaded}<loaded.default />{/if}
         {/await}

@@ -1,3 +1,4 @@
+import SlidersPilot from './fixtures/BitsSlidersPilot.svelte'
 import { expect, it } from 'vitest'
 import { render } from 'svelte/server'
 import Combobox from '../packages/svelte/src/components/combobox/Combobox.svelte'
@@ -82,4 +83,13 @@ it('server-renders selected tabs and findable disclosure bodies', () => {
   expect(body).toContain('aria-selected="true"')
   expect(body).toContain('Empty section')
   expect(body).toContain('hidden="until-found"')
+})
+
+it('server renders slider values and accessible thumbs', () => {
+ const { body } = render(SlidersPilot)
+ expect(body).toContain('name="volume"')
+ expect(body).toContain('value="40"')
+ expect(body).toContain('role="slider"')
+ expect(body).toContain('name="low"')
+ expect(body).toContain('value="20"')
 })

@@ -274,3 +274,44 @@ for this checkpoint; hosted CI remains the whole-suite gate after push.
 
 Next: Slider/RangeSlider and option/form widgets, followed by remaining custom
 ownership inventory and the compiled installed-Svelte-consumer release gates.
+
+## Remaining component work inventory (2026-10-13)
+
+This counts public components requiring migration or an explicit ownership decision,
+not every custom component as a missing Bits primitive. Before the slider checkpoint:
+21 components. After Slider and RangeSlider: 19.
+
+- Option controls (7): Checkbox, CheckboxGroup, RadioGroup, Switch,
+  ChoiceCardGroup, ChipGroup, SegmentedControl.
+- Form contracts (4): NumberField, Field, Fieldset, Form. Native controls and
+  GGary validation may remain; audit ownership rather than force a primitive.
+- Composite controls (3): Toolbar, Ribbon, Toast/Toaster.
+- Domain/floating controls (5): Calendar, DatePicker, TimePicker, Cascader, Shell.
+
+Separate release gates: remaining interaction-owner audit (including native and
+custom domain components), compiled package build, installed Svelte consumer,
+SSR and full regression suite. The component count is a bounded work inventory;
+audit findings may add follow-up fixes.
+
+## Slider/RangeSlider checkpoint (2026-10-13)
+
+Both Svelte sliders now use Bits UI Slider for track pointer interaction and thumb
+keyboard/focus behavior. No core pointer or native range-input handlers are
+attached. GGary retains presentation, marks, formatted values, range editor drafts
+and the pure placeEnd minimum-gap rule. Hidden inputs submit canonical values;
+form reset restores the original defaults and clears range drafts. Field labels
+name and focus the single thumb (rendered as a labelable button with slider role).
+Disabled GGary Fieldsets and readonly Fields propagate to the new interaction
+boundary. ConfigProvider direction is passed to Bits. Theme rules share the
+existing React thumb styling, with Bits-specific exact-centre mark/fill geometry.
+
+Validation: 34 focused conformance/anatomy cases, all 23 existing Chromium pilot
+cases plus two new slider cases, ten Node SSR cases, 544 theme measurements,
+TypeScript/Svelte checks and docs production build. Browser cases cover canonical
+submission/reset, pointer movement, keyboard/minGap, Field label focus/readonly,
+disabled Fieldsets, RTL keys and rendered thumb/fill geometry. Added a no-layout
+ResizeObserver stand-in for jsdom; actual geometry is checked in Chromium.
+Whole fast-suite coverage remains the hosted CI gate after push.
+
+Next: Checkbox, RadioGroup, Switch and their option-group wrappers. The remaining
+19-component inventory above is separate from release gates.

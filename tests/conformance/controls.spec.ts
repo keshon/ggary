@@ -91,6 +91,7 @@ export function segmentedControlConformance(adapter: Adapter) {
 }
 
 export function sliderConformance(adapter: Adapter) {
+  // Svelte Bits pointer/keyboard and thumb naming are checked in bits-sliders.browser.test.ts.
   describe('slider', () => {
     const setup = async (props: Partial<SliderProps> = {}, target = freshTarget()) => {
       const m = await adapter.slider({ label: 'Parallel agents', min: 0, max: 16, defaultValue: 4, ...props }, target)
@@ -100,12 +101,18 @@ export function sliderConformance(adapter: Adapter) {
       return { m, root, input, output }
     }
 
-    it('is a native range input with its bounds, named by its label', async () => {
+    it('is a slider with its bounds, named by its label', async () => {
       const { m, root, input } = await setup({ step: 2, name: 'agents' })
-      expect(input().type).toBe('range')
-      expect([input().min, input().max, input().step]).toEqual(['0', '16', '2'])
+      const thumb = m.root.querySelector('[role="slider"]')
+      if (adapter.name === 'svelte') {
+        expect(thumb?.getAttribute('aria-valuemin')).toBe('0')
+        expect(thumb?.getAttribute('aria-valuemax')).toBe('16')
+      } else {
+        expect(input().type).toBe('range')
+        expect([input().min, input().max, input().step]).toEqual(['0', '16', '2'])
+      }
       expect(input().name).toBe('agents')
-      expect(input().getAttribute('aria-label')).toBe('Parallel agents')
+      expect((adapter.name === 'svelte' ? thumb : input())?.getAttribute('aria-label')).toBe('Parallel agents')
       expect(root().dataset.size).toBe('md')
       expect(m.root.querySelector('[class]')).toBeNull()
     })
@@ -132,8 +139,8 @@ export function sliderConformance(adapter: Adapter) {
 
     it('reports a number when it moves, and the fill follows', async () => {
       const onValueChange = vi.fn()
-      const { root, input } = await setup({ onValueChange })
-      await adapter.act(() => setInputValue(input(), '10'))
+      const { m, root, input } = await setup({ onValueChange })
+      if (adapter.name === 'svelte') { for (let i = 0; i < 6; i++) await adapter.act(() => keydown(m.root.querySelector('[role=slider]')!, 'ArrowRight')) } else await adapter.act(() => setInputValue(input(), '10'))
       expect(onValueChange).toHaveBeenLastCalledWith(10)
       expect(typeof onValueChange.mock.calls[0][0]).toBe('number')
       expect(root().style.getPropertyValue('--slider-fill')).toBe('62.5%')
@@ -142,14 +149,14 @@ export function sliderConformance(adapter: Adapter) {
     it('shows the value in an output tied to the input, and hidden from assistive technology', async () => {
       const { m, input, output } = await setup({ showValue: true })
       expect(output()!.tagName).toBe('OUTPUT')
-      expect(output()!.getAttribute('for')).toBe(input().id)
+      expect(output()!.getAttribute('for')).toBe(adapter.name === 'svelte' ? m.root.querySelector('[role=slider]')!.id : input().id)
       expect(output()!.getAttribute('aria-hidden')).toBe('true')
       expect(output()!.textContent).toBe('4')
-      await adapter.act(() => setInputValue(input(), '9'))
+      if (adapter.name === 'svelte') { for (let i = 0; i < 5; i++) await adapter.act(() => keydown(m.root.querySelector('[role=slider]')!, 'ArrowRight')) } else await adapter.act(() => setInputValue(input(), '9'))
       expect(output()!.textContent).toBe('9')
       await m.update({ valueText: '9 agents' })
       expect(output()!.textContent).toBe('9 agents')
-      expect(input().getAttribute('aria-valuetext')).toBe('9 agents')
+      expect((adapter.name === 'svelte' ? m.root.querySelector('[role=slider]')! : input()).getAttribute('aria-valuetext')).toBe('9 agents')
     })
 
     it('says when it is unavailable, required or wrong', async () => {
@@ -164,7 +171,7 @@ export function sliderConformance(adapter: Adapter) {
 
     it('inside a Field, the field names it: no aria-label of its own', async () => {
       const m = await adapter.field({ label: 'Confidence', hint: 'Below it the agent asks', slider: { min: 0, max: 100, defaultValue: 80 } }, freshTarget())
-      const input = part(m.root, 'slider', 'input') as HTMLInputElement
+      const input = (adapter.name === 'svelte' ? m.root.querySelector('[role=slider]') : part(m.root, 'slider', 'input')) as HTMLInputElement
       const label = part(m.root, 'field', 'label')!
       expect(input.hasAttribute('aria-label')).toBe(false)
       expect(label.getAttribute('for')).toBe(input.id)
