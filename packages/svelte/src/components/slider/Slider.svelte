@@ -6,6 +6,7 @@
   import { observeSliderLabels, mergeProps, onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { getContext, untrack } from 'svelte'
   import { FIELD_CONTEXT, type FieldContext } from '../field/context'
+  import { clearPointerFocus, markKeyboardFocus, markPointerFocus } from './focus'
 
   type Props = Omit<SliderProps, 'id' | 'inputId' | 'value'> & {
     /** Bindable: `bind:value`. A one-way `value` works too. */
@@ -64,7 +65,8 @@
 
 <div {...api.rootProps} data-backend="bits-ui">
   <input bind:this={element} type="hidden" data-scope="slider" data-part="input" name={name} value={api.value} id={`${String(attrs.id)}-submission`} required={required} aria-invalid={attrs['aria-invalid'] === 'true' || undefined} disabled={blocked} form={typeof rest.form === 'string' ? rest.form : undefined} />
-  <BitsSlider.Root type="single" bind:value={() => api.value, change} min={api.min} max={api.max} step={api.step} disabled={blocked} thumbPositioning="exact" dir={kit().dir ?? 'ltr'} data-scope="slider" data-part="control" data-backend="bits-ui">
+  <BitsSlider.Root type="single" bind:value={() => api.value, change} min={api.min} max={api.max} step={api.step} disabled={blocked} thumbPositioning="exact" dir={kit().dir ?? 'ltr'} data-scope="slider" data-part="control" data-backend="bits-ui"
+    onpointerdown={markPointerFocus} onkeydown={markKeyboardFocus} onfocusout={clearPointerFocus}>
     <span data-scope="slider" data-part="track" data-backend="bits-ui"><BitsSlider.Range data-scope="slider" data-part="indicator" data-backend="bits-ui" /></span>
     <BitsSlider.Thumb {...rest} index={0} id={String(attrs.id)} aria-label={attrs['aria-label'] as string | undefined} aria-labelledby={field ? String(attrs.id).replace(/-control$/, '-label') : undefined} aria-describedby={attrs['aria-describedby'] as string | undefined} aria-valuetext={attrs['aria-valuetext'] as string | undefined} aria-readonly={readonly || undefined} aria-invalid={attrs['aria-invalid'] === 'true' || undefined} aria-required={Boolean(required || field?.control.required) || undefined} data-scope="slider" data-part="thumb" data-backend="bits-ui">
       {#snippet child({ props })}<button type="button" {...props}></button>{/snippet}

@@ -8,6 +8,7 @@
   import { getContext, untrack } from 'svelte'
   import Input from '../input/Input.svelte'
   import InputGroup from '../input-group/InputGroup.svelte'
+  import { clearPointerFocus, markKeyboardFocus, markPointerFocus } from '../slider/focus'
 
   type Props = Omit<RangeSliderProps, 'id' | 'value'> & {
     /** Bindable: `[lower, upper]`. A one-way `value` works too. */
@@ -84,7 +85,8 @@
   {/if}
   <input bind:this={first} type="hidden" data-scope="range-slider" data-part="thumb" name={api.getThumbProps(0).name} value={api.value[0]} disabled={rest.disabled} />
   <input type="hidden" data-scope="range-slider" data-part="thumb" name={api.getThumbProps(1).name} value={api.value[1]} disabled={rest.disabled} />
-  <BitsSlider.Root type="multiple" bind:value={() => [...api.value], change} min={rest.min ?? 0} max={rest.max ?? 100} step={rest.step ?? 1} disabled={rest.disabled} autoSort={false} thumbPositioning="exact" dir={kit().dir ?? 'ltr'} data-scope="range-slider" data-part="control" data-backend="bits-ui">
+  <BitsSlider.Root type="multiple" bind:value={() => [...api.value], change} min={rest.min ?? 0} max={rest.max ?? 100} step={rest.step ?? 1} disabled={rest.disabled} autoSort={false} thumbPositioning="exact" dir={kit().dir ?? 'ltr'} data-scope="range-slider" data-part="control" data-backend="bits-ui"
+    onpointerdown={markPointerFocus} onkeydown={markKeyboardFocus} onfocusout={clearPointerFocus}>
     <span {...api.trackProps}></span>
     <BitsSlider.Range {...api.rangeProps} />
     {#each [0, 1] as index}

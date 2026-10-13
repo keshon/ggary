@@ -6,7 +6,7 @@
  import ConfigProvider from '../../packages/svelte/src/components/config-provider/ConfigProvider.svelte'
 </script>
 <form>
- <Slider name="volume" label="Volume" defaultValue={40} />
+ <Slider name="volume" label="Volume" size="sm" defaultValue={40} />
  <RangeSlider name={['low', 'high']} label="Price" defaultValue={[20, 70]} minGap={10} />
  <button type="reset">Reset</button>
 </form>

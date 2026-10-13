@@ -207,9 +207,10 @@
 
 /* Base UI and Bits UI own track positioning and pointer/keyboard interaction. */
 [data-scope='range-slider'][data-part='thumb-handle']:is([data-backend='base-ui'], [data-backend='bits-ui']) { position: absolute; inset-block-start: 50%; inline-size: var(--range-thumb); block-size: var(--range-thumb); box-sizing: border-box; border: var(--ggarry-size-indicator) solid var(--ggarry-bg-accent); border-radius: var(--ggarry-radius-full); background: var(--ggarry-bg-thumb); box-shadow: var(--ggarry-shadow-thumb); cursor: grab; transition: scale var(--ggarry-duration-fast) var(--ggarry-easing-standard); }
-[data-scope='range-slider'][data-part='thumb-handle'][data-backend='bits-ui'] { margin-block-start: calc(var(--range-thumb) / -2); }
+[data-scope='range-slider'][data-part='thumb-handle'][data-backend='bits-ui'] { margin-block-start: calc(var(--range-thumb) / -2); padding: 0; }
 [data-scope='range-slider'][data-part='thumb-handle']:is([data-backend='base-ui'][data-dragging], [data-backend='bits-ui'][data-active]) { cursor: grabbing; scale: 1.15; }
 [data-scope='range-slider'][data-part='thumb-handle']:is([data-backend='base-ui'], [data-backend='bits-ui']):is(:has(input:focus-visible), :focus-visible) { outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring); outline-offset: var(--ggarry-focus-ring-offset); }
+[data-scope='range-slider'][data-part='control'][data-backend='bits-ui'][data-pointer-focus] [data-part='thumb-handle'] { outline: none; }
 [data-scope='range-slider'][data-part='thumb-handle']:is([data-backend='base-ui'], [data-backend='bits-ui']) > input { pointer-events: auto; }
 [data-scope='range-slider'][data-part='root']:is([data-backend='base-ui'], [data-backend='bits-ui'])[data-invalid] [data-part='thumb-handle'] { border-color: var(--ggarry-border-danger); }
 [data-scope='range-slider'][data-part='root']:is([data-backend='base-ui'], [data-backend='bits-ui'])[data-disabled] [data-part='thumb-handle'] { cursor: not-allowed; }

@@ -26,7 +26,8 @@ it('submits canonical slider values, enforces the minimum gap, and resets both c
  const control = host.querySelector<HTMLElement>('[data-scope=slider][data-part=control]')!
  const rect = control.getBoundingClientRect()
  const thumb = sliders[0].getBoundingClientRect()
- expect(thumb.width).toBeGreaterThan(0)
+ expect(thumb.width).toBe(12)
+ expect(thumb.height).toBe(12)
  expect(Math.abs(thumb.x + thumb.width / 2 - (rect.x + rect.width * 0.4))).toBeLessThan(2)
  expect(Math.abs(thumb.y + thumb.height / 2 - (rect.y + rect.height / 2))).toBeLessThan(1)
  const rangeControl = host.querySelector<HTMLElement>('[data-scope=range-slider][data-part=control]')!
@@ -37,6 +38,11 @@ it('submits canonical slider values, enforces the minimum gap, and resets both c
  expect(Math.abs(fill.width - rangeRect.width * 0.5)).toBeLessThan(2)
  await userEvent.click(control); await settle()
  expect(sliders[0].getAttribute('aria-valuenow')).toBe('50')
+ expect(control.hasAttribute('data-pointer-focus')).toBe(true)
+ expect(getComputedStyle(sliders[0]).outlineStyle).toBe('none')
+ await userEvent.keyboard('{ArrowRight}'); await settle()
+ expect(control.hasAttribute('data-pointer-focus')).toBe(false)
+ expect(getComputedStyle(sliders[0]).outlineStyle).toBe('solid')
 })
 
 it('preserves Field naming, readonly refusal, disabled fieldsets and RTL keys', async () => {
