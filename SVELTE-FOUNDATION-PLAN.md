@@ -559,3 +559,39 @@ diagnostics, 544 theme measurements and docs production build. Month pages are
 keyed by page index so navigation controls retain DOM identity when their month
 changes. Previous DatePicker-popup checkpoint passed hosted CI on run 38372986894.
 Whole fast-suite coverage remains the hosted gate after push.
+
+## DatePicker calendar integration checkpoint (2026-10-13)
+
+DateField now renders the Bits-backed Calendar/RangeCalendar inside Bits Popover.
+Removed its calendar focus effect, focusCalendarDay import and the unused Svelte
+CalendarView file. The retained DatePicker machine owns locale text parsing,
+committed ISO values, constraints, presets and field status; it supplies no day
+navigation/focus handlers to the rendered calendar. Bits owns those interactions.
+Single-date activation also closes on reselecting the current day without forcing
+an artificial value change; range selection closes only when complete.
+
+Fixed the range adapter to retain an internal partial DateValue draft independently
+of the committed public ISO range. Ignoring partial primitive updates previously
+made a prefilled range appear complete after its first new endpoint. Added browser
+coverage for prefilled edits, presets, typed ranges and exact committed callbacks.
+Primitive render props use Bits' merge utility so attachment symbols survive.
+
+Fixed two-month blank cells found by previous hosted CI: they expose neither date
+identity nor accessible content. Bits' keyboard month-window policy is retained:
+on moving beyond a two-month window, the newly focused month becomes its first
+month. Conformance expects this Svelte behavior instead of the old minimal shift.
+
+The 414px browser viewport exposed unreachable preset controls. Date popup content
+now respects floating available width/height, wraps months/presets and scrolls when
+needed. Desktop layout stays side by side when space allows.
+
+DatePicker is resolved. Remaining unresolved components: 3: TimePicker, Cascader
+and Shell. Package/installed-consumer release gates remain additional work.
+Next: TimePicker interaction owner and datetime composition checks.
+
+Validation: the full fast suite passed 2800 tests with 9 skips; its sole failure
+was the new CSS reading Bits variables directly. Fixed that boundary by mapping
+Bits sizing variables to existing --gg-available-* names in DateField. All 9
+focused theme/source/browser checks then passed. The full Chromium pilot suite
+passed all 39 cases. Final typecheck has zero errors/warnings, all 544 theme
+measurements pass, and the final docs production build passes.

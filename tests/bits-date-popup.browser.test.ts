@@ -20,12 +20,38 @@ it('opens an anchored date popup, selects and submits ISO dates, resets and retu
  const form=host.querySelector('form')!;expect(new FormData(form).get('day')).toBe('2026-10-15')
  expect(trigger.getAttribute('aria-expanded')).toBe('false')
  form.reset();await settle();expect(new FormData(form).get('day')).toBe('2026-10-12')
+ await userEvent.click(trigger);await settle()
+ await userEvent.click(document.querySelector('[data-scope=calendar][data-part=day][data-date="2026-10-12"]')!);await settle()
+ expect(trigger.getAttribute('aria-expanded')).toBe('false');expect(document.activeElement).toBe(input)
  input.focus();await userEvent.keyboard('{ArrowDown}');await settle();expect(trigger.getAttribute('aria-expanded')).toBe('true')
  await userEvent.keyboard('{ArrowRight}{Enter}');await settle();expect(document.activeElement).toBe(input)
  await userEvent.keyboard('{ArrowDown}');await settle()
  await userEvent.keyboard('{Escape}');await settle();expect(document.activeElement).toBe(input)
  await userEvent.click(trigger);await settle()
- const outside=host.querySelectorAll<HTMLButtonElement>('button').item(2)
+ const outside=host.querySelector<HTMLButtonElement>('[aria-label=Outside]')!
  await userEvent.click(outside);await settle()
  expect(document.activeElement).toBe(outside);expect(trigger.getAttribute('aria-expanded')).toBe('false')
+})
+
+it('keeps prefilled range selection open until complete, submits ISO intervals and supports presets and typed ranges', async () => {
+ const host=document.createElement('div');document.body.append(host);instance=mount(Pilot,{target:host});flushSync();await settle()
+ const form=host.querySelectorAll('form')[1]
+ const trigger=form.querySelector<HTMLElement>('[data-part=trigger]')!
+ await userEvent.click(trigger);await settle()
+ const popup=()=>document.querySelector<HTMLElement>('[data-scope=date-picker][data-part=content]')!
+ const day=(date:string)=>popup().querySelector(`[data-part=day][data-date="${date}"]`)!
+ await userEvent.click(day('2026-10-30'));await settle()
+ expect(trigger.getAttribute('aria-expanded')).toBe('true')
+ expect(new FormData(form).get('period')).toBe('2026-10-29/2026-11-03')
+ await userEvent.click(day('2026-11-05'));await settle()
+ expect(trigger.getAttribute('aria-expanded')).toBe('false')
+ expect(new FormData(form).get('period')).toBe('2026-10-30/2026-11-05')
+ await userEvent.click(trigger);await settle()
+ const preset=popup().querySelector<HTMLButtonElement>('[data-part=preset]')!
+ await userEvent.click(preset);await settle()
+ expect(new FormData(form).get('period'), host.querySelector('[aria-label="Range events"]')!.textContent!).toBe('2026-10-01/2026-10-07')
+ const input=form.querySelector<HTMLInputElement>('[data-part=input]')!
+ await userEvent.fill(input,'2.10.2026 \u2013 4.10.2026');await userEvent.keyboard('{Enter}');await settle()
+ expect(new FormData(form).get('period')).toBe('2026-10-02/2026-10-04')
+ expect(JSON.parse(host.querySelector('[aria-label="Range events"]')!.textContent!)).toEqual([JSON.stringify({start:'2026-10-30',end:'2026-11-05'}), JSON.stringify({start:'2026-10-01',end:'2026-10-07'}), JSON.stringify({start:'2026-10-02',end:'2026-10-04'})])
 })

@@ -35,6 +35,14 @@
  untrack(() => { if (value === undefined) value = defaultValue ?? null })
  const chosen = $derived(toRange(value ?? null))
  const date = (iso: ISODate | null | undefined) => iso ? parseDate(iso) : undefined
+ const singleValue = $derived(date(chosen.start))
+ let rangeValue = $state<{ start: DateValue | undefined; end: DateValue | undefined }>(untrack(() => ({ start: date(chosen.start), end: date(chosen.end) })))
+ let externalRange = untrack(() => ({ ...chosen }))
+ $effect(() => {
+  if (chosen.start === externalRange.start && chosen.end === externalRange.end) return
+  externalRange = { ...chosen }
+  rangeValue = { start: date(chosen.start), end: date(chosen.end) }
+ })
  let placeholder = $state<DateValue>(untrack(() => date(chosen.start ?? defaultMonth) ?? today(getLocalTimeZone())))
  const options = $derived({ locale: locale ?? 'en-US', dir: kit().dir ?? 'ltr', numberOfMonths: months ?? 1, weekStartsOn: (weekStart ?? weekStartOf(locale)) as 0|1|2|3|4|5|6, fixedWeeks: true, weekdayFormat: 'short' as const, disableDaysOutsideMonth: (months ?? 1) > 1, minValue: date(min), maxValue: date(max), isDateDisabled: (day: DateValue) => isDateDisabled?.(day.toString() as ISODate) ?? false, preventDeselect: true })
  const Parts = $derived(mode === 'range' ? Range : Single)
@@ -66,7 +74,7 @@
          <Parts.Cell date={day} month={page.value} {...part('cell')}>
           <Parts.Day {...part('day')} data-date={day.toString()}>
            {#snippet child({ props: dayProps })}
-            <div {...dayProps} {...part('day')} data-date={day.toString()} data-selected={mode === 'range' ? (dayProps['data-range-start'] !== undefined || dayProps['data-range-end'] !== undefined || dayProps['data-selection-start'] !== undefined || dayProps['data-selection-end'] !== undefined ? '' : undefined) : dayProps['data-selected']} data-blank={(months ?? 1) > 1 && day.month !== page.value.month ? '' : undefined} data-outside={day.month !== page.value.month ? '' : undefined} data-in-range={mode === 'range' && (dayProps['data-selected'] !== undefined || dayProps['data-highlighted'] !== undefined) ? '' : undefined} data-range-start={dayProps['data-range-start'] ?? dayProps['data-selection-start']} data-range-end={dayProps['data-range-end'] ?? dayProps['data-selection-end']}>{(months ?? 1) > 1 && day.month !== page.value.month ? '' : day.day}</div>
+            <div {...dayProps} {...part('day')} data-date={(months ?? 1) > 1 && day.month !== page.value.month ? undefined : day.toString()} aria-hidden={(months ?? 1) > 1 && day.month !== page.value.month ? 'true' : undefined} data-selected={mode === 'range' ? (dayProps['data-range-start'] !== undefined || dayProps['data-range-end'] !== undefined || dayProps['data-selection-start'] !== undefined || dayProps['data-selection-end'] !== undefined ? '' : undefined) : dayProps['data-selected']} data-blank={(months ?? 1) > 1 && day.month !== page.value.month ? '' : undefined} data-outside={day.month !== page.value.month ? '' : undefined} data-in-range={mode === 'range' && (dayProps['data-selected'] !== undefined || dayProps['data-highlighted'] !== undefined) ? '' : undefined} data-range-start={dayProps['data-range-start'] ?? dayProps['data-selection-start']} data-range-end={dayProps['data-range-end'] ?? dayProps['data-selection-end']}>{(months ?? 1) > 1 && day.month !== page.value.month ? '' : day.day}</div>
            {/snippet}
           </Parts.Day>
          </Parts.Cell>
@@ -83,11 +91,11 @@
 {/snippet}
 
 {#if mode === 'range'}
- <Range.Root {...part('root')} data-mode="range" {...options} bind:placeholder bind:value={() => ({ start: date(chosen.start), end: date(chosen.end) }), next => { if (next.start && next.end) changed({start: next.start.toString() as ISODate, end: next.end.toString() as ISODate}) }}>
+ <Range.Root {...part('root')} data-mode="range" {...options} bind:placeholder bind:value={() => rangeValue, next => { rangeValue = next; if (next.start && next.end) changed({start: next.start.toString() as ISODate, end: next.end.toString() as ISODate}) }}>
   {#snippet children({ months: pages, weekdays })}{@render contents(pages, weekdays)}{/snippet}
  </Range.Root>
 {:else}
- <Single.Root type="single" {...part('root')} data-mode="single" {...options} bind:placeholder bind:value={() => date(chosen.start), next => changed({start: next?.toString() as ISODate ?? null, end: null})}>
+ <Single.Root type="single" {...part('root')} data-mode="single" {...options} bind:placeholder bind:value={() => singleValue, next => changed({start: next?.toString() as ISODate ?? null, end: null})}>
   {#snippet children({ months: pages, weekdays })}{@render contents(pages, weekdays)}{/snippet}
  </Single.Root>
 {/if}

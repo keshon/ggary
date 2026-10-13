@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { Popover as Primitive } from 'bits-ui'
+  import { Popover as Primitive, mergeProps as mergePrimitiveProps } from 'bits-ui'
   import { getConfig } from '../config-provider/context'
   import { configWords } from '@ggary/core/config-provider'
   import type { ControlSize } from '@ggary/core'
-  import { focusCalendarDay, toRange, type CalendarMode, type DateRange } from '@ggary/core/calendar'
+  import { toRange, type CalendarMode, type DateRange } from '@ggary/core/calendar'
   import { connect, createDatePickerMachine, type DatePickerWords, type DatePreset } from '@ggary/core/date-picker'
   import { mergeProps, onFormReset, svelteNormalizer, uid, type ISODate } from '@ggary/core'
   import { useFormField } from '../form/context.svelte'
   import { untrack, type Snippet } from 'svelte'
-  import CalendarView from './CalendarView.svelte'
+  import Calendar from './Calendar.svelte'
 
   type Props = {
     /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
@@ -78,7 +78,7 @@
 
   let inputEl = $state<HTMLInputElement | null>(null)
   let controlEl = $state<HTMLDivElement | null>(null)
-  let grid = $state<HTMLDivElement>()
+  let calendarHost = $state<HTMLDivElement | null>(null)
 
   $effect(() =>
     onFormReset(inputEl, () => {
@@ -102,6 +102,12 @@
     inheritedDir = kit().dir ?? (computed.direction === 'rtl' ? 'rtl' : 'ltr')
     inheritedStyle = `direction:${inheritedDir};${vars.join(';')}`
   })
+  function closeAfterDayActivation(event: MouseEvent | KeyboardEvent) {
+    if (snapshot.calendar.mode !== 'single') return
+    if (event instanceof KeyboardEvent && event.key !== 'Enter' && event.key !== ' ') return
+    const day = (event.target as Element | null)?.closest('[data-scope=calendar][data-part=day][data-date]')
+    if (day && !day.hasAttribute('data-disabled') && day.getAttribute('aria-disabled') !== 'true') machine.send({ type: 'CLOSE' })
+  }
   let outside = false
   let wasOpen = false
   $effect(() => {
@@ -110,10 +116,6 @@
       if (!snapshot.open && !outside && inputEl?.isConnected) inputEl.focus({ preventScroll: true })
     })
     wasOpen = isOpen
-  })
-  $effect(() => {
-    const id = api.calendar.focusedId
-    untrack(() => focusCalendarDay(grid ?? null, id))
   })
 </script>
 
@@ -130,12 +132,17 @@
   <Primitive.Portal>
     <Primitive.Content id={api.ids.content} side="bottom" align="start" sideOffset={4} customAnchor={controlEl} strategy="fixed" trapFocus={false} preventScroll={false} dir={inheritedDir} style={inheritedStyle}
       onInteractOutside={() => { outside = true }}
-      onOpenAutoFocus={(event) => { event.preventDefault(); document.getElementById(api.calendar.focusedId)?.focus({ preventScroll: true }) }}
+      onOpenAutoFocus={(event) => { event.preventDefault(); calendarHost?.querySelector<HTMLElement>('[data-scope=calendar][data-part=day][tabindex="0"]')?.focus({ preventScroll: true }) }}
       onCloseAutoFocus={(event) => { event.preventDefault(); if (!outside) inputEl?.focus({ preventScroll: true }) }}>
       {#snippet child({ props: contentAttrs, wrapperProps })}
         <div {...wrapperProps} data-scope="date-picker" data-part="positioner" data-backend="bits-ui" data-state="open">
-          <div {...api.contentProps} {...contentAttrs} data-scope="date-picker" data-part="content" data-backend="bits-ui" aria-labelledby={api.calendar.ids.title}>
-            <CalendarView api={api.calendar} bind:grid />
+          <div bind:this={calendarHost} {...api.contentProps} {...mergePrimitiveProps(contentAttrs, { onclick: closeAfterDayActivation, onkeydown: closeAfterDayActivation, style: { '--gg-available-width': 'var(--bits-floating-available-width)', '--gg-available-height': 'var(--bits-floating-available-height)' } })} data-scope="date-picker" data-part="content" data-backend="bits-ui" aria-labelledby={undefined} aria-label={words?.choose ?? (mode === 'range' ? 'Choose dates' : 'Choose date')}>
+            <Calendar value={snapshot.calendar.value} mode={snapshot.calendar.mode} min={snapshot.calendar.min} max={snapshot.calendar.max}
+              weekStart={snapshot.calendar.weekStart} isDateDisabled={snapshot.calendar.isDateDisabled ?? undefined} months={snapshot.calendar.months as 1 | 2} {locale}
+              defaultMonth={snapshot.calendar.focused} {words} onValueChange={(next) => {
+                machine.send({ type: 'CALENDAR', event: { type: 'SET', value: next } })
+                machine.send({ type: 'CLOSE' })
+              }} />
             {#if api.presets.length > 0}
               <div {...api.presetsProps}>
                 {#each api.presets as { preset } (preset.label)}<button {...api.getPresetProps(preset)}>{preset.label}</button>{/each}

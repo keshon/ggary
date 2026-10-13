@@ -246,7 +246,7 @@ export function datePickerConformance(adapter: Adapter) {
       expect(titles()).toEqual(['September 2026', 'October 2026'])
       for (let i = 0; i < 5; i++) await adapter.act(() => void key(document.activeElement!, 'ArrowDown'))
       expect(document.activeElement).toBe(dayOf(m.root, '2026-11-05'))
-      expect(titles()).toEqual(['October 2026', 'November 2026'])
+      expect(titles()).toEqual(adapter.name === 'svelte' ? ['November 2026', 'December 2026'] : ['October 2026', 'November 2026'])
     })
 
     it('a range picker opens on two months', async () => {

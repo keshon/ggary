@@ -167,3 +167,17 @@
 
 [data-scope='calendar'][data-part='cell'] { padding: 0; text-align: center; }
 [data-scope='calendar'][data-part='day'][data-backend='bits-ui'][data-blank] { visibility: hidden; }
+
+/* Date popups must keep months and presets reachable in a narrow viewport. */
+[data-scope='date-picker'][data-part='content'][data-backend='bits-ui'] {
+  box-sizing: border-box;
+  max-inline-size: var(--gg-available-width, 100vw);
+  max-block-size: var(--gg-available-height, 100vh);
+  overflow: auto;
+  flex-wrap: wrap;
+}
+[data-scope='date-picker'][data-part='content'][data-backend='bits-ui'] > [data-scope='calendar'] {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+[data-scope='date-picker'][data-part='content'][data-backend='bits-ui'] [data-scope='calendar'][data-part='months'] { flex-wrap: wrap; }

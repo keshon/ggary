@@ -23,7 +23,6 @@ const CONTROLS = [
 const EXEMPT = new Set([
   'data-grid/FilterEditor.svelte',
   'date-picker/DatePicker.svelte',
-  'date-picker/CalendarView.svelte',
   'config-provider/ConfigProvider.svelte',
   'config-provider/ConfigProvider.tsx',
   'metric/MetricRow.svelte',
