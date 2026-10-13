@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Button, Toolbar, ToolbarSeparator, ToolbarSpacer } from '../../../packages/svelte/src/index'
+  import { ToolbarButton, Toolbar, ToolbarSeparator, ToolbarSpacer } from '../../../packages/svelte/src/index'
 
   let { tools, ...rest }: { tools?: string[]; [key: string]: unknown } = $props()
 </script>
@@ -11,7 +11,7 @@
     {:else if label === '>'}
       <ToolbarSpacer />
     {:else}
-      <Button size="sm">{label}</Button>
+      <ToolbarButton size="sm">{label}</ToolbarButton>
     {/if}
   {/each}
 </Toolbar>

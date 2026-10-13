@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge, Button, CodeBlock, List, ListItem, Panel, Toolbar, ToolbarSeparator, ToolbarSpacer } from '@ggary/svelte'
+  import { Badge, ToolbarButton, CodeBlock, List, ListItem, Panel, Toolbar, ToolbarSeparator, ToolbarSpacer } from '@ggary/svelte'
   import DemoPage from '../../svelte/DemoPage.svelte'
   import Specimen from '../../svelte/Specimen.svelte'
   import { leads, runners } from '../../data/layout'
@@ -11,14 +11,14 @@
   <List ariaLabel="Leads">{#each leads.slice(0, count) as lead (lead)}<ListItem title={lead} />{/each}</List>
 {/snippet}
 
-{#snippet addRunner()}<Button emphasis="minimal" size="sm">Add runner</Button>{/snippet}
+{#snippet addRunner()}<ToolbarButton emphasis="minimal" size="sm">Add runner</ToolbarButton>{/snippet}
 
 {#snippet tools()}
   <Toolbar label="Run tools">
-    <Button size="sm" emphasis="minimal">Filter</Button>
-    <Button size="sm" emphasis="minimal">Sort</Button>
+    <ToolbarButton size="sm" emphasis="minimal">Filter</ToolbarButton>
+    <ToolbarButton size="sm" emphasis="minimal">Sort</ToolbarButton>
     <ToolbarSeparator />
-    <Button size="sm" emphasis="minimal">Export</Button>
+    <ToolbarButton size="sm" emphasis="minimal">Export</ToolbarButton>
     <ToolbarSpacer />
     <Badge tone="running">7 running</Badge>
   </Toolbar>

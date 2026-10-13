@@ -30,6 +30,7 @@ export { default as SegmentedControl } from './components/segmented-control/Segm
 export { default as Slider } from './components/slider/Slider.svelte'
 export { default as Steps } from './components/steps/Steps.svelte'
 export { default as Switch } from './components/switch/Switch.svelte'
+export { default as ToolbarButton } from './components/toolbar/ToolbarButton.svelte'
 export { default as Toolbar } from './components/toolbar/Toolbar.svelte'
 export { default as ToolbarSeparator } from './components/toolbar/ToolbarSeparator.svelte'
 export { default as ToolbarSpacer } from './components/toolbar/ToolbarSpacer.svelte'

@@ -1,3 +1,4 @@
+import ToolbarPilot from './fixtures/BitsToolbarPilot.svelte'
 import RibbonPilot from './fixtures/BitsRibbonPilot.svelte'
 import FormContractsPilot from './fixtures/SvelteFormContractsPilot.svelte'
 import NumberField from '../packages/svelte/src/components/number-field/NumberField.svelte'
@@ -144,4 +145,12 @@ it('server renders Ribbon tabs with an empty-key selected panel', () => {
  expect(body).toContain('role="tablist"')
  expect(body).toContain('aria-selected="true"')
  expect(body).toContain('Draft Empty')
+})
+
+it('server renders managed toolbar semantics and keeps mixed groups ordinary', () => {
+ const { body } = render(ToolbarPilot)
+ expect(body).toContain('role="toolbar"')
+ expect(body).toContain('aria-label="Actions"')
+ expect(body).toContain('Mixed text')
+ expect(body).toContain('Plain action')
 })

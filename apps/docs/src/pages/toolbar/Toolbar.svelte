@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge, Button, Icon, Toolbar, ToolbarSeparator, ToolbarSpacer } from '@ggary/svelte'
+  import { Badge, ToolbarButton, Icon, Toolbar, ToolbarSeparator, ToolbarSpacer } from '@ggary/svelte'
   import DemoPage from '../../svelte/DemoPage.svelte'
   import Specimen from '../../svelte/Specimen.svelte'
 </script>
@@ -8,41 +8,41 @@
   {#snippet variants()}
     <Specimen label={`label="Edit"`}>
       <Toolbar label="Edit">
-        <Button size="sm" emphasis="minimal" aria-label="Cut"><Icon name="cut" /></Button>
-        <Button size="sm" emphasis="minimal" aria-label="Copy"><Icon name="copy" /></Button>
-        <Button size="sm" emphasis="minimal" aria-label="Paste"><Icon name="paste" /></Button>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Cut"><Icon name="cut" /></ToolbarButton>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Copy"><Icon name="copy" /></ToolbarButton>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Paste"><Icon name="paste" /></ToolbarButton>
       </Toolbar>
     </Specimen>
     <Specimen label={`label="Zoom" orientation="vertical"`}>
       <Toolbar label="Zoom" orientation="vertical">
-        <Button size="sm" emphasis="minimal" aria-label="Zoom in"><Icon name="zoom-in" /></Button>
-        <Button size="sm" emphasis="minimal" aria-label="Zoom out"><Icon name="zoom-out" /></Button>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Zoom in"><Icon name="zoom-in" /></ToolbarButton>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Zoom out"><Icon name="zoom-out" /></ToolbarButton>
         <ToolbarSeparator />
-        <Button size="sm" emphasis="minimal" aria-label="Fit to screen"><Icon name="expand" /></Button>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Fit to screen"><Icon name="expand" /></ToolbarButton>
       </Toolbar>
     </Specimen>
     <Specimen label="no label">
       <Toolbar>
-        <Button size="sm" emphasis="low">Filter</Button>
-        <Button size="sm" emphasis="low">Sort</Button>
+        <ToolbarButton size="sm" emphasis="low">Filter</ToolbarButton>
+        <ToolbarButton size="sm" emphasis="low">Sort</ToolbarButton>
       </Toolbar>
     </Specimen>
   {/snippet}
   {#snippet states()}
     <Specimen label="disabled">
       <Toolbar label="History">
-        <Button size="sm" emphasis="minimal" aria-label="Undo"><Icon name="undo" /></Button>
-        <Button size="sm" emphasis="minimal" aria-label="Redo" disabled><Icon name="redo" /></Button>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Undo"><Icon name="undo" /></ToolbarButton>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Redo" disabled><Icon name="redo" /></ToolbarButton>
       </Toolbar>
     </Specimen>
   {/snippet}
   {#snippet composition()}
     <Specimen label="ToolbarSeparator · ToolbarSpacer" wide>
       <Toolbar label="Run tools">
-        <Button size="sm" emphasis="minimal">Filter</Button>
-        <Button size="sm" emphasis="minimal">Sort</Button>
+        <ToolbarButton size="sm" emphasis="minimal">Filter</ToolbarButton>
+        <ToolbarButton size="sm" emphasis="minimal">Sort</ToolbarButton>
         <ToolbarSeparator />
-        <Button size="sm" emphasis="minimal">Export</Button>
+        <ToolbarButton size="sm" emphasis="minimal">Export</ToolbarButton>
         <ToolbarSpacer />
         <Badge tone="running">7 running</Badge>
       </Toolbar>

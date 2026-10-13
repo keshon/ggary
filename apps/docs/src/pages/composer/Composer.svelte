@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Badge, Button, Composer, Icon, Stack, Toolbar, ToolbarSpacer } from '@ggary/svelte'
+  import { Badge, ToolbarButton, Composer, Icon, Stack, Toolbar, ToolbarSpacer } from '@ggary/svelte'
   import DemoPage from '../../svelte/DemoPage.svelte'
   import Specimen from '../../svelte/Specimen.svelte'
   import { chatThread } from '../../data/agent'
@@ -8,7 +8,7 @@
   const field = { label: 'Describe a task or ask a question', placeholder: 'Describe a task or ask a question' }
 </script>
 
-{#snippet addContext()}<Button size="sm" emphasis="minimal" aria-label="Add context"><Icon name="plus" /></Button>{/snippet}
+{#snippet addContext()}<ToolbarButton size="sm" emphasis="minimal" aria-label="Add context"><Icon name="plus" /></ToolbarButton>{/snippet}
 
 <DemoPage>
   {#snippet variants()}
@@ -16,7 +16,7 @@
     <Specimen label={`bar="row"`} wide>
       <Composer {...field} bar="row">
         {@render addContext()}
-        <Button size="sm" emphasis="minimal" aria-label="Attach a file"><Icon name="attachment" /></Button>
+        <ToolbarButton size="sm" emphasis="minimal" aria-label="Attach a file"><Icon name="attachment" /></ToolbarButton>
       </Composer>
     </Specimen>
   {/snippet}
@@ -32,8 +32,8 @@
       <Stack gap="tight">
         <Composer {...field} busy>{@render addContext()}</Composer>
         <Toolbar label="Session">
-          <Button size="sm" emphasis="minimal">Auto</Button>
-          <Button size="sm" emphasis="minimal">Opus 5</Button>
+          <ToolbarButton size="sm" emphasis="minimal">Auto</ToolbarButton>
+          <ToolbarButton size="sm" emphasis="minimal">Opus 5</ToolbarButton>
           <ToolbarSpacer />
           <Badge tone="running">working</Badge>
           <Badge tone="warn">context 90%</Badge>

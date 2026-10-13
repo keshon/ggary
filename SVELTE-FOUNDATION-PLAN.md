@@ -443,3 +443,32 @@ Expose an unmanaged path for mixed controls, matching the React contract.
 Local gates passed: the Ribbon Chromium case, all 16 SSR cases, all 569
 contract cases, TypeScript/Svelte checks and docs production build. Previous
 form checkpoint hosted CI passed on run 38366760078.
+
+## Toolbar and Ribbon groups checkpoint (2026-10-13)
+
+Managed Svelte Toolbar and RibbonGroup now use Bits Toolbar. Added/exported
+ToolbarButton: it renders GGary Button through the Bits registered-button snippet
+in managed context and an ordinary GGary Button otherwise. Removed all Svelte
+attachToolbarKeys calls. Registration is explicit, matching React; arbitrary
+buttons are not scanned into a roving focus group. Named Toolbar consumers must
+use ToolbarButton for actions. Unnamed strips remain ordinary layout.
+
+RibbonGroup exposes managed=false for mixed controls. Its frame is a group;
+managed tools get an inner named toolbar with display:contents to preserve the
+existing layout. Group context boundaries prevent unmanaged descendants from
+accidentally inheriting an outer managed toolbar. Updated the docs consumers in
+Toolbar, Ribbon, Composer and Panel; Select/SegmentedControl Ribbon groups are
+unmanaged. Updated the conformance fixture to register its intended toolbar items.
+
+Chromium checks horizontal/vertical navigation, disabled skipping, Home, single
+Space activation, Ribbon tool navigation and ordinary mixed text-input arrows.
+Added SSR managed/unmanaged markup coverage. Focused conformance and all 571
+source contracts pass.
+
+Toolbar and Ribbon are now resolved. Remaining unresolved components: 6:
+Toast/Toaster, Calendar, DatePicker, TimePicker, Cascader and Shell. Package and
+installed-consumer release gates remain additional work. Next: Toast ownership.
+
+Local gates passed: all 34 Chromium pilot cases, nine focused toolbar/SSR
+cases, all 571 source contracts, TypeScript/Svelte checks and docs build.
+No whole fast-suite rerun is claimed; hosted CI remains the full regression gate.
