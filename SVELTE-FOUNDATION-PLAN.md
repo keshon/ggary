@@ -242,3 +242,35 @@ checkpoint; hosted CI remains the whole-suite gate after push.
 
 Next: Tabs and Accordion, followed by slider/option/form widgets, remaining
 custom-widget ownership inventory and compiled installed-Svelte-consumer gates.
+
+
+## Tabs/Accordion checkpoint (2026-10-13)
+
+Previous composite checkpoint hosted CI passed on run 38263645719. Svelte Tabs
+and Accordion now use Bits UI. Removed their interaction machines, manual roving
+focus and findableContent attachment. Bits owns ordinary selection/disclosure,
+activation and keyboard behavior. GGary retains document-close requests and
+neighbor selection/focus after actual removal, panel-content retention, public
+bindings, noncollapsible policy, anatomy and labels. Internal key encoding keeps
+empty-string public keys distinct from Bits' unselected value. Accordion uses
+Bits hiddenUntilFound for retained searchable content and keeps stable ARIA links.
+
+Fixed the reported tab scrollbars for BOTH React and Svelte. The generic GGarry
+base rule set scrollbar-width: thin on every component, overriding the tab-list
+structure's none due to layer order. Excluded tab lists from that generic rule;
+kept overflow scrolling and ordinary scrollbar styles elsewhere. Real narrow
+lists in Chromium have hidden scrollbars and still scroll focused tabs into view.
+Both framework docs pages were checked visually, including vertical tabs.
+
+Final local checks passed: 36 focused React/Svelte conformance/anatomy cases,
+23 Chromium pilot tests (four new disclosure/scrollbar cases), nine Node SSR
+cases, zero TypeScript/Svelte diagnostics, 544 theme measurements and the docs
+production build. Browser cases cover manual activation, empty keys, draft
+retention, focused document removal and find-in-page disclosure. Noncollapsible
+activation is tested by keyboard because the trigger correctly reports
+aria-disabled while open. Included react/jsx-dev-runtime in browser dependency
+optimization to avoid first-run test reloads. No whole fast-suite rerun is claimed
+for this checkpoint; hosted CI remains the whole-suite gate after push.
+
+Next: Slider/RangeSlider and option/form widgets, followed by remaining custom
+ownership inventory and the compiled installed-Svelte-consumer release gates.

@@ -3,6 +3,7 @@ import { render } from 'svelte/server'
 import Combobox from '../packages/svelte/src/components/combobox/Combobox.svelte'
 import Select from '../packages/svelte/src/components/select/Select.svelte'
 import OverlaysPilot from './fixtures/BitsOverlaysPilot.svelte'
+import DisclosurePilot from './fixtures/BitsDisclosurePilot.svelte'
 import CompositesPilot from './fixtures/BitsCompositesPilot.svelte'
 import AnchoredMenu from '../packages/svelte/src/components/menu/AnchoredMenu.svelte'
 import Kanban from '../packages/svelte/src/components/kanban/Kanban.svelte'
@@ -72,4 +73,13 @@ it('server-renders composite triggers and an inline command palette without floa
   expect(body).toContain('Inline commands')
   expect(body).toContain('Move card')
   expect(body).not.toContain('role="alertdialog"')
+})
+
+it('server-renders selected tabs and findable disclosure bodies', () => {
+  const { body } = render(DisclosurePilot)
+  expect(body).toContain('role="tablist"')
+  expect(body).toContain('Empty document')
+  expect(body).toContain('aria-selected="true"')
+  expect(body).toContain('Empty section')
+  expect(body).toContain('hidden="until-found"')
 })

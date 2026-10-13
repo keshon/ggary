@@ -1,114 +1,62 @@
 <script lang="ts">
-  import { getConfig } from '../config-provider/context'
+  import { Tabs as Primitive } from 'bits-ui'
   import type { ControlSize } from '@ggary/core'
-  import {
-    connect,
-    createTabsMachine,
-    type TabItem,
-    type TabsActivation,
-    type TabsOrientation,
-    type TabsVariant,
-  } from '@ggary/core/tabs'
-  import { focusTab, svelteNormalizer, uid } from '@ggary/core'
+  import type { TabItem, TabsActivation, TabsOrientation, TabsVariant } from '@ggary/core/tabs'
   import { untrack, type Snippet } from 'svelte'
-
-  type Props = {
-    /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
-    size?: ControlSize
-    items: TabItem[]
-    /** Bindable: `bind:value`. A one-way `value` works too. */
-    value?: string | null
-    defaultValue?: string | null
-    onValueChange?: (value: string) => void
-    /** A close button, Delete or a middle click on a closable tab. Remove the item to close it. */
-    onClose?: (value: string) => void
-    /** The tab list's accessible name. */
-    label?: string
-    orientation?: TabsOrientation
-    activation?: TabsActivation
-    /** `sections` for views of one thing, `documents` for open, closable items. Default `sections`. */
-    variant?: TabsVariant
-    /** The panel for a tab. Omit it for tabs that switch something rendered elsewhere. */
-    panel?: Snippet<[TabItem]>
-    /** Render every panel, hidden, rather than the selected one alone. Keeps their state. */
-    keepMounted?: boolean
-    closeLabel?: (label: string) => string
-  }
-
-  let {
-    size: ownSize,
-    items,
-    value = $bindable(),
-    defaultValue,
-    onValueChange,
-    onClose,
-    label,
-    orientation,
-    activation,
-    variant,
-    panel,
-    keepMounted = false,
-    closeLabel,
-  }: Props = $props()
+  import { getConfig } from '../config-provider/context'
+  type Props = { size?: ControlSize; items: TabItem[]; value?: string | null; defaultValue?: string | null; onValueChange?: (value: string) => void; onClose?: (value: string) => void; label?: string; orientation?: TabsOrientation; activation?: TabsActivation; variant?: TabsVariant; panel?: Snippet<[TabItem]>; keepMounted?: boolean; closeLabel?: (label: string) => string }
+  let { size: ownSize, items, value = $bindable(), defaultValue, onValueChange, onClose, label, orientation = 'horizontal', activation = 'automatic', variant = 'sections', panel, keepMounted = false, closeLabel = text => `Close ${text}` }: Props = $props()
   const kit = getConfig()
   const size = $derived(ownSize ?? kit().size)
-
-  const id = uid('gg-tabs')
-
-  // Uncontrolled at heart, as `bind:value` is: a choice moves the tabs and
-  // writes the binding, and a new `value` from outside arrives through SYNC_VALUE.
-  const machine = untrack(() =>
-    createTabsMachine({
-      id,
-      items,
-      defaultValue: value !== undefined ? value : defaultValue,
-      orientation,
-      activation,
-      onValueChange: (next) => {
-        value = next
-        onValueChange?.(next)
-      },
-      onClose: (closed) => onClose?.(closed),
-    })
-  )
-
-  let snapshot = $state(machine.getState())
-  $effect(() => machine.subscribe((next) => (snapshot = next)))
-
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label, variant, panels: panel !== undefined, closeLabel, size }))
-
-  $effect(() => machine.send({ type: 'SYNC_ITEMS', items }))
+  const componentId = $props.id()
+  const id = `gg-bits-tabs-${componentId}`
+  const itemId = (key: string) => `${id}-${encodeURIComponent(key)}`
+  const part = (name: string) => ({ 'data-scope': 'tabs', 'data-part': name, 'data-backend': 'bits-ui' })
+  let localValue = $state<string | null>(untrack(() => value !== undefined ? value : defaultValue !== undefined ? defaultValue : items.find(item => !item.disabled)?.value ?? null))
+  const selected = $derived(value === undefined ? localValue : value)
+  function changed(next: string) { if (next === selected) return; localValue = next; value = next; onValueChange?.(next) }
+  let root = $state<HTMLElement | null>(null)
+  let pendingClose: { value: string; next?: string; focused: boolean } | null = null
+  function close(item: TabItem) {
+    if (item.disabled || !item.closable) return
+    const index = items.indexOf(item)
+    const next = items.slice(index + 1).find(item => !item.disabled) ?? items.slice(0, index).reverse().find(item => !item.disabled)
+    pendingClose = { value: item.value, next: next?.value, focused: document.activeElement?.id === `${itemId(item.value)}-tab` }
+    onClose?.(item.value)
+  }
   $effect(() => {
-    if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value })
-  })
-  $effect(() => machine.send({ type: 'SYNC_OPTIONS', orientation, activation }))
-
-  // Roving focus moves only when the machine asks (the nonce), never on a re-render.
-  let lastFocusNonce = 0
-  $effect(() => {
-    const { focusNonce, focusValue } = api
-    if (focusNonce === 0 || focusNonce === lastFocusNonce || focusValue === null) return
-    lastFocusNonce = focusNonce
-    untrack(() => focusTab(document, api.ids.tab(focusValue)))
+    if (selected !== null && !items.some(item => item.value === selected && !item.disabled)) {
+      const next = pendingClose?.next ?? items.find(item => !item.disabled)?.value
+      if (next !== undefined) changed(next)
+      else { localValue = null; value = null }
+    }
+    if (pendingClose && !items.some(item => item.value === pendingClose!.value)) {
+      const pending = pendingClose; pendingClose = null
+      if (pending.focused && pending.next !== undefined) document.getElementById(`${itemId(pending.next)}-tab`)?.focus()
+    }
   })
 </script>
-
-<div {...api.rootProps}>
-  <div {...api.listProps}>
-    {#each api.items as item (item.value)}
-      <div {...api.getTabProps(item)}>
-        <span {...api.getTabTextProps()}>{item.label}</span>
-        {#if item.closable}
-          <button {...api.getCloseProps(item)}><span {...api.closeIconProps}></span></button>
-        {/if}
-      </div>
+<Primitive.Root bind:ref={root} {...part('root')} bind:value={() => selected === null ? '' : `gg:${selected}`, next => { if (next) changed(next.slice(3)) }} {orientation} activationMode={activation} loop data-size={size} data-variant={variant} dir={kit().dir}>
+  <Primitive.List {...part('list')} aria-label={label} data-variant={variant}>
+    {#each items as item (item.value)}
+      <Primitive.Trigger id={`${itemId(item.value)}-tab`} {...part('tab')} value={`gg:${item.value}`} disabled={item.disabled} aria-disabled={item.disabled ? 'true' : undefined}
+        data-value={item.value} data-state={selected === item.value ? 'active' : 'inactive'} data-closable={item.closable ? '' : undefined} data-modified={item.modified ? '' : undefined}
+        onkeydown={event => { if (event.key === 'Delete' && item.closable && !item.disabled) { event.preventDefault(); close(item) } }}
+        onauxclick={event => { if (event.button === 1) { event.preventDefault(); close(item) } }}>
+        {#snippet child({ props: triggerProps })}
+          <div {...triggerProps}>
+            <span {...part('tab-text')}>{item.label}</span>
+            {#if item.closable}<button {...part('close')} type="button" tabindex={-1} disabled={item.disabled} aria-label={closeLabel(item.label)} onpointerdown={event => event.preventDefault()} onclick={event => { event.stopPropagation(); close(item) }}><span {...part('close-icon')} data-icon="close" aria-hidden="true"></span></button>{/if}
+          </div>
+        {/snippet}
+      </Primitive.Trigger>
     {/each}
-  </div>
+  </Primitive.List>
   {#if panel}
-    {#each api.items as item (item.value)}
-      {#if keepMounted || item.value === snapshot.value}
-        <div {...api.getPanelProps(item)}>{@render panel(item)}</div>
-      {/if}
+    {#each items as item (item.value)}
+      <Primitive.Content {...part('panel')} id={`${itemId(item.value)}-panel`} value={`gg:${item.value}`} data-value={item.value} data-state={selected === item.value ? 'active' : 'inactive'}>
+        {#if keepMounted || selected === item.value}{@render panel(item)}{/if}
+      </Primitive.Content>
     {/each}
   {/if}
-</div>
+</Primitive.Root>

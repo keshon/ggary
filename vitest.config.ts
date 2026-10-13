@@ -47,6 +47,7 @@ export default defineConfig({
         // installed on the machine (no browser download); GG_BROWSER_CHANNEL
         // picks another — `msedge`, or `chromium` after `npx playwright install`.
         plugins: [svelte({ hot: false })],
+        optimizeDeps: { include: ['react/jsx-dev-runtime'] },
         test: {
           name: 'browser',
           include: ['tests/*.browser.test.ts'],

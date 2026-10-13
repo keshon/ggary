@@ -1,84 +1,43 @@
 <script lang="ts">
-  import { connect, createAccordionMachine, findableContent, type AccordionItem } from '@ggary/core/accordion'
-  import { rovingFocus, svelteNormalizer, uid } from '@ggary/core'
+  import { Accordion as Primitive } from 'bits-ui'
+  import type { AccordionItem } from '@ggary/core/accordion'
   import { untrack, type Snippet } from 'svelte'
-
-  type Props = {
-    items: AccordionItem[]
-    /** The section under an item. */
-    panel: Snippet<[AccordionItem]>
-    /** Bindable: the open sections. */
-    value?: string[]
-    defaultValue?: string[]
-    onValueChange?: (value: string[]) => void
-    /** Several sections may stand open. Default false. */
-    multiple?: boolean
-    /** The open section may be closed, leaving none. Default true. */
-    collapsible?: boolean
-    disabled?: boolean
-    /** The heading level of each section's button. Default 3. */
-    headingLevel?: 1 | 2 | 3 | 4 | 5 | 6
-    /** Keep a closed section's content in the page, hidden. Default true: find-in-page searches it. */
-    keepMounted?: boolean
+  type Props = { items: AccordionItem[]; panel: Snippet<[AccordionItem]>; value?: string[]; defaultValue?: string[]; onValueChange?: (value: string[]) => void; multiple?: boolean; collapsible?: boolean; disabled?: boolean; headingLevel?: 1 | 2 | 3 | 4 | 5 | 6; keepMounted?: boolean }
+  let { items, panel, value = $bindable(), defaultValue = [], onValueChange, multiple = false, collapsible = true, disabled = false, headingLevel = 3, keepMounted = true }: Props = $props()
+  let localValue = $state(untrack(() => value ?? defaultValue))
+  const selected = $derived((value ?? localValue).filter(key => items.some(item => item.value === key)).slice(0, multiple ? undefined : 1))
+  function changed(next: string[]) {
+    if (!multiple && !collapsible && selected.length && !next.length) return
+    localValue = next; value = next; onValueChange?.(next)
   }
-
-  /** Headings that show and hide the section under each. */
-  let { items, panel, value = $bindable(), defaultValue, onValueChange, multiple, collapsible, disabled, headingLevel, keepMounted = true }: Props = $props()
-
-  const machine = untrack(() =>
-    createAccordionMachine({
-      id: uid('gg-accordion'),
-      items,
-      defaultValue: value !== undefined ? value : defaultValue,
-      multiple,
-      collapsible,
-      disabled,
-      onValueChange: (next) => {
-        value = next
-        onValueChange?.(next)
-      },
-    })
-  )
-  let snapshot = $state.raw(machine.getState())
-  $effect(() => machine.subscribe((next) => (snapshot = next)))
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { headingLevel }))
-
-  $effect(() => machine.send({ type: 'SYNC_ITEMS', items }))
-  $effect(() => machine.send({ type: 'SYNC_OPTIONS', multiple, collapsible, disabled }))
-  $effect(() => {
-    if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value })
-  })
-
-  let lastFocusNonce = 0
-  $effect(() => {
-    const { focusNonce, focusValue } = api
-    if (focusNonce === 0 || focusNonce === lastFocusNonce || focusValue === null) return
-    lastFocusNonce = focusNonce
-    untrack(() => rovingFocus(document, api.ids.trigger(focusValue)))
-  })
-
-  // A closed section stays findable: the browser's find-in-page opens it.
-  const contents: Record<string, HTMLElement | null> = $state({})
-  $effect(() => {
-    const current = api
-    const cleanups = current.items.map((item) => findableContent(contents[item.value] ?? null, current.isOpen(item.value), () => current.reveal(item.value)))
-    return () => cleanups.forEach((cleanup) => cleanup())
-  })
+  const componentId = $props.id()
+  const id = `gg-bits-accordion-${componentId}`
+  const itemId = (key: string) => `${id}-${encodeURIComponent(key)}`
+  const part = (name: string) => ({ 'data-scope': 'accordion', 'data-part': name, 'data-backend': 'bits-ui' })
 </script>
-
-<div {...api.rootProps}>
-  {#each api.items as item (item.value)}
-    <div {...api.getItemProps(item)}>
-      <div {...api.headingProps}>
-        <button {...api.getTriggerProps(item)}>
-          <span {...api.getLabelProps(item)}>{item.label}</span>
-          {#if item.description}<span {...api.getDescriptionProps(item)}>{item.description}</span>{/if}
-          <span {...api.getIndicatorProps(item)}></span>
-        </button>
-      </div>
-      <div bind:this={contents[item.value]} {...api.getContentProps(item)}>
-        {#if api.isOpen(item.value) || keepMounted}<div {...api.bodyProps}>{@render panel(item)}</div>{/if}
-      </div>
-    </div>
+{#snippet body()}
+  {#each items as item (item.value)}
+    {@const shown = selected.includes(item.value)}
+    <Primitive.Item {...part('item')} value={`gg:${item.value}`} disabled={item.disabled} data-value={item.value} data-state={shown ? 'open' : 'closed'}>
+      <Primitive.Header {...part('heading')} level={headingLevel}>
+        <Primitive.Trigger {...part('trigger')} id={`${itemId(item.value)}-trigger`} aria-labelledby={`${itemId(item.value)}-label`} aria-describedby={item.description ? `${itemId(item.value)}-description` : undefined} aria-disabled={disabled || item.disabled || (shown && !multiple && !collapsible) ? 'true' : undefined} data-state={shown ? 'open' : 'closed'}>
+          {#snippet child({ props: triggerProps })}
+            <button {...triggerProps} aria-controls={`${itemId(item.value)}-content`} aria-disabled={disabled || item.disabled || (shown && !multiple && !collapsible) ? 'true' : undefined}>
+          <span {...part('label')} id={`${itemId(item.value)}-label`}>{item.label}</span>
+          {#if item.description}<span {...part('description')} id={`${itemId(item.value)}-description`}>{item.description}</span>{/if}
+          <span {...part('indicator')} data-icon="chevron-down" aria-hidden="true" data-state={shown ? 'open' : 'closed'}></span>
+            </button>
+          {/snippet}
+        </Primitive.Trigger>
+      </Primitive.Header>
+      <Primitive.Content {...part('content')} id={`${itemId(item.value)}-content`} hiddenUntilFound={keepMounted} forceMount={keepMounted} role={items.length <= 6 ? 'region' : undefined} aria-labelledby={items.length <= 6 ? `${itemId(item.value)}-trigger` : undefined} data-state={shown ? 'open' : 'closed'}>
+        {#if shown || keepMounted}<div {...part('body')}>{@render panel(item)}</div>{/if}
+      </Primitive.Content>
+    </Primitive.Item>
   {/each}
-</div>
+{/snippet}
+{#if multiple}
+  <Primitive.Root {...part('root')} type="multiple" {disabled} loop bind:value={() => selected.map(key => `gg:${key}`), next => changed(next.map(key => key.slice(3)))}>{@render body()}</Primitive.Root>
+{:else}
+  <Primitive.Root {...part('root')} type="single" {disabled} loop bind:value={() => selected.length ? `gg:${selected[0]}` : '', next => changed(next ? [next.slice(3)] : [])}>{@render body()}</Primitive.Root>
+{/if}

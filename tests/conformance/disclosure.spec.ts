@@ -43,6 +43,7 @@ export function disclosureConformance(adapter: Adapter) {
       expect(contents()[1].textContent).toContain('Body Returns')
       await adapter.act(() => click(triggers()[0]))
       await adapter.act(() => click(triggers()[1]))
+      await adapter.wait(30)
       expect(changes).toEqual([['shipping'], ['returns']])
       expect(triggers().map((trigger) => trigger.getAttribute('aria-expanded'))).toEqual(['false', 'true', 'false', 'false'])
       expect(contents()[1].hasAttribute('hidden')).toBe(false)

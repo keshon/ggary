@@ -16,6 +16,6 @@
 :where(:root, [data-mode]) {
   scrollbar-color: var(--ggarry-border-strong) transparent;
 }
-:where(:root, [data-scope]) {
+:where(:root, [data-scope]:not([data-scope='tabs'][data-part='list'])) {
   scrollbar-width: thin;
 }
