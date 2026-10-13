@@ -1,3 +1,4 @@
+import NativeChoicesPilot from './fixtures/SvelteNativeChoicesPilot.svelte'
 import SlidersPilot from './fixtures/BitsSlidersPilot.svelte'
 import { expect, it } from 'vitest'
 import { render } from 'svelte/server'
@@ -92,4 +93,14 @@ it('server renders slider values and accessible thumbs', () => {
  expect(body).toContain('role="slider"')
  expect(body).toContain('name="low"')
  expect(body).toContain('value="20"')
+})
+
+it('renders native Svelte choice controls and required validation on the server', () => {
+ const { body } = render(NativeChoicesPilot)
+ expect(body).toContain('type="checkbox"')
+ expect(body).toContain('type="radio"')
+ expect(body).toContain('role="switch"')
+ expect(body).toContain('name="terms"')
+ expect(body).toContain('required')
+ expect(body).toContain('Accept terms')
 })

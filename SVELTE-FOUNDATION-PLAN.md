@@ -315,3 +315,26 @@ Whole fast-suite coverage remains the hosted CI gate after push.
 
 Next: Checkbox, RadioGroup, Switch and their option-group wrappers. The remaining
 19-component inventory above is separate from release gates.
+
+## Native choice ownership checkpoint (2026-10-13)
+
+Checkbox, RadioGroup and Switch intentionally remain native HTML controls in
+Svelte. The source audit found no legacy interaction machine or custom roving
+focus here: browser inputs own activation, radio arrow navigation, validation,
+form participation and disabled fieldsets. GGary owns binding/callback wiring,
+form-reset synchronization, decorative anatomy, mixed-state synchronization,
+and the small readonly click guard (checkbox inputs have no native readonly).
+Replacing this with Bits buttons plus form proxies would add ownership without
+removing a homemade keyboard/focus implementation. This is a completed ownership
+decision, not a postponed bridge migration. React's Base UI adapters are separate.
+
+Added three real Chromium cases covering labels/Space, native required validity,
+canonical submission and reset, indeterminate state, readonly refusal, disabled
+fieldsets, radio arrow navigation past disabled options and empty public keys.
+These are included in the hosted Svelte browser gate. Focused cross-framework
+conformance and SSR selection passed 104 cases; TypeScript/Svelte checks passed.
+
+Remaining unresolved component count: 16 (four option wrappers, four form contracts,
+three composites and five domain/floating components). Package/consumer release
+gates remain separate. Next: CheckboxGroup, ChoiceCardGroup, ChipGroup and
+SegmentedControl ownership review, replacing custom keyboard machinery where needed.
