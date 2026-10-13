@@ -64,7 +64,7 @@ export function setInputValue(input: HTMLInputElement, value: string): void {
 export function attachScrub(handle: HTMLElement, input: () => HTMLInputElement | null): () => void {
   const onPointerDown = (down: PointerEvent) => {
     const field = input()
-    if (!field || field.disabled || field.readOnly || down.button !== 0) return
+    if (!field || field.disabled || field.matches(':disabled') || field.readOnly || down.button !== 0) return
     down.preventDefault()
     const step = Number(field.getAttribute('step')) || 1
     const start = field.value === '' || !Number.isFinite(Number(field.value)) ? (bound(field, 'min') ?? 0) : Number(field.value)

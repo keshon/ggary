@@ -1,3 +1,5 @@
+import FormContractsPilot from './fixtures/SvelteFormContractsPilot.svelte'
+import NumberField from '../packages/svelte/src/components/number-field/NumberField.svelte'
 import ChipsPilot from './fixtures/BitsChipsPilot.svelte'
 import NativeGroupsPilot from './fixtures/SvelteNativeGroupsPilot.svelte'
 import NativeChoicesPilot from './fixtures/SvelteNativeChoicesPilot.svelte'
@@ -121,4 +123,17 @@ it('server renders chip buttons and unencoded public submission values', () => {
  expect(body).toContain('role="toolbar"')
  expect(body).toContain('aria-pressed="true"')
  expect(body).toContain('name="tags" value=""')
+})
+
+it('renders NumberField initial values in server HTML before effects run', () => {
+ expect(render(NumberField, { props: { name: 'count', defaultValue: 4 } }).body).toContain('value="4"')
+ expect(render(NumberField, { props: { name: 'count', value: 7 } }).body).toContain('value="7"')
+ expect(render(NumberField, { props: { name: 'count', value: null } }).body).toContain('value=""')
+})
+it('server renders the form and its native constraints without browser globals', () => {
+ const { body } = render(FormContractsPilot)
+ expect(body).toContain('name="count"')
+ expect(body).toContain('value="4"')
+ expect(body).toContain('required')
+ expect(body).toContain('Disabled controls')
 })

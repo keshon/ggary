@@ -390,3 +390,34 @@ Final local gates: 42 focused chip conformance cases, 30 Chromium pilot cases,
 The full Chromium run caught blur firing during node removal before disconnection;
 focus tracking now clears on a real focus transfer and retains removal recovery.
 No whole fast-suite rerun is claimed; hosted CI remains that gate after push.
+
+## NumberField and form contracts checkpoint (2026-10-13)
+
+Resolved NumberField, Field, Fieldset and Form ownership. NumberField deliberately
+uses native input[type=number] for editing, keyboard stepping and constraints;
+GGary's optional scrub handle is a custom inspector enhancement, not a bridge.
+Field/Fieldset own presentation and native-validity state. Form owns rules,
+submission status, server errors and registered field metadata. Their pure
+machines remain intentional domain state, not duplicated overlay/focus behavior.
+No Bits replacement is needed to remove a legacy interaction engine here.
+
+Fixed NumberField's missing server-rendered value by emitting its mount-time
+initial value in HTML while retaining the draft-preserving client write effect.
+The shared scrub attachment now checks :disabled as well as the input's own
+flag, so disabled fieldsets block dragging too. Previously scrub could change a
+value that native keyboard/pointer editing correctly treated as disabled.
+
+Added Chromium checks for assembled Form/Field/Fieldset/NumberField: native
+required validity, label focus, hint association, submission/server errors,
+canonical values, reset and disabled scrub. Added SSR initial/default/null value
+and assembled form coverage.
+
+Remaining unresolved components: 8: Toolbar, Ribbon, Toast/Toaster; Calendar,
+DatePicker, TimePicker, Cascader and Shell. Package/installed-consumer release
+gates remain additional work. Next: Toolbar/Ribbon interaction ownership.
+
+Local gates: 33 focused number/field/form and SSR cases, two Chromium assembled
+form cases and TypeScript/Svelte checks passed. Hosted CI for the previous
+ChipGroup checkpoint exposed a source-heuristic false positive: its internal
+Bits snippet spread was named props and classified as consumer passthrough.
+Renamed it primitiveProps; no behavior or public attribute contract changed.

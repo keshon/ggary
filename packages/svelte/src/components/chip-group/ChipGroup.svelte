@@ -91,8 +91,8 @@
 <div bind:this={root} data-scope="chip-group" data-part="root" {id} data-orientation={orientation ?? 'horizontal'} data-disabled={disabled ? '' : undefined}>
   {#if label}<span id={`${id}-label`} data-scope="chip-group" data-part="label">{label}</span>{/if}
   <ToggleGroup.Root type="multiple" bind:value={() => encoded, change} {disabled} orientation={orientation ?? 'horizontal'} data-scope="chip-group" data-part="list" aria-labelledby={label ? `${id}-label` : undefined}>
-    {#snippet child({ props })}
-    <div {...props} role="toolbar" aria-orientation={orientation ?? 'horizontal'}>
+    {#snippet child({ props: primitiveProps })}
+    <div {...primitiveProps} role="toolbar" aria-orientation={orientation ?? 'horizontal'}>
     {#if items.length === 0}<span data-scope="chip-group" data-part="empty">{words.empty ?? 'Nothing here'}</span>{/if}
     {#each items as item, index (item.value)}
       <ToggleGroup.Item value={encode(item.value)} disabled={disabled || item.disabled} id={`${id}-chip-${index}`} {...svelteNormalizer(chipAttrs({ emphasis, size, selected: selection.includes(item.value), disabled: disabled || item.disabled, removable: item.removable ?? removable }))} data-chip-index={index} onfocus={(event) => { focused = event.currentTarget }} onblur={(event) => { if (event.relatedTarget) focused = null }} aria-keyshortcuts={(item.removable ?? removable) ? 'Delete' : undefined} onkeydown={(event) => extraKeys(event, item, index)}>

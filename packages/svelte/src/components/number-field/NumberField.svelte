@@ -61,5 +61,5 @@
   {#if api.showAxis}
     <span {...api.axisProps} {@attach (handle) => attachScrub(handle, () => element)}>{api.axis}</span>
   {/if}
-  <input bind:this={element} {...attrs} />
+  <input bind:this={element} {...attrs} value={initial ?? ''} />
 </span>
