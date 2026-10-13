@@ -71,6 +71,6 @@
   value={parts.date}
   onValueChange={(range) => update({ date: range.start })}
   submitAs={joinDateTime(parts.date, parts.time) ?? ''}
-  onReset={() => (own = initial)}
+  onReset={() => { own = initial; value = joinDateTime(initial.date, initial.time) }}
   timeSlot={time}
 />

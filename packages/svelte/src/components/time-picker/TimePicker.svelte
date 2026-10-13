@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { Popover as Primitive, mergeProps as mergePrimitiveProps } from 'bits-ui'
   import { getConfig } from '../config-provider/context'
   import { configWords } from '@ggary/core/config-provider'
   import type { ControlSize } from '@ggary/core'
   import { connect, createTimePickerMachine, type TimePickerWords } from '@ggary/core/time-picker'
-  import { attachPopover, mergeProps, onFormReset, scrollIntoCenter, scrollIntoViewIfNeeded, svelteNormalizer, uid, type ISOTime } from '@ggary/core'
+  import { mergeProps, onFormReset, scrollIntoCenter, scrollIntoViewIfNeeded, svelteNormalizer, uid, nowTime, type ISOTime } from '@ggary/core'
   import { useFormField } from '../form/context.svelte'
   import { untrack } from 'svelte'
 
@@ -65,26 +66,29 @@
 
   let inputEl = $state<HTMLInputElement | null>(null)
   let controlEl = $state<HTMLDivElement | null>(null)
-  let positionerEl = $state<HTMLDivElement | null>(null)
   let contentEl = $state<HTMLDivElement | null>(null)
 
   $effect(() =>
     onFormReset(inputEl, () => {
       value = initial
-      machine.send({ type: 'SYNC_VALUE', value: initial })
+      machine.send({ type: 'RESET', value: initial })
     })
   )
 
-  $effect(() => {
-    const positioner = positionerEl
-    if (!isOpen || !controlEl || !positioner) return
-    // The focus stays in the field: placement and dismissal only.
-    return untrack(() => {
-      const popover = attachPopover(controlEl!, positioner, { sameWidth: true, gutter: 4, onDismiss: () => machine.send({ type: 'CLOSE' }) })
-      return () => popover.destroy()
-    })
+  const triggerAttrs = $derived.by(() => {
+    const { onclick: _toggle, ...attrs } = api.triggerProps
+    return attrs
   })
-
+  let inheritedStyle = $state('')
+  let inheritedDir = $state<'ltr' | 'rtl'>('ltr')
+  $effect(() => {
+    if (!isOpen || !controlEl) return
+    const computed = getComputedStyle(controlEl)
+    const vars: string[] = []
+    for (let i = 0; i < computed.length; i++) { const key = computed[i]; if (key.startsWith('--')) vars.push(`${key}:${computed.getPropertyValue(key)}`) }
+    inheritedDir = kit().dir ?? (computed.direction === 'rtl' ? 'rtl' : 'ltr')
+    inheritedStyle = `direction:${inheritedDir};${vars.join(';')}`
+  })
   // Opening, the list stands its time in the middle; walking, it scrolls no more than it must.
   let wasOpen = false
   $effect(() => {
@@ -102,20 +106,28 @@
   })
 </script>
 
+<Primitive.Root bind:open={() => isOpen, next => machine.send(next ? { type: 'OPEN', now: nowTime() } : { type: 'CLOSE' })}>
 <div {...api.rootProps}>
   {#if label && !embedded}<label {...api.labelProps}>{label}</label>{/if}
   <div bind:this={controlEl} {...api.controlProps}>
     <input bind:this={inputEl} {...mergeProps(api.inputProps, form.field.controlProps)} />
-    <button {...api.triggerProps}><span {...api.triggerIconProps}></span></button>
+    <Primitive.Trigger {...triggerAttrs}><span {...api.triggerIconProps}></span></Primitive.Trigger>
   </div>
   {#if api.invalid}<span {...api.errorProps}>{api.errorText}</span>{/if}
   <span {...form.field.errorProps}>{form.error}</span>
   {#if name}<input {...api.hiddenInputProps} />{/if}
-  <div bind:this={positionerEl} {...api.positionerProps}>
-    <div bind:this={contentEl} {...api.contentProps}>
-      {#if snapshot.open}
-        {#each api.times as { time, label: words } (time)}<div {...api.getItemProps(time)}>{words}</div>{/each}
-      {/if}
-    </div>
-  </div>
+  <Primitive.Portal>
+    <Primitive.Content forceMount side="bottom" align="start" sideOffset={4} customAnchor={controlEl} strategy="fixed" trapFocus={false} preventScroll={false} dir={inheritedDir} style={inheritedStyle}
+      onOpenAutoFocus={event => { event.preventDefault(); inputEl?.focus({ preventScroll: true }) }}
+      onCloseAutoFocus={event => event.preventDefault()}>
+      {#snippet child({ props: contentAttrs, wrapperProps })}
+        <div {...wrapperProps} data-scope="time-picker" data-part="positioner" data-backend="bits-ui" data-state={isOpen ? 'open' : 'closed'}>
+          <div bind:this={contentEl} {...mergePrimitiveProps(contentAttrs, api.contentProps, { style: { width: 'var(--bits-floating-anchor-width)', '--gg-available-height': 'var(--bits-floating-available-height)' } })} data-backend="bits-ui" hidden={!isOpen}>
+            {#if isOpen}{#each api.times as { time, label: words } (time)}<div {...api.getItemProps(time)}>{words}</div>{/each}{/if}
+          </div>
+        </div>
+      {/snippet}
+    </Primitive.Content>
+  </Primitive.Portal>
 </div>
+</Primitive.Root>

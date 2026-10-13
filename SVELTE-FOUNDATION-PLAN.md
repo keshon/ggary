@@ -607,3 +607,26 @@ focused date to GGary preview endpoint attributes. This is presentation state;
 Bits retains draft selection and keyboard ownership. Both forward and backward
 previews now paint rounded caps using existing theme rules. All 3 focused browser
 cases and typecheck pass; keyboard preview was visually verified in docs.
+
+## TimePicker popup checkpoint (2026-10-13)
+
+Replaced Svelte TimePicker attachPopover with Bits Popover: portal, anchor sizing,
+placement, dismissal and popup lifecycle now belong to Bits. Input focus stays in
+the time field, outside clicks retain their target focus, and locale/theme/dir
+variables reach portalled content. Existing time parsing, off-step Enter commits,
+list navigation and option constraints are retained for this checkpoint.
+
+Combined datetime browser coverage found a reset defect: DateTimeField reset its
+internal halves but left the internally updated bindable value unchanged. Reset
+now restores the submitted initial ISO datetime too. Standalone TimePicker uses
+its RESET event to clear editing/invalid/open state when resetting.
+
+Validation: 41 Chromium pilot cases, 590 contract/SSR cases, 13 focused time
+conformance cases, zero TS/Svelte diagnostics and docs production build passed.
+New browser cases cover anchoring/width, disabled options, selection, typed off-step
+times, Escape, outside focus, standalone reset and combined date/time submission.
+
+TimePicker remains unresolved: decide the list interaction owner next, preserving
+its distinction between typed times and walked options. Remaining unresolved
+components still total 3: TimePicker, Cascader and Shell. Package release gates
+remain separate. No claim of a complete TimePicker interaction migration yet.
