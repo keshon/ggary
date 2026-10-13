@@ -28,8 +28,11 @@ it('submits canonical slider values, enforces the minimum gap, and resets both c
  const thumb = sliders[0].getBoundingClientRect()
  expect(thumb.width).toBeGreaterThan(0)
  expect(Math.abs(thumb.x + thumb.width / 2 - (rect.x + rect.width * 0.4))).toBeLessThan(2)
+ expect(Math.abs(thumb.y + thumb.height / 2 - (rect.y + rect.height / 2))).toBeLessThan(1)
  const rangeControl = host.querySelector<HTMLElement>('[data-scope=range-slider][data-part=control]')!
  const rangeRect = rangeControl.getBoundingClientRect()
+ const rangeThumb = host.querySelector<HTMLElement>('[data-scope=range-slider][data-part=thumb-handle]')!.getBoundingClientRect()
+ expect(Math.abs(rangeThumb.y + rangeThumb.height / 2 - (rangeRect.y + rangeRect.height / 2))).toBeLessThan(1)
  const fill = rangeControl.querySelector<HTMLElement>('[data-part=range]')!.getBoundingClientRect()
  expect(Math.abs(fill.width - rangeRect.width * 0.5)).toBeLessThan(2)
  await userEvent.click(control); await settle()
