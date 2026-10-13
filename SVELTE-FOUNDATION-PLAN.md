@@ -362,3 +362,31 @@ Previous two hosted checkpoints (sliders and native choices) passed CI.
 
 Local gates passed: 42 focused cross-framework conformance cases, 12 Node SSR
 cases, the new Chromium group case, TypeScript/Svelte checks and diff whitespace checks.
+
+## ChipGroup Bits checkpoint (2026-10-13)
+
+Svelte ChipGroup now uses Bits ToggleGroup for toggle interaction and roving
+arrow/Home/End focus. Removed createChipGroupMachine, subscription/SYNC effects,
+core connect keyboard handlers and focus nonce from this adapter. Core machines
+remain for other framework consumers. GGary owns item-order public selection,
+single-mode exclusivity with deselection, label typeahead, removal requests,
+canonical hidden form values and reset. ToggleGroup's multiple mode preserves
+pressed-button semantics; single-mode policy constrains the public array.
+Internal JSON key encoding keeps an empty public key usable. Removal focus
+recovery runs only when a previously focused DOM node is actually removed.
+
+The existing chip conformance cases and a Chromium pilot cover keyboard focus,
+disabled skipping, toggling, typeahead, empty keys, submission/reset, removal
+and single-mode deselection. Added Node SSR submission/button coverage. Previous
+native-group checkpoint passed hosted CI.
+
+Remaining unresolved components: 12: NumberField, Field, Fieldset, Form; Toolbar,
+Ribbon, Toast/Toaster; Calendar, DatePicker, TimePicker, Cascader and Shell.
+Package/installed-consumer release gates remain additional work.
+Next: NumberField and the form ownership contract review.
+
+Final local gates: 42 focused chip conformance cases, 30 Chromium pilot cases,
+13 Node SSR cases, both anatomy contracts, TypeScript/Svelte checks and docs build.
+The full Chromium run caught blur firing during node removal before disconnection;
+focus tracking now clears on a real focus transfer and retains removal recovery.
+No whole fast-suite rerun is claimed; hosted CI remains that gate after push.

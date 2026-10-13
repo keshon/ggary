@@ -1,3 +1,4 @@
+import ChipsPilot from './fixtures/BitsChipsPilot.svelte'
 import NativeGroupsPilot from './fixtures/SvelteNativeGroupsPilot.svelte'
 import NativeChoicesPilot from './fixtures/SvelteNativeChoicesPilot.svelte'
 import SlidersPilot from './fixtures/BitsSlidersPilot.svelte'
@@ -113,4 +114,11 @@ it('server renders native option groups without DOM validation work', () => {
  expect(body).toContain('name="view"')
  expect(body).toContain('type="radio"')
  expect(body).toContain('Card A')
+})
+
+it('server renders chip buttons and unencoded public submission values', () => {
+ const { body } = render(ChipsPilot)
+ expect(body).toContain('role="toolbar"')
+ expect(body).toContain('aria-pressed="true"')
+ expect(body).toContain('name="tags" value=""')
 })
