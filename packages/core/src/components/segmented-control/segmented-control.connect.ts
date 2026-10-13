@@ -55,6 +55,7 @@ export function connect<T = Dict>(props: SegmentedControlProps, normalize: Norma
     value,
     items,
     getItemProps,
+    indicatorProps: normalize({ ...anatomy.attrs('indicator'), 'aria-hidden': 'true' }),
     rootProps: normalize({
       ...anatomy.attrs('root'),
       id,

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { getConfig } from '../config-provider/context'
-  import { connect, type SegmentedControlSize, type SegmentedItem } from '@ggary/core/segmented-control'
+  import { connect, observeSegmentedIndicator, type SegmentedControlSize, type SegmentedItem } from '@ggary/core/segmented-control'
   import { onFormReset, svelteNormalizer, uid } from '@ggary/core'
-  import { untrack } from 'svelte'
+  import { onMount, untrack } from 'svelte'
 
   type Props = {
     items: SegmentedItem[]
@@ -30,6 +30,7 @@
   const initial = untrack(() => value ?? null)
 
   let root: HTMLDivElement
+  onMount(() => observeSegmentedIndicator(root))
   // A native reset rewrites the radios without an event; Svelte set `checked`
   // as a property, which is not what a reset restores to.
   $effect(() =>
@@ -50,6 +51,7 @@
 </script>
 
 <div bind:this={root} {...api.rootProps}>
+  <span {...api.indicatorProps}></span>
   {#each items as item, index (item.value)}
     {@const parts = api.getItemProps(item, index)}
     <label {...parts.itemProps}>

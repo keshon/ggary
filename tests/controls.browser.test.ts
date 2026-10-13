@@ -44,6 +44,22 @@ const views = [
 ]
 
 describe('segmented control in a real browser', () => {
+  it('moves one indicator between segments with different widths', async () => {
+    const host = await mount(h(SegmentedControl, { label: 'View mode', items: views, defaultValue: 'list' }))
+    const control = part(host, 'segmented-control', 'root')
+    const indicator = part(control, 'segmented-control', 'indicator')
+    const items = [...control.querySelectorAll<HTMLElement>('[data-part="item"]')]
+
+    expect(control.dataset.indicatorReady).toBe('')
+    expect(parseFloat(control.style.getPropertyValue('--segmented-indicator-width'))).toBeCloseTo(items[0].getBoundingClientRect().width, 1)
+    expect(indicator.getAttribute('aria-hidden')).toBe('true')
+
+    await userEvent.click(items[2])
+    await frames(1)
+    expect(parseFloat(control.style.getPropertyValue('--segmented-indicator-x'))).toBeCloseTo(items[2].getBoundingClientRect().left - control.getBoundingClientRect().left, 1)
+    expect(parseFloat(control.style.getPropertyValue('--segmented-indicator-width'))).toBeCloseTo(items[2].getBoundingClientRect().width, 1)
+  })
+
   it('is one tab stop, and the arrow keys move the choice — the browser’s own, not ours', async () => {
     const host = await mount(
       h('button', { key: 'before', id: 'before' }, 'Before'),

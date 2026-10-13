@@ -21,6 +21,23 @@
   line-height: var(--ggarry-line-height-tight);
 }
 
+[data-scope='segmented-control'][data-part='indicator'] {
+  inset-block: var(--segmented-inset);
+  left: var(--segmented-indicator-x, var(--segmented-inset));
+  inline-size: var(--segmented-indicator-width, 0);
+  border: 1px solid var(--ggarry-border-default);
+  border-radius: max(var(--ggarry-radius-mark), calc(var(--segmented-radius) - var(--segmented-inset)));
+  background: var(--ggarry-bg-surface);
+  box-shadow: var(--ggarry-shadow-sm);
+  opacity: 0;
+  transition: left var(--ggarry-duration-normal) var(--ggarry-easing-settle),
+    inline-size var(--ggarry-duration-normal) var(--ggarry-easing-settle),
+    opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+[data-scope='segmented-control'][data-part='root'][data-indicator-ready] > [data-part='indicator'] {
+  opacity: 1;
+}
+
 [data-scope='segmented-control'][data-part='item'] {
   min-block-size: var(--ggarry-size-control-sm);
   padding-inline: var(--ggarry-space-3);
@@ -48,10 +65,13 @@
 }
 
 [data-scope='segmented-control'][data-part='item'][data-state='checked'] {
+  color: var(--ggarry-text-default);
+}
+/* Server markup and the first pre-measurement frame still show a selection. */
+[data-scope='segmented-control'][data-part='root']:not([data-indicator-ready]) > [data-part='item'][data-state='checked'] {
   background: var(--ggarry-bg-surface);
   border-color: var(--ggarry-border-default);
   box-shadow: var(--ggarry-shadow-sm);
-  color: var(--ggarry-text-default);
 }
 
 [data-scope='segmented-control'][data-part='item'][data-disabled] {
@@ -72,8 +92,12 @@
     border-color: Highlight;
     color: Highlight;
   }
+  [data-scope='segmented-control'][data-part='indicator'] {
+    border-color: Highlight;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   [data-scope='segmented-control'][data-part='item'] { transition: none; }
+  [data-scope='segmented-control'][data-part='indicator'] { transition: none; }
 }

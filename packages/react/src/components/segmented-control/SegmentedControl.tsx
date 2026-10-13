@@ -1,5 +1,5 @@
-import { useId, useRef, useState } from 'react'
-import { connect, type SegmentedControlSize, type SegmentedItem } from '@ggary/core/segmented-control'
+import { useId, useLayoutEffect, useRef, useState } from 'react'
+import { connect, observeSegmentedIndicator, type SegmentedControlSize, type SegmentedItem } from '@ggary/core/segmented-control'
 import { reactNormalizer } from '@ggary/core'
 import { useFormReset } from '../../utils/use-form-reset'
 import { useConfigured } from '../config-provider'
@@ -39,9 +39,11 @@ export function SegmentedControl(props: SegmentedControlProps) {
 
   const root = useRef<HTMLDivElement>(null)
   useFormReset(root, () => setUncontrolled(defaultValue))
+  useLayoutEffect(() => observeSegmentedIndicator(root.current!), [])
 
   return (
     <div ref={root} {...api.rootProps}>
+      <span {...api.indicatorProps} />
       {items.map((item, index) => {
         const parts = api.getItemProps(item, index)
         return (

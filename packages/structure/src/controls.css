@@ -5,10 +5,15 @@
 /* --- segmented control ------------------------------------------------------ */
 
 [data-scope='segmented-control'][data-part='root'] {
+  position: relative;
   display: inline-flex;
   align-items: stretch;
   max-inline-size: 100%;
   vertical-align: middle;
+}
+[data-scope='segmented-control'][data-part='indicator'] {
+  position: absolute;
+  pointer-events: none;
 }
 [data-scope='segmented-control'][data-part='root'][data-full-width] {
   display: flex;
@@ -19,6 +24,7 @@
 
 [data-scope='segmented-control'][data-part='item'] {
   position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
