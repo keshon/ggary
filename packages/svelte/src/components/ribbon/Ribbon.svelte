@@ -1,14 +1,9 @@
 <script lang="ts">
-  import {
-    connect,
-    createRibbonMachine,
-    type RibbonItem,
-    type RibbonVariant,
-  } from '@ggary/core/ribbon'
-  import { focusTab, svelteNormalizer, uid } from '@ggary/core'
-  import { attachRibbonScrollers } from '@ggary/core'
+  import { Tabs as Primitive } from 'bits-ui'
+  import type { RibbonItem, RibbonVariant } from '@ggary/core/ribbon'
+  import { attachRibbonScrollers, uid } from '@ggary/core'
   import { untrack, type Snippet } from 'svelte'
-
+  import { getConfig } from '../config-provider/context'
   type Props = {
     items: RibbonItem[]
     /** Bindable: `bind:value`. A one-way `value` works too. */
@@ -38,53 +33,39 @@
     ...rest
   }: Props = $props()
 
+
   const id = uid('gg-ribbon')
-
-  const machine = untrack(() =>
-    createRibbonMachine({
-      id,
-      items,
-      defaultValue: value !== undefined ? value : defaultValue,
-      onValueChange: (next) => {
-        value = next
-        onValueChange?.(next)
-      },
-    })
-  )
-
-  let snapshot = $state(machine.getState())
-  $effect(() => machine.subscribe((next) => (snapshot = next)))
-
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { label, variant }))
-
-  $effect(() => machine.send({ type: 'SYNC_ITEMS', items }))
+  const kit = getConfig()
+  untrack(() => { if (value === undefined) value = defaultValue !== undefined ? defaultValue : items.find(item => !item.disabled)?.value ?? null })
+  const part = (name: string) => ({ 'data-scope': 'ribbon', 'data-part': name, 'data-backend': 'bits-ui' })
+  const itemId = (key: string) => `${id}-${encodeURIComponent(key)}`
+  function changed(next: string) { if (next === value) return; value = next; onValueChange?.(next) }
   $effect(() => {
-    if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value })
-  })
-
-  // Roving focus moves only when the machine asks (the nonce), never on a re-render.
-  let lastFocusNonce = 0
-  $effect(() => {
-    const { focusNonce, focusValue } = api
-    if (focusNonce === 0 || focusNonce === lastFocusNonce || focusValue === null) return
-    lastFocusNonce = focusNonce
-    untrack(() => focusTab(document, api.ids.tab(focusValue)))
+    if (value !== null && !items.some(item => item.value === value && !item.disabled)) {
+      const next = items.find(item => !item.disabled)?.value
+      if (next !== undefined) changed(next)
+      else value = null
+    }
   })
 </script>
 
-<div {...rest} {...api.rootProps} {@attach (node) => attachRibbonScrollers(node)}>
-  <div {...api.tabListProps}>
-    {#each api.items as item (item.value)}
-      <div {...api.getTabProps(item)}>
-        <span {...api.getTabTextProps()}>{item.label}</span>
-      </div>
-    {/each}
-  </div>
-  {#if panel}
-    {#each api.items as item (item.value)}
-      {#if keepMounted || item.value === snapshot.value}
-        <div {...api.getPanelProps(item)}>{@render panel(item)}</div>
+  <Primitive.Root bind:value={() => value === null ? '' : `gg:${value}`, next => { if (next) changed(next.slice(3)) }} loop dir={kit().dir}>
+    {#snippet child({ props: primitiveProps })}
+    <div {...primitiveProps} {...rest} {...part('root')} {id} data-variant={variant ?? 'strip'} {@attach (node) => attachRibbonScrollers(node)}>
+      <Primitive.List {...part('tab-list')} aria-label={label} data-variant={variant ?? 'strip'}>
+        {#each items as item (item.value)}
+          <Primitive.Trigger {...part('tab')} id={`${itemId(item.value)}-tab`} value={`gg:${item.value}`} disabled={item.disabled} aria-disabled={item.disabled ? 'true' : undefined} data-value={item.value} data-state={value === item.value ? 'active' : 'inactive'}>
+            <span {...part('tab-text')}>{item.label}</span>
+          </Primitive.Trigger>
+        {/each}
+      </Primitive.List>
+      {#if panel}
+        {#each items as item (item.value)}
+          <Primitive.Content {...part('panel')} id={`${itemId(item.value)}-panel`} value={`gg:${item.value}`} data-value={item.value} data-state={value === item.value ? 'active' : 'inactive'}>
+            {#if keepMounted || value === item.value}{@render panel(item)}{/if}
+          </Primitive.Content>
+        {/each}
       {/if}
-    {/each}
-  {/if}
-</div>
+    </div>
+    {/snippet}
+  </Primitive.Root>

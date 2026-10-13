@@ -1,3 +1,4 @@
+import RibbonPilot from './fixtures/BitsRibbonPilot.svelte'
 import FormContractsPilot from './fixtures/SvelteFormContractsPilot.svelte'
 import NumberField from '../packages/svelte/src/components/number-field/NumberField.svelte'
 import ChipsPilot from './fixtures/BitsChipsPilot.svelte'
@@ -136,4 +137,11 @@ it('server renders the form and its native constraints without browser globals',
  expect(body).toContain('value="4"')
  expect(body).toContain('required')
  expect(body).toContain('Disabled controls')
+})
+
+it('server renders Ribbon tabs with an empty-key selected panel', () => {
+ const { body } = render(RibbonPilot)
+ expect(body).toContain('role="tablist"')
+ expect(body).toContain('aria-selected="true"')
+ expect(body).toContain('Draft Empty')
 })

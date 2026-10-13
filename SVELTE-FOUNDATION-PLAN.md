@@ -421,3 +421,25 @@ form cases and TypeScript/Svelte checks passed. Hosted CI for the previous
 ChipGroup checkpoint exposed a source-heuristic false positive: its internal
 Bits snippet spread was named props and classified as consumer passthrough.
 Renamed it primitiveProps; no behavior or public attribute contract changed.
+
+## Ribbon tab checkpoint (2026-10-13)
+
+Ribbon tab selection and keyboard/focus now use Bits Tabs. Removed the Svelte
+createRibbonMachine subscription/SYNC/focus-nonce path. Kept public bindings,
+default selection, invalid/removed selection fallback, panel retention, anatomy,
+variant and GGary horizontal-scroller attachment. Encoded values distinguish
+an empty public key from no selection. Actual root DOM remains the same layout
+boundary; primitive render props are explicitly named primitiveProps.
+
+Chromium covers empty-key selection, disabled-tab skipping, automatic keyboard
+activation, retained draft input state and ARIA panel links. SSR covers initial
+selection and panel markup.
+
+This is a staged Ribbon checkpoint, not a completed Toolbar/Ribbon migration.
+Both remain in the unresolved count of 8. Next: add Svelte ToolbarButton backed
+by Bits Toolbar, migrate managed Toolbar and RibbonGroup, and update consumers.
+Expose an unmanaged path for mixed controls, matching the React contract.
+
+Local gates passed: the Ribbon Chromium case, all 16 SSR cases, all 569
+contract cases, TypeScript/Svelte checks and docs production build. Previous
+form checkpoint hosted CI passed on run 38366760078.

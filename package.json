@@ -10,7 +10,7 @@
     "assets": "node packages/icons/build.mjs && node packages/theme-ggarry/build.mjs",
     "dev": "npm run assets && npm run dev -w @ggary/docs",
     "test": "npm run assets && vitest run",
-    "test:svelte-pilot:browser": "vitest run tests/bits-pilot.browser.test.ts tests/bits-combobox.browser.test.ts tests/bits-overlays.browser.test.ts tests/bits-menus.browser.test.ts tests/bits-domain-menus.browser.test.ts tests/bits-composites.browser.test.ts tests/bits-disclosure.browser.test.ts tests/bits-sliders.browser.test.ts tests/svelte-native-choices.browser.test.ts tests/svelte-native-groups.browser.test.ts tests/bits-chips.browser.test.ts tests/svelte-form-contracts.browser.test.ts --project browser --maxWorkers 1",
+    "test:svelte-pilot:browser": "vitest run tests/bits-pilot.browser.test.ts tests/bits-combobox.browser.test.ts tests/bits-overlays.browser.test.ts tests/bits-menus.browser.test.ts tests/bits-domain-menus.browser.test.ts tests/bits-composites.browser.test.ts tests/bits-disclosure.browser.test.ts tests/bits-sliders.browser.test.ts tests/svelte-native-choices.browser.test.ts tests/svelte-native-groups.browser.test.ts tests/bits-chips.browser.test.ts tests/svelte-form-contracts.browser.test.ts tests/bits-ribbon.browser.test.ts --project browser --maxWorkers 1",
     "test:fast": "npm run assets && vitest run --project machine --project contract --project dom --project svelte-ssr",
     "test:watch": "vitest",
     "typecheck": "npm run assets && tsc -p tsconfig.json --noEmit && svelte-check --tsconfig ./tsconfig.json --fail-on-warnings --threshold warning",
