@@ -23,6 +23,13 @@
   border-radius: 0;
   box-shadow: none;
 }
+/* The group is one physical control. Individual buttons still change tone on
+   hover and press, but lifting one segment would break its shared silhouette. */
+[data-scope='button-group'][data-part='root'] > [data-scope='button'][data-part='root']:is(:hover, :active),
+[data-scope='button-group'][data-part='root'] > * > [data-scope='button'][data-part='root']:is(:hover, :active) {
+  box-shadow: none;
+  transform: none;
+}
 [data-scope='button-group'][data-part='root'] > * + * > [data-scope='button'][data-part='root'],
 [data-scope='button-group'][data-part='root'] > * + [data-scope='button'][data-part='root'] {
   border-inline-start: 1px solid var(--ggarry-border-default);

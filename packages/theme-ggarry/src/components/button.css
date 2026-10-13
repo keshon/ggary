@@ -8,9 +8,9 @@
 
    GGarry's answers to the four emphasis levels:
 
-     high     solid accent fill
-     medium   neutral outline — the antd-style default button
-     low      accent-tinted fill, no border
+     high     layered accent fill
+     medium   layered neutral outline — the antd-style default button
+     low      layered accent-tinted fill, no border
      minimal  nothing until hover
 
    Every level only re-points the local custom properties below, so a variant
@@ -23,10 +23,21 @@
   --button-font-size: var(--ggarry-font-size-md);
 
   /* medium emphasis is the base: it is the default core emits */
-  --button-bg: transparent;
+  --button-bg: var(--ggarry-bg-surface);
   --button-bg-hover: var(--ggarry-bg-subtle);
   --button-fg: var(--ggarry-text-default);
   --button-border: var(--ggarry-border-strong);
+  --button-layer-weight: 86%;
+  --button-layer-hover-weight: 82%;
+  --button-highlight-weight: 58%;
+  --button-layer-top: color-mix(in oklab, var(--button-bg) var(--button-layer-weight), var(--ggarry-bg-thumb));
+  --button-layer-hover-top: color-mix(in oklab, var(--button-bg-hover) var(--button-layer-hover-weight), var(--ggarry-bg-thumb));
+  --button-highlight: color-mix(in oklab, var(--ggarry-bg-thumb) var(--button-highlight-weight), transparent);
+  --button-depth: linear-gradient(to bottom, var(--button-layer-top), var(--button-bg));
+  --button-depth-hover: linear-gradient(to bottom, var(--button-layer-hover-top), var(--button-bg-hover));
+  --button-depth-active: linear-gradient(to bottom, var(--button-bg), var(--button-layer-top));
+  --button-shadow: inset 0 1px 0 var(--button-highlight), var(--ggarry-shadow-sm);
+  --button-shadow-active: inset 0 1px 2px color-mix(in oklab, var(--ggarry-border-control) 45%, transparent);
 
   display: inline-flex;
   align-items: center;
@@ -40,22 +51,44 @@
   line-height: 1;
   white-space: nowrap;
   color: var(--button-fg);
-  background: var(--button-bg);
+  background: var(--button-depth);
   border: 1px solid var(--button-border);
   /* A corner grows with the control: a constant is a pill on a small one and a
      square on a large one. */
   border-radius: var(--button-radius, var(--ggarry-radius-control-md));
+  box-shadow: var(--button-shadow);
   cursor: pointer;
   user-select: none;
-  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard),
-    color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    box-shadow var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    color var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    transform var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+
+/* A light-mode highlight is mostly white; the same mix looks glossy on a dark
+   surface. Dark buttons keep the layer, but the tonal step is much quieter. */
+[data-mode='dark'] [data-scope='button'][data-part='root'] {
+  --button-layer-weight: 94%;
+  --button-layer-hover-weight: 91%;
+  --button-highlight-weight: 20%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode='light']) [data-scope='button'][data-part='root'] {
+    --button-layer-weight: 94%;
+    --button-layer-hover-weight: 91%;
+    --button-highlight-weight: 20%;
+  }
 }
 
 [data-scope='button'][data-part='root']:hover:not([data-disabled]) {
-  background: var(--button-bg-hover);
+  background: var(--button-depth-hover);
+  transform: translateY(-1px);
 }
 
 [data-scope='button'][data-part='root']:active:not([data-disabled]) {
+  background: var(--button-depth-active);
+  box-shadow: var(--button-shadow-active);
   transform: translateY(0.5px);
 }
 
@@ -87,6 +120,11 @@
   --button-bg-hover: var(--ggarry-bg-muted);
   --button-fg: var(--ggarry-text-default);
   --button-border: transparent;
+  --button-depth: var(--button-bg);
+  --button-depth-hover: var(--button-bg-hover);
+  --button-depth-active: var(--button-bg-hover);
+  --button-shadow: none;
+  --button-shadow-active: none;
 }
 
 /* --- tone ----------------------------------------------------------------
