@@ -1,4 +1,4 @@
-name: React foundation
+name: Framework foundation
 on:
   pull_request:
   push:
@@ -21,7 +21,7 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium
       - run: npm run verify:react
-      - name: Svelte Bits UI pilot in Chromium
+      - name: Svelte foundation in Chromium
         run: npm run test:svelte-pilot:browser
       - name: Installed Svelte package consumer
         run: npm run smoke:svelte-packages

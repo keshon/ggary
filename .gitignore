@@ -4,3 +4,5 @@ dist/
 *.tsbuildinfo
 
 .svelte-kit/
+.claude/
+audits/
