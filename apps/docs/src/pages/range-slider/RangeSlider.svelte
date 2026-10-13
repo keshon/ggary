@@ -12,21 +12,21 @@
   {#snippet variants()}
     {#each DISPLAYS as valueDisplay (valueDisplay)}
       <Specimen label={`valueDisplay="${valueDisplay}"`} wide>
-        <RangeSlider label="Price" {valueDisplay} prefix="€" min={0} max={200} step={5} defaultValue={[40, 120]} formatValue={euro} />
+        <RangeSlider label="Price" {valueDisplay} prefix="€" min={0} max={200} defaultValue={[40, 120]} formatValue={euro} />
       </Specimen>
     {/each}
   {/snippet}
   {#snippet sizes()}
     {#each SIZES as size (size)}
-      <Specimen label={`size="${size}"`} wide><RangeSlider {size} label="Price" min={0} max={200} step={5} defaultValue={[40, 120]} formatValue={euro} /></Specimen>
+      <Specimen label={`size="${size}"`} wide><RangeSlider {size} label="Price" min={0} max={200} defaultValue={[40, 120]} formatValue={euro} /></Specimen>
     {/each}
   {/snippet}
   {#snippet states()}
     <Specimen label={`valueDisplay="bubbles" defaultValue={[60, 75]}`} wide>
-      <RangeSlider label="Budget" valueDisplay="bubbles" min={0} max={200} step={5} defaultValue={[60, 75]} formatValue={euro} />
+      <RangeSlider label="Budget" valueDisplay="bubbles" min={0} max={200} defaultValue={[60, 75]} formatValue={euro} />
     </Specimen>
     <Specimen label="disabled" wide><RangeSlider label="Retries" min={0} max={10} defaultValue={[1, 3]} marks={[0, 5, 10]} disabled /></Specimen>
-    <Specimen label="invalid" wide><RangeSlider label="Price" min={0} max={200} step={5} defaultValue={[0, 200]} formatValue={euro} invalid /></Specimen>
+    <Specimen label="invalid" wide><RangeSlider label="Price" min={0} max={200} defaultValue={[0, 200]} formatValue={euro} invalid /></Specimen>
   {/snippet}
   {#snippet composition()}
     <Specimen label="marks" wide>

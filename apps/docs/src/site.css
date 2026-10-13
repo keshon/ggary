@@ -141,6 +141,17 @@ body {
   display: block;
   padding: 20px;
 }
+/* Slider steps are semantic values, so an extremely long demo rail turns even
+   a sensible step into a visible pixel jump. Keep the specimen representative;
+   applications still choose the rail width through their own layout. */
+.specimen-stage :is(
+  [data-scope='slider'][data-part='root'],
+  [data-scope='range-slider'][data-part='root']
+) {
+  inline-size: 100%;
+  max-inline-size: 40rem;
+  margin-inline: auto;
+}
 .specimen-label {
   padding: 8px 12px;
   border-block-start: 1px solid var(--gg-border);

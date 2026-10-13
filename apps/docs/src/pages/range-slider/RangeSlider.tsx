@@ -27,24 +27,24 @@ export default function RangeSliderPage() {
     <DemoPage
       variants={DISPLAYS.map((valueDisplay) => (
         <Specimen key={valueDisplay} label={`valueDisplay="${valueDisplay}"`} wide>
-          <RangeSlider label="Price" valueDisplay={valueDisplay} prefix="€" min={0} max={200} step={5} defaultValue={[40, 120]} formatValue={euro} />
+          <RangeSlider label="Price" valueDisplay={valueDisplay} prefix="€" min={0} max={200} defaultValue={[40, 120]} formatValue={euro} />
         </Specimen>
       ))}
       sizes={SIZES.map((size) => (
         <Specimen key={size} label={`size="${size}"`} wide>
-          <RangeSlider size={size} label="Price" min={0} max={200} step={5} defaultValue={[40, 120]} formatValue={euro} />
+          <RangeSlider size={size} label="Price" min={0} max={200} defaultValue={[40, 120]} formatValue={euro} />
         </Specimen>
       ))}
       states={
         <>
           <Specimen label={`valueDisplay="bubbles" defaultValue={[60, 75]}`} wide>
-            <RangeSlider label="Budget" valueDisplay="bubbles" min={0} max={200} step={5} defaultValue={[60, 75]} formatValue={euro} />
+            <RangeSlider label="Budget" valueDisplay="bubbles" min={0} max={200} defaultValue={[60, 75]} formatValue={euro} />
           </Specimen>
           <Specimen label="disabled" wide>
             <RangeSlider label="Retries" min={0} max={10} defaultValue={[1, 3]} marks={[0, 5, 10]} disabled />
           </Specimen>
           <Specimen label="invalid" wide>
-            <RangeSlider label="Price" min={0} max={200} step={5} defaultValue={[0, 200]} formatValue={euro} invalid />
+            <RangeSlider label="Price" min={0} max={200} defaultValue={[0, 200]} formatValue={euro} invalid />
           </Specimen>
         </>
       }

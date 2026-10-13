@@ -56,7 +56,7 @@ describe('field control width contract', () => {
   })
 
   it('lets Field composition own the row and reserves a wider stable range picker', () => {
-    const fieldHost = mount([h(Field, { key: 'field', label: 'Stage' }, h(Select, { items: choices }))], 420)
+    const fieldHost = mount([h(Field, { key: 'field', label: 'Stage', children: h(Select, { items: choices }) })], 420)
     fieldHost.style.alignItems = 'stretch'
     expect(fieldHost.querySelector<HTMLElement>('[data-scope="select"][data-part="root"]')!.getBoundingClientRect().width).toBeCloseTo(420, 0)
 

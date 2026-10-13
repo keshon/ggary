@@ -10,7 +10,7 @@ export default function SliderPage() {
       variants={
         <>
           <Specimen label="showValue" wide>
-            <Slider label="Confidence threshold" step={5} defaultValue={80} showValue />
+            <Slider label="Confidence threshold" defaultValue={80} showValue />
           </Specimen>
           <Specimen label="marks" wide>
             <Slider label="Retries" min={0} max={10} defaultValue={3} marks={[0, 5, 10]} />
@@ -38,7 +38,7 @@ export default function SliderPage() {
       composition={
         <Specimen label="Field + Slider" wide>
           <Field label="Confidence threshold" hint="Below it the agent asks before acting">
-            <Slider step={5} defaultValue={80} showValue />
+            <Slider defaultValue={80} showValue />
           </Field>
         </Specimen>
       }
