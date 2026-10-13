@@ -79,6 +79,44 @@ body {
   background: none;
   color: inherit;
 }
+.side-search {
+  position: sticky;
+  z-index: 1;
+  inset-block-start: 0;
+  display: grid;
+  align-items: center;
+  margin-block-end: 12px;
+  padding-block-end: 4px;
+  background: var(--gg-page);
+}
+.side-search > * {
+  grid-area: 1 / 1;
+}
+.side-search > [data-scope='search'] {
+  inline-size: 100%;
+}
+.side-search kbd {
+  position: absolute;
+  inset-inline-end: 0;
+  justify-self: end;
+  margin-inline-end: 9px;
+  padding: 1px 5px;
+  border: 1px solid var(--gg-border);
+  border-radius: var(--gg-radius);
+  color: var(--gg-text-muted);
+  background: var(--gg-surface);
+  font: 11px/16px var(--gg-font-mono);
+  pointer-events: none;
+}
+.side-search:focus-within kbd,
+.side-search:has(input:not(:placeholder-shown)) kbd {
+  display: none;
+}
+.side-empty {
+  margin: 24px 12px;
+  color: var(--gg-text-muted);
+  font-size: 14px;
+}
 
 /* --- a page --------------------------------------------------------------------- */
 

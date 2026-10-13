@@ -2,9 +2,9 @@ import '../theme'
 import '../site.css'
 import { implementationFor, implementationBadge } from './implementation'
 
-import { lazy, StrictMode, Suspense, useEffect, useMemo, useState, type ComponentType } from 'react'
+import { lazy, StrictMode, Suspense, useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
 import { createRoot } from 'react-dom/client'
-import { Button, Nav, SegmentedControl } from '@ggary/react'
+import { Button, Nav, Search, SegmentedControl } from '@ggary/react'
 import { FRAMEWORKS, LOGO, currentPage, goToFramework, navGroups, onRouteChange } from '../site'
 import { MODES, getMode, onModeChange, setMode, type Mode } from '../theme'
 
@@ -20,10 +20,29 @@ const capital = (text: string) => text[0].toUpperCase() + text.slice(1)
 function App() {
   const [page, setPage] = useState(currentPage)
   const [mode, setShownMode] = useState<Mode>(getMode)
+  const [navigationQuery, setNavigationQuery] = useState('')
+  const navigationSearch = useRef<HTMLInputElement>(null)
   useEffect(() => onRouteChange(setPage), [])
   useEffect(() => onModeChange(setShownMode), [])
+  useEffect(() => {
+    const focusSearch = (event: KeyboardEvent) => {
+      if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return
+      if ((event.target as Element | null)?.closest('input, textarea, select, [contenteditable="true"]')) return
+      event.preventDefault()
+      const side = document.getElementById('side')
+      if (side && getComputedStyle(side).display === 'none') {
+        side.showPopover()
+        requestAnimationFrame(() => navigationSearch.current?.focus())
+      } else {
+        navigationSearch.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', focusSearch)
+    return () => window.removeEventListener('keydown', focusSearch)
+  }, [])
   const implementation = implementationFor(page.id)
   const Demo = useMemo(() => load(page.id), [page.id])
+  const groups = useMemo(() => navGroups(page, navigationQuery), [page, navigationQuery])
 
   return (
     <div className="site">
@@ -49,7 +68,28 @@ function App() {
           if ((event.target as Element).closest('a') && side.matches(':popover-open')) side.hidePopover()
         }}
       >
-        <Nav label="Components" numbered groups={navGroups(page)} />
+        <div className="side-search">
+          <Search
+            ref={navigationSearch}
+            size="sm"
+            label="Search components"
+            placeholder="Search components…"
+            value={navigationQuery}
+            onValueChange={setNavigationQuery}
+            onKeyDown={(event) => {
+              if (event.key === 'Escape' && navigationQuery) {
+                event.preventDefault()
+                setNavigationQuery('')
+              }
+            }}
+          />
+          <kbd aria-hidden="true">/</kbd>
+        </div>
+        {groups.length ? (
+          <Nav label="Components" numbered={!navigationQuery.trim()} groups={groups} />
+        ) : (
+          <p className="side-empty" role="status">No components found</p>
+        )}
       </aside>
       <main className="main">
         <article className="page" key={page.id}>

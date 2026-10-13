@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Component } from 'svelte'
-  import { Button, Nav, SegmentedControl } from '@ggary/svelte'
+  import { Button, Nav, Search, SegmentedControl } from '@ggary/svelte'
   import { FRAMEWORKS, LOGO, currentPage, goToFramework, navGroups, onRouteChange } from '../site'
   import { MODES, getMode, onModeChange, setMode, type Mode } from '../theme'
 
@@ -12,9 +12,27 @@
 
   let page = $state(currentPage())
   let mode = $state<Mode>(getMode())
+  let navigationQuery = $state('')
   $effect(() => onRouteChange((next) => (page = next)))
   $effect(() => onModeChange((next) => (mode = next)))
+  $effect(() => {
+    const focusSearch = (event: KeyboardEvent) => {
+      if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return
+      if ((event.target as Element | null)?.closest('input, textarea, select, [contenteditable="true"]')) return
+      event.preventDefault()
+      const input = document.querySelector<HTMLInputElement>('#component-search-svelte')
+      if (side && getComputedStyle(side).display === 'none') {
+        side.showPopover()
+        requestAnimationFrame(() => input?.focus())
+      } else {
+        input?.focus()
+      }
+    }
+    window.addEventListener('keydown', focusSearch)
+    return () => window.removeEventListener('keydown', focusSearch)
+  })
   const demo = $derived(load(page.id)?.())
+  const groups = $derived(navGroups(page, navigationQuery))
 
   let side = $state<HTMLElement | null>(null)
   function closeOnLink(event: MouseEvent) {
@@ -38,7 +56,27 @@
   </header>
   <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
   <aside class="side" id="side" popover="" bind:this={side} onclick={closeOnLink}>
-    <Nav label="Components" numbered groups={navGroups(page)} />
+    <div class="side-search">
+      <Search
+        id="component-search-svelte"
+        size="sm"
+        label="Search components"
+        placeholder="Search components…"
+        bind:value={navigationQuery}
+        onkeydown={(event: KeyboardEvent) => {
+          if (event.key === 'Escape' && navigationQuery) {
+            event.preventDefault()
+            navigationQuery = ''
+          }
+        }}
+      />
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    {#if groups.length}
+      <Nav label="Components" numbered={!navigationQuery.trim()} {groups} />
+    {:else}
+      <p class="side-empty" role="status">No components found</p>
+    {/if}
   </aside>
   <main class="main">
     {#key page.id}

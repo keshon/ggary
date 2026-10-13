@@ -43,12 +43,30 @@ export function onRouteChange(listener: (page: DocPage) => void): () => void {
   return () => window.removeEventListener('hashchange', handle)
 }
 
-/** The navigation, from the manifest, with the page being read marked. */
-export function navGroups(current: DocPage): NavGroup[] {
-  return MANIFEST.map((group) => ({
-    label: group.title,
-    items: group.pages.map((page) => ({ label: page.title, href: `#/${page.id}`, current: page.id === current.id })),
-  }))
+const navigationCollator = new Intl.Collator('en', { numeric: true, sensitivity: 'base' })
+const searchable = (value: string) => value.toLocaleLowerCase('en').replace(/[^a-z0-9]+/g, ' ').trim()
+
+/**
+ * The navigation, from the manifest, with the page being read marked. Groups
+ * retain their semantic order; component names are alphabetical within them.
+ * A query matches a component's name, route or group name.
+ */
+export function navGroups(current: DocPage, query = ''): NavGroup[] {
+  const needle = searchable(query)
+
+  return MANIFEST.flatMap((group) => {
+    const groupMatches = searchable(group.title).includes(needle)
+    const pages = [...group.pages]
+      .filter((page) => !needle || groupMatches || searchable(`${page.title} ${page.id}`).includes(needle))
+      .sort((a, b) => navigationCollator.compare(a.title, b.title))
+
+    return pages.length
+      ? [{
+          label: group.title,
+          items: pages.map((page) => ({ label: page.title, href: `#/${page.id}`, current: page.id === current.id })),
+        }]
+      : []
+  })
 }
 
 /**
