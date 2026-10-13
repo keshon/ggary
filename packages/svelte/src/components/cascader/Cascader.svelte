@@ -1,8 +1,9 @@
 <script lang="ts">
+  import { Popover as Primitive, mergeProps as mergePrimitiveProps } from 'bits-ui'
   import { getConfig } from '../config-provider/context'
   import type { ControlSize } from '@ggary/core'
   import { connect, createCascaderMachine, focusCascaderItem, type CascaderNode } from '@ggary/core/cascader'
-  import { attachPopover, onFormReset, svelteNormalizer, uid } from '@ggary/core'
+  import { onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { untrack } from 'svelte'
 
   type Props = {
@@ -57,7 +58,6 @@
   })
 
   let triggerEl = $state<HTMLButtonElement | null>(null)
-  let positionerEl = $state<HTMLDivElement | null>(null)
   let contentEl = $state<HTMLDivElement | null>(null)
 
   $effect(() =>
@@ -67,50 +67,67 @@
     })
   )
 
-  $effect(() => {
-    const positioner = positionerEl
-    if (!isOpen || !triggerEl || !positioner) return
-    return untrack(() => {
-      const popover = attachPopover(triggerEl!, positioner, { placement: 'bottom-start', gutter: 4, sameWidth: false, onDismiss: () => machine.send({ type: 'CLOSE' }) })
-      // The columns are drawn in this same update: focus the highlighted item once they are.
-      queueMicrotask(() => {
-        focusCascaderItem(contentEl, api.focusedId, true)
-      })
-      return () => {
-        const active = document.activeElement
-        const inside = !active || active === document.body || positioner.contains(active)
-        popover.destroy()
-        if (inside) triggerEl?.focus({ preventScroll: true })
-      }
-    })
+  const triggerAttrs = $derived.by(() => {
+    const { onclick: _toggle, ...attrs } = api.triggerProps
+    return attrs
   })
-
+  let inheritedStyle = $state('')
+  let inheritedDir = $state<'ltr' | 'rtl'>('ltr')
+  $effect(() => {
+    if (!isOpen || !triggerEl) return
+    const computed = getComputedStyle(triggerEl)
+    const vars: string[] = []
+    for (let i = 0; i < computed.length; i++) { const key = computed[i]; if (key.startsWith('--')) vars.push(`${key}:${computed.getPropertyValue(key)}`) }
+    inheritedDir = kit().dir ?? (computed.direction === 'rtl' ? 'rtl' : 'ltr')
+    inheritedStyle = `direction:${inheritedDir};${vars.join(';')}`
+  })
+  let outside = false
+  let wasOpen = false
+  $effect(() => {
+    if (isOpen) outside = false
+    else if (wasOpen && !outside) queueMicrotask(() => {
+      if (!snapshot.open && !outside && triggerEl?.isConnected) triggerEl.focus({ preventScroll: true })
+    })
+    wasOpen = isOpen
+  })
   $effect(() => {
     const id = api.focusedId
     untrack(() => focusCascaderItem(contentEl, id))
   })
 </script>
 
+<Primitive.Root bind:open={() => isOpen, next => machine.send({ type: next ? 'OPEN' : 'CLOSE' })}>
 <div {...api.rootProps}>
   {#if label}<label {...api.labelProps}>{label}</label>{/if}
-  <button bind:this={triggerEl} {...api.triggerProps}>
+  <Primitive.Trigger bind:ref={triggerEl} {...triggerAttrs}>
     <!-- One line: whitespace between the segments would be read out and drawn. -->
     <span {...api.valueProps}>{#if api.chosen.length === 0}{api.placeholder}{:else}{#each api.chosen as node, i (node.value)}{#if i > 0}<span {...api.separatorProps}></span>{/if}<span {...api.valueItemProps}>{node.label}</span>{/each}{/if}</span>
     <span {...api.indicatorProps}></span>
-  </button>
-  <div bind:this={positionerEl} {...api.positionerProps}>
-    <div bind:this={contentEl} {...api.contentProps}>
-      {#each api.columns as column, level (level)}
-        <ul {...api.getColumnProps(level)}>
-          {#each column as node (node.value)}
-            <li {...api.getItemProps(node, level)}>
-              <span {...api.itemTextProps}>{node.label}</span>
-              {#if api.hasChildren(node)}<span {...api.getItemBranchProps(node, level)}></span>{:else}<span {...api.itemIndicatorProps}></span>{/if}
-            </li>
-          {/each}
-        </ul>
-      {/each}
-    </div>
-  </div>
+  </Primitive.Trigger>
+  <Primitive.Portal>
+    <Primitive.Content forceMount id={api.ids.content} side="bottom" align="start" sideOffset={4} customAnchor={triggerEl} strategy="fixed" trapFocus={false} preventScroll={false} dir={inheritedDir} style={inheritedStyle}
+      onInteractOutside={() => { outside = true }}
+      onOpenAutoFocus={event => { event.preventDefault(); focusCascaderItem(contentEl, api.focusedId, true) }}
+      onCloseAutoFocus={event => { event.preventDefault(); if (!outside) triggerEl?.focus({ preventScroll: true }) }}>
+      {#snippet child({ props: contentAttrs, wrapperProps })}
+        <div {...wrapperProps} data-scope="cascader" data-part="positioner" data-backend="bits-ui" data-state={isOpen ? 'open' : 'closed'}>
+          <div bind:this={contentEl} {...mergePrimitiveProps(contentAttrs, api.contentProps, { style: { '--gg-available-width': 'var(--bits-floating-available-width)', '--gg-available-height': 'var(--bits-floating-available-height)' } })} data-backend="bits-ui" hidden={!isOpen}>
+            {#each api.columns as column, level (level)}
+              <ul {...api.getColumnProps(level)}>
+                {#each column as node (node.value)}
+                  <li {...api.getItemProps(node, level)}>
+                    <span {...api.itemTextProps}>{node.label}</span>
+                    {#if api.hasChildren(node)}<span {...api.getItemBranchProps(node, level)}></span>{:else}<span {...api.itemIndicatorProps}></span>{/if}
+                  </li>
+                {/each}
+              </ul>
+            {/each}
+          </div>
+        </div>
+      {/snippet}
+    </Primitive.Content>
+  </Primitive.Portal>
   {#if name}<input {...api.hiddenInputProps} />{/if}
 </div>
+
+</Primitive.Root>

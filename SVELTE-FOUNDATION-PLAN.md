@@ -660,3 +660,36 @@ Final local gates: full fast suite 2802 passed / 9 skipped across 103 files;
 all 42 Chromium pilot cases passed; the final reselect-draft correction passed
 all 3 focused TimePicker browser cases again. Final typecheck has zero errors
 and warnings, and the docs production build passes.
+
+## Cascader ownership checkpoint (2026-10-13)
+
+Svelte Cascader now composes its custom column picker inside Bits Popover.
+Removed attachPopover and its manual placement/dismissal lifecycle. Bits owns
+portal placement, outside interaction and Escape dismissal. Selection-triggered
+close returns focus to the trigger; outside clicks retain their target. Popup
+copies theme variables and direction, respects available viewport width, and
+stacks above an enclosing Dialog. No replacement Menu semantics are introduced.
+
+Cascader remains an intentional GGary extension, matching the React ownership
+boundary: Bits has no equivalent for simultaneously visible hierarchical columns.
+The shared Cascader machine and focusCascaderItem remain responsible for custom
+path selection, parent selection, column keyboard navigation/typeahead and reveal
+scrolling. They are not claimed as Bits functionality. No legacy popup bridge
+remains in this adapter. This resolves its ownership decision rather than claiming
+that every line of its interaction implementation became a library primitive.
+
+Tests retain all existing column/path conformance checks; portalled contents are
+looked up in document.body and popup lifecycle is allowed to finish. Added browser
+coverage for leaf submission/reset, pointer parent selection versus chevron entry,
+outside focus, anchoring, clickable columns above Dialog and layered Escape.
+Added SSR coverage for chosen path and canonical leaf submission.
+
+Remaining unresolved component: 1, Shell. Package/installed-consumer release gates
+remain additional work. Next: Shell overlay/navigation ownership.
+
+Final gates: all 44 Chromium pilot cases, all 592 contract/SSR cases,
+16 focused Cascader conformance cases, zero TS/Svelte errors or warnings,
+544 theme measurements and docs production build passed. A real pointer test
+found the Dialog backdrop intercepting columns; explicitly stacking the Bits
+positioner and positioning the surface fixed it. The complete browser suite
+was rerun successfully after that correction.

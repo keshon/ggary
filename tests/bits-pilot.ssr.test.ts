@@ -1,3 +1,5 @@
+import Cascader from '../packages/svelte/src/components/cascader/Cascader.svelte'
+import { places } from './conformance/places'
 import TimePicker from '../packages/svelte/src/components/time-picker/TimePicker.svelte'
 import CalendarPilot from './fixtures/BitsCalendarPilot.svelte'
 import DatePopupPilot from './fixtures/BitsDatePopupPilot.svelte'
@@ -192,5 +194,14 @@ it('renders a formatted time and one canonical named value without browser globa
  expect(body).toContain('Starts')
  expect(body).toContain('value="14:37"')
  expect(body.match(/name="starts"/g)).toHaveLength(1)
+ expect(body).not.toContain('role="option"')
+})
+
+it('server-renders a Cascader chosen path and leaf value without live columns', () => {
+ const { body } = render(Cascader, { props: { items: places, label: 'Place', name: 'place', defaultValue: ['ru', 'tat', 'kzn'] } })
+ expect(body).toContain('Kazan')
+ expect(body).toContain('name="place"')
+ expect(body).toContain('value="kzn"')
+ expect(body).toContain('aria-expanded="false"')
  expect(body).not.toContain('role="option"')
 })
