@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { Popover as Primitive, mergeProps as mergePrimitiveProps } from 'bits-ui'
+  import { Combobox as Primitive, mergeProps as mergePrimitiveProps } from 'bits-ui'
   import { getConfig } from '../config-provider/context'
   import { configWords } from '@ggary/core/config-provider'
   import type { ControlSize } from '@ggary/core'
-  import { connect, createTimePickerMachine, type TimePickerWords } from '@ggary/core/time-picker'
-  import { mergeProps, onFormReset, scrollIntoCenter, scrollIntoViewIfNeeded, svelteNormalizer, uid, nowTime, type ISOTime } from '@ggary/core'
+  import { timePickerAnatomy, timePickerIds, exampleTime, type TimePickerWords } from '@ggary/core/time-picker'
+  import { onFormReset, formatTime, parseTypedTime, timeSteps, minutesOf, uid, type ISOTime } from '@ggary/core'
   import { useFormField } from '../form/context.svelte'
   import { untrack } from 'svelte'
 
@@ -39,46 +39,55 @@
   const size = $derived(ownSize ?? kit().size)
   const words = $derived(configWords(kit(), 'timePicker', ownWords))
 
-  const initial = untrack(() => (value !== undefined ? value : (defaultValue ?? null)))
-  const machine = untrack(() =>
-    createTimePickerMachine({
-      id: uid('gg-time'),
-      defaultValue: initial,
-      step, min, max, isTimeDisabled, locale,
-      onValueChange: (next) => {
-        value = next
-        onValueChange?.(next)
-        form.edited()
-      },
-    })
-  )
-  let snapshot = $state.raw(machine.getState())
-  $effect(() => machine.subscribe((next) => (snapshot = next)))
-  const isOpen = $derived(snapshot.open)
-  const api = $derived(connect(snapshot, machine.send, svelteNormalizer, { ...words, locale, name, placeholder: placeholder ?? words?.placeholder, size, embedded, label }))
-  // Inside a Form, by name: the error its rules hold for this time.
-  const form = useFormField(() => name, () => api.ids.input, () => label)
-
-  $effect(() => machine.send({ type: 'SYNC_OPTIONS', locale, step, min, max, isTimeDisabled }))
-  $effect(() => {
-    if (value !== undefined) machine.send({ type: 'SYNC_VALUE', value })
-  })
-
+  const initial = untrack(() => value !== undefined ? value : defaultValue ?? null)
+  const id = untrack(() => uid('gg-time'))
+  const ids = timePickerIds(id)
+  const part = (name: Parameters<typeof timePickerAnatomy.attrs>[0]) => ({ ...timePickerAnatomy.attrs(name), 'data-backend': 'bits-ui' })
+  let own = $state(initial)
+  const committed = $derived(value !== undefined ? value : own)
+  let isOpen = $state(false)
+  let draft = $state('')
+  let editing = $state(false)
+  let invalid = $state(false)
+  const text = $derived(editing ? draft : committed ? formatTime(committed, locale) : '')
+  const times = $derived(timeSteps(step ?? 15, min ?? null, max ?? null).map(time => ({ time, label: formatTime(time, locale), disabled: unavailable(time) })))
+  const bitsItems = $derived(times.map(item => ({ value: item.time, label: item.label, disabled: item.disabled })))
+  const form = useFormField(() => name, () => ids.input, () => label)
+  const errorText = $derived(invalid ? (words?.invalid ?? (sample => `Enter a time like ${sample}`))(exampleTime(locale)) : '')
+  const describedBy = $derived([invalid ? ids.error : undefined, form.field.controlProps['aria-describedby']].filter(Boolean).join(' ') || undefined)
+  function unavailable(time: ISOTime) {
+    const minutes = minutesOf(time)
+    return !!((min && minutes < minutesOf(min)) || (max && minutes > minutesOf(max)) || isTimeDisabled?.(time))
+  }
+  function commit(next: ISOTime | null) {
+    if (next && unavailable(next)) return
+    const changed = next !== committed
+    own = next
+    if (value !== undefined) value = next
+    editing = false; invalid = false; draft = ''; isOpen = false
+    if (changed) { onValueChange?.(next); form.edited() }
+  }
+  function commitText() {
+    if (!editing) return
+    const next = draft.trim() === '' ? null : parseTypedTime(draft, locale)
+    if (draft.trim() !== '' && (!next || unavailable(next))) { invalid = true; isOpen = false; return }
+    commit(next)
+  }
+  function domainKey(event: KeyboardEvent) {
+    if (event.isComposing) return
+    if (event.key === 'Enter' && editing) { event.preventDefault(); commitText(); return }
+    if (['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp'].includes(event.key) || (isOpen && !editing && ['Home', 'End'].includes(event.key))) {
+      editing = false; invalid = false; draft = ''
+    }
+    if (event.key === 'Escape' && !isOpen && editing) { event.preventDefault(); editing = false; invalid = false; draft = '' }
+  }
   let inputEl = $state<HTMLInputElement | null>(null)
   let controlEl = $state<HTMLDivElement | null>(null)
-  let contentEl = $state<HTMLDivElement | null>(null)
-
-  $effect(() =>
-    onFormReset(inputEl, () => {
-      value = initial
-      machine.send({ type: 'RESET', value: initial })
-    })
-  )
-
-  const triggerAttrs = $derived.by(() => {
-    const { onclick: _toggle, ...attrs } = api.triggerProps
-    return attrs
-  })
+  $effect(() => onFormReset(inputEl, () => {
+    own = initial
+    if (value !== undefined) value = initial
+    editing = false; invalid = false; draft = ''; isOpen = false
+  }))
   let inheritedStyle = $state('')
   let inheritedDir = $state<'ltr' | 'rtl'>('ltr')
   $effect(() => {
@@ -89,41 +98,35 @@
     inheritedDir = kit().dir ?? (computed.direction === 'rtl' ? 'rtl' : 'ltr')
     inheritedStyle = `direction:${inheritedDir};${vars.join(';')}`
   })
-  // Opening, the list stands its time in the middle; walking, it scrolls no more than it must.
-  let wasOpen = false
-  $effect(() => {
-    const time = snapshot.highlighted
-    const opening = isOpen && !wasOpen
-    wasOpen = isOpen
-    if (!isOpen || !time) return
-    untrack(() =>
-      queueMicrotask(() => {
-        const item = document.getElementById(api.ids.item(time))
-        if (opening) scrollIntoCenter(item, contentEl)
-        else scrollIntoViewIfNeeded(item, contentEl)
-      })
-    )
-  })
 </script>
 
-<Primitive.Root bind:open={() => isOpen, next => machine.send(next ? { type: 'OPEN', now: nowTime() } : { type: 'CLOSE' })}>
-<div {...api.rootProps}>
-  {#if label && !embedded}<label {...api.labelProps}>{label}</label>{/if}
-  <div bind:this={controlEl} {...api.controlProps}>
-    <input bind:this={inputEl} {...mergeProps(api.inputProps, form.field.controlProps)} />
-    <Primitive.Trigger {...triggerAttrs}><span {...api.triggerIconProps}></span></Primitive.Trigger>
+<Primitive.Root type="single" value={committed ?? ''} onValueChange={next => commit(next as ISOTime || null)} bind:open={isOpen} inputValue={text} items={bitsItems} allowDeselect={false} scrollAlignment="center">
+<div {...part('root')} id={ids.root} data-size={size ?? 'md'} data-state={isOpen ? 'open' : 'closed'} data-invalid={invalid ? '' : undefined} data-embedded={embedded ? '' : undefined}>
+  {#if label && !embedded}<label {...part('label')} id={ids.label} for={ids.input}>{label}</label>{/if}
+  <div bind:this={controlEl} {...part('control')} data-state={isOpen ? 'open' : 'closed'} data-invalid={invalid ? '' : undefined}>
+    <Primitive.Input id={ids.input} bind:ref={inputEl}>
+      {#snippet child({ props: inputAttrs })}
+        <input {...mergePrimitiveProps({ onkeydown: domainKey }, inputAttrs, part('input'), {
+          oninput: (event: Event) => { draft = (event.currentTarget as HTMLInputElement).value; editing = true; invalid = false; isOpen = true },
+          onblur: () => { commitText(); isOpen = false }
+        })} value={text} type="text" inputmode="text" autocomplete="off" spellcheck={false}
+          placeholder={placeholder ?? words?.placeholder ?? exampleTime(locale)} aria-label={embedded ? label ?? 'Time' : undefined}
+          aria-controls={ids.content} aria-invalid={invalid || form.error ? 'true' : undefined} data-invalid={invalid || form.error ? '' : undefined} aria-describedby={describedBy} />
+      {/snippet}
+    </Primitive.Input>
+    <Primitive.Trigger {...part('trigger')} id={ids.trigger} type="button" tabindex={-1} aria-label={words?.choose ?? 'Choose time'} aria-controls={ids.content} aria-expanded={isOpen ? 'true' : 'false'}>
+      <span {...part('trigger-icon')} data-icon="chevron-down" aria-hidden="true"></span>
+    </Primitive.Trigger>
   </div>
-  {#if api.invalid}<span {...api.errorProps}>{api.errorText}</span>{/if}
+  {#if invalid}<span {...part('error')} id={ids.error}>{errorText}</span>{/if}
   <span {...form.field.errorProps}>{form.error}</span>
-  {#if name}<input {...api.hiddenInputProps} />{/if}
+  {#if name}<input type="hidden" {name} value={committed ?? ''} data-scope="time-picker" data-part="hidden-input" />{/if}
   <Primitive.Portal>
-    <Primitive.Content forceMount side="bottom" align="start" sideOffset={4} customAnchor={controlEl} strategy="fixed" trapFocus={false} preventScroll={false} dir={inheritedDir} style={inheritedStyle}
-      onOpenAutoFocus={event => { event.preventDefault(); inputEl?.focus({ preventScroll: true }) }}
-      onCloseAutoFocus={event => event.preventDefault()}>
+    <Primitive.Content forceMount id={ids.content} side="bottom" align="start" sideOffset={4} customAnchor={controlEl} strategy="fixed" dir={inheritedDir} style={inheritedStyle}>
       {#snippet child({ props: contentAttrs, wrapperProps })}
         <div {...wrapperProps} data-scope="time-picker" data-part="positioner" data-backend="bits-ui" data-state={isOpen ? 'open' : 'closed'}>
-          <div bind:this={contentEl} {...mergePrimitiveProps(contentAttrs, api.contentProps, { style: { width: 'var(--bits-floating-anchor-width)', '--gg-available-height': 'var(--bits-floating-available-height)' } })} data-backend="bits-ui" hidden={!isOpen}>
-            {#if isOpen}{#each api.times as { time, label: words } (time)}<div {...api.getItemProps(time)}>{words}</div>{/each}{/if}
+          <div {...mergePrimitiveProps(contentAttrs, part('content'), { style: { width: 'var(--bits-floating-anchor-width)', '--gg-available-height': 'var(--bits-floating-available-height)' } })} aria-label={words?.times ?? 'Times'} data-state={isOpen ? 'open' : 'closed'} hidden={!isOpen}>
+            {#if isOpen}{#each times as item (item.time)}<Primitive.Item {...part('item')} id={ids.item(item.time)} value={item.time} label={item.label} disabled={item.disabled} aria-disabled={item.disabled ? 'true' : undefined} onpointerup={() => { if (!item.disabled && item.time === committed) commit(item.time) }}>{item.label}</Primitive.Item>{/each}{/if}
           </div>
         </div>
       {/snippet}

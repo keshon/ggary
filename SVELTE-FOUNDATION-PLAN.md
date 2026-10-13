@@ -630,3 +630,33 @@ TimePicker remains unresolved: decide the list interaction owner next, preservin
 its distinction between typed times and walked options. Remaining unresolved
 components still total 3: TimePicker, Cascader and Shell. Package release gates
 remain separate. No claim of a complete TimePicker interaction migration yet.
+
+## TimePicker interaction checkpoint (2026-10-13)
+
+Svelte TimePicker now uses Bits Combobox Root/Input/Trigger/Content/Item for the
+list and popup. Removed createTimePickerMachine, connect, legacy keyboard/item
+props, custom highlighted state and scroll effects from this adapter. Core time
+parsing, formatting, step generation and unavailable-time checks remain pure
+shared helpers. Local state holds only committed/form values, typed drafts and
+validation. Typed Enter/blur remains a domain operation; arrow keys delegate to
+Bits after leaving typed-edit mode. Reselecting the current option clears a draft
+without emitting an artificial value change.
+
+Bits intentionally owns its standard navigation policy: disabled times are skipped,
+PageUp/PageDown use its page size, and typing initially highlights the first enabled
+option rather than GGary's old nearest-time guess. Typed Enter still commits the
+exact parsed time, including off-step values. Conformance uses real pointer events
+and waits for Bits registration rather than assuming synchronous legacy handlers.
+
+Browser coverage includes disabled-option skipping, typed versus walked selection,
+invalid and out-of-bounds times, reselecting the committed option, two-layer Escape,
+canonical datetime composition and reset. Added server rendering for a formatted
+and canonically submitted time. Docs now mark TimePicker as Built with Bits UI.
+
+TimePicker is resolved. Remaining unresolved components: 2, Cascader and Shell.
+Package/installed-consumer release gates remain additional work. Next: Cascader.
+
+Final local gates: full fast suite 2802 passed / 9 skipped across 103 files;
+all 42 Chromium pilot cases passed; the final reselect-draft correction passed
+all 3 focused TimePicker browser cases again. Final typecheck has zero errors
+and warnings, and the docs production build passes.

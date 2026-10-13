@@ -1,3 +1,4 @@
+import TimePicker from '../packages/svelte/src/components/time-picker/TimePicker.svelte'
 import CalendarPilot from './fixtures/BitsCalendarPilot.svelte'
 import DatePopupPilot from './fixtures/BitsDatePopupPilot.svelte'
 import ToastPilot from './fixtures/SvelteToastPilot.svelte'
@@ -183,4 +184,13 @@ it('server renders single and range calendar grids with ISO day identities', () 
  expect(body).toContain('data-date="2026-10-12"')
  expect(body).toContain('data-mode="range"')
  expect(body).toContain('role="grid"')
+})
+
+it('renders a formatted time and one canonical named value without browser globals', () => {
+ const { body } = render(TimePicker, { props: { label: 'Starts', name: 'starts', locale: 'en-GB', defaultValue: '14:37' } })
+ expect(body).toContain('role="combobox"')
+ expect(body).toContain('Starts')
+ expect(body).toContain('value="14:37"')
+ expect(body.match(/name="starts"/g)).toHaveLength(1)
+ expect(body).not.toContain('role="option"')
 })
