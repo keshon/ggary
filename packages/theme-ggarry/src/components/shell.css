@@ -141,3 +141,5 @@
 @media (prefers-reduced-motion: reduce) {
   [data-scope='shell'][data-part='aside'] { transition: none; }
 }
+
+[data-scope='shell'][data-part='backdrop'] { background: var(--ggarry-bg-scrim); }

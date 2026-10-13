@@ -693,3 +693,35 @@ Final gates: all 44 Chromium pilot cases, all 592 contract/SSR cases,
 found the Dialog backdrop intercepting columns; explicitly stacking the Bits
 positioner and positioning the surface fixed it. The complete browser suite
 was rerun successfully after that correction.
+
+## Shell drawer checkpoint (2026-10-13)
+
+Replaced Svelte Shell attachShellDrawer with Bits Dialog Content/Trigger/Overlay.
+The drawer uses Bits focus trapping, scroll lock, outside interaction and Escape
+layering; desktop navigation remains nonmodal. Content is force-mounted inline,
+so server navigation renders and sidebar DOM/local drafts survive resize and
+reopen without a portal handoff. Shared Shell state retains collapse mode and
+change reasons (toggle, escape, outside, navigate, resize), not modal DOM behavior.
+The skip link remains the first element of the frame.
+
+The real Bits overlay replaces the CSS-only scrim for this adapter, because
+modal background pointer suppression otherwise prevented scrim clicks. Closing
+explicitly hides the overlay: a closing presence marker surviving a desktop-to-
+mobile resize must not intercept the next toggle press. Existing React Shell
+styles and drawer ownership remain unchanged.
+
+Browser coverage exercises focus trapping, nested Select Escape then drawer
+Escape, navigation close, outside dismissal, desktop work interaction, resize
+close reason and sidebar input identity/draft retention. SSR verifies the sidebar
+and work landmarks without a modal overlay.
+
+Component ownership checkpoints are complete: 0 unresolved components. Next:
+Svelte package build/export/installed-consumer release gates and final ownership
+scan. Intentional GGary extensions such as Cascader remain custom compositions;
+completion does not claim a Bits primitive exists for every component.
+
+Validation: full fast suite 2804 passed / 9 skipped across 103 files; all
+46 Chromium pilot cases passed; all 593 contract/SSR checks passed; final
+8 Shell conformance checks passed. Typecheck has zero errors/warnings and
+docs production build passes. Browser resize coverage caught and verified
+the closed-overlay correction before handoff.

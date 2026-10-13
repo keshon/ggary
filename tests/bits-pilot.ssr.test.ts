@@ -1,3 +1,4 @@
+import ShellPilot from './fixtures/BitsShellPilot.svelte'
 import Cascader from '../packages/svelte/src/components/cascader/Cascader.svelte'
 import { places } from './conformance/places'
 import TimePicker from '../packages/svelte/src/components/time-picker/TimePicker.svelte'
@@ -204,4 +205,14 @@ it('server-renders a Cascader chosen path and leaf value without live columns', 
  expect(body).toContain('value="kzn"')
  expect(body).toContain('aria-expanded="false"')
  expect(body).not.toContain('role="option"')
+})
+
+it('server-renders Shell navigation and work without mounting a modal overlay', () => {
+ const { body } = render(ShellPilot)
+ expect(body).toContain('Workspace')
+ expect(body).toContain('Sidebar draft')
+ expect(body).toContain('Work action')
+ expect(body).toContain('role="complementary"')
+ expect(body).not.toContain('aria-modal="true"')
+ expect(body).not.toContain('data-dialog-overlay')
 })

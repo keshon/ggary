@@ -428,3 +428,14 @@
 }
 
 [data-scope='shell'][data-part='aside'][hidden] { display: none; }
+
+/* Bits modal dismissal needs a real pointer-enabled overlay. */
+[data-scope='shell'][data-part='root'][data-backend='bits-ui']::after { content: none; }
+[data-scope='shell'][data-part='backdrop'][data-backend='bits-ui'] {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--gg-z-drawer) - 1);
+  pointer-events: auto;
+}
+
+[data-scope='shell'][data-part='backdrop'][hidden] { display: none; }

@@ -9,6 +9,7 @@ export const shellAnatomy = createAnatomy('shell', [
   'root',
   'skip-link',
   'aside',
+  'backdrop',
   'brand',
   'header',
   'toggle',
