@@ -23,13 +23,15 @@ export interface SelectProps {
   disabled?: boolean
   required?: boolean
   readOnly?: boolean
+  /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+  fullWidth?: boolean
   name?: string
   onValueChange?: (value: string | null, item: SelectItem | null) => void
 }
 
 /** React interaction backend. Keeps GGary's public value/item and styling contract. */
 export function Select(props: SelectProps) {
-  const { size = 'md', items, label, placeholder = 'Select…', value, defaultValue, disabled: ownDisabled, required: ownRequired, readOnly: ownReadOnly, name: ownName, onValueChange } = useConfigured(props, { size: true })
+  const { size = 'md', items, label, placeholder = 'Select…', value, defaultValue, disabled: ownDisabled, required: ownRequired, readOnly: ownReadOnly, fullWidth, name: ownName, onValueChange } = useConfigured(props, { size: true })
   const id = `gg-base-select-${useId().replace(/:/g, '')}`
   const field = useFieldControl()
   const composition = useFieldComposition()
@@ -58,7 +60,7 @@ export function Select(props: SelectProps) {
       if (composition?.name) composition.edited()
       else form.edited(trigger.current)
     }}>
-    <div ref={root} {...part('root')} data-size={size} data-state={state} data-disabled={disabled ? '' : undefined}>
+    <div ref={root} {...part('root')} data-size={size} data-state={state} data-disabled={disabled ? '' : undefined} data-full-width={fullWidth ? '' : undefined}>
       {label && !field && <label {...part('label')} id={`${id}-label`} htmlFor={triggerId} data-disabled={disabled ? '' : undefined}>{label}</label>}
       <Primitive.Trigger ref={trigger} {...mergeProps(form.field.controlProps, field ?? {}, { id: triggerId, 'aria-labelledby': field?.['aria-labelledby'] as string | undefined ?? (label ? `${id}-label` : undefined) })} {...part('trigger')} data-state={state}>
         <Primitive.Value {...part('value')} placeholder={placeholder} data-placeholder={selectedItem ? undefined : ''}>

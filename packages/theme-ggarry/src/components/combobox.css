@@ -10,7 +10,6 @@
 
 [data-scope='combobox'][data-part='root'] {
   gap: var(--ggarry-space-1);
-  min-inline-size: 240px;
   font-family: var(--ggarry-font-family-sans);
 }
 

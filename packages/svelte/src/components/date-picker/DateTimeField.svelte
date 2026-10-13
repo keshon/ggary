@@ -11,6 +11,8 @@
 
   type Props = {
     size?: ControlSize
+    /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+    fullWidth?: boolean
     label?: string
     /** Bindable: `YYYY-MM-DDTHH:mm`, a wall-clock day and time with no zone. */
     value?: ISODateTime | null
@@ -40,7 +42,7 @@
    */
   let {
     size: ownSize, label, value = $bindable(), defaultValue, onValueChange, min, max, weekStart, isDateDisabled, months, locale: ownLocale, name, placeholder, words: ownWords,
-    step, timeLabel = 'Time', timeWords,
+    step, timeLabel = 'Time', timeWords, fullWidth,
   }: Props = $props()
   const kit = getConfig()
   const locale = $derived(ownLocale ?? kit().locale)
@@ -66,7 +68,7 @@
 {/snippet}
 
 <DateField
-  {size} {label} {min} {max} {weekStart} {isDateDisabled} {months} {locale} {name} {placeholder} {words}
+  {size} {label} {min} {max} {weekStart} {isDateDisabled} {months} {locale} {name} {placeholder} {words} {fullWidth}
   mode="single"
   value={parts.date}
   onValueChange={(range) => update({ date: range.start })}

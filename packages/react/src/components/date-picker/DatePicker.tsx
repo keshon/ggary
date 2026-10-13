@@ -129,6 +129,8 @@ interface DateFieldProps extends CalendarOptionsProps {
   readOnly?: boolean
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
   size?: ControlSize
+  /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+  fullWidth?: boolean
   label?: string
   value?: ISODate | DateRange | null
   defaultValue?: ISODate | DateRange | null
@@ -299,7 +301,7 @@ function DateField(props: DateFieldProps & { timeSlot?: ReactNode; submitAs?: st
   return (
     <DirectionProvider direction={environment.dir ?? 'ltr'}>
     <Primitive.Root open={state.open} modal={false} onOpenChange={next => send({ type: next ? 'OPEN' : 'CLOSE' })}>
-    <div {...api.rootProps}>
+    <div {...api.rootProps} data-full-width={props.fullWidth ? '' : undefined}>
       {label && !field?.['aria-labelledby'] && <label {...api.labelProps} htmlFor={controlId}>{label}</label>}
       <div ref={controlRef} {...api.controlProps}>
         <input ref={inputRef} {...mergeProps(api.inputProps, form.field.controlProps, metadata)} id={controlId}

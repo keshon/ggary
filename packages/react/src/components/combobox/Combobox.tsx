@@ -40,6 +40,8 @@ export interface ComboboxProps {
   disabled?: boolean
   required?: boolean
   readOnly?: boolean
+  /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+  fullWidth?: boolean
   /** How many options are drawn at once. Default 50. */
   limit?: number
   name?: string
@@ -54,7 +56,7 @@ const EMPTY: ComboboxItem[] = []
 /** Base UI owns interaction; GGary retains ranked/remote search and creation. */
 export function Combobox(props: ComboboxProps) {
   const { size = 'md', label, items = EMPTY, load, debounce = 200, minLength = 0, multiple = false,
-    value, defaultValue, selectedItems = EMPTY, onValueChange, onCreate, placeholder, disabled: ownDisabled, required: ownRequired, readOnly: ownReadOnly,
+    value, defaultValue, selectedItems = EMPTY, onValueChange, onCreate, placeholder, disabled: ownDisabled, required: ownRequired, readOnly: ownReadOnly, fullWidth,
     limit = 50, name: ownName, words = {} } = useConfigured(props, { size: true, words: 'combobox' })
   const config = useConfig()
   const id = `gg-base-combobox-${useId().replace(/:/g, '')}`
@@ -207,7 +209,7 @@ export function Combobox(props: ComboboxProps) {
         if (details.reason === 'input-change') { setQuery(next); setTyping(true); setOpen(true); setCreateError(null) }
         else if (details.reason === 'input-clear' || details.reason === 'clear-press') { setQuery(''); setTyping(false) }
       }}>
-      <div ref={root} {...part('root')} id={id} data-size={size} data-state={state} data-multiple={multiple ? '' : undefined} data-disabled={disabled ? '' : undefined}>
+      <div ref={root} {...part('root')} id={id} data-size={size} data-state={state} data-multiple={multiple ? '' : undefined} data-disabled={disabled ? '' : undefined} data-full-width={fullWidth ? '' : undefined}>
         {label && !field && <label {...part('label')} id={`${id}-label`} htmlFor={inputId} data-disabled={disabled ? '' : undefined}>{label}</label>}
         <Primitive.InputGroup ref={control} {...part('control')} data-state={state} data-disabled={disabled ? '' : undefined}>
           <div data-scope="combobox" data-part="editor">

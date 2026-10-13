@@ -30,6 +30,8 @@ export interface CascaderProps {
   disabled?: boolean
   required?: boolean
   readOnly?: boolean
+  /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+  fullWidth?: boolean
   /** Submits the chosen leaf's value. */
   name?: string
 }
@@ -37,7 +39,7 @@ export interface CascaderProps {
 /** A choice from a tree, one level to a column. */
 export function Cascader(props: CascaderProps) {
   props = useConfigured(props, { size: true })
-  const { size, items, label, placeholder, rootLabel, value, defaultValue, onValueChange, selectParents = false, disabled: ownDisabled, required: ownRequired, readOnly: ownReadOnly, name: ownName } = props
+  const { size, items, label, placeholder, rootLabel, value, defaultValue, onValueChange, selectParents = false, disabled: ownDisabled, required: ownRequired, readOnly: ownReadOnly, fullWidth, name: ownName } = props
   const id = `gg-cascader-${useId().replace(/:/g, '')}`
   const field = useFieldControl()
   const composition = useFieldComposition()
@@ -111,7 +113,7 @@ export function Cascader(props: CascaderProps) {
   return (
     <DirectionProvider direction={environment.dir ?? 'ltr'}>
     <Primitive.Root open={state.open} modal={false} onOpenChangeComplete={open => { if (open) focusCascaderItem(contentRef.current, api.focusedId) }} onOpenChange={next => send({ type: next ? 'OPEN' : 'CLOSE' })}>
-    <div {...api.rootProps} data-disabled={disabled ? '' : undefined} data-readonly={readOnly ? '' : undefined}>
+    <div {...api.rootProps} data-disabled={disabled ? '' : undefined} data-readonly={readOnly ? '' : undefined} data-full-width={fullWidth ? '' : undefined}>
       {label && !field?.['aria-labelledby'] && <label {...api.labelProps} htmlFor={triggerId}>{label}</label>}
       <Primitive.Trigger ref={triggerRef} {...mergeProps(triggerProps, form.field.controlProps, triggerMetadata, form.error ? form.field.controlProps : {}, {
         id: triggerId,

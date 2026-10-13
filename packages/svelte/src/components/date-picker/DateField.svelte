@@ -13,6 +13,8 @@
   type Props = {
     /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
     size?: ControlSize
+    /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+    fullWidth?: boolean
     label?: string
     /** Bindable: a day, or `{ start, end }` for a range. */
     value?: ISODate | DateRange | null
@@ -42,7 +44,7 @@
   /** A field for a day or a range of days, typed or chosen from a calendar. DatePicker's, and DateTimeField's day. */
   let {
     size: ownSize,
-    label, value = $bindable(), defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, months, locale: ownLocale, name, placeholder, presets, words: ownWords, timeSlot, submitAs, onReset,
+    label, value = $bindable(), defaultValue, onValueChange, mode, min, max, weekStart, isDateDisabled, months, locale: ownLocale, name, placeholder, presets, words: ownWords, timeSlot, submitAs, onReset, fullWidth,
   }: Props = $props()
   const kit = getConfig()
   const locale = $derived(ownLocale ?? kit().locale)
@@ -120,7 +122,7 @@
 </script>
 
 <Primitive.Root bind:open={() => isOpen, next => { if (next) outside = false; machine.send({ type: next ? 'OPEN' : 'CLOSE' }) }}>
-<div {...api.rootProps}>
+<div {...api.rootProps} data-full-width={fullWidth ? '' : undefined}>
   {#if label}<label {...api.labelProps}>{label}</label>{/if}
   <div bind:this={controlEl} {...api.controlProps}>
     <input bind:this={inputEl} {...mergeProps(api.inputProps, form.field.controlProps)} />

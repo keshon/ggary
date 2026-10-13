@@ -43,6 +43,7 @@
 @import './components/dialog.css' layer(gg.components);
 @import './components/empty-state.css' layer(gg.components);
 @import './components/field.css' layer(gg.components);
+@import './components/control-width.css' layer(gg.components);
 @import './components/file-drop.css' layer(gg.components);
 @import './components/fieldset.css' layer(gg.components);
 @import './components/form.css' layer(gg.components);

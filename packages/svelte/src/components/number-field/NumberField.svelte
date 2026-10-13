@@ -10,12 +10,14 @@
     value?: number | null
     defaultValue?: number | null
     onValueChange?: (value: number | null) => void
+    /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+    fullWidth?: boolean
     [key: string]: unknown
   }
 
   let {
     min, max, step, name, label, axis, placeholder, size: ownSize, disabled, readOnly, required, invalid,
-    value = $bindable(), defaultValue, onValueChange, ...rest
+    value = $bindable(), defaultValue, onValueChange, fullWidth, ...rest
   }: Props = $props()
   const kit = getConfig()
   const size = $derived(ownSize ?? kit().size)
@@ -57,7 +59,7 @@
   const attrs = $derived(mergeProps(rest, api.inputProps))
 </script>
 
-<span {...api.rootProps}>
+<span {...api.rootProps} data-full-width={fullWidth ? '' : undefined}>
   {#if api.showAxis}
     <span {...api.axisProps} {@attach (handle) => attachScrub(handle, () => element)}>{api.axis}</span>
   {/if}

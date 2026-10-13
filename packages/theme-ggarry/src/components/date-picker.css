@@ -7,12 +7,13 @@
    ========================================================================== */
 
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'] {
+  --control-inline-size: var(--gg-control-width-compact);
+
   gap: var(--ggarry-space-1);
-  min-inline-size: 180px;
   font-family: var(--ggarry-font-family-sans);
 }
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'][data-mode='range'] {
-  min-inline-size: 280px;
+  --control-inline-size: var(--gg-control-width-wide);
 }
 
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='label'] {

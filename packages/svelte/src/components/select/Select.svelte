@@ -15,11 +15,13 @@
     value?: string | null
     defaultValue?: string | null
     disabled?: boolean
+    /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+    fullWidth?: boolean
     name?: string
     onValueChange?: (value: string | null, item: SelectItem | null) => void
   }
   let { size: ownSize, items, label, placeholder = 'Select...', value = $bindable(),
-    defaultValue, disabled = false, name, onValueChange }: Props = $props()
+    defaultValue, disabled = false, fullWidth, name, onValueChange }: Props = $props()
   const kit = getConfig()
   const size = $derived(ownSize ?? kit().size ?? 'md')
   const componentId = $props.id()
@@ -57,7 +59,7 @@
   })
 </script>
 
-<div {...part('root')} data-size={size} data-disabled={disabled ? '' : undefined}>
+<div {...part('root')} data-size={size} data-disabled={disabled ? '' : undefined} data-full-width={fullWidth ? '' : undefined}>
   <Primitive.Root type="single" value={bitsValue} onValueChange={changed} bind:open={isOpen}
     items={bitsItems} {disabled} allowDeselect={false} loop>
     {#if label}

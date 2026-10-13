@@ -21,12 +21,14 @@
     /** A branch may be chosen itself. Default false: leaves only. */
     selectParents?: boolean
     disabled?: boolean
+    /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+    fullWidth?: boolean
     /** Submits the chosen leaf's value. */
     name?: string
   }
 
   /** A choice from a tree, one level to a column. */
-  let { size: ownSize, items, label, placeholder, rootLabel, value = $bindable(), defaultValue, onValueChange, selectParents, disabled, name }: Props = $props()
+  let { size: ownSize, items, label, placeholder, rootLabel, value = $bindable(), defaultValue, onValueChange, selectParents, disabled, fullWidth, name }: Props = $props()
   const kit = getConfig()
   const size = $derived(ownSize ?? kit().size)
 
@@ -100,7 +102,7 @@
 </script>
 
 <Primitive.Root bind:open={() => isOpen, next => machine.send({ type: next ? 'OPEN' : 'CLOSE' })}>
-<div {...api.rootProps}>
+<div {...api.rootProps} data-full-width={fullWidth ? '' : undefined}>
   {#if label}<label {...api.labelProps}>{label}</label>{/if}
   <Primitive.Trigger bind:ref={triggerEl} {...triggerAttrs}>
     <!-- One line: whitespace between the segments would be read out and drawn. -->

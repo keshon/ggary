@@ -21,6 +21,8 @@ export interface TimePickerProps {
   readOnly?: boolean
   /** `sm`, `md` or `lg`, as Input's and Button's. Default `md`. */
   size?: ControlSize
+  /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+  fullWidth?: boolean
   label?: string
   /** `HH:mm`. Controlled; use `defaultValue` for uncontrolled. */
   value?: ISOTime | null
@@ -45,7 +47,7 @@ export interface TimePickerProps {
 /** A field for a time of day, typed or chosen from a list of times at a step. */
 export function TimePicker(props: TimePickerProps) {
   props = useConfigured(props, { locale: true, size: true, words: 'timePicker' })
-  const { size, label, value, defaultValue, onValueChange, step, min, max, isTimeDisabled, locale, name: ownName, placeholder, words, embedded } = props
+  const { size, label, value, defaultValue, onValueChange, step, min, max, isTimeDisabled, locale, name: ownName, placeholder, words, embedded, fullWidth } = props
   const id = `gg-time-${useId().replace(/:/g, '')}`
   const outerField = useFieldControl()
   const outerComposition = useFieldComposition()
@@ -127,7 +129,7 @@ export function TimePicker(props: TimePickerProps) {
           const highlighted = machine.getState().highlighted
           if (open && highlighted) scrollIntoCenter(document.getElementById(api.ids.item(highlighted)), contentRef.current)
         }}>
-    <div {...api.rootProps}>
+    <div {...api.rootProps} data-full-width={fullWidth ? '' : undefined}>
       {label && !embedded && !field?.['aria-labelledby'] && <label {...api.labelProps} htmlFor={controlId}>{label}</label>}
       <div ref={controlRef} {...api.controlProps}>
         <Primitive.Input ref={inputRef} {...mergeProps(inputProps, form.field.controlProps, metadata)} id={controlId} disabled={disabled} readOnly={readOnly} aria-required={required || undefined} aria-describedby={describedBy}

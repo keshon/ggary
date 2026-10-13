@@ -30,6 +30,9 @@
   --gg-radius: var(--ggarry-radius-lg);
   --gg-space-option: var(--ggarry-rhythm-option);
   --gg-space-group: var(--ggarry-rhythm-group);
+  --gg-control-width-compact: var(--ggarry-size-field-compact);
+  --gg-control-width: var(--ggarry-size-field-default);
+  --gg-control-width-wide: var(--ggarry-size-field-wide);
   --gg-chart-1: var(--ggarry-chart-1);
   --gg-chart-2: var(--ggarry-chart-2);
   --gg-chart-3: var(--ggarry-chart-3);

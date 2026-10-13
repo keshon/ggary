@@ -29,12 +29,14 @@
     disabled?: boolean
     limit?: number
     name?: string
+    /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+    fullWidth?: boolean
     words?: ComboboxWords
   }
 
   let { size: ownSize, label, items = [], load, debounce = 200, minLength = 0,
     multiple = false, value = $bindable(), defaultValue, selectedItems = [], onValueChange,
-    onCreate, placeholder, disabled = false, limit = 50, name, words: ownWords }: Props = $props()
+    onCreate, placeholder, disabled = false, fullWidth, limit = 50, name, words: ownWords }: Props = $props()
   const kit = getConfig()
   const size = $derived(ownSize ?? kit().size ?? 'md')
   const words = $derived(configWords(kit(), 'combobox', ownWords) ?? {})
@@ -157,7 +159,7 @@
 </script>
 
 {#snippet control()}
-<div {...part('root')} data-size={size} data-state={isOpen ? 'open' : 'closed'} data-multiple={multiple ? '' : undefined} data-disabled={disabled ? '' : undefined}>
+<div {...part('root')} data-size={size} data-state={isOpen ? 'open' : 'closed'} data-multiple={multiple ? '' : undefined} data-disabled={disabled ? '' : undefined} data-full-width={fullWidth ? '' : undefined}>
   {#if label}<label {...part('label')} id={`${id}-label`} for={`${id}-input`} data-disabled={disabled ? '' : undefined}>{label}</label>{/if}
   <div {...part('control')} bind:this={controlEl}
     onpointerdown={event => { if (!(event.target as Element).closest('input, button') && !disabled) { event.preventDefault(); inputEl?.focus(); isOpen = true } }}

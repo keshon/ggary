@@ -30,10 +30,12 @@
     words?: TimePickerWords
     /** Inside another field's box, as DatePicker's time: no label or box of its own; `label` names the input. */
     embedded?: boolean
+    /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+    fullWidth?: boolean
   }
 
   /** A field for a time of day, typed or chosen from a list of times at a step. */
-  let { size: ownSize, label, value = $bindable(), defaultValue, onValueChange, step, min, max, isTimeDisabled, locale: ownLocale, name, placeholder, words: ownWords, embedded }: Props = $props()
+  let { size: ownSize, label, value = $bindable(), defaultValue, onValueChange, step, min, max, isTimeDisabled, locale: ownLocale, name, placeholder, words: ownWords, embedded, fullWidth }: Props = $props()
   const kit = getConfig()
   const locale = $derived(ownLocale ?? kit().locale)
   const size = $derived(ownSize ?? kit().size)
@@ -123,7 +125,7 @@
 </script>
 
 <Primitive.Root type="single" value={committed ?? ''} onValueChange={next => commit(next as ISOTime || null)} bind:open={isOpen} inputValue={text} items={bitsItems} allowDeselect={false} scrollAlignment="center">
-<div {...part('root')} id={ids.root} data-size={size ?? 'md'} data-state={isOpen ? 'open' : 'closed'} data-invalid={invalid ? '' : undefined} data-embedded={embedded ? '' : undefined}>
+<div {...part('root')} id={ids.root} data-size={size ?? 'md'} data-state={isOpen ? 'open' : 'closed'} data-invalid={invalid ? '' : undefined} data-embedded={embedded ? '' : undefined} data-full-width={fullWidth ? '' : undefined}>
   {#if label && !embedded}<label {...part('label')} id={ids.label} for={ids.input}>{label}</label>{/if}
   <div bind:this={controlEl} {...part('control')} data-state={isOpen ? 'open' : 'closed'} data-invalid={invalid ? '' : undefined}>
     <Primitive.Input id={ids.input} bind:ref={inputEl}>

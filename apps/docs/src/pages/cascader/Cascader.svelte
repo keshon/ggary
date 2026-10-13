@@ -20,5 +20,11 @@
   {/snippet}
   {#snippet composition()}
     <Specimen label="selectParents"><Cascader label="Team" items={teams} selectParents defaultValue={['sales', 'smb']} placeholder="Any team" /></Specimen>
+    <Specimen label="stable default · fullWidth" wide>
+      <div style="display:grid;gap:12px;inline-size:100%">
+        <Cascader label="Default width" items={regions} defaultValue={['rs', 'beg']} />
+        <Cascader fullWidth label="Full row" items={regions} defaultValue={['ru', 'tat', 'kzn']} />
+      </div>
+    </Specimen>
   {/snippet}
 </DemoPage>

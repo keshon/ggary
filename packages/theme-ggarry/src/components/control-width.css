@@ -1,0 +1,39 @@
+/* ========================================================================== 
+   GGarry — field control width
+
+   Choice and picker controls keep a stable standalone width: their current
+   value must not resize the layout. They may still shrink inside a narrow
+   container. A Field, or an explicit fullWidth prop, owns the available row.
+   ========================================================================== */
+
+:is(
+  [data-scope='select'],
+  [data-scope='combobox'],
+  [data-scope='cascader'],
+  [data-scope='date-picker'],
+  [data-scope='time-picker']:not([data-embedded]),
+  [data-scope='number-field']
+)[data-part='root'] {
+  inline-size: var(--control-inline-size, var(--gg-control-width));
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+:is(
+  [data-scope='select'],
+  [data-scope='combobox'],
+  [data-scope='cascader'],
+  [data-scope='date-picker'],
+  [data-scope='time-picker']:not([data-embedded]),
+  [data-scope='number-field']
+)[data-part='root'][data-full-width],
+[data-scope='field'][data-part='root'] > :is(
+  [data-scope='select'],
+  [data-scope='combobox'],
+  [data-scope='cascader'],
+  [data-scope='date-picker'],
+  [data-scope='time-picker'],
+  [data-scope='number-field']
+)[data-part='root'] {
+  inline-size: 100%;
+}

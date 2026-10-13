@@ -16,6 +16,8 @@ export interface NumberFieldProps
   defaultValue?: number | null
   /** A number, or null while the field is empty or holds no number yet. */
   onValueChange?: (value: number | null) => void
+  /** Fill the available inline space. Standalone controls otherwise use the theme's stable field width. */
+  fullWidth?: boolean
 }
 
 const part = (name: string) => ({ 'data-scope': 'number-field', 'data-part': name, 'data-backend': 'base-ui' })
@@ -23,7 +25,7 @@ const part = (name: string) => ({ 'data-scope': 'number-field', 'data-part': nam
 export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(function NumberField(props, forwardedRef) {
   props = useConfigured(props, { size: true })
   const { min, max, step = 1, name, label, axis, placeholder, size = 'md', disabled, readOnly, required, invalid,
-    value, defaultValue, onValueChange, form, ...rest } = props
+    value, defaultValue, onValueChange, fullWidth, form, ...rest } = props
   const field = useFieldControl()
   const group = useFieldsetGroup()
   const id = useId()
@@ -34,7 +36,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(functi
   const isDisabled = Boolean(disabled || field?.disabled || group?.disabled)
   const isReadOnly = Boolean(readOnly || field?.readOnly)
   const isInvalid = Boolean(invalid || field?.['aria-invalid'] === 'true')
-  const state = { 'data-size': size, 'data-disabled': isDisabled ? '' : undefined,
+  const state = { 'data-size': size, 'data-disabled': isDisabled ? '' : undefined, 'data-full-width': fullWidth ? '' : undefined,
     'data-readonly': isReadOnly ? '' : undefined, 'data-invalid': isInvalid ? '' : undefined }
   return <Primitive.Root {...part('root')} {...state} render={(rootProps) => <span {...rootProps} data-invalid={isInvalid ? '' : undefined} />}
     id={field?.id ?? `gg-number-${id}`} min={min} max={max} step={step}
