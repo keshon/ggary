@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { Popover as Primitive } from 'bits-ui'
   import { getConfig } from '../config-provider/context'
   import { configWords } from '@ggary/core/config-provider'
   import type { ControlSize } from '@ggary/core'
   import { focusCalendarDay, toRange, type CalendarMode, type DateRange } from '@ggary/core/calendar'
   import { connect, createDatePickerMachine, type DatePickerWords, type DatePreset } from '@ggary/core/date-picker'
-  import { attachPopover, mergeProps, onFormReset, svelteNormalizer, uid, type ISODate } from '@ggary/core'
+  import { mergeProps, onFormReset, svelteNormalizer, uid, type ISODate } from '@ggary/core'
   import { useFormField } from '../form/context.svelte'
   import { untrack, type Snippet } from 'svelte'
   import CalendarView from './CalendarView.svelte'
@@ -77,7 +78,6 @@
 
   let inputEl = $state<HTMLInputElement | null>(null)
   let controlEl = $state<HTMLDivElement | null>(null)
-  let positionerEl = $state<HTMLDivElement | null>(null)
   let grid = $state<HTMLDivElement>()
 
   $effect(() =>
@@ -88,53 +88,65 @@
     })
   )
 
-  $effect(() => {
-    const positioner = positionerEl
-    if (!isOpen || !controlEl || !positioner) return
-    return untrack(() => {
-      const popover = attachPopover(controlEl!, positioner, {
-        placement: 'bottom-start',
-        gutter: 4,
-        sameWidth: false,
-        onDismiss: () => machine.send({ type: 'CLOSE' }),
-      })
-      // The calendar is drawn in this same update: focus its day once it is.
-      queueMicrotask(() => document.getElementById(api.calendar.focusedId)?.focus({ preventScroll: true }))
-      return () => {
-        const active = document.activeElement
-        const inside = !active || active === document.body || positioner.contains(active)
-        popover.destroy()
-        if (inside) inputEl?.focus({ preventScroll: true })
-      }
-    })
+  const triggerAttrs = $derived.by(() => {
+    const { onclick: _toggle, ...attrs } = api.triggerProps
+    return attrs
   })
-
+  let inheritedStyle = $state('')
+  let inheritedDir = $state<'ltr' | 'rtl'>('ltr')
+  $effect(() => {
+    if (!isOpen || !controlEl) return
+    const computed = getComputedStyle(controlEl)
+    const vars: string[] = []
+    for (let i = 0; i < computed.length; i++) { const key = computed[i]; if (key.startsWith('--')) vars.push(`${key}:${computed.getPropertyValue(key)}`) }
+    inheritedDir = kit().dir ?? (computed.direction === 'rtl' ? 'rtl' : 'ltr')
+    inheritedStyle = `direction:${inheritedDir};${vars.join(';')}`
+  })
+  let outside = false
+  let wasOpen = false
+  $effect(() => {
+    if (isOpen) outside = false
+    else if (wasOpen && !outside) queueMicrotask(() => {
+      if (!snapshot.open && !outside && inputEl?.isConnected) inputEl.focus({ preventScroll: true })
+    })
+    wasOpen = isOpen
+  })
   $effect(() => {
     const id = api.calendar.focusedId
     untrack(() => focusCalendarDay(grid ?? null, id))
   })
 </script>
 
+<Primitive.Root bind:open={() => isOpen, next => { if (next) outside = false; machine.send({ type: next ? 'OPEN' : 'CLOSE' }) }}>
 <div {...api.rootProps}>
   {#if label}<label {...api.labelProps}>{label}</label>{/if}
   <div bind:this={controlEl} {...api.controlProps}>
     <input bind:this={inputEl} {...mergeProps(api.inputProps, form.field.controlProps)} />
-    <button {...api.triggerProps}><span {...api.triggerIconProps}></span></button>
+    <Primitive.Trigger {...triggerAttrs}><span {...api.triggerIconProps}></span></Primitive.Trigger>
     {@render timeSlot?.()}
   </div>
   {#if api.invalid}<span {...api.errorProps}>{api.errorText}</span>{/if}
   <span {...form.field.errorProps}>{form.error}</span>
-  <div bind:this={positionerEl} {...api.positionerProps}>
-    <div {...api.contentProps}>
-      {#if snapshot.open}
-        <CalendarView api={api.calendar} bind:grid />
-        {#if api.presets.length > 0}
-          <div {...api.presetsProps}>
-            {#each api.presets as { preset } (preset.label)}<button {...api.getPresetProps(preset)}>{preset.label}</button>{/each}
+  <Primitive.Portal>
+    <Primitive.Content id={api.ids.content} side="bottom" align="start" sideOffset={4} customAnchor={controlEl} strategy="fixed" trapFocus={false} preventScroll={false} dir={inheritedDir} style={inheritedStyle}
+      onInteractOutside={() => { outside = true }}
+      onOpenAutoFocus={(event) => { event.preventDefault(); document.getElementById(api.calendar.focusedId)?.focus({ preventScroll: true }) }}
+      onCloseAutoFocus={(event) => { event.preventDefault(); if (!outside) inputEl?.focus({ preventScroll: true }) }}>
+      {#snippet child({ props: contentAttrs, wrapperProps })}
+        <div {...wrapperProps} data-scope="date-picker" data-part="positioner" data-backend="bits-ui" data-state="open">
+          <div {...api.contentProps} {...contentAttrs} data-scope="date-picker" data-part="content" data-backend="bits-ui" aria-labelledby={api.calendar.ids.title}>
+            <CalendarView api={api.calendar} bind:grid />
+            {#if api.presets.length > 0}
+              <div {...api.presetsProps}>
+                {#each api.presets as { preset } (preset.label)}<button {...api.getPresetProps(preset)}>{preset.label}</button>{/each}
+              </div>
+            {/if}
           </div>
-        {/if}
-      {/if}
-    </div>
-  </div>
+        </div>
+      {/snippet}
+    </Primitive.Content>
+  </Primitive.Portal>
   {#if name}<input {...mergeProps(api.hiddenInputProps, submitAs !== undefined ? { value: submitAs } : {})} />{/if}
 </div>
+
+</Primitive.Root>

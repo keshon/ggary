@@ -1,3 +1,4 @@
+import DatePopupPilot from './fixtures/BitsDatePopupPilot.svelte'
 import ToastPilot from './fixtures/SvelteToastPilot.svelte'
 import { createToaster as createNativeToaster } from '../packages/core/src/components/toast'
 import ToolbarPilot from './fixtures/BitsToolbarPilot.svelte'
@@ -165,4 +166,12 @@ it('server renders both toast announcers and persistent error content', () => {
  expect(body).toContain('aria-live="assertive"')
  expect(body).toContain('popover="manual"')
  expect(body).toContain('Failed to save')
+})
+
+it('server renders the date field submission value without mounting its popup', () => {
+ const { body } = render(DatePopupPilot)
+ expect(body).toContain('name="day"')
+ expect(body).toContain('value="2026-10-12"')
+ expect(body).toContain('aria-expanded="false"')
+ expect(body).not.toContain('role="dialog"')
 })

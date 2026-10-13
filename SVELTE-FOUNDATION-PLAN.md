@@ -498,3 +498,35 @@ Next: Calendar/DatePicker foundation and value-format contract.
 Local gates passed: 12 focused toast conformance/SSR cases, two Chromium toast
 cases, TypeScript/Svelte checks and diff whitespace checks. Hosted CI is the
 whole-suite gate after push.
+
+## DatePicker popup checkpoint (2026-10-13)
+
+DateField (shared by ordinary DatePicker and DateTimeField) now uses Bits Popover
+for anchoring, outside/Escape dismissal and portal lifecycle. Removed its
+attachPopover effect and bespoke destroy/focus-restoration path. The existing
+text/date/preset machine still supplies parsed values and calendar state; the
+calendar engine migration is intentionally the next stage. Removed the trigger's
+legacy toggle handler before registering it with Bits to avoid double toggles.
+
+GGary retains ISO/range form serialization, text editing, presets and reset.
+Popup focus enters the current calendar day; Escape/selection return to the
+text input, while outside clicks retain their target focus. Portal content
+copies inherited CSS variables and direction. Shared positioner styling now
+includes the Bits boundary alongside React's Base UI boundary.
+
+Chromium covers anchored geometry, focused day, selection/ISO submission, reset,
+ArrowDown opening and Escape focus return. SSR checks the closed field and
+submission value without mounted popup content.
+
+This is a staged checkpoint. Calendar and DatePicker remain unresolved until
+the calendar engine is migrated; the remaining component count stays 5.
+Next: Bits Calendar/RangeCalendar with GGary ISO date/range adapters.
+
+Local gates passed: all 21 date-picker conformance cases, the Chromium popup
+case (including keyboard Enter selection and outside-click focus), closed-popup
+SSR and anatomy coverage, TypeScript/Svelte checks and docs production build.
+Calendar-driven close needed a deferred field-focus request because it changes
+open state outside the primitive's own dismissal path. Both native browser and
+DOM conformance now assert that focus recovery. Conformance opens the popup
+before checking its ARIA links; closed popup content is deliberately unmounted.
+Previous Toast checkpoint passed hosted CI on run 38371349356.

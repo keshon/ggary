@@ -109,7 +109,7 @@ export function datePickerConformance(adapter: Adapter) {
       ]
       const { m, input, trigger, content, values } = await setup({ mode: 'range', min: '2026-06-01', presets, locale: 'en-GB' })
       await adapter.act(() => click(trigger()))
-      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      await adapter.wait(adapter.name === 'react' || adapter.name === 'svelte' ? 50 : 0)
       const group = part(content(), 'date-picker', 'presets')!
       expect(group.getAttribute('role')).toBe('group')
       const buttons = parts(group, 'date-picker', 'preset') as HTMLButtonElement[]
@@ -118,12 +118,12 @@ export function datePickerConformance(adapter: Adapter) {
         ['Too early', true, 'false'],
       ])
       await adapter.act(() => click(buttons[0]))
-      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      await adapter.wait(adapter.name === 'react' || adapter.name === 'svelte' ? 50 : 0)
       expect(values).toEqual([{ start: '2026-09-01', end: '2026-09-07' }])
       expect(trigger().getAttribute('aria-expanded')).toBe('false')
       expect(input().value).toBe('1 Sept 2026 – 7 Sept 2026')
       await adapter.act(() => click(trigger()))
-      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      await adapter.wait(adapter.name === 'react' || adapter.name === 'svelte' ? 50 : 0)
       expect(part(content(), 'date-picker', 'preset')!.getAttribute('aria-pressed')).toBe('true')
     })
 
@@ -133,6 +133,11 @@ export function datePickerConformance(adapter: Adapter) {
       expect(trigger().getAttribute('aria-haspopup')).toBe('dialog')
       expect(trigger().getAttribute('aria-expanded')).toBe('false')
       expect(trigger().getAttribute('aria-label')).toBe('Choose date')
+      if (adapter.name === 'svelte') {
+        expect(content()).toBeNull()
+        await adapter.act(() => click(trigger()))
+        await adapter.wait(50)
+      }
       expect(trigger().getAttribute('aria-controls')).toBe(content().id)
       expect(content().getAttribute('role')).toBe('dialog')
       expect(input().placeholder).toBe('18.09.2026')
@@ -160,13 +165,13 @@ export function datePickerConformance(adapter: Adapter) {
     it('the button opens the calendar on the chosen day; choosing closes it and brings the focus back', async () => {
       const { m, input, trigger, content, values } = await setup({ defaultValue: '2026-07-04' })
       await adapter.act(() => click(trigger()))
-      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      await adapter.wait(adapter.name === 'react' || adapter.name === 'svelte' ? 50 : 0)
       expect(trigger().getAttribute('aria-expanded')).toBe('true')
       expect(document.activeElement).toBe(dayOf(content(), '2026-07-04'))
       await adapter.act(() => void key(document.activeElement!, 'ArrowRight'))
       expect(document.activeElement).toBe(dayOf(content(), '2026-07-05'))
       await adapter.act(() => void key(document.activeElement!, 'Enter'))
-      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      await adapter.wait(adapter.name === 'react' || adapter.name === 'svelte' ? 50 : 0)
       expect(values).toEqual([{ start: '2026-07-05', end: null }])
       expect(trigger().getAttribute('aria-expanded')).toBe('false')
       expect(document.activeElement).toBe(input())
@@ -175,9 +180,9 @@ export function datePickerConformance(adapter: Adapter) {
     it('Escape in the calendar closes it without choosing, and the focus goes back to the field', async () => {
       const { trigger, input, values } = await setup({ defaultValue: '2026-07-04' })
       await adapter.act(() => click(trigger()))
-      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      await adapter.wait(adapter.name === 'react' || adapter.name === 'svelte' ? 50 : 0)
       await adapter.act(() => void key(document.activeElement!, 'Escape'))
-      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      await adapter.wait(adapter.name === 'react' || adapter.name === 'svelte' ? 50 : 0)
       expect(trigger().getAttribute('aria-expanded')).toBe('false')
       expect(document.activeElement).toBe(input())
       expect(values).toEqual([])
@@ -246,7 +251,7 @@ export function datePickerConformance(adapter: Adapter) {
     it('a range picker opens on two months', async () => {
       const m = await adapter.datePicker({ label: 'Stay', locale: 'en-GB', mode: 'range', defaultValue: { start: '2026-09-28', end: '2026-10-03' }, months: 2 }, freshTarget())
       await adapter.act(() => click(part(m.root, 'date-picker', 'trigger')!))
-      await adapter.wait(adapter.name === 'react' ? 50 : 0)
+      await adapter.wait(adapter.name === 'react' || adapter.name === 'svelte' ? 50 : 0)
       expect(parts(document.getElementById(part(m.root, 'date-picker', 'input')!.id.replace('-input', '-content'))!, 'calendar', 'grid')).toHaveLength(2)
       expect(dayOf(document.getElementById(part(m.root, 'date-picker', 'input')!.id.replace('-input', '-content'))!, '2026-10-01').hasAttribute('data-in-range')).toBe(true)
     })
