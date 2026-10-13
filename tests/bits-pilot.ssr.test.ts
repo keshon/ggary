@@ -1,3 +1,4 @@
+import CalendarPilot from './fixtures/BitsCalendarPilot.svelte'
 import DatePopupPilot from './fixtures/BitsDatePopupPilot.svelte'
 import ToastPilot from './fixtures/SvelteToastPilot.svelte'
 import { createToaster as createNativeToaster } from '../packages/core/src/components/toast'
@@ -174,4 +175,12 @@ it('server renders the date field submission value without mounting its popup', 
  expect(body).toContain('value="2026-10-12"')
  expect(body).toContain('aria-expanded="false"')
  expect(body).not.toContain('role="dialog"')
+})
+
+it('server renders single and range calendar grids with ISO day identities', () => {
+ const { body } = render(CalendarPilot)
+ expect(body).toContain('data-backend="bits-ui"')
+ expect(body).toContain('data-date="2026-10-12"')
+ expect(body).toContain('data-mode="range"')
+ expect(body).toContain('role="grid"')
 })

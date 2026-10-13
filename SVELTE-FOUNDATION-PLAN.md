@@ -530,3 +530,32 @@ open state outside the primitive's own dismissal path. Both native browser and
 DOM conformance now assert that focus recovery. Conformance opens the popup
 before checking its ARIA links; closed popup content is deliberately unmounted.
 Previous Toast checkpoint passed hosted CI on run 38371349356.
+
+## Standalone Calendar checkpoint (2026-10-13)
+
+Standalone Svelte Calendar now uses Bits Calendar/RangeCalendar. Removed its
+createCalendarMachine, subscription/SYNC effects and manual focusCalendarDay
+path. ISO values are converted through the explicit @internationalized/date
+3.12.4 dependency; public single values and complete {start,end} range callbacks
+remain GGary-shaped. Bits owns navigation, focus, range anchoring and selection.
+GGary supplies locale/week start, bounds, disabled-date matcher, labels, two-month
+layout and presentation-state mapping to the existing theme. Two-month duplicate
+outside days remain blank and unfocusable. Navigation buttons use native disabled
+when the primitive reports a bound; header/grid links are explicit.
+
+Selection ARIA belongs to Bits' gridcell around the focusable day; conformance
+checks follow that actual structure. Theme state mapping preserves endpoint
+markers and the band between them. Added Chromium cross-month range, disabled
+skipping, keyboard selection and ISO callback checks, plus SSR calendar coverage.
+
+Standalone Calendar is resolved. Remaining unresolved components: 4: DatePicker,
+TimePicker, Cascader and Shell. DatePicker still renders its original CalendarView
+inside the migrated Bits popup; replace that engine in the next checkpoint.
+Package/installed-consumer release gates remain additional work.
+
+Final local gates passed: all 38 Chromium pilot cases, all 20 Node SSR cases,
+14 focused calendar conformance cases, all 571 source contracts, zero TS/Svelte
+diagnostics, 544 theme measurements and docs production build. Month pages are
+keyed by page index so navigation controls retain DOM identity when their month
+changes. Previous DatePicker-popup checkpoint passed hosted CI on run 38372986894.
+Whole fast-suite coverage remains the hosted gate after push.

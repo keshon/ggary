@@ -39,7 +39,7 @@ export function calendarConformance(adapter: Adapter) {
       expect(days).toHaveLength(42)
       expect(days.filter((day) => day.tabIndex === 0).map((day) => day.dataset.date)).toEqual(['2026-09-18'])
       const chosen = dayOf(m.root, '2026-09-18')
-      expect(chosen.getAttribute('aria-selected')).toBe('true')
+      expect((adapter.name === 'svelte' ? chosen.closest('[role=gridcell]')! : chosen).getAttribute('aria-selected')).toBe('true')
       expect(chosen.getAttribute('aria-label')).toBe('Friday, 18 September 2026')
       expect(chosen.textContent).toBe('18')
       expect(m.root.querySelector('[class]')).toBeNull()
@@ -55,7 +55,8 @@ export function calendarConformance(adapter: Adapter) {
       await press('ArrowLeft')
       await press('Enter')
       expect(values).toEqual([{ start: '2026-10-01', end: null }])
-      expect(dayOf(m.root, '2026-10-01').getAttribute('aria-selected')).toBe('true')
+      const selectedDay = dayOf(m.root, '2026-10-01')
+      expect((adapter.name === 'svelte' ? selectedDay.closest('[role=gridcell]')! : selectedDay).getAttribute('aria-selected')).toBe('true')
     })
 
     it('the month buttons turn the page and stop at the bounds', async () => {

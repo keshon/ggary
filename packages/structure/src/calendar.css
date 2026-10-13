@@ -164,3 +164,6 @@
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='positioner']:is([data-backend='base-ui'], [data-backend='bits-ui']) {
   z-index: var(--gg-z-popover, 1100);
 }
+
+[data-scope='calendar'][data-part='cell'] { padding: 0; text-align: center; }
+[data-scope='calendar'][data-part='day'][data-backend='bits-ui'][data-blank] { visibility: hidden; }

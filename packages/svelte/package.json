@@ -22,6 +22,7 @@
   "dependencies": {
     "@ggary/core": "*",
     "@ggary/icons": "*",
+    "@internationalized/date": "3.12.4",
     "bits-ui": "^2.19.5"
   }
 }
