@@ -21,5 +21,14 @@ it('navigates disabled dates and selects ISO days and a range across two months'
  expect(day(calendars[1],'2026-10-30').hasAttribute('data-in-range')).toBe(true)
  expect(day(calendars[1],'2026-10-29').hasAttribute('data-range-start')).toBe(true)
  expect(day(calendars[1],'2026-11-03').hasAttribute('data-range-end')).toBe(true)
- expect(day(calendars[0],'2026-10-14').getBoundingClientRect().width).toBeGreaterThan(0)
+ // Text must share the disc's center; a div's default line box sits at the top.
+ for (const target of [day(calendars[0],'2026-10-14'), day(calendars[1],'2026-10-29')]) {
+  const text = document.createRange(); text.selectNodeContents(target)
+  const glyph = text.getBoundingClientRect(), box = target.getBoundingClientRect()
+  expect(Math.abs(glyph.top + glyph.height / 2 - box.top - box.height / 2)).toBeLessThan(2)
+  expect(Math.abs(glyph.left + glyph.width / 2 - box.left - box.width / 2)).toBeLessThan(2)
+  const disc = getComputedStyle(target, '::before')
+  expect(parseFloat(disc.borderTopLeftRadius)).toBeGreaterThanOrEqual(parseFloat(disc.width) / 2)
+ }
+
 })

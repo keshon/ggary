@@ -166,6 +166,12 @@
 }
 
 [data-scope='calendar'][data-part='cell'] { padding: 0; text-align: center; }
+/* Bits renders a div inside the grid cell; center its number on the disc. */
+[data-scope='calendar'][data-part='day'][data-backend='bits-ui'] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 [data-scope='calendar'][data-part='day'][data-backend='bits-ui'][data-blank] { visibility: hidden; }
 
 /* Date popups must keep months and presets reachable in a narrow viewport. */

@@ -595,3 +595,9 @@ Bits sizing variables to existing --gg-available-* names in DateField. All 9
 focused theme/source/browser checks then passed. The full Chromium pilot suite
 passed all 39 cases. Final typecheck has zero errors/warnings, all 544 theme
 measurements pass, and the final docs production build passes.
+
+Calendar visual correction: Bits day divs now center text vertically and
+horizontally over the existing rounded selection/focus discs. The table-cell
+layout previously left numbers at the top. Browser geometry assertions cover
+single and range endpoints plus their radius. All 8 focused calendar, popup
+and theme checks passed; the docs page was visually verified.
