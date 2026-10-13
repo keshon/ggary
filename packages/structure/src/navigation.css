@@ -191,3 +191,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+[data-scope='pagination'][data-part='root'] { max-inline-size: 100%; min-inline-size: 0; overflow-x: auto; }
+[data-scope='pagination'][data-part='list'] { flex-wrap: nowrap; }
+[data-scope='pagination'][data-part='item'] { flex: none; white-space: nowrap; }
+@media (max-width: 480px) {
+  [data-scope='pagination'][data-part='list']:has([data-direction]) > [data-part='item']:not([data-direction], [data-current]) { display: none; }
+}

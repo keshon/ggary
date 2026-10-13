@@ -111,6 +111,9 @@
     textOf(column.value ? column.value(row) : (row as Record<string, unknown>)[column.id])
 </script>
 
+<!-- Keyboard focus lets users scroll wide data with arrow keys. -->
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+<div data-scope="table" data-part="viewport" tabindex="0" role="region" aria-label={caption ?? label ?? "Table"}>
 <table {...rest} {...api.rootProps}>
   {#if caption !== undefined}<caption {...api.captionProps}>{caption}</caption>{/if}
   <thead {...api.headerProps}>
@@ -167,3 +170,4 @@
     {/if}
   </tbody>
 </table>
+</div>

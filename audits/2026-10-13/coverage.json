@@ -1,0 +1,5315 @@
+{
+  "date": "2026-10-13",
+  "baselineCommit": "1752e633f5b29b237203c97a48863072d83da3ab",
+  "scope": "Visual overview of every demo page; full-size checks of suspected defects and sampled interactions. Not exhaustive accessibility or usability certification.",
+  "pageCount": 111,
+  "baselineCaptureCount": 444,
+  "darkSampleCaptureCount": 44,
+  "report": "VISUAL-UX-AUDIT.md",
+  "cacheEvidenceDirectory": "node_modules/.cache/visual-audit",
+  "durableEvidenceDirectory": "audits/2026-10-13/evidence",
+  "remediation": {
+    "status": "V01-V12 resolved",
+    "verifiedWidths": [320, 390, 768, 1440],
+    "frameworks": ["react", "svelte"],
+    "openStateEvidence": [
+      "audits/2026-10-13/evidence/after-svelte-cascader-390.png",
+      "audits/2026-10-13/evidence/after-svelte-time-picker-390.png"
+    ]
+  },
+  "pages": [
+    {
+      "id": "button",
+      "title": "Button",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-button.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-button.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-button.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-button.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "button-group",
+      "title": "ButtonGroup",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-button-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-button-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-button-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-button-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "chip",
+      "title": "Chip",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-chip.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-chip.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-chip.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-chip.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "chip-group",
+      "title": "ChipGroup",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-chip-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-chip-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-chip-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-chip-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "menu",
+      "title": "Menu",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V04"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-menu.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-menu.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-react-390-menu-submenu.png"
+          ]
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-menu.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-menu.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-svelte-390-menu-open.png",
+            "state-svelte-390-menu-submenu.png",
+            "state-svelte-390-menubar.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "menubar",
+      "title": "Menubar",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-menubar.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-menubar.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-menubar.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-menubar.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": [
+            "state-svelte-390-menubar.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "context-menu",
+      "title": "ContextMenu",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-context-menu.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-context-menu.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-context-menu.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-context-menu.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": [
+            "state-svelte-390-context-menu.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "command-palette",
+      "title": "CommandPalette",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-command-palette.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-command-palette.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-command-palette.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-command-palette.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": [
+            "state-svelte-390-command-palette.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "field",
+      "title": "Field",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-field.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-field.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-field.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-field.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "input",
+      "title": "Input",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-input.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-input.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-input.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-input.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "textarea",
+      "title": "Textarea",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-textarea.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-textarea.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-textarea.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-textarea.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "search",
+      "title": "Search",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-search.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-search.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-search.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-search.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "input-group",
+      "title": "InputGroup",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-input-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-input-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-input-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-input-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "number-field",
+      "title": "NumberField",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-number-field.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-number-field.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-number-field.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-number-field.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "checkbox",
+      "title": "Checkbox",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-checkbox.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-checkbox.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-checkbox.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-checkbox.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "checkbox-group",
+      "title": "CheckboxGroup",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-checkbox-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-checkbox-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-checkbox-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-checkbox-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "switch",
+      "title": "Switch",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-switch.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-switch.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-switch.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-switch.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "radio-group",
+      "title": "RadioGroup",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-radio-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-radio-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-radio-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-radio-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "choice-card-group",
+      "title": "ChoiceCardGroup",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-choice-card-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-choice-card-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-choice-card-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-choice-card-group.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "segmented-control",
+      "title": "SegmentedControl",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-segmented-control.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-segmented-control.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-segmented-control.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-segmented-control.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "select",
+      "title": "Select",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-select.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-select.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-react-390-select-keyboard.png"
+          ]
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-select.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-select.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-svelte-390-select-keyboard.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "combobox",
+      "title": "Combobox",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V10"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-combobox.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-combobox.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-react-390-combobox-multiple.png"
+          ]
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-combobox.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-combobox.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-svelte-390-combobox-multiple.png",
+            "state-svelte-390-combobox-open.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "cascader",
+      "title": "Cascader",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V09"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-cascader.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-cascader.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": [
+            "state-react-390-cascader-open.png"
+          ]
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-cascader.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-cascader.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": [
+            "state-svelte-390-cascader-open.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "date-picker",
+      "title": "DatePicker",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V01"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-date-picker.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-date-picker.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-date-picker.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-date-picker.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "calendar",
+      "title": "Calendar",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V01"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-calendar.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-calendar.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-calendar.png",
+              "documentWidth": 585,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-calendar.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "time-picker",
+      "title": "TimePicker",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V05"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-time-picker.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-time-picker.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": [
+            "state-react-390-time-picker-open.png"
+          ]
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-time-picker.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-time-picker.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": [
+            "state-svelte-390-time-picker-open.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "slider",
+      "title": "Slider",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V08"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-slider.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-slider.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-slider.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-slider.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "range-slider",
+      "title": "RangeSlider",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-range-slider.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-range-slider.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-range-slider.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-range-slider.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "file-drop",
+      "title": "FileDrop",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-file-drop.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-file-drop.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-file-drop.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-file-drop.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "upload",
+      "title": "Upload",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-upload.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-upload.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-upload.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-upload.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "fieldset",
+      "title": "Fieldset",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-fieldset.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-fieldset.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-fieldset.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-fieldset.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "form",
+      "title": "Form",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-form.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-form.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-form.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-form.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "dialog",
+      "title": "Dialog",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V07"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-dialog.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-dialog.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-react-390-dialog-open.png"
+          ]
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-dialog.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-dialog.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-svelte-390-dialog-open.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sheet",
+      "title": "Sheet",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V07",
+        "V11"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-sheet.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-sheet.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-react-390-sheet-open.png"
+          ]
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-sheet.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-sheet.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-svelte-390-sheet-open.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "popover",
+      "title": "Popover",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-popover.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-popover.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-popover.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-popover.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": [
+            "state-svelte-390-popover.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "tooltip",
+      "title": "Tooltip",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-tooltip.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-tooltip.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-tooltip.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-tooltip.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": [
+            "state-svelte-390-tooltip-focus.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "popconfirm",
+      "title": "Popconfirm",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-popconfirm.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-popconfirm.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-popconfirm.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-popconfirm.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": [
+            "state-svelte-390-popconfirm.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "toast",
+      "title": "Toast",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-toast.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-toast.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-toast.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-toast.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "tabs",
+      "title": "Tabs",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-tabs.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-tabs.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-tabs.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-tabs.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-svelte-390-tabs-end.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "breadcrumbs",
+      "title": "Breadcrumbs",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-breadcrumbs.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-breadcrumbs.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-breadcrumbs.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-breadcrumbs.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "nav",
+      "title": "Nav",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-nav.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-nav.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-nav.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-nav.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "anchor",
+      "title": "Anchor",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-anchor.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-anchor.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-anchor.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-anchor.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "pagination",
+      "title": "Pagination",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V12"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-pagination.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-pagination.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-pagination.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-pagination.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "steps",
+      "title": "Steps",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-steps.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-steps.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-steps.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-steps.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "toolbar",
+      "title": "Toolbar",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-toolbar.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-toolbar.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-toolbar.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-toolbar.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "ribbon",
+      "title": "Ribbon",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-ribbon.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-ribbon.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-ribbon.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-ribbon.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "shell",
+      "title": "Shell",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V03"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-shell.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-shell.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-shell.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-shell.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-svelte-390-shell-drawer.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "split",
+      "title": "Split",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-split.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-split.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-split.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-split.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "rail",
+      "title": "Rail",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-rail.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-rail.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-rail.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-rail.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "status-bar",
+      "title": "StatusBar",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-status-bar.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-status-bar.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-status-bar.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-status-bar.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "page-header",
+      "title": "PageHeader",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-page-header.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-page-header.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-page-header.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-page-header.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "section",
+      "title": "Section",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-section.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-section.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-section.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-section.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "container",
+      "title": "Container",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-container.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-container.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-container.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-container.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "flex",
+      "title": "Flex",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-flex.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-flex.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-flex.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-flex.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "stack",
+      "title": "Stack",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-stack.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-stack.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-stack.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-stack.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "cluster",
+      "title": "Cluster",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-cluster.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-cluster.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-cluster.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-cluster.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "grid",
+      "title": "Grid",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-grid.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-grid.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-grid.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-grid.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "columns",
+      "title": "Columns",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-columns.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-columns.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-columns.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-columns.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "divider",
+      "title": "Divider",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-divider.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-divider.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-divider.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-divider.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "card",
+      "title": "Card",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-card.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-card.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-card.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-card.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "panel",
+      "title": "Panel",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V06"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-panel.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-panel.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-panel.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-panel.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "config-provider",
+      "title": "ConfigProvider",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-config-provider.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-config-provider.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-config-provider.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-config-provider.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "list",
+      "title": "List",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-list.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-list.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-list.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-list.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "table",
+      "title": "Table",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [
+        "V02"
+      ],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-table.png",
+              "documentWidth": 591,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-table.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-table.png",
+              "documentWidth": 591,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-table.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "data-grid",
+      "title": "DataGrid",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-data-grid.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-data-grid.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-data-grid.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-data-grid.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": [
+            "state-svelte-390-data-grid.png"
+          ]
+        }
+      }
+    },
+    {
+      "id": "kanban",
+      "title": "Kanban",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-kanban.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-kanban.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-kanban.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-kanban.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "gantt",
+      "title": "Gantt",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-gantt.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-gantt.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-gantt.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-gantt.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "tree",
+      "title": "Tree",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-tree.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-tree.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-tree.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-tree.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "accordion",
+      "title": "Accordion",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-accordion.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-accordion.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-accordion.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-accordion.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "icon",
+      "title": "Icon",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-icon.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-icon.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-icon.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-icon.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "badge",
+      "title": "Badge",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-badge.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-badge.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-badge.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-badge.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "avatar",
+      "title": "Avatar",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-avatar.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-avatar.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-avatar.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-avatar.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "avatar-group",
+      "title": "AvatarGroup",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-avatar-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-avatar-group.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-avatar-group.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-avatar-group.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "spinner",
+      "title": "Spinner",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-spinner.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-spinner.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-spinner.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-spinner.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "skeleton",
+      "title": "Skeleton",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-skeleton.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-skeleton.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-skeleton.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-skeleton.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "progress",
+      "title": "Progress",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-progress.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-progress.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-progress.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-progress.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "meter",
+      "title": "Meter",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-meter.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-meter.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-meter.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-meter.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "ring",
+      "title": "Ring",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-ring.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-ring.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-ring.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-ring.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "banner",
+      "title": "Banner",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-banner.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-banner.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-banner.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-banner.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "note",
+      "title": "Note",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-note.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-note.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-note.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-note.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "result",
+      "title": "Result",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-result.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-result.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-result.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-result.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "empty-state",
+      "title": "EmptyState",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-empty-state.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-empty-state.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-empty-state.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-empty-state.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "status-dot",
+      "title": "StatusDot",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-status-dot.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-status-dot.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-status-dot.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-status-dot.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "caret",
+      "title": "Caret",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-caret.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-caret.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-caret.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-caret.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "timeline",
+      "title": "Timeline",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-timeline.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-timeline.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-timeline.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-timeline.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "key-value-list",
+      "title": "KeyValueList",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-key-value-list.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-key-value-list.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-key-value-list.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-key-value-list.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "metric",
+      "title": "Metric",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-metric.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-metric.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-metric.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-metric.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "file-change",
+      "title": "FileChange",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-file-change.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-file-change.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-file-change.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-file-change.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "prose",
+      "title": "Prose",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-prose.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-prose.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-prose.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-prose.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "text",
+      "title": "Text",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-text.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-text.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-text.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-text.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "link",
+      "title": "Link",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-link.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-link.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-link.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-link.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "code-block",
+      "title": "CodeBlock",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-code-block.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-code-block.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-code-block.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-code-block.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "copyable",
+      "title": "Copyable",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-copyable.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-copyable.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-copyable.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-copyable.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "inserts",
+      "title": "Inserts",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-inserts.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-inserts.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-inserts.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-inserts.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "sparkline",
+      "title": "Sparkline",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-sparkline.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-sparkline.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-sparkline.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-sparkline.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "legend",
+      "title": "Legend",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-legend.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-legend.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-legend.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-legend.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "share",
+      "title": "Share",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-share.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-share.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-share.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-share.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "heatmap",
+      "title": "Heatmap",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-heatmap.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-heatmap.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-heatmap.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-heatmap.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "run",
+      "title": "Run",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-run.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-run.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-run.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-run.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "queue",
+      "title": "Queue",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-queue.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-queue.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-queue.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-queue.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "history",
+      "title": "History",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-history.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-history.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-history.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-history.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "budget",
+      "title": "Budget",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-budget.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-budget.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-budget.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-budget.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "step",
+      "title": "Step",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-step.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-step.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-step.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-step.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "log",
+      "title": "Log",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-log.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-log.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-log.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-log.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "diff",
+      "title": "Diff",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-diff.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-diff.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-diff.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-diff.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "lanes",
+      "title": "Lanes",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-lanes.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-lanes.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-lanes.png",
+              "documentWidth": 390,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-lanes.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "turn",
+      "title": "Turn",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-turn.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-turn.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-turn.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-turn.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "composer",
+      "title": "Composer",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-composer.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-composer.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-composer.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-composer.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": true,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "thinking",
+      "title": "Thinking",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-thinking.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-thinking.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-thinking.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-thinking.png",
+              "documentWidth": 1440,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "approval",
+      "title": "Approval",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-approval.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-approval.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-approval.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-approval.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    },
+    {
+      "id": "failure",
+      "title": "Failure",
+      "designSystem": "overview-reviewed",
+      "visual": "overview-reviewed",
+      "responsive": "390-and-1440-reviewed",
+      "ux": "baseline-specimen-review; interactive states sampled",
+      "findings": [],
+      "frameworks": {
+        "react": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/react-390-failure.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/react-1440-failure.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        },
+        "svelte": {
+          "baseline": [
+            {
+              "width": 390,
+              "evidence": "node_modules/.cache/visual-audit/svelte-390-failure.png",
+              "documentWidth": 380,
+              "status": "overview-reviewed"
+            },
+            {
+              "width": 1440,
+              "evidence": "node_modules/.cache/visual-audit/svelte-1440-failure.png",
+              "documentWidth": 1430,
+              "status": "overview-reviewed"
+            }
+          ],
+          "darkSample": false,
+          "interactiveEvidence": []
+        }
+      }
+    }
+  ]
+}

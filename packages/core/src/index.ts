@@ -146,3 +146,5 @@ export * as diff from './components/diff'
 export * as lanes from './components/lanes'
 export * as ribbon from './components/ribbon'
 export * as table from './components/table'
+
+export { observeSliderLabels } from './utils/slider-labels'

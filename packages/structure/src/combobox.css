@@ -109,3 +109,7 @@
   z-index: calc(var(--gg-z-dialog, 1000) + var(--gg-z-popover, 50));
   min-inline-size: var(--gg-anchor-width, 200px);
 }
+
+[data-scope='combobox'][data-part='control'] { flex-wrap: nowrap; }
+[data-scope='combobox'][data-part='editor'] { display: flex; flex: 1 1 0; flex-wrap: wrap; align-items: center; min-inline-size: 0; gap: inherit; }
+[data-scope='combobox'][data-part='actions'] { display: flex; flex: none; align-items: center; gap: inherit; }

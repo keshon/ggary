@@ -23,7 +23,7 @@ export function paginationRange(options: PaginationRangeOptions): PageItem[] {
 
   const items: PageItem[] = []
   if (previousLabel !== undefined) {
-    items.push({ label: previousLabel, page: page - 1, href: page > 1 ? address(page - 1) : undefined, disabled: page <= 1 })
+    items.push({ label: previousLabel, direction: 'previous', page: page - 1, href: page > 1 ? address(page - 1) : undefined, disabled: page <= 1 })
   }
   const page_ = (n: number) => ({ label: String(n), page: n, href: address(n), current: n === page })
   let previous = 0
@@ -37,7 +37,7 @@ export function paginationRange(options: PaginationRangeOptions): PageItem[] {
     previous = number
   }
   if (nextLabel !== undefined) {
-    items.push({ label: nextLabel, page: page + 1, href: page < pages ? address(page + 1) : undefined, disabled: page >= pages })
+    items.push({ label: nextLabel, direction: 'next', page: page + 1, href: page < pages ? address(page + 1) : undefined, disabled: page >= pages })
   }
   return items
 }
@@ -63,7 +63,7 @@ export function connect<T = Dict>(props: PaginationProps, normalize: Normalizer<
   const { items, label = 'Pages' } = props
 
   const getItemProps = (item: PageItem) => ({
-    itemProps: normalize({ ...anatomy.attrs('item') }),
+    itemProps: normalize({ ...anatomy.attrs('item'), 'data-direction': item.direction, 'data-current': item.current ? '' : undefined }),
     linkProps: normalize({
       ...anatomy.attrs(item.gap ? 'gap' : 'link'),
       href: item.disabled ? undefined : item.href,

@@ -1,9 +1,9 @@
 import { useFieldsetGroup } from '../fieldset/Fieldset'
-import { forwardRef, useId, useRef, useState, type InputHTMLAttributes } from 'react'
+import { forwardRef, useEffect, useId, useRef, useState, type InputHTMLAttributes } from 'react'
 import { Slider as Primitive } from '@base-ui/react/slider'
 import { DirectionProvider } from '@base-ui/react/direction-provider'
 import { connect, type SliderProps as CoreSliderProps } from '@ggary/core/slider'
-import { reactNormalizer } from '@ggary/core'
+import { observeSliderLabels, reactNormalizer } from '@ggary/core'
 import { useFieldControl } from '../field/Field'
 import { useMergedRef } from '../../utils/use-merged-ref'
 import { useFormReset } from '../../utils/use-form-reset'
@@ -35,6 +35,8 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(function Slider(
   const config = useConfig()
   // Core supplies presentation only: no legacy input callback is installed.
   const api = connect({ id, value: value ?? own, min, max, step, name, label, valueText, showValue, size, disabled, required, invalid, marks }, reactNormalizer, { formatValue, field: field ?? undefined })
+  const marksRef = useRef<HTMLDivElement>(null)
+  useEffect(() => observeSliderLabels(marksRef.current), [marks])
   const element = useRef<HTMLInputElement>(null)
   const ref = useMergedRef(element, forwardedRef)
   useFormReset(element, () => setOwn(defaultValue ?? min + (max - min) / 2))
@@ -50,7 +52,7 @@ export const Slider = forwardRef<HTMLInputElement, SliderProps>(function Slider(
           render={(thumbProps) => <div {...thumbProps}>{sliderInput(thumbProps.children, { ...rest, ...inputAttributes })}</div>} />
       </Primitive.Control>
       {api.showValue && <output {...api.outputProps}>{api.valueLabel}</output>}
-      {api.marks.length > 0 && <div {...api.marksProps}>{api.marks.map((mark) => <span key={mark.value} {...api.getMarkProps(mark)}>{mark.label}</span>)}</div>}
+      {api.marks.length > 0 && <div ref={marksRef} {...api.marksProps}>{api.marks.map((mark) => <span key={mark.value} {...api.getMarkProps(mark)}><span data-scope="slider" data-part="mark-label">{mark.label}</span></span>)}</div>}
     </Primitive.Root>
   </DirectionProvider>
 })

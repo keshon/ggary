@@ -97,11 +97,20 @@ export function Cascader(props: CascaderProps) {
   const { onClick: _legacyToggle, ...triggerProps } = api.triggerProps
   const { popover: _nativePopover, ...positionerProps } = api.positionerProps
 
-  useLayoutEffect(() => focusCascaderItem(contentRef.current, api.focusedId), [api.focusedId])
+  useLayoutEffect(() => {
+    if (!state.open) return
+    focusCascaderItem(contentRef.current, api.focusedId)
+    let settledFrame = 0
+    const frame = requestAnimationFrame(() => {
+      settledFrame = requestAnimationFrame(() => focusCascaderItem(contentRef.current, api.focusedId, true))
+    })
+    const settled = window.setTimeout(() => focusCascaderItem(contentRef.current, api.focusedId, true), 60)
+    return () => { cancelAnimationFrame(frame); cancelAnimationFrame(settledFrame); window.clearTimeout(settled) }
+  }, [api.focusedId, state.open])
 
   return (
     <DirectionProvider direction={environment.dir ?? 'ltr'}>
-    <Primitive.Root open={state.open} modal={false} onOpenChange={next => send({ type: next ? 'OPEN' : 'CLOSE' })}>
+    <Primitive.Root open={state.open} modal={false} onOpenChangeComplete={open => { if (open) focusCascaderItem(contentRef.current, api.focusedId) }} onOpenChange={next => send({ type: next ? 'OPEN' : 'CLOSE' })}>
     <div {...api.rootProps} data-disabled={disabled ? '' : undefined} data-readonly={readOnly ? '' : undefined}>
       {label && !field?.['aria-labelledby'] && <label {...api.labelProps} htmlFor={triggerId}>{label}</label>}
       <Primitive.Trigger ref={triggerRef} {...mergeProps(triggerProps, form.field.controlProps, triggerMetadata, form.error ? form.field.controlProps : {}, {

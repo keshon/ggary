@@ -210,6 +210,7 @@ export function Combobox(props: ComboboxProps) {
       <div ref={root} {...part('root')} id={id} data-size={size} data-state={state} data-multiple={multiple ? '' : undefined} data-disabled={disabled ? '' : undefined}>
         {label && !field && <label {...part('label')} id={`${id}-label`} htmlFor={inputId} data-disabled={disabled ? '' : undefined}>{label}</label>}
         <Primitive.InputGroup ref={control} {...part('control')} data-state={state} data-disabled={disabled ? '' : undefined}>
+          <div data-scope="combobox" data-part="editor">
           {multiple && selected.map(item => <span key={item.value} {...part('chip')} data-value={item.value}>
             <span {...part('chip-text')}>{item.label}</span>
             <button {...part('chip-remove')} type="button" tabIndex={-1} disabled={disabled || readOnly}
@@ -227,12 +228,15 @@ export function Combobox(props: ComboboxProps) {
               event.preventDefault(); commit(chosen.slice(0, -1))
             }
           }} />
+          </div>
+          <div data-scope="combobox" data-part="actions">
           <Primitive.Clear {...part('clear')} tabIndex={-1} aria-label={words.clear ?? 'Clear'}>
             <span {...part('clear-icon')} data-icon="close" aria-hidden="true" />
           </Primitive.Clear>
           <Primitive.Trigger {...part('trigger')} tabIndex={-1} aria-label="Show options" data-state={state}>
             <span {...part('trigger-icon')} data-icon="chevron-down" aria-hidden="true" />
           </Primitive.Trigger>
+          </div>
         </Primitive.InputGroup>
         {!composition?.name && <span {...form.field.errorProps}>{form.error}</span>}
         <span {...part('status')} id={`${id}-status`} role="status" aria-live="polite">{statusText}</span>

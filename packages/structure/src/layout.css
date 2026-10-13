@@ -88,6 +88,9 @@
 /* The one breakpoint. The same number is SHELL_NARROW in core, which a
    contract test holds to this one: a query cannot read a custom property. */
 @media (width < 60rem) {
+  [data-scope='shell'][data-collapse='bar'] [data-part='aside'] [data-scope='nav']:is([data-part='root'], [data-part='group'], [data-part='item'], [data-part='branch']) { flex: none; }
+  [data-scope='shell'][data-collapse='bar'] [data-part='aside'] [data-scope='nav'][data-part='root'] { min-inline-size: max-content; }
+
   [data-scope='shell'][data-part='root'] {
     grid-template-areas: 'header' 'aside' 'main' 'footer';
     grid-template-columns: minmax(0, 1fr);

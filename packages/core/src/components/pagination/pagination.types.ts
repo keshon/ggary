@@ -1,6 +1,8 @@
 export interface PageItem {
   /** The page number, or the words at the edges: "Back", "Forward". */
   label: string
+  /** Directional navigation remains visible in compact layouts. */
+  direction?: 'previous' | 'next'
   href?: string
   page?: number
   current?: boolean

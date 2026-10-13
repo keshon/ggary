@@ -3,7 +3,7 @@
   import { FIELDSET_CONTEXT, type FieldsetContext } from '../fieldset/context'
   import { getConfig } from '../config-provider/context'
   import { connect, type SliderProps } from '@ggary/core/slider'
-  import { mergeProps, onFormReset, svelteNormalizer, uid } from '@ggary/core'
+  import { observeSliderLabels, mergeProps, onFormReset, svelteNormalizer, uid } from '@ggary/core'
   import { getContext, untrack } from 'svelte'
   import { FIELD_CONTEXT, type FieldContext } from '../field/context'
 
@@ -43,6 +43,8 @@
     })
   )
 
+  let marksEl = $state<HTMLDivElement | null>(null)
+  $effect(() => observeSliderLabels(marksEl))
   let element: HTMLInputElement
   $effect(() =>
     onFormReset(element, () => {
@@ -72,8 +74,8 @@
     <output {...api.outputProps}>{api.valueLabel}</output>
   {/if}
   {#if api.marks.length > 0}
-    <div {...api.marksProps}>
-      {#each api.marks as mark (mark.value)}<span {...api.getMarkProps(mark)}>{mark.label}</span>{/each}
+    <div bind:this={marksEl} {...api.marksProps}>
+      {#each api.marks as mark (mark.value)}<span {...api.getMarkProps(mark)}><span data-scope="slider" data-part="mark-label">{mark.label}</span></span>{/each}
     </div>
   {/if}
 </div>

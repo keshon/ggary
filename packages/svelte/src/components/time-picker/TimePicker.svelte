@@ -88,6 +88,28 @@
     if (value !== undefined) value = initial
     editing = false; invalid = false; draft = ''; isOpen = false
   }))
+  let contentEl = $state<HTMLDivElement | null>(null)
+  $effect(() => {
+    if (!isOpen || !contentEl || !inputEl) return
+    const content = contentEl, input = inputEl
+    let frame = 0
+    const reveal = () => {
+      cancelAnimationFrame(frame)
+      frame = requestAnimationFrame(() => {
+        const activeId = input.getAttribute('aria-activedescendant')
+        const active = activeId ? content.ownerDocument.getElementById(activeId) : null
+        const item = active ?? content.querySelector<HTMLElement>('[aria-selected="true"]')
+        if (!item || !content.contains(item)) return
+        const outer = content.getBoundingClientRect(), inner = item.getBoundingClientRect()
+        if (inner.top < outer.top || inner.bottom > outer.bottom) content.scrollTop += inner.top - outer.top - (content.clientHeight - inner.height) / 2
+      })
+    }
+    const observer = new MutationObserver(reveal)
+    observer.observe(input, { attributes: true, attributeFilter: ['aria-activedescendant'] })
+    observer.observe(content, { childList: true, subtree: true, attributes: true, attributeFilter: ['aria-selected'] })
+    reveal()
+    return () => { observer.disconnect(); cancelAnimationFrame(frame) }
+  })
   let inheritedStyle = $state('')
   let inheritedDir = $state<'ltr' | 'rtl'>('ltr')
   $effect(() => {
@@ -125,7 +147,7 @@
     <Primitive.Content forceMount id={ids.content} side="bottom" align="start" sideOffset={4} customAnchor={controlEl} strategy="fixed" dir={inheritedDir} style={inheritedStyle}>
       {#snippet child({ props: contentAttrs, wrapperProps })}
         <div {...wrapperProps} data-scope="time-picker" data-part="positioner" data-backend="bits-ui" data-state={isOpen ? 'open' : 'closed'}>
-          <div {...mergePrimitiveProps(contentAttrs, part('content'), { style: { width: 'var(--bits-floating-anchor-width)', '--gg-available-height': 'var(--bits-floating-available-height)' } })} aria-label={words?.times ?? 'Times'} data-state={isOpen ? 'open' : 'closed'} hidden={!isOpen}>
+          <div bind:this={contentEl} {...mergePrimitiveProps(contentAttrs, part('content'), { style: { width: 'var(--bits-floating-anchor-width)', '--gg-available-height': 'var(--bits-floating-available-height)' } })} aria-label={words?.times ?? 'Times'} data-state={isOpen ? 'open' : 'closed'} hidden={!isOpen}>
             {#if isOpen}{#each times as item (item.time)}<Primitive.Item {...part('item')} id={ids.item(item.time)} value={item.time} label={item.label} disabled={item.disabled} aria-disabled={item.disabled ? 'true' : undefined} onpointerup={() => { if (!item.disabled && item.time === committed) commit(item.time) }}>{item.label}</Primitive.Item>{/each}{/if}
           </div>
         </div>

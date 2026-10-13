@@ -7,12 +7,24 @@
   let { item, closeOnSelect, onSelect, onReason, onNextMenu, dir, inheritedStyle, level, children }: Props = $props()
   let shown = $state(false)
   let trigger = $state<HTMLElement | null>(null)
+  let side = $state<'left' | 'right' | 'bottom'>('right')
+  $effect(() => {
+    if (!shown || !trigger) return
+    const chooseSide = () => {
+      const rect = trigger!.getBoundingClientRect()
+      const width = trigger!.ownerDocument.documentElement.clientWidth
+      side = Math.max(rect.left - 12, width - rect.right - 12) < 180 ? 'bottom' : dir === 'rtl' ? 'left' : 'right'
+    }
+    chooseSide()
+    window.addEventListener('resize', chooseSide)
+    return () => window.removeEventListener('resize', chooseSide)
+  })
   const part = (name: string) => ({ 'data-scope': 'menu', 'data-part': name, 'data-backend': 'bits-ui' })
 </script>
 <Primitive.Sub bind:open={shown}>
   <Primitive.SubTrigger bind:ref={trigger} {...part('item')} disabled={item.disabled} textValue={item.label} data-type="submenu">{@render children()}</Primitive.SubTrigger>
   <Primitive.Portal>
-    <Primitive.SubContent strategy="fixed" side={dir === 'rtl' ? 'left' : 'right'} align="start" sideOffset={4} loop style={inheritedStyle} {dir} aria-labelledby={trigger?.id}
+    <Primitive.SubContent strategy="fixed" side={side} align="start" sideOffset={4} loop style={inheritedStyle} {dir} aria-labelledby={trigger?.id}
       onkeydown={event => { if (onNextMenu && event.key === (dir === 'rtl' ? 'ArrowLeft' : 'ArrowRight') && !(event.target as HTMLElement).hasAttribute('data-menu-sub-trigger')) { event.preventDefault(); event.stopPropagation(); onNextMenu(event.key) } }}
       escapeKeydownBehavior="close" onEscapeKeydown={event => { event.preventDefault(); event.stopPropagation(); shown = false; trigger?.focus() }}>
       {#snippet child({ props: contentProps, wrapperProps })}

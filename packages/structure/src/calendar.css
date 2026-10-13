@@ -187,3 +187,11 @@
   min-inline-size: 0;
 }
 [data-scope='date-picker'][data-part='content'][data-backend='bits-ui'] [data-scope='calendar'][data-part='months'] { flex-wrap: wrap; }
+
+/* Months keep readable day targets and wrap within their actual container. */
+[data-scope='calendar'][data-part='root'] { box-sizing: border-box; max-inline-size: 100%; min-inline-size: 0; overflow: auto; }
+[data-scope='calendar'][data-part='months'] { flex-wrap: wrap; }
+[data-scope='calendar'][data-part='month'] { flex: 0 0 auto; inline-size: 252px; }
+[data-scope='calendar'][data-part='grid'] { inline-size: 100%; }
+[data-scope='date-picker'][data-part='content'] { box-sizing: border-box; max-inline-size: var(--gg-available-width, calc(100vw - 16px)); max-block-size: var(--gg-available-height, 100vh); overflow: auto; flex-wrap: wrap; }
+[data-scope='date-picker'][data-part='content'] > [data-scope='calendar'] { min-inline-size: 0; max-inline-size: 100%; }

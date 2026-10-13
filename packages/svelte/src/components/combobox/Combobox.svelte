@@ -162,6 +162,7 @@
   <div {...part('control')} bind:this={controlEl}
     onpointerdown={event => { if (!(event.target as Element).closest('input, button') && !disabled) { event.preventDefault(); inputEl?.focus(); isOpen = true } }}
     data-state={isOpen ? 'open' : 'closed'} data-disabled={disabled ? '' : undefined}>
+    <div data-scope="combobox" data-part="editor">
     {#if multiple}
       {#each selected as item (item.value)}
         <span {...part('chip')} data-value={item.value}>
@@ -182,9 +183,12 @@
       onkeydown={event => { if (!event.isComposing && !disabled && event.key === 'Backspace' && multiple && !query && chosen.length) { event.preventDefault(); commit(chosen.slice(0, -1)) } }}>
       {#snippet child({ props: inputProps })}<input {...inputProps} value={inputText} />{/snippet}
     </Primitive.Input>
+    </div>
+    <div data-scope="combobox" data-part="actions">
     <button {...part('clear')} type="button" tabindex={-1} aria-label={words.clear ?? 'Clear'} {disabled} hidden={!chosen.length && !query}
       onpointerdown={event => event.preventDefault()} onclick={clear}><span {...part('clear-icon')} data-icon="close" aria-hidden="true"></span></button>
     <Primitive.Trigger {...part('trigger')} type="button" tabindex={-1} aria-label="Show options"><span {...part('trigger-icon')} data-icon="chevron-down" aria-hidden="true"></span></Primitive.Trigger>
+    </div>
   </div>
   <span {...form.field.errorProps}>{form.error}</span>
   <span {...part('status')} id={`${id}-status`} role="status" aria-live="polite">{statusText}</span>

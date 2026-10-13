@@ -8,9 +8,11 @@
 </script>
 
 {#snippet parameters()}
+  <div class="sheet-parameters">
   <Select label="Model" items={roles} defaultValue="editor" />
   <Field label="Agents" hint="1 to 12"><Input type="number" defaultValue="7" /></Field>
   <Switch defaultChecked>Keep logs</Switch>
+  </div>
 {/snippet}
 
 {#snippet apply()}<Button emphasis="high">Apply</Button>{/snippet}

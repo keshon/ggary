@@ -14,6 +14,9 @@ it('anchors the time popup, preserves typed off-step values, selection, reset an
  const trigger=form.querySelector<HTMLElement>('[data-part=trigger]')!
  await userEvent.click(trigger);await settle()
  const popup=document.querySelector<HTMLElement>('[data-scope=time-picker][data-part=content][data-state=open]')!
+ const selected = popup.querySelector<HTMLElement>('[aria-selected="true"]')!
+ expect(selected.getBoundingClientRect().top).toBeGreaterThanOrEqual(popup.getBoundingClientRect().top)
+ expect(selected.getBoundingClientRect().bottom).toBeLessThanOrEqual(popup.getBoundingClientRect().bottom)
  expect(document.activeElement).toBe(input)
  const control=form.querySelector('[data-part=control]')!.getBoundingClientRect(), rect=popup.getBoundingClientRect()
  expect(Math.abs(rect.left-control.left)).toBeLessThan(3)

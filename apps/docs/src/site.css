@@ -244,3 +244,10 @@ body {
 .combobox-pilot-page .specimens {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
 }
+
+/* Size-contained panels need an explicit width from their host. */
+.specimen-stage > [data-scope='panel'][data-part='root'] { inline-size: 100%; }
+/* Static previews are constrained by their miniature window. */
+.frame > dialog[open] { box-sizing: border-box; max-inline-size: 100%; animation: none; translate: none; }
+.sheet-parameters { display: grid; gap: 16px; inline-size: 100%; }
+.sheet-parameters > [data-scope='select'] { inline-size: 100%; }

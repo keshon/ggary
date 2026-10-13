@@ -44,3 +44,6 @@
   width: 1px;
   white-space: nowrap;
 }
+
+/* Scroll the data, rather than the entire page; keep native table semantics. */
+[data-scope='table'][data-part='viewport'] { inline-size: 100%; max-inline-size: 100%; min-inline-size: 0; overflow: auto; }

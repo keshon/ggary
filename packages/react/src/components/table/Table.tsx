@@ -81,6 +81,7 @@ export function Table<Row = any>(props: TableProps<Row>) {
   useEffect(() => machine.send({ type: 'SYNC_OPTIONS', selectable }), [machine, selectable])
 
   return (
+    <div data-scope="table" data-part="viewport" tabIndex={0} role="region" aria-label={caption ?? label ?? "Table"}>
     <table {...rest} {...api.rootProps}>
       {caption !== undefined && <caption {...api.captionProps}>{caption}</caption>}
       <thead {...api.headerProps}>
@@ -132,5 +133,6 @@ export function Table<Row = any>(props: TableProps<Row>) {
         )}
       </tbody>
     </table>
+    </div>
   )
 }

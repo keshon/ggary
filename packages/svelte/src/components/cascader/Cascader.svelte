@@ -92,7 +92,10 @@
   })
   $effect(() => {
     const id = api.focusedId
+    if (!isOpen || !contentEl) return
     untrack(() => focusCascaderItem(contentEl, id))
+    const frame = requestAnimationFrame(() => focusCascaderItem(contentEl, id))
+    return () => cancelAnimationFrame(frame)
   })
 </script>
 
