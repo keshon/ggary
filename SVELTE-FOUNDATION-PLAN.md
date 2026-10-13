@@ -472,3 +472,29 @@ installed-consumer release gates remain additional work. Next: Toast ownership.
 Local gates passed: all 34 Chromium pilot cases, nine focused toolbar/SSR
 cases, all 571 source contracts, TypeScript/Svelte checks and docs build.
 No whole fast-suite rerun is claimed; hosted CI remains the full regression gate.
+
+## Svelte Toast ownership checkpoint (2026-10-13)
+
+Installed Bits UI has no Toast primitive. Svelte Toaster deliberately remains a
+GGary component with a pure queue/timer store, native manual-popover top layer,
+pre-existing polite/assertive announcers and native action/close buttons. This is
+an explicit custom-component ownership decision, not a pending interaction bridge.
+React's separate Base UI toast owner remains unchanged.
+
+Fixed overlapping pause reasons in the Svelte region: hover and keyboard focus
+are tracked independently. Leaving with the pointer no longer restarts timers
+while focus is inside; blurring no longer restarts them while hovered. Region
+unmount/store replacement releases the pause it acquired. The default idle
+region does not resume a queue that was paused externally.
+
+Chromium covers combined pause reasons, cleanup, native top-layer openness,
+announcement urgency and single action invocation/dismissal. SSR covers stable
+announcers and persistent error content. Previous toolbar checkpoint passed CI.
+
+Remaining unresolved components: 5: Calendar, DatePicker, TimePicker, Cascader,
+and Shell. Package/installed-consumer release gates remain additional work.
+Next: Calendar/DatePicker foundation and value-format contract.
+
+Local gates passed: 12 focused toast conformance/SSR cases, two Chromium toast
+cases, TypeScript/Svelte checks and diff whitespace checks. Hosted CI is the
+whole-suite gate after push.

@@ -1,3 +1,5 @@
+import ToastPilot from './fixtures/SvelteToastPilot.svelte'
+import { createToaster as createNativeToaster } from '../packages/core/src/components/toast'
 import ToolbarPilot from './fixtures/BitsToolbarPilot.svelte'
 import RibbonPilot from './fixtures/BitsRibbonPilot.svelte'
 import FormContractsPilot from './fixtures/SvelteFormContractsPilot.svelte'
@@ -153,4 +155,14 @@ it('server renders managed toolbar semantics and keeps mixed groups ordinary', (
  expect(body).toContain('aria-label="Actions"')
  expect(body).toContain('Mixed text')
  expect(body).toContain('Plain action')
+})
+
+it('server renders both toast announcers and persistent error content', () => {
+ const toaster = createNativeToaster()
+ toaster.toast({ title: 'Failed to save', tone: 'error' })
+ const { body } = render(ToastPilot, { props: { toaster } })
+ expect(body).toContain('aria-live="polite"')
+ expect(body).toContain('aria-live="assertive"')
+ expect(body).toContain('popover="manual"')
+ expect(body).toContain('Failed to save')
 })

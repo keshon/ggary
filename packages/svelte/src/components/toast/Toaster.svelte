@@ -27,12 +27,26 @@
 
   const api = $derived(connect(snapshot, toaster, svelteNormalizer, { placement, label, closeLabel }))
 
+  let hovered = $state(false)
+  let focused = $state(false)
+  // Each pause reason survives the other ending. Cleanup releases this region's pause.
+  $effect(() => {
+    const current = toaster
+    const active = hovered || focused
+    if (active) current.pause()
+    return () => { if (active) current.resume() }
+  })
+
   // Opened once and kept open: a live region that is not displayed announces nothing.
   let region: HTMLElement
   $effect(() => keepRegionOpen(region))
 </script>
 
-<section bind:this={region} {...api.regionProps}>
+<section bind:this={region} {...api.regionProps}
+  onpointerenter={() => { hovered = true }} onpointerleave={() => { hovered = false }}
+  onfocusin={() => { focused = true }}
+  onfocusout={(event) => { if (!region.contains(event.relatedTarget as Node | null)) focused = false }}>
+
   <div {...api.politeProps}>
     {#key snapshot.announcement.nonce}{#if api.politeText}<p {...api.announcementProps}>{api.politeText}</p>{/if}{/key}
   </div>
