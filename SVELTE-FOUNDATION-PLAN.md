@@ -757,3 +757,10 @@ candidate caches as artifacts. Hosted CI remains the post-push gate, not a local
 verified result. Local release-candidate gates are complete; no npm publication
 or version release occurred. The adapter scan found no attachPopover,
 attachShellDrawer, attachDialog or bridge references in packages/svelte/src.
+
+Hosted CI run 38389814754 passed common verification, Svelte pilots,
+package exports/types/build and Node SSR, then observed the native input
+reset's temporary empty value before onFormReset's deferred callback.
+The installed-consumer assertion now waits for both displayed and canonical
+form values to converge to 14:00. This changes test synchronization only.
+The complete installed-consumer gate and 5 extra reset cycles passed locally.

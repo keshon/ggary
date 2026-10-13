@@ -92,6 +92,13 @@ try {
  await page.getByRole('button',{name:'Submit',exact:true}).click()
  assert.equal(await page.getByLabel('Submitted time').textContent(),'16:37')
  await page.getByRole('button',{name:'Reset',exact:true}).click()
+ // Native reset runs before the adapter's deferred reset callback.
+ // Require both displayed and canonical values to converge, rather than
+ // observing the temporary native empty value between those two steps.
+ await page.waitForFunction(() => {
+  const form=document.querySelector('form'), input=form?.querySelector('[role=combobox]')
+  return form && input instanceof HTMLInputElement && input.value === '14:00' && new FormData(form).get('starts') === '14:00'
+ })
  assert.equal(await page.getByRole('combobox',{name:'Starts',exact:true}).inputValue(),'14:00')
  await page.getByRole('button',{name:'Open settings',exact:true}).click()
  const stageControl=page.getByRole('combobox',{name:'Stage',exact:true})
