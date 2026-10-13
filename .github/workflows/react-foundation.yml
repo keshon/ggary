@@ -23,12 +23,16 @@ jobs:
       - run: npm run verify:react
       - name: Svelte Bits UI pilot in Chromium
         run: npm run test:svelte-pilot:browser
+      - name: Installed Svelte package consumer
+        run: npm run smoke:svelte-packages
       - name: Ensure inventory is current
         run: git diff --exit-code -- packages/react/component-inventory.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: react-package-candidates
-          path: node_modules/.cache/react-release
+          name: framework-package-candidates
+          path: |
+            node_modules/.cache/react-release
+            node_modules/.cache/svelte-release
           if-no-files-found: ignore
           retention-days: 7

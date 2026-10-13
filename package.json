@@ -18,9 +18,13 @@
     "build:react-packages": "npm run assets && node scripts/build-react-packages.mjs",
     "smoke:react-packages": "npm run build:react-packages && node scripts/smoke-react-packages.mjs",
     "audit:react-foundation": "npm run assets && node scripts/audit-react-foundation.mjs",
-    "verify:react": "node scripts/verify-react-foundation.mjs"
+    "verify:react": "node scripts/verify-react-foundation.mjs",
+    "build:svelte-packages": "npm run assets && node scripts/build-framework-packages.mjs svelte",
+    "smoke:svelte-packages": "npm run build:svelte-packages && node scripts/smoke-svelte-packages.mjs",
+    "verify:svelte": "node scripts/verify-svelte-foundation.mjs"
   },
   "devDependencies": {
+    "@sveltejs/package": "^2.5.8",
     "@sveltejs/vite-plugin-svelte": "^5.1.1",
     "@types/node": "^24.13.5",
     "@types/react": "^19.3.0",

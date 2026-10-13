@@ -725,3 +725,35 @@ Validation: full fast suite 2804 passed / 9 skipped across 103 files; all
 8 Shell conformance checks passed. Typecheck has zero errors/warnings and
 docs production build passes. Browser resize coverage caught and verified
 the closed-overlay correction before handoff.
+
+## Svelte installed-consumer gate (2026-10-13)
+
+Added build:svelte-packages, smoke:svelte-packages and verify:svelte root commands.
+The framework candidate builder shares core/icons/theme compilation with React;
+existing React commands keep their compatibility entry point and cache location.
+Svelte candidates use @sveltejs/package 2.5.8, compatible with the current TS 5
+stack. The latest packaging major requires TS 6; no toolchain upgrade was forced.
+Source workspace manifests stay unchanged and candidates remain private.
+
+Candidates contain preprocessed Svelte components, transpiled JavaScript and
+adjacent declarations. Explicit subpath exports are generated only for actual
+component entry files. Sibling GGary versions match the packed candidates. The
+consumer asserts export targets exist both in the staged directory and npm tarball.
+An isolated staging tsconfig prevents declaration emission into the monorepo's
+.svelte-kit directory; generated package output is ignored by Git.
+
+The smoke app installs five tarballs into a temp directory outside the workspace
+without workspace aliases/symlinks. It imports every public Svelte entry and
+checks generated declarations reject an invalid TimePicker step. It passes
+svelte-check with zero errors/warnings, a Vite production build, a Node SSR build
+and execution without window, plus real browser time submission/reset, nested
+Select/Dialog Escape and range-date selection. Both root and subpath imports,
+shared theme/icons and date dependencies are exercised.
+
+Final validation: smoke:svelte-packages passed all export/type/build/SSR/browser
+gates on Node 24; smoke:react-packages also passed after the builder refactor.
+The CI workflow now runs the installed Svelte gate and retains both framework
+candidate caches as artifacts. Hosted CI remains the post-push gate, not a locally
+verified result. Local release-candidate gates are complete; no npm publication
+or version release occurred. The adapter scan found no attachPopover,
+attachShellDrawer, attachDialog or bridge references in packages/svelte/src.

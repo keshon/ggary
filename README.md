@@ -85,6 +85,19 @@ For tests without a browser:
 npm run test:fast
 ```
 
+Build private distributable candidates and test them in an independent installed app:
+
+```bash
+npm run smoke:react-packages
+npm run smoke:svelte-packages
+```
+
+`npm run build:svelte-packages` creates candidates without running the consumer.
+`npm run verify:svelte` runs the complete Svelte checks and installed-consumer gate.
+Candidates and results are saved under `node_modules/.cache/svelte-release`; these
+commands do not publish packages. Svelte packaging uses `@sveltejs/package` to
+produce JavaScript, preprocessed components and TypeScript declarations.
+
 The test suite covers component behaviour, package contracts, framework conformance, browser behaviour, and theme constraints.
 
 ## Project status
