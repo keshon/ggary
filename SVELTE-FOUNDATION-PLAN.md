@@ -601,3 +601,9 @@ horizontally over the existing rounded selection/focus discs. The table-cell
 layout previously left numbers at the top. Browser geometry assertions cover
 single and range endpoints plus their radius. All 8 focused calendar, popup
 and theme checks passed; the docs page was visually verified.
+
+Range preview correction: map Bits highlighted membership plus the hovered/
+focused date to GGary preview endpoint attributes. This is presentation state;
+Bits retains draft selection and keyboard ownership. Both forward and backward
+previews now paint rounded caps using existing theme rules. All 3 focused browser
+cases and typecheck pass; keyboard preview was visually verified in docs.

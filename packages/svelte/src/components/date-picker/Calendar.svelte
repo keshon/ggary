@@ -1,5 +1,5 @@
 <script lang="ts">
- import { Calendar as Single, RangeCalendar as Range } from 'bits-ui'
+ import { Calendar as Single, RangeCalendar as Range, mergeProps as mergePrimitiveProps } from 'bits-ui'
  import { parseDate, today, getLocalTimeZone, type DateValue } from '@internationalized/date'
  import { getConfig } from '../config-provider/context'
  import { configWords } from '@ggary/core/config-provider'
@@ -43,6 +43,14 @@
   externalRange = { ...chosen }
   rangeValue = { start: date(chosen.start), end: date(chosen.end) }
  })
+ // Bits exposes preview membership, but only committed endpoint attributes.
+ // Track the pointer/focus date for painting caps; Bits still owns selection.
+ let previewDate = $state<string>()
+ const previewRange = $derived.by(() => {
+  if (!rangeValue.start || rangeValue.end || !previewDate) return undefined
+  const anchor = rangeValue.start.toString()
+  return anchor < previewDate ? { start: anchor, end: previewDate } : { start: previewDate, end: anchor }
+ })
  let placeholder = $state<DateValue>(untrack(() => date(chosen.start ?? defaultMonth) ?? today(getLocalTimeZone())))
  const options = $derived({ locale: locale ?? 'en-US', dir: kit().dir ?? 'ltr', numberOfMonths: months ?? 1, weekStartsOn: (weekStart ?? weekStartOf(locale)) as 0|1|2|3|4|5|6, fixedWeeks: true, weekdayFormat: 'short' as const, disableDaysOutsideMonth: (months ?? 1) > 1, minValue: date(min), maxValue: date(max), isDateDisabled: (day: DateValue) => isDateDisabled?.(day.toString() as ISODate) ?? false, preventDeselect: true })
  const Parts = $derived(mode === 'range' ? Range : Single)
@@ -74,7 +82,10 @@
          <Parts.Cell date={day} month={page.value} {...part('cell')}>
           <Parts.Day {...part('day')} data-date={day.toString()}>
            {#snippet child({ props: dayProps })}
-            <div {...dayProps} {...part('day')} data-date={(months ?? 1) > 1 && day.month !== page.value.month ? undefined : day.toString()} aria-hidden={(months ?? 1) > 1 && day.month !== page.value.month ? 'true' : undefined} data-selected={mode === 'range' ? (dayProps['data-range-start'] !== undefined || dayProps['data-range-end'] !== undefined || dayProps['data-selection-start'] !== undefined || dayProps['data-selection-end'] !== undefined ? '' : undefined) : dayProps['data-selected']} data-blank={(months ?? 1) > 1 && day.month !== page.value.month ? '' : undefined} data-outside={day.month !== page.value.month ? '' : undefined} data-in-range={mode === 'range' && (dayProps['data-selected'] !== undefined || dayProps['data-highlighted'] !== undefined) ? '' : undefined} data-range-start={dayProps['data-range-start'] ?? dayProps['data-selection-start']} data-range-end={dayProps['data-range-end'] ?? dayProps['data-selection-end']}>{(months ?? 1) > 1 && day.month !== page.value.month ? '' : day.day}</div>
+            {@const preview = mode === 'range' && dayProps['data-highlighted'] !== undefined && previewRange !== undefined}
+            {@const start = preview ? day.toString() === previewRange?.start : dayProps['data-range-start'] !== undefined || dayProps['data-selection-start'] !== undefined}
+            {@const end = preview ? day.toString() === previewRange?.end : dayProps['data-range-end'] !== undefined || dayProps['data-selection-end'] !== undefined}
+            <div {...mergePrimitiveProps(dayProps, { onmouseenter: () => { if (dayProps['data-disabled'] === undefined) previewDate = day.toString() }, onfocusin: () => { if (dayProps['data-disabled'] === undefined) previewDate = day.toString() } })} {...part('day')} data-date={(months ?? 1) > 1 && day.month !== page.value.month ? undefined : day.toString()} aria-hidden={(months ?? 1) > 1 && day.month !== page.value.month ? 'true' : undefined} data-selected={mode === 'range' ? (start || end ? '' : undefined) : dayProps['data-selected']} data-blank={(months ?? 1) > 1 && day.month !== page.value.month ? '' : undefined} data-outside={day.month !== page.value.month ? '' : undefined} data-in-range={mode === 'range' && (dayProps['data-selected'] !== undefined || dayProps['data-highlighted'] !== undefined) ? '' : undefined} data-preview={preview ? '' : undefined} data-range-start={start ? '' : undefined} data-range-end={end ? '' : undefined}>{(months ?? 1) > 1 && day.month !== page.value.month ? '' : day.day}</div>
            {/snippet}
           </Parts.Day>
          </Parts.Cell>
