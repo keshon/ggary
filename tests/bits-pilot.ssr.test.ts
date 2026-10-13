@@ -1,3 +1,4 @@
+import NativeGroupsPilot from './fixtures/SvelteNativeGroupsPilot.svelte'
 import NativeChoicesPilot from './fixtures/SvelteNativeChoicesPilot.svelte'
 import SlidersPilot from './fixtures/BitsSlidersPilot.svelte'
 import { expect, it } from 'vitest'
@@ -103,4 +104,13 @@ it('renders native Svelte choice controls and required validation on the server'
  expect(body).toContain('name="terms"')
  expect(body).toContain('required')
  expect(body).toContain('Accept terms')
+})
+
+it('server renders native option groups without DOM validation work', () => {
+ const { body } = render(NativeGroupsPilot)
+ expect(body).toContain('name="boxes"')
+ expect(body).toContain('name="cards"')
+ expect(body).toContain('name="view"')
+ expect(body).toContain('type="radio"')
+ expect(body).toContain('Card A')
 })

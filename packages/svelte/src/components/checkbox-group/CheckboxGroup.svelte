@@ -72,7 +72,9 @@
   $effect(() => {
     const message = api.validationMessage
     void items
-    list.querySelector('input')?.setCustomValidity(message)
+    const inputs = [...list.querySelectorAll<HTMLInputElement>('input')]
+    for (const input of inputs) input.setCustomValidity('')
+    inputs.find(input => !input.disabled)?.setCustomValidity(message)
   })
 </script>
 

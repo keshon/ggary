@@ -338,3 +338,27 @@ Remaining unresolved component count: 16 (four option wrappers, four form contra
 three composites and five domain/floating components). Package/consumer release
 gates remain separate. Next: CheckboxGroup, ChoiceCardGroup, ChipGroup and
 SegmentedControl ownership review, replacing custom keyboard machinery where needed.
+
+## Native option-group checkpoint (2026-10-13)
+
+CheckboxGroup, ChoiceCardGroup and SegmentedControl intentionally retain native
+inputs. There is no custom keyboard/focus implementation to replace in these
+three. Preserved form names, public values, radio keyboard navigation, validation
+and reset. Found and fixed missing at-least-one validation for required Svelte
+checkbox choice cards. Svelte CheckboxGroup now places custom validity on the
+first enabled input and clears obsolete errors; shared input-event validity sync
+also targets an enabled control. Previously a disabled first option could hide
+an invalid group from the browser's constraint validation.
+
+Added Chromium coverage for both required groups with disabled first options,
+label activation, canonical submitted values, valid/invalid transitions and reset,
+and segmented radio arrows past a disabled option with an empty default key.
+
+Remaining unresolved components: 13. ChipGroup is next: unlike the native groups,
+it has a custom selection/roving-focus/typeahead/removal machine. Evaluate Bits
+ToggleGroup for selection/focus, preserving GGary removal requests and form values.
+Then four form contracts, three composites and five domain/floating components.
+Previous two hosted checkpoints (sliders and native choices) passed CI.
+
+Local gates passed: 42 focused cross-framework conformance cases, 12 Node SSR
+cases, the new Chromium group case, TypeScript/Svelte checks and diff whitespace checks.

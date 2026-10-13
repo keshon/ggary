@@ -46,7 +46,7 @@ export function connect<T = Dict>(props: CheckboxGroupProps, normalize: Normaliz
    */
   const syncValidity = (event: Event, checked: string[]) => {
     const input = event.currentTarget as HTMLInputElement
-    const first = input.closest?.('[data-part="list"]')?.querySelector('input')
+    const first = input.closest?.('[data-part="list"]')?.querySelector<HTMLInputElement>('input:not(:disabled)')
     first?.setCustomValidity(messageFor(checked))
   }
 

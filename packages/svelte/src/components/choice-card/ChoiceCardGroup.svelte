@@ -52,6 +52,16 @@
       group: fieldset?.group,
     })
   )
+  $effect(() => {
+    void items
+    void disabled
+    void fieldset?.group.disabled
+    const selected = Array.isArray(value) ? value : []
+    const missing = type === 'checkbox' && Boolean(required || fieldset?.group.required) && selected.length === 0
+    const inputs = [...root.querySelectorAll<HTMLInputElement>('input')]
+    for (const input of inputs) input.setCustomValidity('')
+    inputs.find(input => !input.disabled)?.setCustomValidity(missing ? 'Select at least one option.' : '')
+  })
 </script>
 
 <div bind:this={root} {...api.rootProps}>
