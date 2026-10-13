@@ -22,6 +22,10 @@ function App() {
   const [mode, setShownMode] = useState<Mode>(getMode)
   const [navigationQuery, setNavigationQuery] = useState('')
   const navigationSearch = useRef<HTMLInputElement>(null)
+  const showNarrowNavigation = () => {
+    const side = document.getElementById('side')
+    if (side && getComputedStyle(side).display === 'none') side.showPopover()
+  }
   useEffect(() => onRouteChange(setPage), [])
   useEffect(() => onModeChange(setShownMode), [])
   useEffect(() => {
@@ -29,13 +33,8 @@ function App() {
       if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return
       if ((event.target as Element | null)?.closest('input, textarea, select, [contenteditable="true"]')) return
       event.preventDefault()
-      const side = document.getElementById('side')
-      if (side && getComputedStyle(side).display === 'none') {
-        side.showPopover()
-        requestAnimationFrame(() => navigationSearch.current?.focus())
-      } else {
-        navigationSearch.current?.focus()
-      }
+      showNarrowNavigation()
+      navigationSearch.current?.focus()
     }
     window.addEventListener('keydown', focusSearch)
     return () => window.removeEventListener('keydown', focusSearch)
@@ -54,8 +53,26 @@ function App() {
           <span className="brand-mark" dangerouslySetInnerHTML={{ __html: LOGO }} />
           GGary
         </a>
-        <SegmentedControl label="Framework" size="sm" items={FRAMEWORKS} value="react" onValueChange={goToFramework} />
+        <div className="bar-search" onFocus={showNarrowNavigation}>
+          <Search
+            ref={navigationSearch}
+            size="sm"
+            label="Search components"
+            placeholder="Search components…"
+            value={navigationQuery}
+            onValueChange={setNavigationQuery}
+            onClick={showNarrowNavigation}
+            onKeyDown={(event) => {
+              if (event.key === 'Escape' && navigationQuery) {
+                event.preventDefault()
+                setNavigationQuery('')
+              }
+            }}
+          />
+          <kbd aria-hidden="true">/</kbd>
+        </div>
         <div className="bar-end">
+          <SegmentedControl label="Framework" size="sm" items={FRAMEWORKS} value="react" onValueChange={goToFramework} />
           <SegmentedControl label="Colour mode" size="sm" items={MODES.map((value) => ({ value, label: capital(value) }))} value={mode} onValueChange={(value) => setMode(value as Mode)} />
         </div>
       </header>
@@ -68,23 +85,6 @@ function App() {
           if ((event.target as Element).closest('a') && side.matches(':popover-open')) side.hidePopover()
         }}
       >
-        <div className="side-search">
-          <Search
-            ref={navigationSearch}
-            size="sm"
-            label="Search components"
-            placeholder="Search components…"
-            value={navigationQuery}
-            onValueChange={setNavigationQuery}
-            onKeyDown={(event) => {
-              if (event.key === 'Escape' && navigationQuery) {
-                event.preventDefault()
-                setNavigationQuery('')
-              }
-            }}
-          />
-          <kbd aria-hidden="true">/</kbd>
-        </div>
         {groups.length ? (
           <Nav label="Components" numbered={!navigationQuery.trim()} groups={groups} />
         ) : (

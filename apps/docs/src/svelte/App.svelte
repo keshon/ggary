@@ -13,28 +13,30 @@
   let page = $state(currentPage())
   let mode = $state<Mode>(getMode())
   let navigationQuery = $state('')
+  let side = $state<HTMLElement | null>(null)
+  function showNarrowNavigation() {
+    const navigation = document.getElementById('side')
+    if (navigation && getComputedStyle(navigation).display === 'none') navigation.showPopover()
+  }
   $effect(() => onRouteChange((next) => (page = next)))
   $effect(() => onModeChange((next) => (mode = next)))
   $effect(() => {
+    const input = document.querySelector<HTMLInputElement>('#component-search-svelte')
     const focusSearch = (event: KeyboardEvent) => {
       if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return
       if ((event.target as Element | null)?.closest('input, textarea, select, [contenteditable="true"]')) return
       event.preventDefault()
-      const input = document.querySelector<HTMLInputElement>('#component-search-svelte')
-      if (side && getComputedStyle(side).display === 'none') {
-        side.showPopover()
-        requestAnimationFrame(() => input?.focus())
-      } else {
-        input?.focus()
-      }
+      showNarrowNavigation()
+      input?.focus()
     }
     window.addEventListener('keydown', focusSearch)
-    return () => window.removeEventListener('keydown', focusSearch)
+    return () => {
+      window.removeEventListener('keydown', focusSearch)
+    }
   })
   const demo = $derived(load(page.id)?.())
   const groups = $derived(navGroups(page, navigationQuery))
 
-  let side = $state<HTMLElement | null>(null)
   function closeOnLink(event: MouseEvent) {
     if ((event.target as Element).closest('a') && side?.matches(':popover-open')) side.hidePopover()
   }
@@ -49,20 +51,14 @@
       <span class="brand-mark">{@html LOGO}</span>
       GGary
     </a>
-    <SegmentedControl label="Framework" size="sm" items={FRAMEWORKS} value="svelte" onValueChange={goToFramework} />
-    <div class="bar-end">
-      <SegmentedControl label="Colour mode" size="sm" items={MODES.map((value) => ({ value, label: capital(value) }))} value={mode} onValueChange={(value: string) => setMode(value as Mode)} />
-    </div>
-  </header>
-  <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
-  <aside class="side" id="side" popover="" bind:this={side} onclick={closeOnLink}>
-    <div class="side-search">
+    <div class="bar-search">
       <Search
         id="component-search-svelte"
         size="sm"
         label="Search components"
         placeholder="Search components…"
         bind:value={navigationQuery}
+        onclick={showNarrowNavigation}
         onkeydown={(event: KeyboardEvent) => {
           if (event.key === 'Escape' && navigationQuery) {
             event.preventDefault()
@@ -72,6 +68,13 @@
       />
       <kbd aria-hidden="true">/</kbd>
     </div>
+    <div class="bar-end">
+      <SegmentedControl label="Framework" size="sm" items={FRAMEWORKS} value="svelte" onValueChange={goToFramework} />
+      <SegmentedControl label="Colour mode" size="sm" items={MODES.map((value) => ({ value, label: capital(value) }))} value={mode} onValueChange={(value: string) => setMode(value as Mode)} />
+    </div>
+  </header>
+  <!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
+  <aside class="side" id="side" popover="" bind:this={side} onclick={closeOnLink}>
     {#if groups.length}
       <Nav label="Components" numbered={!navigationQuery.trim()} {groups} />
     {:else}
