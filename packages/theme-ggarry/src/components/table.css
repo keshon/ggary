@@ -38,6 +38,10 @@
   border-block-start: 1px solid var(--ggarry-border-default);
 }
 
+[data-scope='table'][data-part='body'] > [data-part='row'] {
+  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+
 /* A sorted column says so, in the accent, icon and all. */
 [data-scope='table'][data-part='sort'] {
   gap: var(--ggarry-space-1);
@@ -68,4 +72,9 @@
   padding-block: var(--ggarry-space-6);
   color: var(--ggarry-text-muted);
   text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='table'][data-part='sort'],
+  [data-scope='table'][data-part='body'] > [data-part='row'] { transition: none; }
 }

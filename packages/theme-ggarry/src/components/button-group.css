@@ -23,12 +23,13 @@
   border-radius: 0;
   box-shadow: none;
 }
-/* The group is one physical control. Individual buttons still change tone on
-   hover and press, but lifting one segment would break its shared silhouette. */
-[data-scope='button-group'][data-part='root'] > [data-scope='button'][data-part='root']:is(:hover, :active),
-[data-scope='button-group'][data-part='root'] > * > [data-scope='button'][data-part='root']:is(:hover, :active) {
-  box-shadow: none;
-  transform: none;
+/* Hover stays in the shared silhouette. A real press may move inward: that is
+   momentary force feedback rather than a resting geometry change. */
+[data-scope='button-group'][data-part='root'] > [data-scope='button'][data-part='root']:active,
+[data-scope='button-group'][data-part='root'] > * > [data-scope='button'][data-part='root']:active {
+  z-index: 1;
+  box-shadow: var(--button-shadow-active);
+  transform: translateY(0.5px);
 }
 [data-scope='button-group'][data-part='root'] > * + * > [data-scope='button'][data-part='root'],
 [data-scope='button-group'][data-part='root'] > * + [data-scope='button'][data-part='root'] {

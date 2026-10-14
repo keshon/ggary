@@ -1,0 +1,118 @@
+/* Floating surfaces share one motion grammar: a short fade, a four-pixel move
+   from the anchor, and just enough scale to make the elevation legible. */
+:is(
+  [data-scope='popover'],
+  [data-scope='popconfirm'],
+  [data-scope='menu'],
+  [data-scope='select'],
+  [data-scope='combobox'],
+  [data-scope='cascader'],
+  [data-scope='date-picker'],
+  [data-scope='time-picker']
+)[data-part='content'] {
+  --ggarry-surface-motion-x: 0;
+  --ggarry-surface-motion-y: -4px;
+  transform-origin: var(--transform-origin, var(--bits-floating-transform-origin, center));
+  transition:
+    opacity var(--ggarry-duration-fast) var(--ggarry-easing-enter),
+    translate var(--ggarry-duration-fast) var(--ggarry-easing-enter),
+    scale var(--ggarry-duration-fast) var(--ggarry-easing-enter),
+    visibility 0s linear 0s;
+}
+
+:is(
+  [data-scope='popover'],
+  [data-scope='popconfirm'],
+  [data-scope='menu'],
+  [data-scope='select'],
+  [data-scope='combobox'],
+  [data-scope='cascader'],
+  [data-scope='date-picker'],
+  [data-scope='time-picker']
+)[data-part='content'][data-side='top'] { --ggarry-surface-motion-y: 4px; }
+
+:is(
+  [data-scope='popover'],
+  [data-scope='popconfirm'],
+  [data-scope='menu'],
+  [data-scope='select'],
+  [data-scope='combobox'],
+  [data-scope='cascader'],
+  [data-scope='date-picker'],
+  [data-scope='time-picker']
+)[data-part='content'][data-side='left'] { --ggarry-surface-motion-x: 4px; --ggarry-surface-motion-y: 0; }
+
+:is(
+  [data-scope='popover'],
+  [data-scope='popconfirm'],
+  [data-scope='menu'],
+  [data-scope='select'],
+  [data-scope='combobox'],
+  [data-scope='cascader'],
+  [data-scope='date-picker'],
+  [data-scope='time-picker']
+)[data-part='content'][data-side='right'] { --ggarry-surface-motion-x: -4px; --ggarry-surface-motion-y: 0; }
+
+:is(
+  [data-scope='popover'],
+  [data-scope='popconfirm'],
+  [data-scope='menu'],
+  [data-scope='select'],
+  [data-scope='combobox'],
+  [data-scope='cascader'],
+  [data-scope='date-picker'],
+  [data-scope='time-picker']
+)[data-part='content']:is([data-starting-style], [data-ending-style], [data-state='closed']) {
+  opacity: 0;
+  translate: var(--ggarry-surface-motion-x) var(--ggarry-surface-motion-y);
+  scale: 0.985;
+}
+
+:is(
+  [data-scope='popover'],
+  [data-scope='popconfirm'],
+  [data-scope='menu'],
+  [data-scope='select'],
+  [data-scope='combobox'],
+  [data-scope='cascader'],
+  [data-scope='date-picker'],
+  [data-scope='time-picker']
+)[data-part='content'][data-state='closed'] {
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity var(--ggarry-duration-fast) var(--ggarry-easing-exit),
+    translate var(--ggarry-duration-fast) var(--ggarry-easing-exit),
+    scale var(--ggarry-duration-fast) var(--ggarry-easing-exit),
+    visibility 0s linear var(--ggarry-duration-fast);
+}
+
+@starting-style {
+  :is(
+    [data-scope='popover'],
+    [data-scope='popconfirm'],
+    [data-scope='menu'],
+    [data-scope='select'],
+    [data-scope='combobox'],
+    [data-scope='cascader'],
+    [data-scope='date-picker'],
+    [data-scope='time-picker']
+  )[data-part='content']:popover-open {
+    opacity: 0;
+    translate: var(--ggarry-surface-motion-x) var(--ggarry-surface-motion-y);
+    scale: 0.985;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :is(
+    [data-scope='popover'],
+    [data-scope='popconfirm'],
+    [data-scope='menu'],
+    [data-scope='select'],
+    [data-scope='combobox'],
+    [data-scope='cascader'],
+    [data-scope='date-picker'],
+    [data-scope='time-picker']
+  )[data-part='content'] { transition: none; }
+}

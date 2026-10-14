@@ -47,6 +47,6 @@
   },
   "opacity": { "disabled": "0.55", "stale": "0.6", "quiet": "0.6", "area": "0.12" },
   "duration": { "fast": "120ms", "normal": "200ms", "spin": "600ms", "blink": "1s", "pulse": "1.6s", "calm": "3s" },
-  "easing": { "standard": "ease", "settle": "ease-out", "breathe": "ease-in-out" },
+  "easing": { "standard": "ease", "enter": "cubic-bezier(0.16, 1, 0.3, 1)", "exit": "cubic-bezier(0.4, 0, 1, 1)", "settle": "ease-out", "breathe": "ease-in-out" },
   "z": { "sheet": "10", "drawer": "30", "skip-link": "40", "popover": "50" }
 }

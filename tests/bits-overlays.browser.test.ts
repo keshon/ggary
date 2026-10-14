@@ -5,7 +5,7 @@ import Pilot from './fixtures/BitsOverlaysPilot.svelte'
 import '../packages/structure/src/index.css'
 import '@ggary/theme-ggarry'
 let instance: ReturnType<typeof mount> | undefined
-const settle = async () => { await new Promise(resolve => setTimeout(resolve, 50)); flushSync() }
+const settle = async (delay = 50) => { await new Promise(resolve => setTimeout(resolve, delay)); flushSync() }
 afterEach(async () => { if (instance) await unmount(instance); instance = undefined; document.body.replaceChildren() })
 function setup() { const host = document.createElement('div'); document.body.append(host); instance = mount(Pilot, { target: host }); flushSync(); return host }
 it('routes Select, Popover and Dialog Escape one layer at a time with focus return', async () => {
@@ -20,6 +20,8 @@ it('routes Select, Popover and Dialog Escape one layer at a time with focus retu
   await userEvent.keyboard('{Escape}'); await settle()
   expect(popup()).not.toBeNull()
   await userEvent.keyboard('{Escape}'); await settle()
+  expect(popup()?.dataset.state).toBe('closed')
+  await settle(100)
   expect(popup()).toBeNull()
   expect(document.activeElement).toBe(popupTrigger)
   const dialog = document.querySelector<HTMLElement>('[data-scope="dialog"][data-part="content"]')!
@@ -37,6 +39,8 @@ it('shows Tooltip on keyboard focus, closes on Escape, and leaves the trigger us
   const rect = tooltip()!.getBoundingClientRect()
   expect(rect.width).toBeGreaterThan(0)
   await userEvent.keyboard('{Escape}'); await settle()
+  expect(document.querySelector<HTMLElement>('[role="tooltip"]')?.dataset.state).toBe('closed')
+  await settle(100)
   expect(tooltip()).toBeNull()
   expect(document.activeElement).toBe(trigger)
 })

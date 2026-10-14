@@ -2,7 +2,7 @@
   import { Popover as Primitive, mergeProps } from 'bits-ui'
   import type { PopoverChangeDetails, PopoverPlacement } from '@ggary/core/popover'
   import type { Dict } from '@ggary/core'
-  import { untrack, type Snippet } from 'svelte'
+  import { onDestroy, untrack, type Snippet } from 'svelte'
   import { getConfig } from '../config-provider/context'
 
   type Props = {
@@ -27,6 +27,14 @@
     closeButton = false, closeLabel = 'Close' }: Props = $props()
   let localOpen = $state(untrack(() => open ?? defaultOpen))
   const shown = $derived(open ?? localOpen)
+  let present = $state(untrack(() => shown))
+  let exitTimer: ReturnType<typeof setTimeout> | undefined
+  function cancelExit() { if (exitTimer !== undefined) clearTimeout(exitTimer); exitTimer = undefined }
+  $effect(() => {
+    if (shown) { cancelExit(); present = true }
+    else if (present) { cancelExit(); exitTimer = setTimeout(() => { present = false }, 120) }
+  })
+  onDestroy(cancelExit)
   let reason: PopoverChangeDetails['reason'] = 'api'
   function changed(next: boolean) {
     localOpen = next; open = next; onOpenChange?.(next, { reason }); reason = 'api'
@@ -57,14 +65,14 @@
     </Primitive.Trigger>
   </div>
   <Primitive.Portal>
-    <Primitive.Content id={`${id}-content`} {side} {align} sideOffset={6} strategy="fixed" dir={inheritedDir} style={inheritedStyle}
+    <Primitive.Content id={`${id}-content`} forceMount={present} {side} {align} sideOffset={6} strategy="fixed" dir={inheritedDir} style={inheritedStyle}
       trapFocus={false} preventScroll={false}
       onEscapeKeydown={event => { reason = 'escape'; if (!closeOnEscape) { event.preventDefault(); reason = 'api' } }}
       onInteractOutside={event => { reason = 'outside'; if (!closeOnOutside) { event.preventDefault(); reason = 'api' } }}>
       {#snippet child({ props: contentProps, wrapperProps })}
-        <div {...wrapperProps} {...part('positioner')} hidden={!shown}>
-          <div {...mergeProps(contentProps, part('content'), { style: { '--gg-available-width': 'var(--bits-floating-available-width)' } })} role="dialog" hidden={!shown} data-state={shown ? 'open' : 'closed'} aria-labelledby={title != null ? `${id}-title` : undefined}>
-            {#if shown}
+        <div {...wrapperProps} {...part('positioner')} hidden={!present}>
+          <div {...mergeProps(contentProps, part('content'), { style: { '--gg-available-width': 'var(--bits-floating-available-width)' } })} role="dialog" hidden={!present} data-state={shown ? 'open' : 'closed'} aria-labelledby={title != null ? `${id}-title` : undefined}>
+            {#if present}
               {#if title != null}<h2 {...part('title')} id={`${id}-title`}>{title}</h2>{/if}
               {#if closeButton}<Primitive.Close {...part('close')} type="button" aria-label={closeLabel} onclick={() => reason = 'close-button'} onkeydown={() => reason = 'close-button'}><span {...part('close-icon')} data-icon="close" aria-hidden="true"></span></Primitive.Close>{/if}
               {@render children?.()}

@@ -33,6 +33,13 @@ Both demos use the same component library and theme.
 
 GGary separates component behaviour from rendering and appearance.
 
+Its visual language uses depth by role. Page content stays flat, controls use
+shallow tactile depth, selection tracks are recessed, and floating surfaces are
+elevated. Motion follows the same hierarchy: controls respond in 120 ms,
+dialogs settle in 200 ms, sheets move from their edge, and no transition moves
+surrounding layout. Depth and motion communicate interaction or layering; they
+are not decorative effects.
+
 * **Shared behaviour.** State machines live in a framework-independent core. React and Svelte provide their own rendering adapters.
 * **Explicit DOM contracts.** Components expose `data-scope`, `data-part`, and state attributes. Styling does not depend on generated class names.
 * **Token-based styling.** Components consume design tokens rather than hardcoded visual values.

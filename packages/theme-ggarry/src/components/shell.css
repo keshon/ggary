@@ -126,12 +126,12 @@
     /* Closing, it hides once it has slid away; opening, it is visible at once
        — a transition that starts at hidden would refuse the focus it is given. */
     transition:
-      translate var(--ggarry-duration-normal) var(--ggarry-easing-standard),
-      visibility 0s linear var(--ggarry-duration-normal);
+      translate var(--ggarry-duration-fast) var(--ggarry-easing-exit),
+      visibility 0s linear var(--ggarry-duration-fast);
   }
   [data-scope='shell'][data-collapse='drawer'][data-state='open'] > [data-part='aside'],
   [data-scope='shell'][data-collapse='drawer'][data-state='open'] > [data-part='column'] > [data-part='aside'] {
-    transition: translate var(--ggarry-duration-normal) var(--ggarry-easing-standard);
+    transition: translate var(--ggarry-duration-normal) var(--ggarry-easing-enter);
   }
   [data-scope='shell'][data-collapse='drawer'][data-state='open']::after {
     background: var(--ggarry-bg-scrim);

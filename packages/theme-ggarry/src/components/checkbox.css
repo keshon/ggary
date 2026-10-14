@@ -86,6 +86,20 @@
   align-self: center;
   justify-self: center;
   color: var(--ggarry-text-on-accent);
+  opacity: 1;
+  scale: 1;
+  visibility: visible;
+  transition:
+    opacity var(--ggarry-duration-fast) var(--ggarry-easing-enter),
+    scale var(--ggarry-duration-fast) var(--ggarry-easing-enter);
+}
+
+[data-scope='checkbox'][data-part='input']:not(:checked):not(:indeterminate) + [data-part='indicator'],
+[data-scope='data-grid'][data-part='checkbox']:not(:checked):not(:indeterminate) + [data-part='checkbox-indicator'],
+[data-scope='checkbox'][data-part='indicator'][data-backend='base-ui'][data-state='unchecked'] {
+  opacity: 0;
+  scale: 0.65;
+  visibility: visible;
 }
 
 /* Readonly keeps its colours — the value is still the information — and says
@@ -125,9 +139,8 @@
 [data-scope='checkbox'][data-part='toggle'][data-backend='base-ui'][data-state='unchecked'][data-readonly] {
   background: var(--ggarry-bg-subtle);
 }
-[data-scope='checkbox'][data-part='indicator'][data-backend='base-ui'][data-state='unchecked'] {
-  visibility: hidden;
-}
 @media (prefers-reduced-motion: reduce) {
-  [data-scope='checkbox'][data-part='toggle'][data-backend='base-ui'] { transition: none; }
+  [data-scope='checkbox'][data-part='toggle'][data-backend='base-ui'],
+  [data-scope='checkbox'][data-part='indicator'],
+  [data-scope='data-grid'][data-part='checkbox-indicator'] { transition: none; }
 }

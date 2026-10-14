@@ -31,6 +31,12 @@
 [data-scope='gantt'][data-part='root'][data-scale='week'] { --gantt-day: 14px; }
 [data-scope='gantt'][data-part='root'][data-scale='month'] { --gantt-day: 4px; }
 
+/* On a phone the default 240px task column leaves too little timeline to
+   establish sequence. Keep names useful while exposing several day cells. */
+@media (max-width: 480px) {
+  [data-scope='gantt'][data-part='root'] { --gantt-list: 180px; }
+}
+
 [data-scope='gantt']:is([data-part='header'], [data-part='body']) {
   inline-size: calc(var(--gantt-list) + var(--gantt-timeline));
 }
@@ -137,6 +143,13 @@
   border: 1px solid var(--ggarry-border-accent);
   border-radius: var(--ggarry-radius-md);
   background: var(--ggarry-bg-accent-subtle);
+  transition:
+    border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    box-shadow var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    opacity var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+}
+[data-scope='gantt'][data-part='bar']:hover:not([data-drafting]) {
+  box-shadow: var(--ggarry-shadow-sm);
 }
 /* A bar that runs on past the chart's edge is cut square there. */
 [data-scope='gantt'][data-part='bar'][data-before] {
@@ -329,7 +342,7 @@
   outline-offset: var(--ggarry-focus-ring-offset);
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-scope='gantt'][data-part='group-toggle'] { transition: none; }
+  [data-scope='gantt']:is([data-part='bar'], [data-part='group-toggle']) { transition: none; }
 }
 
 [data-scope='gantt'][data-part='empty'] {

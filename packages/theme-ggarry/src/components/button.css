@@ -83,7 +83,6 @@
 
 [data-scope='button'][data-part='root']:hover:not([data-disabled]) {
   background: var(--button-depth-hover);
-  transform: translateY(-1px);
 }
 
 [data-scope='button'][data-part='root']:active:not([data-disabled]) {

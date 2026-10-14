@@ -47,6 +47,14 @@
   padding-inline-start: var(--ggarry-space-3);
   line-height: var(--ggarry-line-height-relaxed);
 }
+[data-scope='thinking'][data-part='root'][data-state='open'] [data-part='body'] {
+  animation: ggarry-thinking-reveal var(--ggarry-duration-normal) var(--ggarry-easing-enter) both;
+}
+
+@keyframes ggarry-thinking-reveal {
+  from { opacity: 0; translate: 0 -3px; }
+  to { opacity: 1; translate: none; }
+}
 
 /* The summary of a thought still arriving reads as live: the same accent the
    caret at the end of the body takes. */
@@ -56,4 +64,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   [data-scope='thinking']:is([data-part='trigger'], [data-part='indicator']) { transition: none; }
+  [data-scope='thinking'][data-part='root'][data-state='open'] [data-part='body'] { animation: none; }
 }

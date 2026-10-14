@@ -2,7 +2,7 @@
   import { Dialog as Primitive } from 'bits-ui'
   import type { DialogChangeReason, DialogChangeDetails, DialogPlacement, DialogRole, DialogSize } from '@ggary/core/dialog'
   import type { Dict } from '@ggary/core'
-  import { untrack, type Snippet } from 'svelte'
+  import { onDestroy, untrack, type Snippet } from 'svelte'
   import { getConfig } from '../config-provider/context'
 
   type Props = {
@@ -34,6 +34,14 @@
   const config = getConfig()
   let localOpen = $state(untrack(() => open ?? defaultOpen))
   const shown = $derived(open ?? localOpen)
+  let present = $state(untrack(() => shown))
+  let exitTimer: ReturnType<typeof setTimeout> | undefined
+  function cancelExit() { if (exitTimer !== undefined) clearTimeout(exitTimer); exitTimer = undefined }
+  $effect(() => {
+    if (shown) { cancelExit(); present = true }
+    else if (present) { cancelExit(); exitTimer = setTimeout(() => { present = false }, 120) }
+  })
+  onDestroy(cancelExit)
   let reason: DialogChangeReason = 'api'
   function changed(next: boolean) {
     localOpen = next
@@ -79,16 +87,16 @@
     {/if}
   </div>
   <Primitive.Portal>
-    <div {...part('layer')} data-mode={config().mode} dir={inheritedDir} lang={config().locale} style={inheritedStyle} hidden={!shown}>
-      {#if modal}<Primitive.Overlay {...part('backdrop')} />{/if}
-      <Primitive.Content {...part('content')} id={`${id}-content`} forceMount hidden={!shown}
+    <div {...part('layer')} data-mode={config().mode} dir={inheritedDir} lang={config().locale} style={inheritedStyle} hidden={!present}>
+      {#if modal}<Primitive.Overlay {...part('backdrop')} forceMount />{/if}
+      <Primitive.Content {...part('content')} id={`${id}-content`} forceMount hidden={!present}
         {role} data-size={size} data-placement={placement} data-modal={modal ? '' : undefined}
         trapFocus={modal} preventScroll={modal} onsubmit={submitted}
         onEscapeKeydown={(event) => { reason = 'escape'; if (!closeOnEscape) { event.preventDefault(); reason = 'api' } }}
         onInteractOutside={(event) => { reason = 'outside'; if (!closeOnOutside) { event.preventDefault(); reason = 'api' } }}>
         {#snippet child({ props: primitiveProps })}
         <div {...primitiveProps} {role} aria-modal={modal ? 'true' : undefined}>
-          {#if shown}
+          {#if present}
             {#if title != null || description != null || closeButton}
               <header {...part('header')}>
                 {#if title != null}<Primitive.Title {...part('title')} level={2}>{title}</Primitive.Title>{/if}

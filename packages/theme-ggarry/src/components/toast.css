@@ -24,12 +24,16 @@
   font-size: var(--ggarry-font-size-md);
   line-height: var(--ggarry-line-height-snug);
 
-  transition: opacity var(--ggarry-duration-normal) var(--ggarry-easing-standard), translate var(--ggarry-duration-normal) var(--ggarry-easing-standard);
+  transition:
+    opacity var(--ggarry-duration-normal) var(--ggarry-easing-enter),
+    translate var(--ggarry-duration-normal) var(--ggarry-easing-enter);
 }
 
 [data-scope='toast'][data-part='toast'][data-state='leaving'] {
   opacity: 0;
   translate: 16px 0;
+  transition-duration: var(--ggarry-duration-fast);
+  transition-timing-function: var(--ggarry-easing-exit);
 }
 
 @starting-style {

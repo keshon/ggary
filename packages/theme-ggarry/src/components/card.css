@@ -3,8 +3,8 @@
 
    A card is an object on the page; a panel (panel.css) is a place. Both read
    one channel — ground, edge, title size and ink — which rank, tone, plain
-   and nesting set, so the two cannot drift apart. No shadow: a shadow means
-   floating and about to leave.
+   and nesting set, so the two cannot drift apart. Static cards stay on their
+   sheet; an interactive card may gain one shallow layer while it is targeted.
 
    The tone map below is GGarry's one statement of what a tone looks like as a
    ground; the banner and the note read it too.
@@ -64,10 +64,22 @@
 
 [data-scope='card'][data-part='root'][data-interactive] {
   cursor: pointer;
-  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+  transition:
+    border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    box-shadow var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='card'][data-part='root'][data-interactive]:hover {
   border-color: var(--ggarry-border-strong);
+  box-shadow: var(--ggarry-shadow-sm);
+}
+[data-scope='card'][data-part='root'][data-interactive]:focus-visible {
+  outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
+  outline-offset: var(--ggarry-focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-scope='card'][data-part='root'][data-interactive] { transition: none; }
 }
 
 [data-scope='card'][data-part='title'] {

@@ -23,10 +23,13 @@
     disabled = false, open = $bindable(), defaultOpen = false, onOpenChange }: Props = $props()
   let localOpen = $state(untrack(() => open ?? defaultOpen))
   const shown = $derived(!disabled && (open ?? localOpen))
+  let present = $state(untrack(() => shown))
   let disposed = false
   let reason: TooltipChangeDetails['reason'] = 'api'
   let closeTimer: ReturnType<typeof setTimeout> | undefined
+  let exitTimer: ReturnType<typeof setTimeout> | undefined
   function cancelClose() { if (closeTimer !== undefined) clearTimeout(closeTimer); closeTimer = undefined }
+  function cancelExit() { if (exitTimer !== undefined) clearTimeout(exitTimer); exitTimer = undefined }
   function publish(next: boolean) {
     cancelClose()
     if (disposed || next === shown || (next && disabled)) return
@@ -44,7 +47,11 @@
     } else publish(next)
   }
   $effect(() => { if (disabled) { cancelClose(); localOpen = false; open = false } })
-  onDestroy(() => { disposed = true; cancelClose() })
+  $effect(() => {
+    if (shown) { cancelExit(); present = true }
+    else if (present) { cancelExit(); exitTimer = setTimeout(() => { present = false }, 120) }
+  })
+  onDestroy(() => { disposed = true; cancelClose(); cancelExit() })
   const componentId = $props.id()
   const id = `gg-bits-tooltip-${componentId}`
   const kit = getConfig()
@@ -78,8 +85,8 @@
       <Primitive.Content id={`${id}-content`} forceMount {side} {align} sideOffset={6} strategy="fixed" dir={inheritedDir} style={inheritedStyle}
         onEscapeKeydown={() => reason = 'escape'} onpointerenter={() => { reason = 'pointer'; cancelClose() }} onpointerleave={() => reason = 'pointer'}>
         {#snippet child({ props: contentProps, wrapperProps })}
-          <div {...wrapperProps} {...part('positioner')} hidden={!shown}>
-            <div {...mergeProps(contentProps, part('content'), { style: { '--gg-available-width': 'var(--bits-floating-available-width)' } })} role="tooltip" hidden={!shown} data-state={shown ? 'open' : 'closed'}>
+          <div {...wrapperProps} {...part('positioner')} hidden={!present}>
+            <div {...mergeProps(contentProps, part('content'), { style: { '--gg-available-width': 'var(--bits-floating-available-width)' } })} role="tooltip" hidden={!present} data-state={shown ? 'open' : 'closed'}>
               {#if typeof text === 'string'}{text}{:else}{@render text()}{/if}
             </div>
           </div>
