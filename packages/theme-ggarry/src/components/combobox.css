@@ -28,6 +28,7 @@
   padding: var(--control-inset) var(--ggarry-space-1) var(--control-inset) var(--ggarry-space-3);
   border: 1px solid var(--ggarry-border-control);
   border-radius: var(--control-radius);
+  box-shadow: var(--ggarry-shadow-field);
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-default);
   font-size: var(--control-font-size);
@@ -42,9 +43,16 @@
 }
 /* The ring goes round the box, not the bare input inside it. */
 [data-scope='combobox'][data-part='control']:has([data-part='input']:focus-visible) {
-  border-color: var(--ggarry-border-accent);
+  border-color: var(--ggarry-border-control);
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
   outline-offset: var(--ggarry-focus-ring-offset);
+}
+[data-scope='combobox'][data-part='control']:has([data-part='input'][aria-invalid='true']) {
+  border-color: var(--ggarry-border-danger);
+}
+[data-scope='combobox'][data-part='control']:has([data-part='input'][readonly]) {
+  border-color: var(--ggarry-border-default);
+  background: var(--ggarry-bg-subtle);
 }
 [data-scope='combobox'][data-part='control'][data-disabled] {
   opacity: var(--ggarry-opacity-disabled);
@@ -198,17 +206,17 @@
 [data-scope='combobox'][data-part='root'] {
   --control-height: var(--ggarry-size-control-md);
   --control-font-size: var(--ggarry-font-size-md);
-  --control-radius: var(--ggarry-radius-control-md);
+  --control-radius: var(--ggarry-radius-field-md);
 }
 [data-scope='combobox'][data-part='root'][data-size='sm'] {
   --control-height: var(--ggarry-size-control-sm);
   --control-font-size: var(--ggarry-font-size-sm);
-  --control-radius: var(--ggarry-radius-control-sm);
+  --control-radius: var(--ggarry-radius-field-sm);
 }
 [data-scope='combobox'][data-part='root'][data-size='lg'] {
   --control-height: var(--ggarry-size-control-lg);
   --control-font-size: var(--ggarry-font-size-lg);
-  --control-radius: var(--ggarry-radius-control-lg);
+  --control-radius: var(--ggarry-radius-field-lg);
 }
 [data-scope='combobox'][data-part='root'] { --control-inset: 3px; }
 [data-scope='combobox'][data-part='root'][data-size='sm'] { --control-inset: 1px; }

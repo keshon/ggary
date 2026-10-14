@@ -112,7 +112,10 @@
   --button-bg: var(--ggarry-bg-accent-subtle);
   --button-bg-hover: var(--ggarry-border-default);
   --button-fg: var(--ggarry-text-accent);
-  --button-border: transparent;
+  --button-border: color-mix(in oklab, var(--ggarry-text-accent) 16%, transparent);
+  /* Pale fills need a definite edge. The shared outer shadow makes that edge
+     read as a glow, so low emphasis keeps only the inset highlight. */
+  --button-shadow: inset 0 1px 0 var(--button-highlight);
 }
 [data-scope='button'][data-part='root'][data-emphasis='minimal'] {
   --button-bg: transparent;
@@ -145,6 +148,7 @@
 [data-scope='button'][data-part='root'][data-destructive][data-emphasis='low'] {
   --button-bg: color-mix(in oklab, var(--ggarry-bg-danger) 10%, transparent);
   --button-bg-hover: color-mix(in oklab, var(--ggarry-bg-danger) 18%, transparent);
+  --button-border: color-mix(in oklab, var(--ggarry-text-danger) 16%, transparent);
 }
 [data-scope='button'][data-part='root'][data-destructive][data-emphasis='high'] {
   --button-bg: var(--ggarry-bg-danger);

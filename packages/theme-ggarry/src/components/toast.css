@@ -57,6 +57,9 @@
 [data-scope='toast'][data-part='toast'][data-tone='error'] [data-part='icon'] { color: var(--ggarry-text-danger); }
 
 [data-scope='toast'][data-part='title'] {
+  margin: 0;
+  font-size: var(--ggarry-font-size-md);
+  line-height: var(--ggarry-line-height-snug);
   font-weight: var(--ggarry-font-weight-semibold);
 }
 

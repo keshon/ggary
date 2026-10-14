@@ -54,6 +54,6 @@
 }
 
 [data-scope='popover'][data-part='close-icon'] {
-  inline-size: 14px;
-  block-size: 14px;
+  inline-size: 16px;
+  block-size: 16px;
 }

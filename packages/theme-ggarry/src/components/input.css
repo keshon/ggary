@@ -25,7 +25,8 @@
   color: var(--ggarry-text-default);
   background: var(--ggarry-bg-surface);
   border: 1px solid var(--ggarry-border-control);
-  border-radius: var(--input-radius, var(--ggarry-radius-control-md));
+  border-radius: var(--input-radius, var(--ggarry-radius-field-md));
+  box-shadow: var(--ggarry-shadow-field);
   transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard), background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 
@@ -39,8 +40,8 @@
   border-color: var(--ggarry-border-accent);
 }
 
-:is([data-scope='input'], [data-scope='textarea'])[data-part='root']:focus-visible:not([data-invalid]) {
-  border-color: var(--ggarry-border-accent);
+:is([data-scope='input'], [data-scope='textarea'])[data-part='root']:focus-visible:not([data-invalid]):not(:disabled):not(:read-only) {
+  border-color: var(--ggarry-border-control);
 }
 
 :is([data-scope='input'], [data-scope='textarea'])[data-part='root'][data-invalid] {
@@ -63,13 +64,13 @@
 
 :is([data-scope='input'], [data-scope='textarea'])[data-part='root'][data-size='sm'] {
   --input-height: var(--ggarry-size-control-sm);
-  --input-radius: var(--ggarry-radius-control-sm);
+  --input-radius: var(--ggarry-radius-field-sm);
   --input-font-size: var(--ggarry-font-size-sm);
 }
 
 :is([data-scope='input'], [data-scope='textarea'])[data-part='root'][data-size='lg'] {
   --input-height: var(--ggarry-size-control-lg);
-  --input-radius: var(--ggarry-radius-control-lg);
+  --input-radius: var(--ggarry-radius-field-lg);
   --input-font-size: var(--ggarry-font-size-lg);
 }
 

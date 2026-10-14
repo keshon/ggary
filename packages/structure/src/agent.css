@@ -168,9 +168,15 @@
   display: inline-flex;
   align-items: center;
 }
-/* The figures change as the run goes on and must not tug at what is beside them. */
+[data-scope='run'][data-part='root'] {
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  flex-wrap: wrap;
+}
+/* Stable figures keep the reading calm; the sentence may wrap in a narrow host
+   instead of widening the surface that owns it. */
 [data-scope='run'][data-part='value'] {
-  white-space: nowrap;
+  min-inline-size: 0;
   font-variant-numeric: tabular-nums;
 }
 

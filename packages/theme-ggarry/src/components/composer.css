@@ -54,6 +54,7 @@
      layer, and a layer below cannot take a border off. */
   border: 0;
   border-radius: 0;
+  box-shadow: none;
   background: transparent;
   /* The two-and-a-half-control floor every textarea has is exactly what a
      composer must not have; the content sets the height instead. */

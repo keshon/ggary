@@ -32,6 +32,7 @@
   border: 0;
   border-inline-start: 1px solid var(--ggarry-border-default);
   border-radius: 0;
+  box-shadow: none;
   background: none;
 }
 [data-scope='time-picker'][data-part='root'][data-embedded] > [data-part='control']:has([data-part='input']:focus-visible) {

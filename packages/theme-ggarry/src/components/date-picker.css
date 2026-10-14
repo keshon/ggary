@@ -15,6 +15,9 @@
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'][data-mode='range'] {
   --control-inline-size: var(--gg-control-width-wide);
 }
+[data-scope='date-picker'][data-part='root']:has([data-scope='time-picker'][data-embedded]) {
+  --control-inline-size: var(--gg-control-width-wide);
+}
 
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='label'] {
   font-size: var(--ggarry-font-size-sm);
@@ -28,6 +31,7 @@
   padding-inline: var(--ggarry-space-3) 3px;
   border: 1px solid var(--ggarry-border-control);
   border-radius: var(--control-radius);
+  box-shadow: var(--ggarry-shadow-field);
   background: var(--ggarry-bg-surface);
   color: var(--ggarry-text-default);
   font-size: var(--control-font-size);
@@ -38,12 +42,16 @@
   border-color: var(--ggarry-border-accent);
 }
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='control']:has([data-part='input']:focus-visible) {
-  border-color: var(--ggarry-border-accent);
+  border-color: var(--ggarry-border-control);
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
   outline-offset: var(--ggarry-focus-ring-offset);
 }
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='control'][data-invalid] {
   border-color: var(--ggarry-border-danger);
+}
+:is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='control']:has([data-part='input']:read-only) {
+  border-color: var(--ggarry-border-default);
+  background: var(--ggarry-bg-subtle);
 }
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='input']:focus-visible {
   outline: none;
@@ -120,15 +128,15 @@
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'] {
   --control-height: var(--ggarry-size-control-md);
   --control-font-size: var(--ggarry-font-size-md);
-  --control-radius: var(--ggarry-radius-control-md);
+  --control-radius: var(--ggarry-radius-field-md);
 }
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'][data-size='sm'] {
   --control-height: var(--ggarry-size-control-sm);
   --control-font-size: var(--ggarry-font-size-sm);
-  --control-radius: var(--ggarry-radius-control-sm);
+  --control-radius: var(--ggarry-radius-field-sm);
 }
 :is([data-scope='date-picker'], [data-scope='time-picker'])[data-part='root'][data-size='lg'] {
   --control-height: var(--ggarry-size-control-lg);
   --control-font-size: var(--ggarry-font-size-lg);
-  --control-radius: var(--ggarry-radius-control-lg);
+  --control-radius: var(--ggarry-radius-field-lg);
 }
