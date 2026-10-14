@@ -72,6 +72,7 @@ export function Dialog({ open, defaultOpen = false, onOpenChange, title, descrip
       <div {...part('layer')} data-mode={config.mode} dir={config.dir} lang={config.locale} style={inheritedStyle}>
         {modal && <Primitive.Backdrop {...part('backdrop')} />}
         <Primitive.Popup {...part('content')} finalFocus={trigger ? triggerRef : true} role={role} id={`${id}-content`}
+          aria-modal={modal ? true : undefined}
           data-size={size} data-placement={placement} data-modal={modal ? '' : undefined}
           data-state={shown ? 'open' : 'closed'}
           onSubmit={(event) => {

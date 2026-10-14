@@ -65,7 +65,7 @@ describe('dialog in a real browser', () => {
     expect(content().dataset.state).toBe('closed')
     expect(onOpenChange).toHaveBeenCalledTimes(2)
     expect(onOpenChange).toHaveBeenLastCalledWith(false, { reason: 'escape' })
-    expect(document.activeElement).toBe(trigger)
+    await vi.waitFor(() => expect(document.activeElement).toBe(trigger))
   })
 
   it('locks the page scroll while modal, and only while modal', async () => {
@@ -144,7 +144,9 @@ describe('dialog in a real browser', () => {
     await userEvent.click(trigger)
     await act(async () => settle())
     expect(trigger.getAttribute('aria-expanded')).toBe('true')
-    expect(openLayerCount()).toBe(2)
+    expect(document.querySelector('[data-scope="select"][data-part="content"]')?.hasAttribute('data-open')).toBe(true)
+    // Base UI owns this stack; it must not leak into GGary's legacy dismissable registry.
+    expect(openLayerCount()).toBe(0)
 
     await userEvent.keyboard('{Escape}')
     await act(async () => settle())
