@@ -56,5 +56,6 @@
   padding: var(--ggarry-space-3) var(--ggarry-space-4);
   border-radius: var(--ggarry-radius-md);
   background: var(--ggarry-bg-subtle);
+  box-shadow: var(--ggarry-shadow-recessed);
   font-size: var(--ggarry-font-size-sm);
 }

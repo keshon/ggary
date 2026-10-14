@@ -57,6 +57,7 @@
   padding: var(--ggarry-space-3) var(--ggarry-space-4);
   border-radius: var(--ggarry-radius-lg);
   background: var(--ggarry-bg-subtle);
+  box-shadow: var(--ggarry-shadow-recessed);
 }
 
 /* The actions come up under the cursor, which is the opposite of the kit's

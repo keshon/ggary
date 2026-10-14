@@ -15,19 +15,27 @@
 
 [data-scope='composer'][data-part='root'] {
   --composer-pad: var(--ggarry-space-3);
+  --composer-send-highlight-weight: 30%;
+  --composer-send-top: color-mix(in oklab, var(--ggarry-bg-accent) 84%, var(--ggarry-bg-thumb));
+  --composer-send-hover-top: color-mix(in oklab, var(--ggarry-bg-accent-hover) 82%, var(--ggarry-bg-thumb));
+  --composer-send-highlight: color-mix(in oklab, var(--ggarry-bg-thumb) var(--composer-send-highlight-weight), transparent);
 
   border: 1px solid var(--ggarry-border-control);
   border-radius: var(--ggarry-radius-lg);
   background: var(--ggarry-bg-surface);
+  box-shadow: var(--ggarry-shadow-recessed);
   color: var(--ggarry-text-default);
   font-family: var(--ggarry-font-family-sans);
   /* The corners hold over the field and the bar alike. */
   overflow: hidden;
-  transition: border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+  transition:
+    border-color var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    box-shadow var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='composer'][data-part='root']:hover:not([data-disabled]),
 [data-scope='composer'][data-part='root']:focus-within {
   border-color: var(--ggarry-border-accent);
+  box-shadow: var(--ggarry-shadow-recessed), var(--ggarry-shadow-sm);
 }
 /* The ring goes round the WHOLE frame, so what is highlighted is the object
    the keyboard is in rather than a rectangle through the middle of it. */
@@ -78,12 +86,20 @@
   inline-size: var(--ggarry-size-control-sm);
   block-size: var(--ggarry-size-control-sm);
   border-radius: var(--ggarry-radius-full);
-  background: var(--ggarry-bg-accent);
+  background: linear-gradient(to bottom, var(--composer-send-top), var(--ggarry-bg-accent));
+  box-shadow: inset 0 1px 0 var(--composer-send-highlight), var(--ggarry-shadow-sm);
   color: var(--ggarry-text-on-accent);
-  transition: background-color var(--ggarry-duration-fast) var(--ggarry-easing-standard);
+  transition:
+    box-shadow var(--ggarry-duration-fast) var(--ggarry-easing-standard),
+    transform var(--ggarry-duration-fast) var(--ggarry-easing-standard);
 }
 [data-scope='composer'][data-part='send']:hover:not(:disabled) {
-  background: var(--ggarry-bg-accent-hover);
+  background: linear-gradient(to bottom, var(--composer-send-hover-top), var(--ggarry-bg-accent-hover));
+}
+[data-scope='composer'][data-part='send']:active:not(:disabled) {
+  background: linear-gradient(to bottom, var(--ggarry-bg-accent), var(--composer-send-top));
+  box-shadow: inset 0 1px 2px color-mix(in oklab, var(--ggarry-border-control) 45%, transparent);
+  transform: translateY(0.5px);
 }
 [data-scope='composer'][data-part='send']:focus-visible {
   outline: var(--ggarry-focus-ring-width) solid var(--ggarry-focus-ring);
@@ -93,11 +109,22 @@
    leaving a hole the eye has to re-find when a character is typed. */
 [data-scope='composer'][data-part='send']:disabled {
   background: var(--ggarry-bg-muted);
+  box-shadow: none;
   color: var(--ggarry-text-muted);
 }
 [data-scope='composer'][data-part='send-icon'] {
   inline-size: 14px;
   block-size: 14px;
+}
+
+[data-mode='dark'] [data-scope='composer'][data-part='root'] {
+  --composer-send-highlight-weight: 14%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode='light']) [data-scope='composer'][data-part='root'] {
+    --composer-send-highlight-weight: 14%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
