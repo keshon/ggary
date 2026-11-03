@@ -2,13 +2,16 @@
 
 **A UI kit for React and Svelte, built around a shared core.**
 
-GGary is a component library for building application interfaces. It provides React 19 and Svelte 5 components backed by the same framework-independent state machines, DOM contracts, and design tokens.
+GGary is a component library for building application interfaces. It provides
+React 19 and Svelte 5 components with shared DOM contracts, design tokens and
+core utilities. Some components use the shared core directly; interaction-heavy
+components also build on Base UI for React and Bits UI for Svelte.
 
 One component model. Two framework adapters. One visual language.
 
 ## Components
 
-114 components covering application interfaces, from basic controls to complex data views.
+Components cover application interfaces, from basic controls to complex data views.
 
 **Actions and inputs**
 Button, ButtonGroup, Input, Select, Combobox, DatePicker, TimePicker, Checkbox, Switch, RadioGroup, Slider, FileDrop and more.
@@ -35,12 +38,11 @@ GGary separates component behaviour from rendering and appearance.
 
 Its visual language uses depth by role. Page content stays flat, controls use
 shallow tactile depth, selection tracks are recessed, and floating surfaces are
-elevated. Motion follows the same hierarchy: controls respond in 120 ms,
-dialogs settle in 200 ms, sheets move from their edge, and no transition moves
-surrounding layout. Depth and motion communicate interaction or layering; they
-are not decorative effects.
+elevated. Motion follows the same hierarchy, with component-specific transitions
+and reduced-motion behavior. Theme tokens and CSS define the actual values.
 
-* **Shared behaviour.** State machines live in a framework-independent core. React and Svelte provide their own rendering adapters.
+* **Shared contracts.** Core utilities and DOM/state contracts keep presentation
+  coherent across adapters. Backend ownership depends on the component.
 * **Explicit DOM contracts.** Components expose `data-scope`, `data-part`, and state attributes. Styling does not depend on generated class names.
 * **Token-based styling.** Components consume design tokens rather than hardcoded visual values.
 * **Intent-based variants.** Component APIs describe what an action means, not how it should look.
@@ -60,52 +62,30 @@ The architecture is designed to keep behaviour consistent across frameworks with
 | `@ggary/structure`    | Structural CSS shared across themes                          |
 | `@ggary/theme-ggarry` | GGarry design tokens and component styles                    |
 
-The React and Svelte packages expose the same component API and component set.
+Use each framework's component examples for its native event/composition API.
+The workspace packages are private development packages, not a published release
+installation contract. See [Using GGary](docs/running.md).
 
-## Development
-
-Clone the repository and install dependencies:
+## Try the components
 
 ```bash
 git clone https://github.com/keshon/ggary.git
 cd ggary
 npm install
-```
-
-Start the sandbox:
-
-```bash
 npm run dev
 ```
 
-Run the checks:
+Open the URL printed by Vite, then `/react.html` or `/svelte.html`. The sandbox
+contains paired examples for each component. See [Using GGary](docs/running.md)
+for React/Svelte imports, theme setup and local package boundaries.
 
-```bash
-npm test
-npm run typecheck
-npm run check:themes
-```
+## Documentation
 
-For tests without a browser:
-
-```bash
-npm run test:fast
-```
-
-Build private distributable candidates and test them in an independent installed app:
-
-```bash
-npm run smoke:react-packages
-npm run smoke:svelte-packages
-```
-
-`npm run build:svelte-packages` creates candidates without running the consumer.
-`npm run verify:svelte` runs the complete Svelte checks and installed-consumer gate.
-Candidates and results are saved under `node_modules/.cache/svelte-release`; these
-commands do not publish packages. Svelte packaging uses `@sveltejs/package` to
-produce JavaScript, preprocessed components and TypeScript declarations.
-
-The test suite covers component behaviour, package contracts, framework conformance, browser behaviour, and theme constraints.
+| Guide | Contents |
+|---|---|
+| [Using GGary](docs/running.md) | Workspace setup, component examples, themes and consumer constraints |
+| [Architecture](docs/architecture.md) | Shared contracts, adapter backends, CSS layers and package boundaries |
+| [Conventions](docs/conventions.md) | Development checks, component changes and candidate package verification |
 
 ## Project status
 
